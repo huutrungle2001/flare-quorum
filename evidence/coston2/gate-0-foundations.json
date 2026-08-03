@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "gate": "0",
   "status": "IN_PROGRESS",
-  "recordedAt": "2026-08-03T20:03:54.962Z",
-  "sourceCommit": "a326fc67dc232162d3b0c78d79d17dac4b4b625c",
+  "recordedAt": "2026-08-03T20:12:51.865Z",
+  "sourceCommit": "d4d726fce8f4c5b27fe7098d9f36b9117d3f833f",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "blockNumber": "33591521",
-    "blockTimestamp": 1785787445
+    "blockNumber": "33591785",
+    "blockTimestamp": 1785787979
   },
   "publicIdentifiers": {
     "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
@@ -42,9 +42,9 @@
     "nextPublicExtensionId": "65922",
     "xrpUsdFeed": {
       "id": "0x015852502f55534400000000000000000000000000",
-      "value": "1079161",
+      "value": "1080554",
       "decimals": 6,
-      "timestamp": 1785787442
+      "timestamp": 1785787978
     },
     "fTestXRP": {
       "address": "0x0b6A3645c240605887a5532109323A3E12273dc7",
@@ -97,6 +97,10 @@
         "matches": true
       },
       {
+        "id": "tee-proxy-source-archive",
+        "matches": true
+      },
+      {
         "id": "tee-machine-manager-abi",
         "matches": true
       },
@@ -141,6 +145,15 @@
         "matches": true
       }
     ],
+    "teeProxyReleaseRecipe": {
+      "dockerfile": "apps/fcc-extension/proxy/Dockerfile",
+      "platform": "linux/amd64",
+      "sourceCommit": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
+      "sourceSha256": "64b74cc37f2e64771244e17ea335d5fc4b5c726b32976b9d548c81c833213984",
+      "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
+      "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
+      "releaseImageDigest": null
+    },
     "configuredMachineCount": 0,
     "productionMachineCount": 0
   },
@@ -162,7 +175,8 @@
     "fAssetsDirectMintingBindingsLive": true,
     "xrpUsdFeedIsLive": true,
     "dockerDaemonAvailable": false,
-    "teeProxyImagesDigestPinned": false,
+    "teeProxyBuildInputsPinned": true,
+    "teeProxyReleaseImageDigestRecorded": false,
     "stableProxyConfigured": false,
     "stableProxyReachable": false,
     "indexerConfigured": true,
@@ -170,13 +184,14 @@
   },
   "blockers": [
     "DOCKER_DAEMON_UNAVAILABLE",
-    "TEE_PROXY_IMAGE_DIGESTS_UNPINNED",
+    "TEE_PROXY_RELEASE_IMAGE_DIGEST_MISSING",
     "STABLE_PROXY_NOT_CONFIGURED",
     "STABLE_PROXY_NOT_REACHABLE",
     "THREE_PRODUCTION_MACHINES_NOT_VERIFIED"
   ],
   "notes": [
-    "The official scaffold main branch is reference-only until its stale tee-node and tee-proxy pins are upgraded in the VeilBid extension.",
+    "The official scaffold main branch is reference-only; VeilBid pins the organizer-directed tee-node module and tee-proxy release recipe independently.",
+    "The tee-proxy build inputs are pinned, but Gate 0 remains incomplete until Docker builds the recipe and the immutable release image digest is recorded.",
     "No RPC URL, deployment key, indexer credential, proxy response, or machine secret is recorded.",
     "Simulated TEE mode is the declared Coston2 judging target; it is not hardware-backed confidentiality."
   ]
