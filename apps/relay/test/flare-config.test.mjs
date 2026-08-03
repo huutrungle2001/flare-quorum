@@ -17,6 +17,9 @@ test("Flare relay reads explicit Coston2 config without Sepolia fallback", () =>
   assert.equal(config.deploymentBlock, 33_590_000n);
   assert.equal(config.deploymentStatus, "planned");
   assert.equal(config.signerPrivateKey, null);
+  assert.deepEqual(config.fccProxyUrls, []);
+  assert.equal(config.fccExtensionVersion, null);
+  assert.equal(config.fccInstructionFeeWei, null);
 });
 
 test("Flare relay fails closed when market or deployment metadata is missing", () => {
@@ -42,4 +45,46 @@ test("Flare write modes require a verified release and a dedicated signer", () =
     }),
     (error) => error instanceof FlareRelayConfigError && error.code === "unverified-flare-deployment-write-disabled",
   );
+});
+
+test("Flare write modes require three secure FCC proxies, version, and fee", () => {
+  const verified = {
+    ...baseEnv,
+    FLARE_DEPLOYMENT_STATUS: "verified",
+    FLARE_FINALIZER_PRIVATE_KEY: `0x${"11".repeat(32)}`,
+  };
+  assert.throws(
+    () => loadFlareRelayConfig("once", verified),
+    (error) => error instanceof FlareRelayConfigError && error.code === "missing-fcc-proxy-set",
+  );
+  assert.throws(
+    () => loadFlareRelayConfig("once", {
+      ...verified,
+      FLARE_FCC_PROXY_URLS: "http://public.example,http://second.example,http://third.example",
+    }),
+    (error) => error instanceof FlareRelayConfigError && error.code === "insecure-fcc-proxy-url",
+  );
+  const withProxies = {
+    ...verified,
+    FLARE_FCC_PROXY_URLS: "https://one.example,https://two.example/base/,https://three.example",
+  };
+  assert.throws(
+    () => loadFlareRelayConfig("once", withProxies),
+    (error) => error instanceof FlareRelayConfigError && error.code === "missing-fcc-extension-version",
+  );
+  assert.throws(
+    () => loadFlareRelayConfig("once", { ...withProxies, FLARE_FCC_EXTENSION_VERSION: "0.2.0" }),
+    (error) => error instanceof FlareRelayConfigError && error.code === "missing-fcc-instruction-fee",
+  );
+  const config = loadFlareRelayConfig("once", {
+    ...withProxies,
+    FLARE_FCC_EXTENSION_VERSION: "0.2.0",
+    FLARE_FCC_INSTRUCTION_FEE_WEI: "1000000",
+  });
+  assert.deepEqual(config.fccProxyUrls, [
+    "https://one.example",
+    "https://two.example/base",
+    "https://three.example",
+  ]);
+  assert.equal(config.fccInstructionFeeWei, 1_000_000n);
 });

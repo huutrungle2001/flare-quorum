@@ -9,6 +9,44 @@ export interface FlareRelayConfig {
   deploymentBlock: bigint;
   deploymentStatus: "planned" | "verified";
   signerPrivateKey: Hex | null;
+  fccProxyUrls: readonly string[];
+  fccExtensionVersion: string | null;
+  fccInstructionFeeWei: bigint | null;
+}
+
+function proxyUrl(value: string): string {
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new FlareRelayConfigError("invalid-fcc-proxy-url");
+  }
+  if (parsed.username || parsed.password || parsed.search || parsed.hash) {
+    throw new FlareRelayConfigError("invalid-fcc-proxy-url");
+  }
+  const loopback = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1" || parsed.hostname === "[::1]";
+  if (parsed.protocol !== "https:" && !(parsed.protocol === "http:" && loopback)) {
+    throw new FlareRelayConfigError("insecure-fcc-proxy-url");
+  }
+  parsed.pathname = parsed.pathname.replace(/\/+$/, "");
+  return parsed.toString().replace(/\/$/, "");
+}
+
+function loadProxyUrls(value: string | undefined): readonly string[] {
+  if (value === undefined || value.trim() === "") return [];
+  const urls = value.split(",").map((item) => proxyUrl(item.trim()));
+  if (urls.length !== 3 || new Set(urls).size !== urls.length) {
+    throw new FlareRelayConfigError("invalid-fcc-proxy-set");
+  }
+  return urls;
+}
+
+function positiveBigint(value: string | undefined, code: string): bigint | null {
+  if (value === undefined || value.trim() === "") return null;
+  if (!/^[0-9]+$/.test(value)) throw new FlareRelayConfigError(code);
+  const parsed = BigInt(value);
+  if (parsed <= 0n) throw new FlareRelayConfigError(code);
+  return parsed;
 }
 
 export class FlareRelayConfigError extends Error {
@@ -48,11 +86,26 @@ export function loadFlareRelayConfig(
     throw new FlareRelayConfigError("invalid-flare-deployment-status");
   }
   const signerPrivateKey = signerKey(env.FLARE_FINALIZER_PRIVATE_KEY);
+  const fccProxyUrls = loadProxyUrls(env.FLARE_FCC_PROXY_URLS);
+  const fccExtensionVersion = env.FLARE_FCC_EXTENSION_VERSION?.trim() || null;
+  const fccInstructionFeeWei = positiveBigint(
+    env.FLARE_FCC_INSTRUCTION_FEE_WEI,
+    "invalid-fcc-instruction-fee",
+  );
   if ((mode === "once" || mode === "poll") && signerPrivateKey === null) {
     throw new FlareRelayConfigError("missing-flare-finalizer-private-key");
   }
   if ((mode === "once" || mode === "poll") && deploymentStatus !== "verified") {
     throw new FlareRelayConfigError("unverified-flare-deployment-write-disabled");
+  }
+  if ((mode === "once" || mode === "poll") && fccProxyUrls.length !== 3) {
+    throw new FlareRelayConfigError("missing-fcc-proxy-set");
+  }
+  if ((mode === "once" || mode === "poll") && fccExtensionVersion === null) {
+    throw new FlareRelayConfigError("missing-fcc-extension-version");
+  }
+  if ((mode === "once" || mode === "poll") && fccInstructionFeeWei === null) {
+    throw new FlareRelayConfigError("missing-fcc-instruction-fee");
   }
   return {
     mode,
@@ -61,5 +114,8 @@ export function loadFlareRelayConfig(
     deploymentBlock: BigInt(deploymentBlock),
     deploymentStatus,
     signerPrivateKey,
+    fccProxyUrls,
+    fccExtensionVersion,
+    fccInstructionFeeWei,
   };
 }
