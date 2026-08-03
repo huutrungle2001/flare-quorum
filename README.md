@@ -165,6 +165,8 @@ only after a verified Coston2 release exists.
 
 ## Documentation
 
+- [Original Hackathon Brief](docs/original.md)
+- [Competition Requirements and Judging Map](docs/hackathon-brief.md)
 - [User Guide](docs/user-guide.md)
 - [Championship Execution Plan](PLAN.md)
 - [Architecture Decisions](docs/architecture-decisions.md)

@@ -157,6 +157,8 @@ Rules:
 | Historical Nox release | `packages/contracts`, `packages/chain-bindings`, `evidence/sepolia` |
 | Product/security/deployment truth | root docs and `docs/` |
 | Execution sequence and phase status | `PLAN.md` |
+| Supplied competition source | `docs/original.md` |
+| Competition checklist/judging mapping | `docs/hackathon-brief.md` |
 
 ## 5. Root orchestration
 

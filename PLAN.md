@@ -8,6 +8,10 @@
 > to maximize usefulness, Flare depth, technical credibility, clarity, and
 > evidence of new work.
 
+The supplied competition requirements are preserved in
+[`docs/original.md`](docs/original.md) and translated into submission gates in
+[`docs/hackathon-brief.md`](docs/hackathon-brief.md).
+
 ## 1. Championship product
 
 **Product:** VeilBid Flare
