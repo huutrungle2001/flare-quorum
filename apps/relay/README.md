@@ -19,6 +19,16 @@ Structured results contain only the action kind, public tender ID, outcome,
 public transaction hash, and an allowlisted reason code. Handles, proofs,
 private keys, plaintext bids, balances, and raw provider errors are excluded.
 
+## Coston2 boundary
+
+The relay package also exposes an isolated `FlareLiveRelay` health reader and
+`loadFlareRelayConfig` for the planned Coston2 market. It requires explicit
+`COSTON2_RPC_URL`, market address, deployment block, and deployment status; it
+never falls back to the Sepolia manifest. Flare write modes fail closed until a
+`verified` Coston2 release and a dedicated finalizer account are configured.
+The close/request/result/finalize Flare write path remains disabled until the
+registered FCC result provider and release manifest exist.
+
 ## Commands
 
 Build first, then load the root `.env.local`:
