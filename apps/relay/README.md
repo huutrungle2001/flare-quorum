@@ -1,8 +1,8 @@
 # Settlement Relay
 
-> Historical runtime note: the implemented relay currently targets the
-> Sepolia/Nox baseline. A separate Coston2/FCC lifecycle will replace the judge
-> path after it is implemented and verified.
+> Release boundary: `cli.js` retains the historical Sepolia/Nox runner.
+> `flare-cli.js` is the isolated Coston2/FCC runner and never reads or falls
+> back to the Sepolia manifest.
 
 Stateless, permissionless funding confirmation, close, and public-proof/finalize
 automation, including the proof-derived zero-winner refund outcome. It uses public chain state only
@@ -21,13 +21,20 @@ private keys, plaintext bids, balances, and raw provider errors are excluded.
 
 ## Coston2 boundary
 
-The relay package also exposes an isolated `FlareLiveRelay` health reader and
-`loadFlareRelayConfig` for the planned Coston2 market. It requires explicit
-`COSTON2_RPC_URL`, market address, deployment block, and deployment status; it
-never falls back to the Sepolia manifest. Flare write modes fail closed until a
-`verified` Coston2 release and a dedicated finalizer account are configured.
-The close/request/result/finalize Flare write path remains disabled until the
-registered FCC result provider and release manifest exist.
+The Coston2 runner reads canonical tender state and plans `close`, `request`,
+expired-attempt `retry`, and `finalize` actions. It simulates every write,
+submits sequentially under a bounded action budget, and waits for a successful
+receipt. Finalization polls three distinct HTTPS FCC proxy URLs, validates the
+pinned `ActionResponse` schema and `TEE_ACTION_RESULT` signature domain, and
+requires two distinct tender-fixed TEE identities to sign identical canonical
+selection bytes. Unavailable, malformed, split, expired, or weak responses
+remain pending; there is no synthetic result or success fallback.
+
+Write modes require an explicit verified Coston2 deployment, dedicated
+finalizer key, three public proxy URLs, extension semantic version, and current
+FCC instruction fee. URLs with credentials, query strings, fragments, or
+non-TLS public transport are rejected. The finalizer has no bid-decryption
+capability and raw proxy bodies are bounded and never logged.
 
 ## Commands
 
@@ -39,7 +46,31 @@ node --env-file-if-exists=.env.local apps/relay/dist/cli.js dry-run
 node --env-file-if-exists=.env.local apps/relay/dist/cli.js health
 node --env-file-if-exists=.env.local apps/relay/dist/cli.js once
 node --env-file-if-exists=.env.local apps/relay/dist/cli.js poll
+
+# Coston2/FCC lifecycle
+pnpm flare:relay:health
+pnpm flare:relay:dry-run
+pnpm flare:relay:once
+pnpm flare:relay:poll
 ```
+
+The Coston2 commands use:
+
+```text
+COSTON2_RPC_URL
+FLARE_MARKET_ADDRESS
+FLARE_MARKET_DEPLOYMENT_BLOCK
+FLARE_DEPLOYMENT_STATUS=verified
+FLARE_FINALIZER_PRIVATE_KEY             # write modes only
+FLARE_FCC_PROXY_URLS                    # exactly three comma-separated URLs
+FLARE_FCC_EXTENSION_VERSION
+FLARE_FCC_INSTRUCTION_FEE_WEI
+FLARE_ACTION_BUDGET                     # 1 by default, maximum 100
+```
+
+`health` and `dry-run` remain read-only. `once` and `poll` are intentionally
+disabled while the release status is `planned`; local tests do not override
+this production gate.
 
 `dry-run` and `health` require only `SEPOLIA_RPC_URL`. `once` and `poll`
 require a dedicated gas-funded `FINALIZER_PRIVATE_KEY`. Runtime consumers use

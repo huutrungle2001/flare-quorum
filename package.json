@@ -67,6 +67,10 @@
     "flare:foundations:check": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs",
     "flare:foundations:collect": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write",
     "flare:gate:0": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write --require-complete",
-    "flare:verify:foundation": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/verify-flare-foundation-sender.mjs"
+    "flare:verify:foundation": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/verify-flare-foundation-sender.mjs",
+    "flare:relay:health": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js health",
+    "flare:relay:dry-run": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js dry-run",
+    "flare:relay:once": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js once",
+    "flare:relay:poll": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js poll"
   }
 }
