@@ -1,7 +1,7 @@
 # Flare Summer Signal — VeilBid Competition Brief
 
 > Derived from the project-owner-supplied
-> [`original.md`](original.md). This file converts the supplied competition text
+> [`original/hackathon-brief.md`](original/hackathon-brief.md). This file converts the supplied competition text
 > into release requirements. Dates and prize figures are retained for reference,
 > but the engineering plan is gate-driven and does not depend on the deadline.
 

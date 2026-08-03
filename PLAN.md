@@ -9,7 +9,7 @@
 > evidence of new work.
 
 The supplied competition requirements are preserved in
-[`docs/original.md`](docs/original.md) and translated into submission gates in
+[`docs/original/hackathon-brief.md`](docs/original/hackathon-brief.md) and translated into submission gates in
 [`docs/hackathon-brief.md`](docs/hackathon-brief.md).
 
 ## 1. Championship product
@@ -87,6 +87,11 @@ All open design questions are resolved in
   available for one extension.
 - [ ] Confirm real confidential hardware versus simulated TEE judge policy.
 - [ ] Pin the official FCC scaffold commit and all container digests.
+- [ ] Apply [`docs/fcc-coston2-operations.md`](docs/fcc-coston2-operations.md):
+  resolve live `FlareTeeManager`, enforce the organizer minimum TEE/proxy
+  revisions, use a fresh extension ID and `rRap`, and reach machine status `2`.
+- [ ] Obtain current indexer credentials and a named Cloudflare Tunnel or
+  reserved ngrok domain; quick-tunnel URLs are forbidden for registration.
 - [ ] Pin Go, Foundry, Solidity, Node, pnpm, viem, and Flare periphery versions.
 - [ ] Record official Coston2 registry, FCC, FAssets, FTSO, and Smart Account
   discovery paths without hardcoding undocumented addresses.

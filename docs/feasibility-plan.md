@@ -21,7 +21,13 @@ Prove:
 - official FCC scaffold and example commit are reachable and pinned;
 - exact Go, Foundry, Solidity, Docker, Node, pnpm, and Flare dependency versions;
 - Coston2 registry/FCC configuration is resolved from supported sources;
-- proxy/indexer access and an HTTPS endpoint are available;
+- live `FlareTeeManager` bytecode/interface matches the pinned official
+  configuration (the supplied redeploy bulletin currently reports
+  `0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE`);
+- tested `tee-node >= v0.0.22` and organizer-supported `tee-proxy` revisions;
+- current indexer access and a stable named HTTPS endpoint are available;
+- a fresh extension/machine registration uses `rRap`, the on-chain URL matches
+  `EXT_PROXY_URL`, and machine status reaches `2` (`PRODUCTION`);
 - confidential/simulated TEE mode is explicitly identified;
 - at least three registered machines can serve one extension, or the exact
   organizer infrastructure limit is recorded;
@@ -29,7 +35,8 @@ Prove:
   verifier, and DA paths are discoverable.
 
 Kill condition: a mandatory service is unavailable or depends on undocumented,
-unverifiable addresses/credentials.
+unverifiable addresses/credentials, or the registration preflight in
+[`fcc-coston2-operations.md`](fcc-coston2-operations.md) does not pass.
 
 ## 3. Gate A — registered FCC result
 

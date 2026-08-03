@@ -24,21 +24,22 @@ Never relabel its addresses, tests, evidence, or UI as a Flare implementation.
 Read these files before making changes:
 
 1. `README.md`
-2. `docs/original.md`
+2. `docs/original/README.md` and its supplied source materials.
 3. `docs/hackathon-brief.md`
-4. `docs/user-guide.md`
-5. `docs/deployment.md`
-6. `docs/product-plan.md`
-7. `docs/feasibility-plan.md`
-8. `docs/build-plan.md`
-9. `docs/architecture.md`
-10. `docs/contract-spec.md`
-11. `docs/threat-model.md`
-12. `docs/verification.md`
-13. `docs/repository-layout.md`
-14. `docs/architecture-decisions.md`
-15. `PLAN.md`
-16. `DESIGNS.md` for user-interface changes.
+4. `docs/fcc-coston2-operations.md`
+5. `docs/user-guide.md`
+6. `docs/deployment.md`
+7. `docs/product-plan.md`
+8. `docs/feasibility-plan.md`
+9. `docs/build-plan.md`
+10. `docs/architecture.md`
+11. `docs/contract-spec.md`
+12. `docs/threat-model.md`
+13. `docs/verification.md`
+14. `docs/repository-layout.md`
+15. `docs/architecture-decisions.md`
+16. `PLAN.md`
+17. `DESIGNS.md` for user-interface changes.
 
 ## 3. Source priority
 

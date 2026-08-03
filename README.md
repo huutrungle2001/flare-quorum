@@ -165,8 +165,9 @@ only after a verified Coston2 release exists.
 
 ## Documentation
 
-- [Original Hackathon Brief](docs/original.md)
+- [Original Source Materials](docs/original/README.md)
 - [Competition Requirements and Judging Map](docs/hackathon-brief.md)
+- [FCC Coston2 Operational Baseline](docs/fcc-coston2-operations.md)
 - [User Guide](docs/user-guide.md)
 - [Championship Execution Plan](PLAN.md)
 - [Architecture Decisions](docs/architecture-decisions.md)

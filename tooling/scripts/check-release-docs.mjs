@@ -30,8 +30,11 @@ const requiredFiles = [
   "PLAN.md",
   "SECURITY.md",
   "feedback.md",
-  "docs/original.md",
+  "docs/original/README.md",
+  "docs/original/hackathon-brief.md",
+  "docs/original/fcc-coston2-redeploy-message.md",
   "docs/hackathon-brief.md",
+  "docs/fcc-coston2-operations.md",
   "docs/user-guide.md",
   "docs/deployment.md",
   "docs/product-plan.md",
@@ -72,8 +75,9 @@ assert.match(readme, /sepolia\.release\.json/);
 assert.match(readme, /multi-criteria offers to a fixed Flare TEE quorum/i);
 assert.match(readme, /2-of-3/i);
 assert.match(readme, /PLAN\.md/);
-assert.match(readme, /docs\/original\.md/);
+assert.match(readme, /docs\/original\/README\.md/);
 assert.match(readme, /docs\/hackathon-brief\.md/);
+assert.match(readme, /docs\/fcc-coston2-operations\.md/);
 
 const plannedFlareManifest = resolve(
   repositoryRoot,
@@ -98,7 +102,6 @@ const forbidden = [
   /\[DEMO_VIDEO_URL\]/,
   /Waiting for approval/,
   /docs\/demo-and-submission\.md/,
-  /docs\/original\//,
   /settlement-relay\.yml/,
 ];
 

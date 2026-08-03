@@ -3,6 +3,10 @@
 > Status: target workflow; no canonical Coston2 release exists. Current scripts
 > deploy only the historical Sepolia/Nox baseline.
 
+FCC registration and proxy operations must also satisfy the current
+[`FCC Coston2 Operational Baseline`](fcc-coston2-operations.md), derived from
+the preserved organizer-group redeploy bulletin and official scaffold sources.
+
 ## 1. Release separation
 
 | Release | Canonical authority | Status |
@@ -27,10 +31,17 @@ Record in a committed public dependency manifest:
   AssetManager discovery source;
 - availability of three registered TEE identities for one extension and their
   supported sealed-state recovery mechanism.
+- live `FlareTeeManager` resolution, deployed bytecode/interface match, fresh
+  extension/machine registration, and machine status `2` (`PRODUCTION`);
+- tested `tee-node >= v0.0.22` plus organizer-supported `tee-proxy` revision;
+- current indexer credentials and a stable named HTTPS proxy origin.
 
 Do not hardcode an address copied from prose when an official registry or
 configuration source exists. A drift check must compare any temporary local FCC
-interface with the pinned official source.
+interface with the pinned official source. The supplied 2026-08-03 bulletin and
+current official scaffold configuration agree on manager
+`0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE`, but deployment tooling must
+resolve and verify it rather than hardcode it.
 
 ## 3. Local configuration policy
 
@@ -41,6 +52,7 @@ not a ready configuration:
 COSTON2_RPC_URL=https://coston2-api.flare.network/ext/C/rpc
 FLARE_DEPLOYMENT_PRIVATE_KEY=0x...
 FCC_PROXY_URL=https://...
+FLARE_TEE_MANAGER=0x...
 FCC_INDEXER_HOST=...
 FCC_INDEXER_USER=...
 FCC_INDEXER_PASSWORD=...
@@ -63,6 +75,8 @@ No production market deployment starts before Gates 0–E pass:
    `packages/flare-contracts` as a separate Foundry workspace.
 2. Register the minimal extension/code version and verify one correctly
    domain-separated Coston2 result on-chain.
+   Registration uses a fresh `EXTENSION_ID`, current manager/configuration,
+   `register-tee -command rRap`, a stable named tunnel, and status `2`.
 3. Prove authenticated private bid ingress, body-log exclusion, one signed
    receipt, sealed persistence, and ordered-root validation.
 4. Register/select three compatible machines and prove common receipt quorum,
