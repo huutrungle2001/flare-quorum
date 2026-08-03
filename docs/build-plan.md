@@ -36,7 +36,7 @@ stack.
 - [x] Select Confidential Compute Apps as the primary bounty.
 - [x] Define the public/private boundary for public FXRP settlement.
 - [x] Define source priority, gates, target architecture, and evidence policy.
-- [ ] Publish the transition commit to the private Summer Signal repository.
+- [x] Publish the transition commit to the private Summer Signal repository.
 
 ### Milestone 1 — FCC feasibility
 
