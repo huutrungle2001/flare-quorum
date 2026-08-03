@@ -145,7 +145,16 @@ Every workflow labels data as one of:
 - **RPC/indexer/relay unavailable:** recover from canonical chain state with
   another provider/runner; never load sample success data.
 
-## 9. Historical application
+## 9. Read-only operator inspection
+
+Run `pnpm flare:mcp` only with explicit Coston2 market address, deployment
+block, deployment status, and RPC configuration. Its four public tools list
+tenders, inspect a tender, inspect the frozen FCC/FTSO selection envelope, and
+inspect runtime/immutable protocol bindings. Every read is pinned to the same
+12-block-finalized checkpoint; the console has no signer, writer, decryption
+path, raw FCC response output, or Sepolia fallback.
+
+## 10. Historical application
 
 The existing Sepolia UI, Safe flow, Nox computation, ERC-7984 settlement, and
 evidence remain useful regression material. They are not the Coston2 judge path

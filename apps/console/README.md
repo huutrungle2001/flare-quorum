@@ -1,23 +1,45 @@
 # Operator Console
 
-> Historical runtime note: the implemented tools inspect the Sepolia/Nox
-> baseline. Planned Flare inspection must use generated Coston2 bindings and
-> cannot claim support until those tools are implemented.
+The console exposes two strictly isolated, read-only MCP servers:
 
-Local procurement queries and optional MCP stdio tools. Public reads are the
-only implemented policy. The service returns public tender terms, lifecycle
-readiness, settlement/receipt evidence, and per-bid viewer checks without
-returning encrypted handles or requesting decryption.
+- `pnpm mcp` inspects the historical verified Sepolia/Nox baseline;
+- `pnpm flare:mcp` inspects only an explicitly configured Coston2 market.
 
-## MCP stdio
+Neither server has a signer, transaction writer, bid-decryption capability, or
+success fallback. Tool errors expose allowlisted codes instead of raw RPC
+responses.
 
-After building, start the local server with:
+## Coston2 MCP
 
-```bash
-pnpm mcp
+The Flare server requires all four public configuration values:
+
+```dotenv
+COSTON2_RPC_URL=https://coston2-api.flare.network/ext/C/rpc
+FLARE_MARKET_ADDRESS=0x...
+FLARE_MARKET_DEPLOYMENT_BLOCK=...
+FLARE_DEPLOYMENT_STATUS=planned
 ```
 
-It exposes exactly five tools:
+It refuses missing metadata, another chain, absent bytecode, and a deployment
+block that has not reached the 12-block read finality boundary. Public tender
+state and award logs are both read at the same finalized block.
+
+The four tools are:
+
+- `list_flare_tenders`
+- `get_flare_tender`
+- `inspect_flare_selection`
+- `inspect_flare_protocol_binding`
+
+They return public roots, quorum bitmap, extension/code/machine fingerprints,
+FTSO snapshot, request/retry facts, award facts, runtime code hash, immutable
+Flare dependencies, and threshold constants. They never return bid plaintext,
+ciphertext, raw FCC response bodies, signatures, credentials, or secret
+configuration.
+
+## Historical MCP
+
+The Sepolia server exposes:
 
 - `list_tenders`
 - `get_tender`
@@ -25,6 +47,4 @@ It exposes exactly five tools:
 - `inspect_settlement_evidence`
 - `inspect_bid_viewer`
 
-All inputs use strict schemas. Tool errors return allowlisted codes rather than
-raw RPC messages. Standard output is reserved for MCP JSON-RPC; the server has
-no signer, transaction, or private-decryption implementation.
+Its data must never be presented as the Coston2 judge lifecycle.

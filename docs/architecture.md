@@ -230,7 +230,8 @@ escrow, or bypass settlement verification.
 - **Web:** XRP Buyer, EVM Buyer, Vendor, Public, Activity, Evidence, and
   redemption journeys.
 - **Relay:** public close/request/result aggregation/finalize only.
-- **Console:** read-only contract, FCC, FTSO, FAssets, and evidence inspection.
+- **Console:** isolated read-only Coston2 contract/FCC/FTSO inspection at one
+  finalized checkpoint; FAssets/FDC inspection remains pending its live gate.
 - **FCC extension:** private ingress, sealed state, deterministic scoring, and
   minimum signed result.
 

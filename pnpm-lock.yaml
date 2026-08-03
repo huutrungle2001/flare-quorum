@@ -27,6 +27,9 @@ importers:
       '@veilbid/chain-bindings':
         specifier: workspace:*
         version: link:../../packages/chain-bindings
+      '@veilbid/flare-bindings':
+        specifier: workspace:*
+        version: link:../../packages/flare-bindings
       viem:
         specifier: 2.47.6
         version: 2.47.6(typescript@5.9.3)(zod@4.4.3)

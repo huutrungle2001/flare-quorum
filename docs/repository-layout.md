@@ -100,9 +100,11 @@ winner logic.
 
 ### `apps/console`
 
-Read-only public inspection. New tools may inspect extension identity, code
-version, result binding, Flare settlement, and evidence, but never decrypt bids
-or sign writes.
+Read-only public inspection with separate Sepolia and Coston2 MCP entry points.
+The Flare tools inspect finalized tender state, extension/code/machine binding,
+quorum/root, FTSO snapshot, selection/award facts, runtime code hash, immutable
+dependencies, and threshold constants. They cannot decrypt bids, return raw FCC
+responses, sign, or write transactions.
 
 ### Historical baseline workspaces
 

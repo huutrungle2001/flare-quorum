@@ -8,11 +8,13 @@
     "build": "tsc -p tsconfig.json",
     "lint": "tsc --noEmit",
     "mcp": "node dist/mcp-stdio.js",
+    "mcp:flare": "node dist/flare-mcp-stdio.js",
     "test": "pnpm build && node --test test/*.test.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
     "@veilbid/chain-bindings": "workspace:*",
+    "@veilbid/flare-bindings": "workspace:*",
     "viem": "2.47.6",
     "zod": "4.4.3"
   },
