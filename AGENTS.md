@@ -110,8 +110,17 @@ Sepolia evidence to satisfy a Coston2 acceptance criterion.
 - Record what existed before Summer Signal and what was newly built during it.
 - Update canonical docs when architecture, privacy, deployment, verification,
   or selected-bounty status changes.
-- After completing and validating a requested change, create one or more small,
-  logically scoped Git commits unless the user explicitly requests otherwise.
+- Keep changes easy to review: after each small, logically complete change has
+  passed its proportional validation, create a focused Git commit unless the
+  user explicitly requests otherwise.
+- Push the resulting validated commits to the current branch's configured
+  remote after completing the requested task or a stable group of changes.
+  Immediate per-commit pushes are not required, and the user may request that
+  commits remain local.
+- Never combine unrelated work merely to reduce the number of commits, and
+  never push failing, incomplete, secret-bearing, or unreviewed release-facing
+  work. If authentication, network access, or upstream configuration blocks a
+  push, keep the validated commit locally and report the exact blocker.
 
 ## 7. Validation
 
