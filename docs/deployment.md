@@ -30,6 +30,17 @@ Collect sanitized evidence with `pnpm flare:foundations:collect`. The stricter
 `pnpm flare:gate:0` command fails until every external registration prerequisite
 also passes; an `IN_PROGRESS` evidence file is not a release gate pass.
 
+The deployed-but-unregistered Gate-A sender is independently reproducible with:
+
+```bash
+pnpm flare:verify:foundation
+```
+
+The verifier recompiles the artifact, fills the recorded live-manager
+immutables, checks the deployment transaction and both registry getters, and
+requires the exact runtime hash. Success still reports
+`VERIFIED_DEPLOYED_UNREGISTERED`; it does not claim an FCC result.
+
 Record in a committed public dependency manifest:
 
 - official FCC scaffold commit, Go version, Docker image digests, public

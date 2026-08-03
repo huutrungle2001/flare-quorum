@@ -66,6 +66,7 @@
     "verify:deployment:test": "pnpm --filter @veilbid/auction-house verify:deployment:test",
     "flare:foundations:check": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs",
     "flare:foundations:collect": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write",
-    "flare:gate:0": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write --require-complete"
+    "flare:gate:0": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write --require-complete",
+    "flare:verify:foundation": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/verify-flare-foundation-sender.mjs"
   }
 }
