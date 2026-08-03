@@ -1,189 +1,202 @@
-# VeilBid Flare Product Plan
+# VeilBid Flare Championship Product Plan
 
-> Status: Approved direction; implementation and Coston2 verification pending.
+> Status: Product and architecture direction approved; implementation and live
+> Coston2 verification have not started.
 
 ## 1. Product identity
 
 - Name: VeilBid Flare
 - Tagline: Confidential Procurement for XRP and Flare Treasuries
 - Primary bounty: Confidential Compute Apps
-- Conditional secondary bounty: Interoperable Asset Products
+- Secondary bounty target: Interoperable Asset Products
 - Development network: Flare Testnet Coston2 (`114`)
-- Core integration: Flare Confidential Compute (FCC)
-- Economic integration target: FAssets/FTestXRP/FXRP
+- Settlement asset: official FTestXRP on Coston2; FXRP on Flare Mainnet roadmap
+- Confidential compute: Flare Compute Extension with a target 2-of-3 TEE result
+  threshold
 
-## 2. Problem
+## 2. Product thesis
 
-Procurement buyers need public rules and accountable awards, while vendors need
-commercial offers protected from competitors. Public bids leak information;
-private servers make the operator the unreviewable decision maker.
+XRP treasuries can hold and transfer value globally but do not have a native,
+credible procurement workflow. Public offers leak vendor strategy; a private
+server hides offers but asks participants to trust the operator's winner.
 
-VeilBid lets vendors encrypt offers to an attested TEE. A reproducible Flare
-Compute Extension evaluates the public rule privately and returns a minimally
-disclosed, signed result. A Flare contract verifies the result before it can
-change canonical tender or escrow state.
+VeilBid Flare lets an XRP user fund a tender through a Flare Smart Account,
+keeps vendor proposals inside attested TEEs, evaluates a public deterministic
+multi-criteria rule, and settles an XRP-backed asset only after a threshold of
+registered machines agrees on the result.
 
-## 3. Target users
+## 3. Users
 
-Primary users:
+Primary:
 
-- XRP-native businesses, DAOs, and treasury operators purchasing services.
-- Flare ecosystem teams running vendor or grant procurement.
-- Vendors that do not want losing commercial terms published.
+- XRP-native companies and treasury operators buying services.
+- Flare DAOs, grants teams, and ecosystem operations teams.
+- Vendors protecting losing prices, delivery commitments, and qualifications.
 
-Secondary users:
+Secondary:
 
-- Auditors reviewing rule, code-version, result, and settlement evidence.
-- Permissionless finalizers maintaining lifecycle progress.
-- XRPL users interacting through Flare Smart Accounts in the extended release.
+- Auditors verifying public rules, machine/code policy, result binding, and
+  settlement.
+- Permissionless finalizers maintaining asynchronous lifecycle progress.
+- Ecosystem integrators reusing the procurement contract or result schema.
 
-## 4. Value proposition
+## 4. Flagship journey
 
-> A buyer can run a publicly governed tender funded with an interoperable XRP
-> asset while a Flare TEE privately evaluates vendor offers and the contract
-> accepts only the signed result of the agreed computation.
+1. An XRPL user derives its Flare PersonalAccount and current nonce.
+2. The buyer signs an XRPL payment whose `0xFE` memo commits to a
+   `PackedUserOperation` containing FTestXRP approval plus tender creation.
+3. FDC proves the XRPL payment; `executeDirectMintingWithData` mints FTestXRP and
+   atomically executes the user operation from the PersonalAccount.
+4. The tender freezes public rules, credential issuers, three registered TEE
+   identities/key fingerprints, and a 2-of-3 result threshold.
+5. Each vendor ECIES-encrypts a canonical bid to the selected TEEs through
+   private ingress. TEEs return signed receipts; only salted commitments and
+   receipt signatures reach the chain.
+6. The contract preserves a common machine quorum across every accepted bid and
+   builds an ordered root.
+7. Close captures the official XRP/USD FTSO snapshot.
+8. TEEs validate credentials, normalize XRP/USD prices, apply the public
+   price/delivery/warranty penalty, and sign a minimum result.
+9. Anyone finalizes after two distinct registered machines sign the same digest.
+10. Winner receives public FTestXRP payout; buyer receives public remainder, or
+    a zero winner returns full escrow.
+11. Winner can use the official FAssets redemption path to native XRP.
 
-## 5. Release tiers
+## 5. Mandatory championship scope
 
-### Tier 1 — mandatory confidential-compute product
+### Confidential procurement
 
-- Coston2 tender contract and public lifecycle.
-- Buyer escrow in one supported test asset.
-- One to eight public approved vendor addresses.
-- ECIES-encrypted immutable bid packages.
-- FCC extension for nonzero/ceiling eligibility and deterministic minimum.
-- Result signature verification against a registered TEE identity.
-- Winner and winning settlement amount public at finalization.
-- Full refund if no bid satisfies the encrypted rule.
-- Wallet-free explorer and permissionless recovery.
+- One to eight public approved vendors.
+- Private bid ingress; no permanent ciphertext publication.
+- Fixed schema with XRP/USD price, delivery, warranty, and signed credentials.
+- Threshold TEE receipts before canonical bid acceptance.
+- Ordered commitment root and first-accepted exact-tie rule.
+- Deterministic eligibility and weighted scoring.
+- 2-of-3 matching TEE result signatures.
 
-### Tier 2 — meaningful interoperable asset product
+### XRP interoperability
 
-- FTestXRP escrow and payout on Coston2.
-- FXRP discovery through the official Flare contract registry.
-- User-visible mint/fund or redemption journey tied to procurement.
-- FDC-backed proof of relevant XRPL payment/redemption state where the
-  application itself needs that proof.
+- Official FTestXRP discovery and exact escrow.
+- XRP-native Smart Account `0xFE` mint-and-fund journey.
+- FDC `XRPPayment` proof in the direct-mint execution path.
+- XRP/USD FTSO close snapshot for currency normalization.
+- Winner payout and buyer remainder/refund in FTestXRP.
+- Guided official redemption from FXRP/FTestXRP flow to XRP where supported.
 
-Only after Tier 2 passes may the project select the Interoperable Asset Products
-bounty.
+### Product and evidence
 
-### Tier 3 — differentiation
+- Wallet-free public Coston2 explorer.
+- Buyer, Vendor, Public Finalizer, Activity, and Evidence workspaces.
+- Stateless result/finalization relay.
+- Extension ID, code version, machine identities, quorum, rules, FTSO snapshot,
+  result digest, settlement, and receipt evidence.
+- Responsive, keyboard-operable, explicit unavailable/recovery states.
+- User interviews, vendor usability tests, and at least one pilot/design partner
+  target before submission.
 
-- Confidential multi-criteria scoring under a public rules hash.
-- FTSOv2 close-time price snapshot for approved multi-currency normalization.
-- Milestone settlement using an FDC Payment or Web2Json proof.
-- XRP-native tender actions through Flare Smart Accounts.
-- Threshold result approval across multiple registered TEE identities.
+## 6. Development-only vertical slice
 
-## 6. Public and private data
+A 1-of-1, price-only, generic-token lifecycle is permitted only to validate FCC
+transport, signature, and recovery. It must never become the final judge path or
+be described as the complete product.
+
+## 7. Public and confidential data
 
 | Data | Visibility |
 |---|---|
-| Tender ID, buyer, metadata hash/URI, ceiling, deadline | Public |
-| Approved vendor and submitting vendor addresses | Public |
-| Rule hash and supported extension/code version | Public |
-| Encrypted bid payload or payload reference | Public ciphertext; never evidence content |
-| Bid commitment and ordered bid root | Public |
-| Price, delivery, qualification, and scoring inputs | Private inside the TEE |
-| Eligibility and comparison intermediates | Private inside the TEE |
-| Signed result envelope | Public minimum disclosure |
-| Winner | Public after finalization |
-| Winning amount paid with ordinary FTestXRP/FXRP | Public at finalization |
-| Losing bid values | Private by default |
-| Transactions, status, receipt, extension ID, code hash | Public |
+| Tender, buyer, vendors, ceiling, deadline, rules | Public |
+| Extension, code version, TEE identities/key fingerprints, threshold | Public |
+| Bid plaintext, credentials, delivery, warranty, losing prices | Private inside intended TEEs |
+| Bid ciphertext | Private transport/sealed storage; not published on-chain |
+| Salted plaintext commitment and TEE bid receipts | Public |
+| Ordered bid root and common quorum bitmap | Public |
+| FTSO feed/value/decimals/timestamp at close | Public |
+| Eligibility, normalization, component penalties | Private inside intended TEEs |
+| Threshold result envelope/signatures | Public |
+| Winner and winning FXRP amount | Public after finalization |
+| Losing results | Private by default |
+| Smart Account, XRPL transaction ID, user-op hash, nonce | Public cross-chain evidence |
 
-The product must state that TEE operators and FCC infrastructure are inside the
-confidentiality/correctness trust boundary. It does not claim cryptographic
-privacy against a compromised TEE.
+TEE hardware/runtime, FCC relaying/proxy, code governance, and the extension are
+inside the confidentiality and correctness boundary. The design is not a
+zero-knowledge proof system.
 
-## 7. User journeys
+## 8. Scoring V1
 
-### Buyer
+Hard eligibility requires:
 
-1. Connect on Coston2 and choose a supported payment asset.
-2. Publish metadata, public ceiling, deadline, vendor allowlist, and rule hash.
-3. Escrow enough FTestXRP or the current supported test asset.
-4. Wait for the tender to become `Open` only after funding is confirmed.
-5. Monitor public participation without seeing vendor plaintext.
-6. Let any finalizer close the tender and request FCC computation.
-7. Verify the registered TEE signer, rule/bid-root binding, winner, and payout.
-8. Recover unused escrow or a no-valid-bid refund according to terminal state.
+- all required credential issuer signatures are valid;
+- positive price at or below the FXRP ceiling after conversion;
+- delivery at or below the public maximum;
+- warranty at or above the public minimum;
+- supported schema, currency, range, and nonce.
 
-### Vendor
-
-1. Inspect tender rules, TEE identity/code version, ceiling, and deadline.
-2. Fetch and validate the intended TEE encryption key through the approved FCC
-   discovery path.
-3. Encode the canonical bid schema, bind it to the tender/vendor/nonce, and
-   ECIES-encrypt it.
-4. Submit the ciphertext commitment before the deadline.
-5. Confirm that public state shows participation but not plaintext terms.
-6. If selected, receive the public FTestXRP/FXRP settlement and optionally
-   redeem FXRP to an XRPL address.
-
-### Public finalizer
-
-1. Close a ready tender and freeze its ordered bid root.
-2. Request the configured FCC selection action.
-3. Poll the proxy for a result without receiving plaintext bid data.
-4. Submit the result envelope and signature to the market.
-5. Treat competing writes as benign only after rereading canonical state.
-
-### XRP-native buyer — extended release
-
-1. Construct a supported Flare Smart Account custom instruction.
-2. Authorize it with an XRPL payment/memo flow.
-3. Let the operator/FDC deliver the instruction to the buyer's Flare account.
-4. Create or fund the tender without requiring the user to manage FLR directly.
-
-## 8. Scoring rule
-
-Tier 1 uses a deterministic lowest-valid-price rule:
+The public weights sum to `10_000` basis points. Lowest checked fixed-point
+penalty wins:
 
 ```text
-valid = price > 0 && price <= publicCeiling
-winner = earliest submitted bid with the lowest valid price
+pricePenalty    = ceil(priceXrp * SCALE / ceilingXrp)
+deliveryPenalty = deliveryDays * SCALE / maxDeliveryDays
+warrantyPenalty = (maxWarrantyDays - min(warrantyDays, maxWarrantyDays))
+                  * SCALE / (maxWarrantyDays - minWarrantyDays)
+
+totalPenalty = priceWeight * pricePenalty
+             + deliveryWeight * deliveryPenalty
+             + warrantyWeight * warrantyPenalty
 ```
 
-Tier 3 may add fixed-point weighted scoring. Every supported field, range,
-normalization rule, tie rule, and weight must be fixed before bidding and
-committed in `rulesHash`. The client cannot provide an independent winner.
+Exact constants, rounding, overflow bounds, and zero-denominator rules are
+defined by `SCORING_V1` and shared golden vectors. No AI or post-close buyer
+judgment is allowed.
 
-## 9. Non-goals for the first Flare release
+## 9. Architecture decisions
 
-- Confidential ERC-20 transfer amounts.
-- Hidden vendor identity, timing, transaction graph, or public metadata.
-- Arbitrary AI or subjective winner selection.
-- Verification that real-world services were delivered without an explicit FDC
-  integration and supported evidence source.
-- KYC, legal arbitration, collusion resistance, or anonymous credentials.
-- Mainnet-value custody, production security, or formal audit claims.
-- Use of every Flare protocol solely to increase an integration count.
+All formerly open choices are accepted in
+[`architecture-decisions.md`](architecture-decisions.md), including:
 
-## 10. Acceptance criteria
+- private ingress and sealed state;
+- TEE quorum/threshold;
+- key rotation and version governance;
+- deterministic schemas and roots;
+- FTSO conversion;
+- FTestXRP settlement;
+- Smart Account/FDC funding;
+- recovery and result retrieval;
+- administration and evidence policy.
 
-| Area | Completion condition |
+## 10. Non-goals
+
+- Confidential ordinary ERC-20 transfer amounts.
+- On-chain encrypted bid storage.
+- Hidden vendor identity, participation, timing, or transaction graph.
+- Arbitrary AI, natural-language, or subjective winner selection.
+- Buyer/admin winner override or post-bid rule changes.
+- Legal delivery verification, dispute arbitration, KYC, or collusion resistance.
+- Production-value custody, formal audit, perfect privacy, or mainnet readiness.
+
+## 11. Acceptance criteria
+
+| Area | Championship completion condition |
 |---|---|
-| Confidential input | Plaintext bid is absent from calldata, storage, events, proxy logs, and evidence |
-| FCC decision | Registered extension decrypts and computes the winner inside the TEE |
-| Result authenticity | Market verifies domain-separated signature from an approved registered TEE identity |
-| Result binding | Chain, market, extension, tender, rule hash, bid root, close checkpoint, nonce, and expiry are checked |
-| Correctness | Invalid bids lose; lower valid bid wins; earlier valid bid wins ties |
-| Settlement | Winner receives public winning amount; buyer receives public remainder, or full refund for zero winner |
-| Replay | Duplicate bid/result/finalization cannot change terminal state |
-| Recovery | Mined close/request state survives browser, relay, or proxy restart |
-| Public UX | Judge can verify a finalized Coston2 tender without a wallet |
-| Evidence | Sanitized Coston2 identifiers and lifecycle assertions agree with deployed source and bindings |
-| New work | Pre-hackathon Sepolia baseline and Summer Signal Flare work are clearly separated |
+| XRP onboarding | XRPL `0xFE` payment, FDC proof, direct mint, and tender funding execute atomically |
+| Private ingress | No plaintext/ciphertext appears on-chain or in public logs/evidence |
+| Bid acceptance | Signed receipts preserve a common threshold-capable machine quorum |
+| FCC decision | Fixed TEE quorum executes credential-gated multi-criteria scoring |
+| Result authenticity | Two distinct registered tender-fixed machines sign the same full-domain digest |
+| FTSO | Supported fresh XRP/USD snapshot is fixed at close and bound to scoring/result |
+| Escrow | Official FTestXRP award plus remainder/refund conserves ceiling exactly once |
+| Recovery | Close/request/results resume after browser, relay, proxy, or one-machine outage |
+| UX | Complete XRP Buyer, Vendor, Public, Activity, Evidence, and redemption journeys |
+| Deployment | Runtime/source/registry/extension/code/machine/binding facts agree |
+| Privacy | Secret and output scans find no forbidden bid, ciphertext, key, or credential material |
+| New work | Every Flare artifact is separated from historical Sepolia/Nox work |
+| Usefulness | Real buyer/vendor feedback and pilot/design-partner evidence is recorded honestly |
 
-## 11. Submission narrative
+## 12. Submission message
 
-The submission must explicitly state:
-
-- Before Summer Signal: verified VeilBid on Sepolia using iExec Nox, ERC-7984,
-  Safe, web/relay/console, and historical evidence.
-- During Summer Signal: new Coston2 contracts, FCC extension, ECIES bid path,
-  TEE result verification, Flare UI/bindings, and Coston2 evidence.
-- Additional work, if complete: FAssets settlement/redemption, FDC milestone or
-  XRP payment proof, FTSO normalization, and Smart Account onboarding.
+> Before Summer Signal, VeilBid proved confidential price procurement on
+> Sepolia with Nox. During Summer Signal, we rebuilt the protocol around Flare:
+> XRP-native Smart Account funding, FAssets escrow, private FCC multi-criteria
+> bids, FTSO normalization, threshold TEE result verification, and Coston2
+> evidence. The winning payout is public; losing commercial offers remain inside
+> the selected attested TEEs.

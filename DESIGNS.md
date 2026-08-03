@@ -24,12 +24,13 @@ action, marking a selected state, or confirming verified evidence.
 ## 1. Experience principles
 
 - **Private competition, verifiable award.** Every screen distinguishes public
-  metadata, encrypted losing bids, TEE-only plaintext, and the public winner and
-  settlement amount.
+  metadata, ephemeral encrypted transport, sealed TEE-only bid state, and the
+  public winner and settlement amount.
 - **Roles before controls.** Buyer, Vendor, Public Finalizer, Auditor, and XRP
   Treasury contexts must be explicit before an action appears.
-- **Verification is a journey.** Wallet preparation, Coston2 confirmation, FCC
-  instruction relay, TEE-signed result, and settlement are separate stages.
+- **Verification is a journey.** XRP authorization/FDC minting, Coston2 funding,
+  private TEE receipts, FTSO close, threshold result, and settlement are
+  separate stages.
 - **Flat, not vague.** No decorative depth may imply transaction finality or
   authority.
 - **Readable under pressure.** Display typography never replaces operational
@@ -254,9 +255,9 @@ Recoverable proof operations also appear in Activity.
 Examples:
 
 - `CREATE TENDER`
-- `ENCRYPT & SUBMIT BID`
+- `SEND PRIVATELY & SUBMIT RECEIPTS`
 - `FINALIZE AWARD`
-- `AUTHORIZE REVEAL`
+- `REDEEM FXRP`
 
 ### Secondary pill button
 
@@ -319,12 +320,16 @@ The confidential field is visually treated as a sealed dossier:
 - Black field header with `ENCRYPTED INPUT`.
 - White numeric input area.
 - Clear target contract, token, public ceiling, and viewer explanation.
-- Pre-submit checklist: correct vendor, Coston2, verified market/extension/TEE
-  key, deadline, and target.
-- Primary action: `ENCRYPT & SUBMIT BID`.
+- Fixed fields for XRP/USD price, delivery days, warranty days, and supported
+  credential inputs; no free-form or AI-scored terms.
+- Pre-submit checklist: correct vendor, Coston2, verified market/extension/code,
+  all three TEE fingerprints, common threshold, deadline, and rules hash.
+- Primary action: `SEND PRIVATELY & SUBMIT RECEIPTS`.
+- Progress shows encryption/receipt acknowledgement per machine, then the final
+  on-chain receipt bitmap and common quorum.
 
-The field never echoes a submitted plaintext value into durable activity,
-analytics, logs, or URLs.
+The field never echoes a submitted plaintext or ciphertext into durable
+activity, analytics, logs, URLs, calldata, or public evidence.
 
 ### XRP treasury custody header
 
@@ -335,7 +340,9 @@ Full-width white panel with black border and 25px radius:
 - FTestXRP/FXRP asset and public balance.
 - Public escrow ceiling and allowance/funding state.
 - FAssets mint/redemption readiness when verified.
-- FCC extension and code-version policy.
+- XRPL transaction, user-operation hash, FDC proof, PersonalAccount, and nonce
+  checkpoints.
+- FCC extension/code version, three machine fingerprints, and 2-of-3 policy.
 
 Copy must state: `THE TREASURY OWNS THE FUNDS. THE TEE SELECTS; THE CONTRACT SETTLES.`
 
@@ -343,7 +350,7 @@ Copy must state: `THE TREASURY OWNS THE FUNDS. THE TEE SELECTS; THE CONTRACT SET
 
 On-chain status sequence:
 
-`FUNDING PENDING → OPEN → CLOSED → COMPUTE PENDING → AWARDED / REFUNDED`
+`XRP AUTHORIZED → MINT/FUND PENDING → OPEN → CLOSED → COMPUTE PENDING → AWARDED / REFUNDED`
 
 `CANCELLED` is a terminal branch from failed funding confirmation or from
 `OPEN` before the first bid.
@@ -351,8 +358,9 @@ On-chain status sequence:
 Derived readiness labels appear beneath the status rather than as contract
 states:
 
-`VERIFYING ESCROW`, `ACCEPTING SEALED BIDS`, `FCC REQUEST PENDING`, and
-`TEE RESULT READY`.
+`FDC PROOF PENDING`, `VERIFYING ESCROW`, `ACCEPTING PRIVATE BIDS`,
+`QUORUM HEALTHY`, `FTSO SNAPSHOT FROZEN`, `FCC REQUEST PENDING`, and
+`2 OF 3 RESULTS AGREE`.
 
 - Barlow Condensed 700 uppercase.
 - Current step: green.
@@ -367,7 +375,7 @@ Full-bleed black or black card:
 - Mono eyebrow: `TEE-SIGNED RESULT / PUBLIC SETTLEMENT`.
 - Display serif: `AWARDED`.
 - Public winner identity.
-- TEE signer/result/transaction/receipt evidence.
+- Two TEE signers, quorum/result/transaction/receipt evidence.
 - Receipt owner equals the winning vendor and the receipt is non-transferable.
 - Winning settlement amount is public and explicitly labeled. Losing prices
   remain encrypted.
@@ -379,8 +387,12 @@ Flat white evidence panel:
 
 - Chain ID and block.
 - Contract and transaction.
-- Extension ID, code version, TEE signer, rule hash, and ordered bid root.
+- Extension ID, code version, three machine fingerprints, common quorum, rule
+  hash, and ordered bid root.
+- XRP/USD FTSO value, decimals, timestamp, feed ID, and close block.
 - Result digest, signature status, and verification result.
+- XRPL payment, FDC proof, Smart Account sender/nonce/user-operation hash, and
+  FAssets settlement identifiers for the flagship tender.
 - Receipt ID.
 - Expandable, field-level sanitized calldata/event summaries.
 
@@ -392,8 +404,10 @@ signature may be displayed only when the evidence policy permits it.
 
 Shows:
 
-- Market, extension ID, approved code version, and registered TEE signer.
-- Rule hash, ordered bid root, close checkpoint, and result digest.
+- Market, extension ID, approved code version, three registered machines, and
+  2-of-3 threshold.
+- Receipt/common-quorum bitmaps, rule hash, ordered bid root, FTSO snapshot,
+  close checkpoint, result digest, and two recovered signers.
 - Exact evidence scope: `PUBLIC VERIFICATION ONLY`.
 - Explicit exclusions: `NO BID DECRYPTION / NO SPEND / NO WINNER OVERRIDE`.
 - Winning payout and refund/remainder conservation.
@@ -402,14 +416,19 @@ The first Flare release exposes no auditor control that decrypts losing bids.
 
 ### Progress notice
 
-One persistent operation notice tracks at most six stages:
+One persistent operation notice tracks the active sub-journey, with at most six
+visible stages. XRP funding uses:
 
-1. Wallet preparation.
-2. Transaction submitted.
-3. Coston2 confirmed.
-4. FCC instruction relayed.
-5. TEE result signed and retrieved.
-6. Result verified and state refreshed.
+1. PersonalAccount and nonce derived.
+2. User operation reviewed.
+3. XRPL `0xFE` payment committed.
+4. FDC proof ready.
+5. Direct mint and calls submitted.
+6. Coston2 tender funded.
+
+Bid intake uses `LOCAL DRAFT → ENCRYPTING → TEE RECEIPTS → ON-CHAIN
+COMMITMENT`; selection uses `CLOSE → FTSO SNAPSHOT → FCC REQUEST → 2 OF 3
+AGREE → SETTLED`. Completed stages remain expandable in Activity.
 
 Mined transactions are not marked failed because a later FCC stage is pending.
 Recovery actions appear in Activity.
@@ -441,8 +460,8 @@ outlines, no photographic texture, and no token/coin imagery.
 ### Marquee
 
 ```text
-ENCRYPTED BIDS — TEE-SIGNED WINNERS — XRP-FUNDED BUDGETS —
-PUBLIC EVIDENCE — PERMISSIONLESS FINALIZATION
+PRIVATE MULTI-CRITERIA BIDS — 2-OF-3 TEE AWARDS — XRP-FUNDED BUDGETS —
+FTSO-BOUND SCORING — PUBLIC SETTLEMENT
 ```
 
 Use Barlow Condensed 700, `48–80px`, black on white. Motion pauses on hover and
@@ -520,7 +539,26 @@ privacy/status badges.
 - Do not describe encrypted bids as anonymous transactions.
 - Do not reveal or log bid plaintext after submission.
 
-## 13. CSS custom properties
+## 13. Championship screen acceptance
+
+The Coston2 judge release is visually complete only when these screens exist
+and use verified generated bindings:
+
+| Screen | Must communicate |
+|---|---|
+| Landing/live proof | XRP-to-FXRP funding, private multi-criteria bids, 2-of-3 FCC award, public settlement |
+| XRP Treasury setup | PersonalAccount, nonce, user-op hash, XRPL memo, FDC proof, direct mint/fund checkpoints |
+| Tender builder | Public weights/bounds/issuers, quote currencies, FTestXRP ceiling, FTSO policy, fixed TEE set |
+| Vendor bid room | Session-only fields, three verified keys, private ingress, per-machine receipts, common quorum |
+| Public tender | Commitments/bitmaps/root, no payload links, close/FTSO/result readiness |
+| Activity/recovery | Canonical checkpoints, competing relay safety, explicit dependency failures, no mock success |
+| Award/evidence | Two recovered signers, exact digest binding, FTSO snapshot, payout/remainder, receipt, redemption path |
+
+The `1-of-1` feasibility UI, generic-token settlement, simulated TEE, and direct
+EVM buyer path must carry visible development/recovery labels and cannot be used
+as the championship hero or primary demo.
+
+## 14. CSS custom properties
 
 ```css
 :root {
@@ -577,7 +615,7 @@ privacy/status badges.
 }
 ```
 
-## 14. Agent prompt guide
+## 15. Agent prompt guide
 
 ### Global prompt
 
@@ -585,10 +623,11 @@ privacy/status badges.
 > Use Cormorant Garamond 300 for sparse display moments, Barlow Condensed for
 > operational UI, and Space Mono for privacy/evidence metadata. All cards and
 > buttons use 25px corners, role pills use 100px corners, structural borders are
-> 1px black, and there are no shadows or gradients. Show Public, Encrypted,
-> Authorized, Pending, and Proof Ready states with text and icons. Preserve the
-> distinction between connected wallet, XRP treasury, Flare Smart Account,
-> buyer, vendor, finalizer, registered TEE, and auditor.
+> 1px black, and there are no shadows or gradients. Show Public, Encrypted in
+> Transit, Sealed in TEE, Authorized, Pending, and Proof Ready states with text
+> and icons. Preserve the distinction between connected wallet, XRP treasury,
+> Flare Smart Account, buyer, vendor, finalizer, each registered TEE, common
+> quorum, and auditor.
 
 ### Tender explorer prompt
 
@@ -600,29 +639,34 @@ privacy/status badges.
 
 ### Bid composer prompt
 
-> Create a sealed-dossier bid composer. Use a black `ENCRYPTED INPUT` header, a
-> white numeric field, target TEE/commitment explanation, public ceiling and deadline, and
-> a green `ENCRYPT & SUBMIT BID` pill. Do not place plaintext bid values in URL,
-> activity, analytics, or completed-state copy.
+> Create a sealed-dossier bid composer for XRP/USD price, delivery, warranty,
+> and supported credentials. Show three verified TEE fingerprints, private
+> ingress, per-machine receipt progress, commitment, and common quorum. Use a
+> green `SEND PRIVATELY & SUBMIT RECEIPTS` pill. Do not place plaintext or
+> ciphertext in URL, activity, analytics, calldata, or completed-state copy.
 
 ### Winner panel prompt
 
 > Create a full-bleed black award panel with mono eyebrow `TEE-SIGNED RESULT /
 > PUBLIC SETTLEMENT`, a thin serif `AWARDED` headline, public winner identity, result
 > and receipt evidence, and a clearly public winning-settlement amount. Losing
-> bid prices remain encrypted. A single green halo may sit behind the award seal.
+> bid prices remain sealed/private. Show the two matching TEE signers and frozen
+> FTSO snapshot. A single green halo may sit behind the award seal.
 
 ### XRP treasury header prompt
 
 > Create a flat XRP treasury custody panel with buyer or Flare Smart Account
-> address, authorization mode, FTestXRP/FXRP balance, allowance, escrow, and
-> redemption readiness. Include the exact message `THE TREASURY OWNS THE FUNDS.
+> address, authorization mode, nonce, user-operation hash, XRPL memo, FDC proof,
+> direct mint, FTestXRP/FXRP balance, escrow, and redemption readiness. Include
+> the exact message `THE TREASURY OWNS THE FUNDS.
 > THE TEE SELECTS; THE CONTRACT SETTLES.` Use no dashboard sidebar and no
 > decorative elevation.
 
 ### Proof inspector prompt
 
 > Create a white flat proof inspector using Space Mono for chain ID, block,
-> contract, transaction, extension ID, code version, TEE signer, rule hash, bid
-> root, result digest, verification result, and receipt. Never expose TEE keys,
-> wallet signatures, credentials, encrypted payloads, or confidential plaintext.
+> contract, transaction, extension ID, code version, three machine fingerprints,
+> common quorum, rule hash, bid root, FTSO snapshot, two result signers, result
+> digest, verification result, settlement, and receipt. Include the public
+> XRPL/FDC/Smart Account trail. Never expose TEE secrets, private-wallet
+> signatures, credentials, encrypted payloads, or confidential plaintext.

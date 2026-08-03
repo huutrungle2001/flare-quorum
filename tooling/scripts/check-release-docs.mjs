@@ -27,6 +27,7 @@ function trackedMarkdown() {
 
 const requiredFiles = [
   "README.md",
+  "PLAN.md",
   "SECURITY.md",
   "feedback.md",
   "docs/user-guide.md",
@@ -35,6 +36,7 @@ const requiredFiles = [
   "docs/feasibility-plan.md",
   "docs/build-plan.md",
   "docs/architecture.md",
+  "docs/architecture-decisions.md",
   "docs/contract-spec.md",
   "docs/threat-model.md",
   "docs/verification.md",
@@ -65,6 +67,9 @@ assert.match(readme, /Primary bounty:\*\* Confidential Compute Apps/);
 assert.match(readme, /currently in planning and feasibility validation/i);
 assert.match(readme, /pre-hackathon baseline/i);
 assert.match(readme, /sepolia\.release\.json/);
+assert.match(readme, /multi-criteria offers to a fixed Flare TEE quorum/i);
+assert.match(readme, /2-of-3/i);
+assert.match(readme, /PLAN\.md/);
 
 const plannedFlareManifest = resolve(
   repositoryRoot,
@@ -90,7 +95,6 @@ const forbidden = [
   /Waiting for approval/,
   /docs\/demo-and-submission\.md/,
   /docs\/original\//,
-  /PLAN\.md/,
   /settlement-relay\.yml/,
 ];
 

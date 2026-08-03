@@ -1,48 +1,73 @@
-# VeilBid Flare Contract Specification
+# VeilBid Flare Championship Contract Specification
 
-> Status: Target interface. Names and fields may change through recorded
-> feasibility decisions; nothing in this document is deployed on Coston2 yet.
+> Status: Target interface; implementation and Coston2 deployment pending.
 
-## 1. Domain types
+## 1. Core types
 
 ### Tender
 
 ```text
 buyer
-paymentToken
+paymentToken               // official FTestXRP
 metadataHash
 rulesHash
-publicCeiling
+publicCeilingXrp
 bidDeadline
 status
 approvedVendors[]
 bidCount
 orderedBidRoot
-closeBlock
+commonQuorumBitmap
 extensionId
 codeVersion
+teeIdentities[3]
+teeKeyFingerprints[3]
+resultThreshold            // 2
+ftsoFeedId                 // XRP/USD when USD enabled
+ftsoValue
+ftsoDecimals
+ftsoTimestamp
+closeBlock
 requestId
 resultNonce
 winnerBidId
 winner
-winningAmount
+winningAmountXrp
 ```
 
-### Bid reference
+### Bid receipt
 
 ```text
+schemaVersion
+chainId
+market
+extensionId
+codeVersion
 tenderId
+vendor
+submissionNonce
+rulesHash
+plaintextCommitment
+teeIdentity
+receiptExpiry
+signature
+```
+
+### Stored bid reference
+
+```text
 bidId
 vendor
-ciphertextCommitment
-submittedAt
 submissionNonce
+plaintextCommitment
+receiptBitmap
+acceptedBlock
 ```
 
-### Result envelope
+### Selection result
 
 ```text
-version
+schemaVersion
 chainId
 market
 extensionId
@@ -50,10 +75,15 @@ codeVersion
 tenderId
 rulesHash
 orderedBidRoot
+commonQuorumBitmap
+ftsoFeedId
+ftsoValue
+ftsoDecimals
+ftsoTimestamp
 closeBlock
 winnerBidId
 winner
-winningAmount
+winningAmountXrp
 resultNonce
 expiry
 ```
@@ -61,138 +91,158 @@ expiry
 ## 2. States
 
 ```text
-FundingPending -> Open -> Closed -> ComputePending -> ResultReady -> Awarded
-       |           |                                     |          Refunded
+FundingPending -> Open -> Closed -> ComputePending -> Awarded
+       |           |                          \-----> Refunded
        +-> Cancelled <-+
 ```
 
-Every terminal transition is one-way. `ResultReady` may be represented as a
-readiness condition rather than stored state if the FCC proxy is the result
-transport; the verified digest and terminal state remain canonical on-chain.
+Result readiness is derived from valid proxy results and threshold signatures,
+not a caller-controlled contract state.
 
-## 3. Target functions
+## 3. Target writes
 
-### Market writes
-
-- `createTender(...)`
-- `confirmFunding(tenderId)` or an atomic exact-balance-delta variant
-- `submitEncryptedBid(tenderId, ciphertextOrReference, commitment, nonce)`
+- `createTender(TenderTerms, MachinePolicy, ScoringPolicy)`
+- `createTenderAndFund(...)` for atomic buyer/Smart Account execution
+- `confirmFunding(tenderId)` when separate balance-delta confirmation is needed
+- `submitBidReceipts(tenderId, receiptEnvelope[])`
 - `closeTender(tenderId)`
 - `requestSelection(tenderId)`
-- `finalizeTender(tenderId, resultEnvelope, teeSignature)`
-- `cancelTender(tenderId)` within the explicitly permitted pre-bid boundary
+- `finalizeTender(tenderId, SelectionResult, TeeSignature[])`
+- `cancelTender(tenderId)` only inside the permitted pre-bid boundary
 
-### Market reads
+No write function accepts an independent winner, score, FTSO value, machine
+replacement, or settlement amount.
 
-- `getTender(tenderId)`
-- `getBidReference(tenderId, bidId)`
-- `getApprovedVendors(tenderId)`
-- `canClose(tenderId)`
-- `canRequestSelection(tenderId)`
-- `validateResultDigest(tenderId, resultEnvelope)`
-- `isApprovedTeeSigner(extensionId, codeVersion, signer)`
+## 4. Creation and funding
 
-Exact FCC registry calls and interfaces are selected from the official scaffold
-during Gate A. Local placeholder interfaces must be removed or pinned to a
-verified upstream source before a release.
+- Buyer is `msg.sender`, including a Flare PersonalAccount.
+- Token equals official configured FTestXRP.
+- Ceiling is nonzero and within release bounds.
+- Future deadline is bounded.
+- One to eight unique nonzero approved vendors.
+- Scoring weights sum exactly to `10_000`.
+- Numeric scoring bounds and credential issuer/type policy are valid.
+- Extension/code version is approved for new tenders.
+- Three distinct registered machines and key fingerprints are fixed.
+- Threshold is exactly two in championship mode.
+- XRP/USD feed ID is official when USD quotes are enabled.
+- Exact FTestXRP ceiling reaches escrow before `Open`.
 
-## 4. Tender validation
+Generic assets and one-machine policy are accepted only by isolated feasibility
+contracts, never the release market.
 
-- Nonzero buyer, token, and metadata/rules hashes.
-- Supported payment token only.
-- Ceiling is nonzero and within an explicit bound.
-- Future deadline within supported duration bounds.
-- One to eight unique, nonzero approved vendors.
-- Supported FCC extension and code version fixed before bidding.
-- Exact escrow accounting before `Open`.
-- Only buyer may cancel, and never after a bid or frozen close unless the
-  documented policy explicitly proves it cannot disadvantage a vendor.
+## 5. Receipt acceptance
 
-## 5. Bid submission validation
+`submitBidReceipts` requires:
 
-- Tender is `Open` and unexpired.
-- Caller is an approved vendor and has no previous bid.
-- Nonce is unused for this tender/vendor.
-- Commitment is nonzero and ciphertext/reference satisfies size/format bounds.
-- Public binding fields are included in the encrypted canonical schema.
-- Submission ordering is deterministic and contributes to `orderedBidRoot`.
+1. Tender `Open` and unexpired.
+2. Caller is approved vendor with no accepted bid.
+3. Submission nonce is exact unused next nonce.
+4. Every receipt reconstructs the canonical `BID_RECEIPT_V1` digest.
+5. Signer is a distinct tender-fixed registered machine for fixed code version.
+6. Receipts agree on vendor, nonce, rule, and plaintext commitment.
+7. Receipt expiry has not passed.
+8. Valid signer bitmap intersected with current common quorum preserves at least
+   two machines.
+9. Terminal bid reference is stored and ordered root updated once.
 
-The contract cannot validate private price or scoring fields. That validation
-is performed in the TEE and committed by the result signature.
+The contract never receives bid plaintext or ciphertext.
 
-## 6. Close and request
+## 6. Close
 
-`closeTender`:
+`closeTender` requires deadline passed or all approved vendors accepted when
+early close is enabled. It:
 
-- Requires `Open` and deadline passed, or all approved slots submitted if early
-  close is enabled.
-- Freezes bid count, order, root, rule hash, and close checkpoint.
-- Rejects further bids.
+- freezes bid count, ordered root, common quorum, rules, and close block;
+- rejects future bid receipts;
+- reads and stores official XRP/USD value/decimals/timestamp when USD quotes are
+  enabled;
+- enforces positive value and configured freshness;
+- advances to `Closed`.
+
+The caller cannot supply the FTSO snapshot.
+
+## 7. Selection request
 
 `requestSelection`:
 
-- Requires a frozen tender without a terminal result.
-- Selects TEE IDs only through the approved FCC mechanism.
-- Sends an instruction containing the minimum public binding and the approved
-  ciphertext retrieval references.
-- Records public request identity/checkpoint for recovery.
+- requires `Closed` and no accepted terminal result;
+- targets machines in the frozen common quorum through official FCC contracts;
+- sends exact public tender/root/rules/FTSO/close/result-nonce binding;
+- records request/action checkpoint for recovery;
+- advances to `ComputePending`.
 
-## 7. Finalize validation
+Re-requesting after expiry or delivery failure must preserve the same frozen
+inputs and follow the documented FCC fee/replay policy.
 
-`finalizeTender` must:
+## 8. Finalization
 
-1. Require the correct closed/compute state.
-2. Recompute the domain-separated result digest.
-3. Recover the signer and verify it is a registered, approved TEE for the fixed
-   extension/code version.
-4. Verify chain ID and market address.
-5. Verify tender, rules hash, ordered bid root, and close block.
-6. Verify the exact unused result nonce and nonexpired envelope.
-7. For nonzero winner ID, map it to an existing bid/vendor and require envelope
-   winner equality.
-8. Require `winningAmount > 0 && winningAmount <= publicCeiling` for an award.
-9. For zero winner ID, require zero address/amount and execute the full refund.
-10. Mark nonce/terminal state before token transfer or receipt interaction.
-11. Settle once and emit public evidence events.
+`finalizeTender`:
 
-The caller has no authority to alter envelope fields covered by the signature.
+1. Reconstructs the current FCC-compatible domain-separated result digest.
+2. Checks every result field against stored tender state.
+3. Recovers distinct signers and verifies tender-fixed registration, code
+   compatibility, and common-quorum membership.
+4. Requires at least two valid signatures over the exact same digest.
+5. Requires current unused result nonce and nonexpired envelope.
+6. Maps nonzero winner bid ID to the stored vendor and requires equality.
+7. Requires positive winning amount at or below ceiling.
+8. For zero winner, requires zero address/amount.
+9. Marks nonce and terminal state before token/receipt interaction.
+10. Pays winner/remainder or full refund exactly once.
+11. Mints one non-transferable receipt only for an award.
 
-## 8. Settlement
+Split result digests never reach threshold and cannot be chosen by the caller.
 
-Tier 1 uses ordinary ERC-20/FTestXRP transfers:
+## 9. Scoring verification boundary
 
-- Award: `winningAmount` to stored vendor and `ceiling - winningAmount` to buyer.
-- No valid bid: full ceiling to buyer.
-- Transfer amounts are public.
-- Actual balance deltas must equal expected values or the supported token policy
-  must reject the asset.
+Private scoring is trusted to the threshold TEE extension. The contract verifies
+public rule version, fixed inputs, identities, and threshold signatures; it
+cannot recompute private eligibility. Shared golden vectors and code/image
+verification provide implementation evidence, not a zero-knowledge proof.
 
-FAssets redemption is a separate user journey. It must not bypass terminal
-accounting or make VeilBid custodian of XRPL secrets.
+## 10. Settlement
 
-## 9. Invariants
+- Only official FTestXRP release asset.
+- Award: `winningAmountXrp` to winner and
+  `publicCeilingXrp - winningAmountXrp` to buyer.
+- Zero winner: full ceiling to buyer.
+- Checks-effects-interactions and reentrancy guard.
+- Balance-delta verification when required by token behavior.
+- No admin withdrawal, rescue, fee, or callback-based receipt mint.
+- Winning amount is public.
 
-- No public/client function independently selects winner or winning amount.
-- Winner equals the vendor at the TEE-signed winner bid ID.
-- Result binds the exact frozen bid set and rules.
-- At most one accepted result nonce and terminal settlement per tender.
-- Total award plus remainder/refund equals escrow.
-- Zero/over-ceiling bid cannot produce a valid awarded result.
-- Equal valid bids preserve the committed order tie rule.
-- Only approved vendors submit, at most once.
-- Losing plaintext and private scoring data do not appear in contract state or
-  events.
-- Untrusted finalizers cannot alter tender terms, signer policy, or result.
-- Receipt owner equals the stored winner and receipt transfer/approval is
-  disabled.
+## 11. Reads
 
-## 10. Events
+- `getTender(tenderId)`
+- `getApprovedVendors(tenderId)`
+- `getBidReference(tenderId, bidId)`
+- `getMachinePolicy(tenderId)`
+- `getScoringPolicy(tenderId)`
+- `getFtsoSnapshot(tenderId)`
+- `canClose(tenderId)`
+- `canRequestSelection(tenderId)`
+- `resultDigest(tenderId, SelectionResult)`
+- `validResultSignerBitmap(tenderId, digest, signatures)`
 
-Target public events:
+## 12. Invariants
+
+- No plaintext or ciphertext bid exists in contract state, calldata, or event.
+- Every accepted bid has a threshold-capable common machine quorum.
+- Ordered root and first-accepted tie order never change after close.
+- Machine/key/code/rule/threshold policy never changes after opening.
+- Client, buyer, admin, and relay cannot choose winner or FTSO price.
+- Two distinct compatible tender-fixed machines agree on accepted result.
+- Winner equals stored vendor for signed bid ID.
+- Total terminal transfer equals exact escrow once.
+- Wrong domain/root/rules/feed/nonce/expiry cannot settle.
+- Receipt owner equals winner and cannot transfer/approve the receipt.
+
+## 13. Events
 
 - `TenderCreated`
 - `TenderFunded`
-- `EncryptedBidSubmitted`
+- `BidReceiptAccepted`
 - `TenderClosed`
 - `SelectionRequested`
 - `SelectionRetried`
@@ -201,16 +251,12 @@ Target public events:
 - `TenderCancelled`
 - `AwardReceiptMinted`
 
-Events may include public IDs, commitments, hashes, addresses, amounts,
-extension/code identifiers, status, and checkpoints. They must not include
-plaintext losing bids, private documents, decryption keys, or raw sensitive
-proxy responses.
+Events expose commitments, signer bitmap, root, rules, FTSO snapshot, request,
+result digest, winner, amount, and settlement evidence. They never expose bid
+plaintext/ciphertext, credentials, TEE secrets, or sensitive proxy responses.
 
-## 11. Administration
+## 14. Governance
 
-- No admin winner override or arbitrary escrow withdrawal.
-- Signer/code-version changes must not affect an already open or closed tender.
-- Emergency controls, if required by FCC version governance, must be explicit,
-  delayed where practical, and incapable of selecting a favorable result.
-- Contracts remain non-upgradeable by default. Any upgradeability proposal
-  requires a new threat model and migration/evidence plan.
+Non-upgradeable release contracts. Future-tender allowlists may be governed
+through `Ownable2Step` or a small multisig, but governance cannot mutate live
+tenders, lower threshold, override winner, decrypt bids, or withdraw escrow.

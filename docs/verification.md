@@ -1,135 +1,161 @@
-# VeilBid Flare Verification Plan and Evidence Ledger
+# VeilBid Flare Championship Verification Plan
 
-> Status: Flare verification has not started. The verified Sepolia/Nox evidence
-> is retained as pre-hackathon baseline only.
+> Status: all Flare implementation and Coston2 verification rows are `NOT RUN`.
+> Historical Sepolia/Nox artifacts are pre-hackathon baseline only.
 
 ## 1. Evidence policy
 
-Committed Flare evidence may contain:
+Committed Flare evidence may contain public network, contract, extension,
+machine, code-version, FTSO, transaction, block, commitment, result, winner,
+settlement, runtime-hash, and Boolean assertion data.
 
-- network and chain ID;
-- contract addresses, extension ID, approved code/image version, registered TEE
-  public identities, transactions, blocks, and public result digests;
-- source/runtime hashes and configuration assertions;
-- public tender status, vendor addresses, winner, settlement amount, and receipt;
-- Boolean test assertions and allowlisted failure codes.
+It must not contain bid plaintext or ciphertext, credentials, salts, sealed TEE
+state, ingress bodies/headers, wallet or XRPL signatures, private keys, seeds,
+proxy/indexer secrets, raw provider responses, or fabricated identifiers. The
+winning amount is public; losing inputs and component scores remain redacted.
 
-Committed evidence must not contain:
+Evidence schemas must reject forbidden fields. Sensitive assertions happen
+in-memory and save only an allowlisted pass/fail code.
 
-- plaintext losing bids or private scoring/qualification fields;
-- TEE, wallet, XRPL, proxy, or indexer secrets;
-- ECIES private material or full encrypted payloads;
-- raw credentials, provider responses, wallet signatures, or debug dumps;
-- fabricated identifiers or an unexecuted test marked pass.
+## 2. Phase-gate ledger
 
-The winning amount is public in the first Flare release and may appear in
-evidence. Losing values remain redacted.
+| Gate | Required live outcome | Minimum evidence | Status |
+|---|---|---|---|
+| 0 — Foundations | Official access, registry discovery, versions, image digests, machine capacity pinned | Dependency/version manifest and reachability assertions | NOT RUN |
+| A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | NOT RUN |
+| B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext and survives sealed restart | Commitment/receipt IDs, redaction assertions, restart checkpoint | NOT RUN |
+| C — Common quorum | Three fixed machines acknowledge bids and at least two remain common to every accepted bid | Machine fingerprints, receipt bitmaps, common bitmap, rejection cases | NOT RUN |
+| D — Private scoring | Real TEEs match shared `SCORING_V1` vectors and select the deterministic eligible winner | Vector hashes, public inputs, result digest, Boolean expectations | NOT RUN |
+| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | NOT RUN |
+| F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP | Feed snapshot, discovered asset IDs, balance conservation | NOT RUN |
+| G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | NOT RUN |
+| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | NOT RUN |
 
-## 2. Mandatory verification matrix
+No later gate converts an earlier failure into success. Private ingress, FCC
+selection, FTestXRP conservation, and the XRP-native flagship path are product
+stop conditions defined in [`PLAN.md`](../PLAN.md).
 
-| Area | Required evidence | Current status |
+## 3. Mandatory release matrix
+
+| Area | Passing condition | Status |
 |---|---|---|
-| FCC registration | Extension, code version, TEE identity, Coston2 transactions | NOT RUN |
-| Signature verification | Correct signer succeeds; wrong signer/domain/chain/market fails | NOT RUN |
-| Encrypted input | ECIES plaintext never crosses public/log/evidence boundary | NOT RUN |
-| Bid binding | Wrong tender/vendor/nonce/rules/commitment fails | NOT RUN |
-| Private selection | Lower valid wins; invalid excluded; earlier tie; no-valid zero | NOT RUN |
-| Root/rule binding | Wrong ordered root, close block, or rules hash fails | NOT RUN |
-| Replay/expiry | Duplicate and expired result cannot settle | NOT RUN |
-| Escrow conservation | Winner plus remainder, or full refund, equals ceiling | NOT RUN |
-| Reentrancy/asset policy | Terminal state precedes supported token interactions | NOT RUN |
-| Recovery | Fresh relay/browser resumes mined close/request/result state | NOT RUN |
-| Deployment | Source, runtime, constructor, immutable wiring, signer policy agree | NOT RUN |
-| Bindings | Generated ABI/address snapshot matches verified release | NOT RUN |
-| Public UX | Wallet-free Coston2 tender and FCC evidence load without mocks | NOT RUN |
-| Privacy scan | Logs/evidence/source exclude forbidden plaintext and secrets | NOT RUN |
-| New-work ledger | Pre-hackathon and Summer Signal changes are traceable | IN PROGRESS |
+| Deployment truth | Source, runtime, constructor, manifest, registry wiring, extension image, machines, and bindings agree | NOT RUN |
+| Bid privacy | No plaintext/ciphertext in chain, logs, analytics, evidence, or durable browser/proxy state | NOT RUN |
+| Receipt binding | Wrong chain/market/extension/code/tender/vendor/rules/nonce/commitment/expiry fails | NOT RUN |
+| Quorum continuity | Every accepted bid preserves a common 2-of-3 machine set; weaker receipt sets fail | NOT RUN |
+| State integrity | TEE rebuilds ordered root; omitted, duplicated, reordered, and rolled-back state fails | NOT RUN |
+| Eligibility | Missing/forged/duplicate/unsupported credential and every public bound fails closed | NOT RUN |
+| Scoring | XRP/USD conversion, price/delivery/warranty penalties, rounding, bounds, tie, and no-valid cases match golden vectors | NOT RUN |
+| FTSO | Unsupported, zero, malformed, or stale feed data cannot close a USD-enabled tender | NOT RUN |
+| Result threshold | Two distinct approved common-quorum signers agree; one signer, duplicate signer, and split digests fail | NOT RUN |
+| Domain/replay | Wrong root, rule, FTSO snapshot, close block, nonce, expiry, winner ID, or amount fails | NOT RUN |
+| FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | NOT RUN |
+| Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | NOT RUN |
+| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | NOT RUN |
+| Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | NOT RUN |
+| Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | NOT RUN |
+| Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | NOT RUN |
+| New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | IN PROGRESS |
+| User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN |
 
-## 3. Conditional integration matrix
-
-| Integration | Completion evidence | Current status |
-|---|---|---|
-| FAssets/FTestXRP | Official address discovery, escrow, payout/refund, XRP-native user journey | NOT RUN |
-| FDC | Supported proof verified on-chain and bound to one product decision | NOT RUN |
-| FTSOv2 | Supported feed snapshot, bounds, decimals, timestamp, deterministic normalization | NOT RUN |
-| Flare Smart Accounts | XRPL-authorized custom action, replay protection, no hidden app custody | NOT RUN |
-| Multi-TEE | Same result digest satisfies documented signer threshold/recovery | NOT RUN |
-
-Do not list a conditional integration in the final submission as implemented
-until its row passes.
-
-## 4. Planned evidence files
+## 4. Planned evidence set
 
 ```text
-evidence/coston2/gate-a-fcc-result.json
-evidence/coston2/gate-b-encrypted-bid.json
-evidence/coston2/gate-c-private-selection.json
-evidence/coston2/gate-d-settlement.json
-evidence/coston2/gate-e-recovery.json
-evidence/coston2/gate-f-fassets.json
+evidence/coston2/foundations.release.json
+evidence/coston2/fcc-registered-result.release.json
+evidence/coston2/private-ingress-sealed-restart.release.json
+evidence/coston2/common-quorum-three-machine.release.json
+evidence/coston2/scoring-golden-vectors.release.json
+evidence/coston2/threshold-result-adversarial.release.json
+evidence/coston2/ftso-fassets-settlement.release.json
+evidence/coston2/xrpl-smart-account-funding.release.json
 evidence/coston2/deployment-consistency.release.json
-evidence/coston2/source-publication.release.json
-evidence/coston2/release-two-vendor.json
-evidence/coston2/relay-write-e2e.json
-evidence/coston2/production-smoke.json
-evidence/coston2/production-keyboard.json
+evidence/coston2/two-vendor-lifecycle.release.json
+evidence/coston2/three-vendor-recovery.release.json
+evidence/coston2/web-desktop-mobile-keyboard.release.json
+evidence/coston2/production-smoke.release.json
+evidence/coston2/user-validation.release.json
+evidence/coston2/new-work-ledger.release.json
 ```
 
-Schemas must reject confidential fields rather than relying on maintainers to
-remember manual redaction.
+File names are targets, not evidence that the tests ran. Each schema records
+`sourceCommit`, public environment identity, assertions, blockers, and
+collection time. A release file never changes from failed to passed without new
+live identifiers.
 
-## 5. Required adversarial cases
+## 5. Required adversarial suites
 
-- Plaintext or malformed bid submission.
-- Ciphertext encrypted to an unexpected TEE key.
-- Wrong chain, market, extension, code version, tender, vendor, nonce, or rule.
-- Duplicated vendor submission and reordered commitment root.
-- Zero, over-ceiling, equal, and no-valid bid sets.
-- Forged/unregistered TEE signer.
-- Correct signature over wrong result domain.
-- Result for another tender/root/close checkpoint.
-- Expired and replayed result.
-- Settlement token failure and reentrant callback.
-- Proxy/indexer/RPC interruption after every public checkpoint.
-- Competing finalizers.
-- FDC/FTSO proof/value outside supported source, freshness, or bounds when those
-  optional integrations exist.
+### Bid ingress and state
 
-## 6. Historical baseline ledger
+- Plaintext, malformed ECIES, oversized, wrong-key, stale-key, and unauthenticated
+  requests.
+- Wrong schema, chain, market, extension, code, tender, vendor, rules, nonce,
+  credential domain, and commitment.
+- One-machine receipt, duplicate signer, expired receipt, repeated vendor, and
+  receipt set that collapses the common quorum.
+- Missing, duplicate, reordered, corrupted, and rolled-back sealed state.
+- Proxy restart, TEE restart, queue loss, timeout, retry, and competing submitter.
 
-The following remain valid only for the previous implementation:
+### Scoring and oracle
 
-- `packages/contracts/deployments/sepolia.release.json`
-- `evidence/local/`
-- `evidence/sepolia/`
-- generated Sepolia bindings under `packages/chain-bindings/generated/`
+- Zero/over-ceiling price, min/max numeric bounds, unsupported currency, invalid
+  credential, equal score, equal price with different terms, and no-valid bid.
+- Golden vectors across Go, Solidity reference model, and TypeScript model.
+- Arithmetic overflow, division edge, every rounding boundary, and USD-to-XRP
+  upward payout rounding.
+- Wrong feed, zero/negative-equivalent value, unsupported decimals, stale
+  timestamp, and changed snapshot.
 
-They prove that the team previously built a substantive confidential procurement
-product. They do not prove any Coston2 contract, FCC extension, FAssets flow, or
-Summer Signal work.
+### Result and settlement
 
-## 7. New-work ledger
+- Unregistered, duplicate, removed, wrong-code, and non-common-quorum signer.
+- One signature, split digests, wrong domain, chain, market, tender, root, rule,
+  feed, close block, nonce, expiry, bid ID, winner, and amount.
+- Replayed result, competing finalizers, token failure, reentrant callback, and
+  repeated terminal call.
+- Winner payout plus remainder and zero-winner full-refund conservation.
 
-Every Summer Signal release-facing commit should be categorized:
+### XRP-native funding
+
+- Wrong PersonalAccount, sender, nonce, XRPL source/destination, amount, memo,
+  user-op bytes/hash, FDC proof, and AssetManager binding.
+- Duplicate proof/nonce, delayed proof, executor interruption, partial-call
+  failure, and recovery after a mined public checkpoint.
+- Confirmation that VeilBid never receives or logs an XRPL secret.
+
+## 6. Historical baseline and new-work ledger
+
+The following prove only the previous Sepolia/Nox implementation:
+
+- `packages/contracts/deployments/sepolia.release.json`;
+- `packages/chain-bindings/generated/`;
+- `evidence/sepolia/` and existing `evidence/local/`.
+
+The final Summer Signal ledger categorizes each release-facing commit:
 
 | Category | Examples |
 |---|---|
-| Ported | Web roles, public index, relay recovery adapted from Sepolia to Coston2 |
-| Newly built | FCC extension, ECIES schema, TEE signature verification, Flare contracts/bindings |
+| Pre-existing | Sepolia/Nox/Safe/ERC-7984 release and evidence |
+| Ported | Role shell, public index, stateless recovery patterns |
+| Newly built | Go FCC extension, private ingress, receipt quorum, Flare market/bindings |
 | Integrated | FAssets, FDC, FTSO, Smart Accounts |
-| Improved | Multi-criteria scoring, result-domain hardening, multi-TEE recovery |
+| Improved | Multi-criteria rules, threshold agreement, domain and recovery hardening |
 
-The final ledger includes commit IDs, evidence paths, deployment IDs, and one
-sentence explaining user value.
+Each entry includes commit IDs, evidence paths, deployment identifiers, and a
+one-sentence user benefit. Historical artifacts are never copied into the
+Coston2 release manifest as proof of Flare execution.
 
-## 8. Release gate
+## 7. Judge-ready release gate
 
-A Flare release is judge-ready only when:
+The release is ready only when:
 
-- mandatory matrix rows pass;
+- Gates 0–H and every mandatory matrix row pass;
 - the canonical Coston2 manifest is verified and blocker-free;
-- extension source/code version and registered signer mapping are public;
-- contract/bindings/evidence/UI all use the same addresses and extension;
-- the wallet-free judge path shows a real finalized lifecycle;
-- privacy and trust claims match `docs/threat-model.md`;
-- secret scans cover current files and full Git history.
+- source, runtime, bindings, extension image, machine mapping, UI, relay, and
+  evidence all identify the same release;
+- a real XRP-authorized mint-and-fund, multi-vendor private selection,
+  threshold finalize, FTestXRP settlement, and redemption path are reproducible;
+- wallet-free judges can inspect a finalized lifecycle and negative evidence;
+- privacy/trust language matches [`threat-model.md`](threat-model.md);
+- current-tree, full-history, and runtime-output scans pass;
+- no capability is described as complete solely because its code or mock exists.

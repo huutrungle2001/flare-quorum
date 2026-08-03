@@ -26,6 +26,7 @@ VeilBid/
 ├── docs/
 ├── AGENTS.md
 ├── DESIGNS.md
+├── PLAN.md                   # championship execution authority
 ├── README.md
 └── SECURITY.md
 ```
@@ -41,14 +42,18 @@ exist yet. Documentation must not imply otherwise.
 New official-scaffold-based confidential-compute workspace:
 
 - canonical bid schema and command identifiers;
-- TEE-only decryption and deterministic selection;
+- authenticated private bid ingress and per-machine receipt signing;
+- TEE-only decryption, sealed persistence, root reconstruction, and
+  deterministic selection;
+- three-machine execution and exact-digest threshold results;
 - minimal signed result construction;
 - structured allowlisted logs;
 - proxy/indexer integration and health;
 - extension unit, deterministic model, and Coston2 E2E tests.
 
-It must not hold wallet custody, submit a winner outside its deterministic rule,
-or persist plaintext bid state beyond the documented TEE lifecycle.
+It must not hold wallet custody, put plaintext/ciphertext on-chain, submit a
+winner outside its deterministic rule, log request bodies, or persist plaintext
+bid state beyond the documented confidential lifecycle.
 
 ### `packages/flare-contracts`
 
@@ -56,7 +61,8 @@ New authority for:
 
 - `VeilBidFlareMarket` and award receipt;
 - FCC registry/instruction/result interfaces;
-- optional milestone/FAssets integrations;
+- bid-receipt/common-quorum and ordered-root verification;
+- FTestXRP, FTSO, FDC, FAssets, and Smart Account integration boundaries;
 - unit, invariant, signature, adversarial, and Coston2 tests;
 - Flare deployment manifests, source publication, and verification;
 - artifact input for `packages/flare-bindings`.
@@ -74,7 +80,10 @@ verified Flare production artifacts and manifests.
 Reused product shell and UX patterns, migrated to:
 
 - Coston2 wallet/network handling;
-- FCC identity/key discovery and encrypted bid submission;
+- FCC identity/key discovery, private encrypted ingress, and signed receipt
+  submission;
+- XRP-native Smart Account mint-and-fund and direct EVM recovery path;
+- public FTSO snapshot, common quorum, threshold result, and FAssets settlement;
 - Coston2 event-derived tender explorer;
 - public result/signature/extension evidence;
 - Flare asset funding and optional XRP-native journeys.
@@ -84,8 +93,10 @@ presented as the Flare judge path.
 
 ### `apps/relay`
 
-Migrated stateless finalizer for close, FCC request, public result retrieval,
-and finalize. It contains no database, plaintext bid, TEE key, or winner logic.
+Migrated stateless finalizer for close, FCC requests to the frozen common
+quorum, public result retrieval, exact-digest grouping, and threshold finalize.
+It contains no database, plaintext/ciphertext bid, TEE key, oracle override, or
+winner logic.
 
 ### `apps/console`
 
@@ -108,6 +119,7 @@ flowchart LR
     FB --> RELAY[apps/relay]
     FB --> CONSOLE[apps/console]
     EXT[apps/fcc-extension] -->|signed result schema| FC
+    WEB -->|private ECIES ingress| EXT
     FC -.->|public evidence| C2[evidence/coston2]
     EXT -.->|sanitized evidence| C2
     WEB -.->|sanitized smoke| C2
@@ -120,6 +132,8 @@ Rules:
 
 - Result schemas and operation identifiers have one canonical shared source or
   generated representation; Solidity and extension copies are drift-checked.
+- Bid plaintext/ciphertext flows only from vendor memory to the authenticated
+  TEE ingress. The market receives signed receipts and commitments only.
 - Flare contracts do not depend on the extension runtime.
 - Apps consume bindings through package exports, never relative source paths.
 - Evidence is output and never runtime state.
@@ -133,7 +147,7 @@ Rules:
 | Flare contract tests | `packages/flare-contracts/test/` |
 | Coston2 manifest | `packages/flare-contracts/deployments/coston2.release.json` |
 | FCC extension business logic | `apps/fcc-extension/` |
-| Canonical encrypted/result schemas | Flare shared schema source selected during Gate B |
+| Canonical bid/receipt/result schemas | Flare shared schema source frozen during Gates B–D |
 | Generated Flare bindings | `packages/flare-bindings/generated/` |
 | Coston2 public index | `packages/flare-bindings/src/index/` |
 | Browser-session bid plaintext | `apps/web` memory only |
@@ -142,6 +156,7 @@ Rules:
 | Coston2 evidence | `evidence/coston2/` |
 | Historical Nox release | `packages/contracts`, `packages/chain-bindings`, `evidence/sepolia` |
 | Product/security/deployment truth | root docs and `docs/` |
+| Execution sequence and phase status | `PLAN.md` |
 
 ## 5. Root orchestration
 
@@ -153,9 +168,9 @@ their authority.
 
 ## 6. Generated and secret material
 
-Ignored outputs include build artifacts, caches, extension runtime state,
-proxy/Redis state, local environment files, tunnels, credentials, raw encrypted
-payloads, private evidence, and wallet/TEE/XRPL key material.
+Ignored outputs include build artifacts, caches, sealed extension runtime state,
+proxy/Redis state, local environment files, tunnels, credentials, ephemeral
+encrypted payloads, private diagnostics, and wallet/TEE/XRPL key material.
 
 Committed extension configuration may contain only public registry addresses,
 extension IDs, approved code/version hashes, TEE public identities/keys intended

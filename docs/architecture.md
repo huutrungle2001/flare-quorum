@@ -1,269 +1,236 @@
-# VeilBid Flare Architecture
+# VeilBid Flare Championship Architecture
 
-> Status: Target architecture. No canonical Coston2 deployment exists yet.
+> Status: Accepted target architecture; no canonical Coston2 deployment exists
+> yet. Detailed rationale is in
+> [`architecture-decisions.md`](architecture-decisions.md).
 
 ## 1. Goals
 
-- Make Flare Confidential Compute essential to winner selection.
-- Keep canonical tender, escrow, and terminal state on Flare.
-- Keep vendor plaintext inside the attested TEE boundary only.
-- Verify a minimal signed result on-chain with complete domain binding.
-- Make asynchronous request/result/finalization recoverable.
-- Add FAssets, FDC, FTSO, and Smart Accounts only through meaningful product
-  journeys.
-- Preserve the verified Sepolia/Nox release as an isolated historical baseline.
+- Make private FCC computation and XRP interoperability essential to one product.
+- Keep bid plaintext and ciphertext off permanent public ledgers.
+- Remove single-client, buyer, relay, admin, and single-TEE winner authority.
+- Make public tender, commitments, rules, quorum, result, and settlement fully
+  reproducible from Flare state.
+- Preserve recoverability across browser, relay, proxy, and one-machine outage.
+- Use only deterministic, bounded, testable scoring.
 
 ## 2. System context
 
 ```mermaid
 flowchart LR
-    Buyer[Buyer wallet or XRP user] --> Web[VeilBid web app]
-    Vendor[Approved vendor] --> Web
-    Observer[Judge or auditor] --> Web
+    XRPL[XRPL buyer] -->|0xFE payment + user-op hash| FDC[FDC XRPPayment]
+    FDC --> SA[Flare Smart Account]
+    SA -->|mint FXRP + approve + create/fund| Market[VeilBidFlareMarket]
 
-    Web -->|reads and signed writes| Market[VeilBidFlareMarket on Coston2]
-    Web -->|fetch TEE identity/key and result| Proxy[FCC extension proxy]
-    Vendor -->|ECIES-encrypted bid| Market
+    EVM[EVM buyer recovery path] --> Market
+    Vendor[Approved vendor] -->|ECIES private ingress| P1[TEE proxy 1]
+    Vendor -->|ECIES private ingress| P2[TEE proxy 2]
+    Vendor -->|ECIES private ingress| P3[TEE proxy 3]
 
-    Market -->|instruction event| FCC[Flare FCC registries and relayers]
-    FCC --> TEE[Registered VeilBid TEE extension]
-    TEE -->|signed minimal result| Proxy
-    Proxy --> Finalizer[Stateless finalizer]
-    Finalizer -->|result envelope and signature| Market
+    P1 --> T1[Registered TEE 1]
+    P2 --> T2[Registered TEE 2]
+    P3 --> T3[Registered TEE 3]
+    T1 -->|signed bid receipt| Market
+    T2 -->|signed bid receipt| Market
+    T3 -->|signed bid receipt| Market
 
-    Market --> Asset[FTestXRP or FXRP]
-    Asset --> XRPL[XRP redemption path]
-    FDC[Flare Data Connector] -.->|optional payment or milestone proof| Market
-    FTSO[FTSOv2 snapshot] -.->|optional normalization input| Market
-    SmartAccount[Flare Smart Account] -.->|optional XRP-authorized action| Market
+    FTSO[FTSO XRP/USD] -->|close snapshot| Market
+    Market -->|selection instruction| FCC[FCC registries and relayers]
+    FCC --> T1
+    FCC --> T2
+    FCC --> T3
+
+    T1 -->|signed result| Relay[Stateless relay]
+    T2 -->|signed result| Relay
+    T3 -->|signed result| Relay
+    Relay -->|2 matching results| Market
+
+    Market -->|public payout/refund| FXRP[FTestXRP / FXRP]
+    FXRP -->|official redemption| XRP[XRP recipient]
+    Web[Web and Evidence UI] --> Market
 ```
 
-## 3. Trust and execution boundary
+## 3. Canonical authorities
 
-### Flare contract
+| State | Authority |
+|---|---|
+| Tender terms, vendors, rules, machine policy | Flare market contract |
+| Accepted bid order and commitments | Flare market events/storage |
+| Bid plaintext and credentials | Sealed state inside tender-fixed TEEs |
+| FCC machine registration/code version | Official FCC contracts plus tender snapshot |
+| FTSO price snapshot | Market-captured official feed value |
+| Winner computation | Deterministic extension on each selected TEE |
+| Result acceptance | Market threshold signature verification |
+| Escrow and settlement | Market plus official FTestXRP/FXRP |
+| XRPL authorization | XRPL signature, FDC proof, Smart Account nonce/hash checks |
+| Public index | Rebuildable generated event index |
 
-Canonical for:
+No application database or relay cache is canonical.
 
-- tender identity, public rules, vendor admission, deadline, and status;
-- ordered bid commitments and frozen bid root;
-- escrow balances and terminal settlement;
-- configured FCC extension, allowed code version, and signer policy;
-- result nonce/expiry/replay checks;
-- public winner, amount, receipt, and evidence events.
+## 4. Private bid intake
 
-The contract never decrypts or calculates a bid and never accepts a winner
-without a verified FCC result envelope.
+### Tender machine policy
 
-### FCC infrastructure and TEE extension
+Before opening, a tender freezes:
 
-Responsible for:
+- extension ID and approved code version;
+- three registered TEE identities and public-key fingerprints;
+- result threshold `2`;
+- supported schema/scoring version;
+- credential issuer/type policy.
 
-- receiving adequately authorized instructions through the FCC path;
-- decrypting the ECIES bid packages inside the TEE;
-- verifying canonical encoding, binding, nonce, and commitment;
-- executing deterministic eligibility and selection;
-- signing the minimum result envelope;
-- returning no losing bid values or private credentials.
+One-of-one mode exists only in development feasibility.
 
-FCC relayers, proxy, registered TEE identity, code-version governance, machine
-attestation, and the extension implementation are inside the correctness,
-confidentiality, and availability boundary.
+### Vendor submission
 
-### Browser
+The vendor:
 
-Responsible for:
+1. verifies chain, market, tender, rules, extension, code version, and machine
+   identities/keys;
+2. encodes `BID_SCHEMA_V1` deterministically with a strong random salt;
+3. ECIES-encrypts separately to each selected machine;
+4. submits through authenticated HTTPS private ingress;
+5. receives signed `BID_RECEIPT_V1` responses;
+6. submits the receipt set to the market before deadline.
 
-- showing exactly which fields are public or private;
-- validating the selected chain, contract, extension, and TEE key;
-- canonical bid encoding and client-side ECIES encryption;
-- submitting ciphertext only;
-- clearing plaintext on account/network change and never persisting it.
+Each TEE decrypts and validates only inside confidential execution, then seals
+the bid. Public receipts contain commitment/binding only.
 
-A compromised browser can observe data before encryption.
+### Common quorum
 
-## 4. On-chain components
-
-### `VeilBidFlareMarket`
-
-- Creates and funds tenders.
-- Stores one to eight unique approved vendors.
-- Accepts one immutable ciphertext commitment per approved vendor.
-- Maintains an ordered bid root from public commitments.
-- Closes after the deadline or all vendor slots submit.
-- Emits an FCC instruction bound to frozen public state.
-- Verifies result signature, signer registration/policy, domain, rule hash, bid
-  root, close checkpoint, nonce, expiry, winner slot, and amount bounds.
-- Pays the public winning amount and public remainder, or refunds full escrow
-  for a zero winner.
-- Mints one non-transferable award receipt.
-
-### `VeilBidFlareAwardReceipt`
-
-- Immutable, non-transferable ERC-721-style public award record.
-- Mints only after successful FCC result verification and settlement.
-- Contains tender, buyer, winner, asset, result digest, and finalized block/time.
-- Contains no losing bid or private qualification data.
-
-### Optional `VeilBidMilestoneEscrow`
-
-Introduced only after the core market is verified. It releases a predefined
-tranche after a supported FDC proof is checked and bound to one tender,
-milestone, source, recipient, amount, and nonce. It does not parse arbitrary
-untrusted API output.
-
-## 5. Encrypted bid protocol
-
-Canonical plaintext schema inside the browser and TEE:
+For every accepted bid, the market computes the valid receipt bitmap and:
 
 ```text
-version
-chainId
-market
-extensionId
-tenderId
-vendor
-submissionNonce
-rulesHash
-price
-optional fixed-schema scoring fields
-salt
+commonQuorumBitmap = commonQuorumBitmap & bidReceiptBitmap
 ```
 
-Submission flow:
+Acceptance requires at least two bits after intersection. This guarantees that
+the same two or more machines retain every accepted bid. Close requires the same
+condition.
 
-1. Client verifies Coston2, market address, extension ID, approved code version,
-   TEE identity, and encryption public key.
-2. Client encodes the exact schema and computes its local commitment.
-3. Client ECIES-encrypts the canonical bytes to the intended TEE key.
-4. Contract records vendor, ciphertext commitment, ordering, and submission
-   checkpoint; events must not emit plaintext.
-5. At close, the contract freezes the ordered root and emits the selection
-   instruction.
-6. The TEE decrypts, checks each plaintext against its public commitment and
-   binding, then applies the deterministic rule.
+### Ordered root
 
-The storage location for full ciphertext bytes is selected during Gate B. If
-on-chain, cost limits are explicit. If content-addressed off-chain storage is
-used, the chain commitment and immutable availability/retrieval policy become
-part of the signed result and threat model.
+The market assigns a one-indexed bid ID and updates the domain-separated rolling
+root defined in ADR-008. This order defines the exact-tie rule and lets each TEE
+detect missing or rolled-back sealed state.
 
-## 6. Selection and signed result
+## 5. Deterministic scoring
 
-Tier-1 rule:
+Bid schema supports:
 
-```text
-valid = price > 0 && price <= publicCeiling
-winner = earliest submitted bid with the lowest valid price
-```
+- XRP or USD price at six-decimal fixed point;
+- delivery days;
+- warranty days;
+- bounded buyer-approved credential issuer/type/signature tuples.
 
-Result schema:
+Public tender rules define hard bounds, required credential types, weights, and
+`SCORING_V1`. Credentials gate eligibility; price/delivery/warranty produce a
+checked weighted penalty. Lowest penalty wins; earlier accepted bid wins an
+exact tie. There is no AI, natural-language scoring, or post-close buyer input.
 
-```text
-version
-chainId
-market
-extensionId
-codeVersion
-tenderId
-rulesHash
-orderedBidRoot
-closeBlock
-winnerBidId
-winner
-winningAmount
-resultNonce
-expiry
-```
+## 6. FTSO close snapshot
 
-The TEE signs a domain-separated digest. The market reconstructs the digest and
-checks every public field. A caller supplies transport data, not a decision.
+If USD quotes are enabled, `closeTender` reads the official XRP/USD feed and
+stores feed ID, value, decimals, timestamp, and close block. It rejects stale,
+zero, unsupported, or malformed data. The exact snapshot is sent to every TEE
+and signed in the result.
 
-## 7. Lifecycle
+USD winner payout converts to XRP with the shared checked formula and rounds up.
+XRP quotes pass through unchanged. Component penalties and losing conversions
+remain private.
+
+## 7. FCC selection and threshold result
 
 ```mermaid
-stateDiagram-v2
-    [*] --> FundingPending: create and escrow
-    FundingPending --> Open: exact public escrow confirmed
-    FundingPending --> Cancelled: funding failed or buyer cancels before opening
-    Open --> Closed: deadline or all approved vendors submitted
-    Open --> Cancelled: buyer cancels before first bid if policy permits
-    Closed --> ComputePending: FCC instruction emitted
-    ComputePending --> ResultReady: signed result available
-    ResultReady --> Awarded: verified nonzero winner and settlement
-    ResultReady --> Refunded: verified zero winner and full refund
-    ComputePending --> ComputePending: retry/reassign under fixed recovery policy
+sequenceDiagram
+    participant F as Finalizer
+    participant M as Market
+    participant R as FCC registries/relayers
+    participant T as TEE quorum
+
+    F->>M: closeTender(tenderId)
+    M->>M: freeze root/quorum/FTSO/close checkpoint
+    F->>M: requestSelection(tenderId)
+    M->>R: send fixed selection instruction to common quorum
+    R->>T: deliver action
+    T->>T: restore sealed state, rebuild root, score independently
+    T-->>F: signed ActionResults
+    F->>F: group by exact result digest
+    F->>M: finalizeTender(envelope, signatures[2+])
+    M->>M: verify domain, distinct registered signers, threshold
+    M->>M: terminal state before FTestXRP transfers
 ```
 
-No timeout path may let the buyer recover funds after bids are frozen if doing
-so can invalidate a legitimate result. Recovery may recompute the same fixed
-input under the approved signer/code policy.
+The result binds schema, chain, market, extension, code, tender, rules, ordered
+root, common quorum, FTSO snapshot, close block, winner slot/vendor/amount,
+nonce, and expiry.
 
-## 8. Flare protocol roles
+Split results remain pending and become public evidence of disagreement. A
+relay never selects between them.
 
-### FAssets
+## 8. XRP-native funding
 
-FTestXRP/FXRP is the intended interoperable settlement asset. Address discovery,
-mint/fund, escrow, payout, and redemption behavior must use supported Flare
-interfaces. Ordinary transfer amounts remain public.
+The flagship buyer uses Smart Account opcode `0xFE`:
 
-### FDC
+1. derive deterministic PersonalAccount and nonce;
+2. encode approval plus `createTender`/funding calls in a `PackedUserOperation`;
+3. commit `keccak256(userOp)` in the XRPL payment memo;
+4. deliver bytes to the executor;
+5. FDC proves the `XRPPayment`;
+6. `executeDirectMintingWithData` verifies hash/sender/nonce, mints FTestXRP,
+   and atomically executes the calls.
 
-Optional proof layer for an external XRP payment or defined delivery/milestone
-signal. The contract verifies the supported attestation proof and binds its
-decoded fields to a predetermined action.
+The PersonalAccount is the on-chain buyer. VeilBid has no XRPL key or custodial
+signer. Direct EVM funding remains a recovery and developer path.
 
-### FTSOv2
+## 9. Settlement and redemption
 
-Optional public snapshot for fixed-point conversion when the shipped tender
-supports multiple quote units. Feed ID, value, decimals, and timestamp are
-captured in public tender/close state and included in `rulesHash` or the signed
-result binding.
+The championship release accepts only official FTestXRP:
 
-### Flare Smart Accounts
+- award: public winning XRP amount to vendor, public remainder to buyer;
+- no valid bid: full public refund;
+- exact one-time conservation and non-transferable award receipt;
+- no fee-on-transfer/rebasing token support;
+- winner may use official FAssets redemption to native XRP.
 
-Optional XRP-native control path. It must use a supported XRPL-authorized
-instruction, prevent replay, and preserve the same market validation as an EVM
-wallet call.
+Winning price and payout are public. Losing commercial data remains inside the
+selected TEE boundary.
 
-## 9. Off-chain applications
+## 10. Recovery
 
-### Web
+- Browser/relay restart: rebuild public checkpoint from events.
+- Proxy queue loss: replay the fixed public FCC instruction under the same
+  request/recovery policy.
+- One machine loss: remaining common quorum can compute and reach threshold.
+- Machine/key/code change: cannot affect an open/closed tender.
+- TEE sealed-state mismatch: machine refuses to sign; contract never lowers
+  threshold.
+- Split TEE result: remain pending; investigate/recompute exact input.
+- Quorum loss: explicit liveness failure, no buyer timeout refund after bids.
+- FTSO unavailable/stale: USD-enabled close pauses; no manual price.
+- FDC/Smart Account failure: use documented stuck-mint recovery; no app custody.
+- Competing finalizer: canonical reread and benign-race classification only.
 
-- Wallet-free public explorer and evidence route.
-- Buyer funding/create and vendor encrypted submission.
-- FCC identity/key/status display.
-- Close, compute-request, signed-result, and finalize progress.
-- Explicit public/private labels and no fabricated success states.
+## 11. Administration
 
-### Relay
+Contracts are non-upgradeable. Governance may approve extension/code versions,
+assets, feeds, and credential issuers for future tenders only. It cannot mutate
+existing tender policy, decrypt bids, lower threshold, choose winner, withdraw
+escrow, or bypass settlement verification.
 
-- Stateless public readiness discovery.
-- Close/request/result/finalize only.
-- Simulation and canonical reread before writes.
-- No bid key, plaintext, or subjective winner path.
+## 12. Applications
 
-### Console
+- **Web:** XRP Buyer, EVM Buyer, Vendor, Public, Activity, Evidence, and
+  redemption journeys.
+- **Relay:** public close/request/result aggregation/finalize only.
+- **Console:** read-only contract, FCC, FTSO, FAssets, and evidence inspection.
+- **FCC extension:** private ingress, sealed state, deterministic scoring, and
+  minimum signed result.
 
-- Read-only public tender, FCC, result, settlement, and evidence inspection.
-- No signer, bid decryption, raw sensitive proxy response, or custody.
+Every unavailable state is explicit. No application substitutes mock bids,
+prices, proofs, results, or settlement.
 
-## 10. Failure and recovery
+## 13. Historical isolation
 
-- RPC failure: show unavailable state.
-- TEE key/identity mismatch: block encryption and submission.
-- Proxy/indexer delay: bounded pending/retry state.
-- TEE unavailable: apply the fixed approved-machine recovery policy to the same
-  bid root and rule hash.
-- Result expired: request recomputation; never reopen or reorder bids.
-- Invalid signature/binding: reject and preserve recoverable closed state.
-- Competing finalizer: reread and classify as benign only if canonical state has
-  already advanced correctly.
-- FDC/FTSO/Smart Account outage: pause only the dependent optional flow; never
-  substitute user-supplied proof or price.
-
-## 11. Historical isolation
-
-`packages/contracts`, `packages/chain-bindings`, and `evidence/sepolia` remain
-the Nox/Sepolia baseline. The Flare edition uses separate contract, binding,
-deployment, and evidence authorities so that no historical address or proof is
-mistaken for Summer Signal work.
+Sepolia/Nox contracts, bindings, evidence, and flows remain historical baseline.
+They are not compilation, deployment, consumer, or evidence inputs for Flare.

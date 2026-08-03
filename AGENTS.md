@@ -34,7 +34,9 @@ Read these files before making changes:
 9. `docs/threat-model.md`
 10. `docs/verification.md`
 11. `docs/repository-layout.md`
-12. `DESIGNS.md` for user-interface changes.
+12. `docs/architecture-decisions.md`
+13. `PLAN.md`
+14. `DESIGNS.md` for user-interface changes.
 
 ## 3. Source priority
 
@@ -58,18 +60,22 @@ only for the baseline release manifest and its generated bindings/evidence.
   finalization path.
 - Never branch on a client-provided winner or maintain a plaintext shadow bid
   ledger outside the TEE.
-- Vendor plaintext must not appear in calldata, events, proxy logs, evidence,
-  browser persistence, or public result payloads.
+- Vendor plaintext or ciphertext must not appear in calldata, events, on-chain
+  storage, proxy logs, evidence, browser persistence, or public result payloads.
+- Private ingress must return registered TEE-signed bid receipts before a bid
+  can enter the canonical ordered root.
 - Encrypted bid payloads must be bound to chain, market, tender, vendor, rules,
   and a one-time submission nonce.
 - Signed results must be bound to chain ID, market, extension ID, tender ID,
   rules hash, bid root, close checkpoint, result nonce, and expiry.
-- The contract verifies that the signer is a registered, approved TEE identity
-  for the intended extension and code version.
+- Championship tenders freeze three registered TEE identities and public-key
+  fingerprints, preserve a common bid quorum, and require two distinct machines
+  to sign the exact same result digest.
+- One-of-one mode is feasibility-only and must be labeled as such.
 - Ordinary FXRP/FTestXRP settlement amounts are public. Do not claim private
   token settlement without a separately verified mechanism.
-- FTSO, FDC, FAssets, and Smart Accounts count only when exercised by an actual
-  user flow and tested on the supported Flare network.
+- FTSO, FDC, FAssets, and Smart Accounts are mandatory parts of the flagship
+  XRP-native funding and multi-currency settlement journey.
 - No success fallback may use mock winners, bids, TEE results, prices,
   attestations, or chain state when FCC, RPC, proxy, FDC, or indexing fails.
 - Finalizers and inspection clients receive no bid-decryption capability.

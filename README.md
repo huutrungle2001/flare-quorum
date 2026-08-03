@@ -3,17 +3,17 @@
 > Confidential procurement for XRP and Flare treasuries, powered by Flare
 > Confidential Compute.
 
-VeilBid Flare is the next edition of VeilBid. Buyers publish transparent tender
-rules and escrow an award budget; approved vendors submit encrypted commercial
-offers; a Flare Compute Extension evaluates the bids inside a Trusted Execution
-Environment (TEE); and a Flare smart contract accepts only a result signed by a
-registered TEE identity.
+VeilBid Flare is the next edition of VeilBid. XRP-native buyers atomically mint
+FXRP and fund a tender; approved vendors privately deliver encrypted
+multi-criteria offers to a fixed Flare TEE quorum; and a Flare smart contract
+settles only after two registered TEE identities agree on the same deterministic
+result.
 
 The project targets **Flare Summer Signal** with:
 
 - **Primary bounty:** Confidential Compute Apps.
-- **Secondary bounty:** Interoperable Asset Products, only after a real
-  FAssets/FXRP lifecycle is implemented and verified.
+- **Secondary bounty target:** Interoperable Asset Products through a real
+  XRP/FDC/Smart Account/FAssets funding and redemption lifecycle.
 - **Development network:** Flare Testnet Coston2 (`114`).
 - **Target settlement asset:** FTestXRP on Coston2 and FXRP on Flare Mainnet.
 
@@ -35,37 +35,42 @@ was actually produced by the agreed rule.
 VeilBid Flare combines:
 
 - Public tender rules, deadlines, vendor admission, escrow, and lifecycle.
-- ECIES-encrypted bid packages that are readable only inside the selected TEE.
-- Deterministic private eligibility and scoring in a Flare Compute Extension.
+- Private ECIES bid ingress with no permanent on-chain ciphertext.
+- Threshold TEE-signed bid receipts and a public ordered commitment root.
+- Deterministic private credential, price, delivery, and warranty scoring.
 - A signed result bound to the chain, market, tender, bid root, rule hash, close
   checkpoint, and replay nonce.
 - On-chain verification and permissionless finalization.
-- FXRP/FTestXRP escrow and optional redemption to native XRP.
+- FTSO-bound XRP/USD normalization and FTestXRP/FXRP settlement.
+- XRP-native mint-and-fund through Flare Smart Accounts and FDC.
+- Official FXRP redemption path back to native XRP.
 - A public evidence trail without plaintext losing bids or private credentials.
 
 ## Target lifecycle
 
 ```text
-Buyer creates tender and escrows FTestXRP/FXRP
+XRPL payment commits an approval + create/fund Smart Account operation
                     |
-Approved vendors encrypt bid packages to the TEE public key
+FDC proves payment; FAssets mints FXRP and funds tender atomically
                     |
-Flare contract records ciphertext commitments and closes bidding
+Vendors privately submit encrypted offers to three fixed TEE machines
                     |
-FCC extension decrypts, validates, scores, and signs the minimum result
+Threshold TEE receipts form the public ordered bid root
                     |
-Anyone submits the signed result to the market
+Close captures XRP/USD FTSO snapshot
                     |
-Contract verifies the registered TEE identity and finalizes settlement
+TEEs validate credentials, score terms, and sign one result digest
                     |
-Winner receives FTestXRP/FXRP and may redeem FXRP to native XRP
+Contract verifies 2-of-3 agreement and settles FTestXRP/FXRP
+                    |
+Winner may redeem FXRP to native XRP
 ```
 
 ## Privacy boundary
 
 Private by design:
 
-- Losing bid prices and commercial terms.
+- Losing bid prices, commercial terms, credentials, and encrypted payloads.
 - Vendor qualification inputs submitted for confidential scoring.
 - Intermediate eligibility, normalization, and comparison results.
 - TEE decryption keys and plaintext working state.
@@ -74,7 +79,8 @@ Public by design:
 
 - Tender metadata, buyer, approved vendor addresses, deadline, rule hash, and
   public ceiling.
-- Bidder participation, ciphertext commitments, timing, and transaction hashes.
+- Bidder participation, salted commitments, TEE receipt signatures, timing, and
+  transaction hashes.
 - TEE extension identity, code/version identifiers, signed result envelope, and
   lifecycle evidence.
 - Winner and winning settlement amount when ordinary FXRP/FTestXRP is paid.
@@ -87,14 +93,16 @@ accounting layer is research scope and must not be described as shipped.
 
 | Flare capability | Product role | Delivery status |
 |---|---|---|
-| Flare Confidential Compute | Decrypt, validate, score, and sign the winner result inside a TEE | Planned, mandatory |
+| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Planned, mandatory |
 | Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Planned, mandatory |
-| FAssets / FTestXRP / FXRP | XRP-backed tender escrow, vendor payout, and redemption path | Planned after FCC core |
-| Flare Data Connector | Verify external XRP payment or delivery/milestone evidence | Planned extension |
-| FTSOv2 | Snapshot prices for an approved multi-currency scoring rule | Optional extension |
-| Flare Smart Accounts | Let XRPL-native users trigger Flare actions without managing FLR directly | Optional extension |
+| FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Planned, mandatory |
+| Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Planned, mandatory |
+| FTSOv2 | Freeze XRP/USD close snapshot for XRP/USD bid normalization | Planned, mandatory |
+| Flare Smart Accounts | Atomically mint FXRP and create/fund tender from an XRPL instruction | Planned, mandatory |
+| Multi-TEE threshold | Fixed three-machine bid custody and two matching selection results | Planned championship gate |
 
-Every integration must be exercised by the product and recorded in evidence.
+Every integration must be exercised by the single flagship product journey and
+recorded in evidence.
 Displaying a feed, accepting an arbitrary token, or merely changing RPC does not
 count as a completed integration.
 
@@ -135,7 +143,9 @@ docs/
 ```
 
 Directories marked as new targets do not exist until their feasibility gates
-pass. See the [Product Plan](docs/product-plan.md),
+pass. See the [Championship Plan](PLAN.md),
+[Architecture Decisions](docs/architecture-decisions.md),
+[Product Plan](docs/product-plan.md),
 [Feasibility Plan](docs/feasibility-plan.md), and
 [Build Plan](docs/build-plan.md).
 
@@ -156,6 +166,8 @@ only after a verified Coston2 release exists.
 ## Documentation
 
 - [User Guide](docs/user-guide.md)
+- [Championship Execution Plan](PLAN.md)
+- [Architecture Decisions](docs/architecture-decisions.md)
 - [Product Plan](docs/product-plan.md)
 - [Feasibility Plan](docs/feasibility-plan.md)
 - [Build Plan](docs/build-plan.md)

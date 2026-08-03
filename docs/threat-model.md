@@ -1,134 +1,182 @@
-# VeilBid Flare Threat Model
+# VeilBid Flare Championship Threat Model
 
-> Scope: planned Coston2 release. The existing Sepolia/Nox release has separate
-> historical evidence and does not establish the security of this design.
+> Status: accepted target security model for the planned Coston2 release.
+> Implementation, review, and live evidence have not started. The historical
+> Sepolia/Nox evidence does not establish the security of this architecture.
 
 ## 1. Security objectives
 
 VeilBid Flare aims to:
 
-- keep losing bid plaintext outside calldata, storage, events, logs, and public
-  evidence;
-- execute eligibility and selection inside a registered Flare TEE extension;
-- prevent the UI, buyer, vendor, relay, or arbitrary server from substituting a
-  winner;
-- bind a signed result to the exact chain, contract, extension/code version,
-  tender, rule, bid root, close checkpoint, nonce, and expiry;
-- settle public FTestXRP/FXRP amounts exactly once;
-- preserve recoverability without reopening or reordering frozen bids;
-- keep wallet, proxy/indexer, and TEE secrets out of the repository.
+- keep every bid plaintext and ciphertext outside public calldata, storage,
+  events, logs, analytics, and committed evidence;
+- accept an on-chain bid reference only after a common quorum of registered,
+  tender-fixed TEEs has acknowledged the same salted commitment;
+- make qualification and multi-criteria scoring deterministic inside the
+  approved FCC extension;
+- prevent the browser, buyer, relay, proxy, administrator, or one TEE from
+  choosing a winner or changing frozen inputs;
+- bind receipts and results to the exact chain, market, extension, code version,
+  tender, rules, machine policy, bid root, oracle snapshot, nonce, and expiry;
+- settle the public FTestXRP escrow exactly once;
+- support recovery from public checkpoints without introducing a plaintext
+  database or a mock-success path;
+- keep EVM, XRPL, TEE, proxy, and infrastructure secrets out of the repository.
 
 ## 2. Assets and visibility
 
-| Asset/data | Visibility | Trusted controller/viewer |
+| Asset/data | Intended visibility | Authority |
 |---|---|---|
-| Plaintext bid and private qualification | Private | Vendor endpoint and intended TEE execution |
-| Encrypted bid payload/reference | Public or publicly retrievable ciphertext | Everyone can observe; intended TEE can decrypt |
-| Bid commitment/root | Public | Canonical contract |
-| TEE encryption/private signing keys | Private | FCC/attested TEE boundary |
-| Rules, ceiling, deadline, approved vendors | Public | Everyone |
-| Winner | Public after finalization | Everyone |
-| Winning amount and ERC-20 transfer | Public | Everyone |
-| Losing amounts | Private by default | TEE and original vendor endpoint only |
-| FXRP/FTestXRP balances | Public ERC-20 state | Token holders/contracts |
-| Result envelope, signer, digest, code version | Public | Everyone |
-| Revealed local plaintext | Browser memory | Current vendor/browser session |
+| Bid price, delivery, warranty, credentials, salt | Private | Submitting vendor and approved TEE quorum |
+| Encrypted bid transport payload | Private in transit; never committed on-chain | Vendor and target TEE connection |
+| Sealed bid state | Opaque outside confidential runtime | Tender-fixed TEE identity/code policy |
+| Salted commitment, vendor, receipt bitmap, timing | Public | Canonical market contract |
+| TEE encryption/signing secrets | Private | FCC-attested TEE boundary |
+| Rules, ceiling, deadline, issuer policy, machine fingerprints | Public | Canonical market contract |
+| FTSO XRP/USD close snapshot | Public | Canonical market contract |
+| Winner and winning FTestXRP amount | Public after finalization | Canonical market contract |
+| Losing bid values and score components | Private by default | TEE runtime and original vendor only |
+| XRP/FXRP/FTestXRP transaction graph | Public | XRPL and Flare networks |
+| Receipt/result digests and signatures | Public | Everyone can verify |
+| Local unsent plaintext | Browser memory only | Current vendor session |
 
-The system does not hide bidder identity, participation, timing, public
-metadata, ciphertext existence/size, final winner, winning payout, or transaction
-graph.
+The system does not hide bidder identity, participation, timing, traffic
+metadata, tender metadata, commitment existence, the final winner, the winning
+amount, or either network's transaction graph.
 
 ## 3. Trust boundaries
 
-### Wallet and browser
+### Wallet, XRPL authorization, and browser
 
-A compromised endpoint can steal bid plaintext before encryption, replace
-displayed rules, select the wrong TEE key, or observe authorized local reveals.
-The UI must display verified chain/market/extension/key identifiers and clear
-session plaintext on account or network changes.
+A compromised endpoint can steal a bid before encryption, alter displayed
+rules, target the wrong machine key, or authorize an unwanted public
+transaction. The client must derive public configuration from the verified
+release, display chain/market/extension/code/machine fingerprints, and clear
+session plaintext on account, network, tender, key, or policy changes.
 
-### FCC, proxy, relayers, and TEE
+The flagship buyer path relies on an XRPL payment memo committing the exact
+Smart Account user-operation hash. VeilBid never receives an XRPL secret or
+operates a hidden buyer signer.
 
-FCC registries, data-provider relaying, proxy availability, TEE attestation,
-registered identity, key management, code version, and extension code are in the
-confidentiality, correctness, and availability boundary. Hardware isolation and
-signed results reduce operator trust but do not create a zero-knowledge proof of
-the computation.
+### Private ingress, proxy, and sealed storage
 
-### Flare contracts
+The ingress endpoint authenticates tender/vendor context, limits payload size
+and rate, terminates only the transport layer required by the supported FCC
+deployment, and must not log bodies. Bid confidentiality ultimately depends on
+encryption to the verified TEE key, not on ordinary proxy secrecy.
 
-Contracts are canonical for public inputs, signer policy, result binding,
-escrow, and terminal state. They cannot inspect private computation and are
-unaudited hackathon code.
+Proxy queue/cache state is not the procurement ledger. Each TEE seals its own
+state, while the on-chain ordered commitment root detects missing, duplicated,
+or rolled-back records. Gate B must prove the organizer-supported environment
+can provide this path; public on-chain ciphertext is not an accepted fallback.
 
-### Asset and interoperability protocols
+### FCC machines and extension code
 
-FAssets/AssetManager, FDC, FTSO, and Smart Account contracts/services are
-trusted according to their documented protocol and deployment assumptions. A
-VeilBid bug must not be presented as a guarantee inherited from those systems.
+Confidentiality and scoring correctness depend on FCC registries, attestation,
+machine identity, key management, the pinned extension image/code version, and
+the TEE runtime. Two matching signatures from three fixed machines reduce
+single-machine faults and availability risk, but do not eliminate correlated
+hardware, runtime, registry, or identical-code defects. The contract verifies
+agreement and binding, not a zero-knowledge proof of private execution.
 
-### Relay and RPC
+### Flare market contracts
 
-An RPC can delay or lie to a client but cannot sign a wallet transaction. A
-relay is an untrusted permissionless caller with no bid plaintext or winner
-authority.
+Contracts are canonical for public inputs, receipt ordering, quorum policy,
+FTSO snapshot, result verification, escrow, and terminal state. They are
+non-upgradeable and unaudited hackathon code. Limited governance may configure
+future tenders but cannot mutate a live tender, reduce its threshold, replace a
+winner, or withdraw escrow.
+
+### FAssets, FDC, FTSO, and Smart Accounts
+
+The XRP-native journey trusts the supported Flare protocol deployments and
+their documented assumptions. FDC proves the supported XRPL payment statement;
+it does not prove procurement quality. FTSO supplies a public price snapshot;
+it does not hide conversion or settlement. FAssets and Smart Accounts provide
+minting, account, and redemption mechanics; VeilBid does not inherit a security
+guarantee beyond those exact interfaces.
+
+### Relays, RPCs, and indexers
+
+Relays are permissionless, stateless callers. They may delay requests or waste
+their own gas but hold no plaintext and cannot supply a winner. RPCs and
+indexers can omit, delay, or misreport data to a client; release bytecode,
+events, transactions, and multiple public checkpoints remain independently
+verifiable.
 
 ## 4. Threats and mitigations
 
-| Threat | Mitigation | Residual risk |
+| Threat | Required mitigation | Residual risk |
 |---|---|---|
-| Vendor sends plaintext | Canonical client encryption and contract accepts only ciphertext/reference format | Malicious vendor may publish its own bid |
-| Wrong TEE key | UI verifies extension/machine/key binding before encryption | Compromised UI or FCC discovery can mislead user |
-| Ciphertext rebound to another tender | Encrypted schema binds chain, market, tender, vendor, rules, nonce | TEE/client encoding bug |
-| UI supplies favored winner | Contract accepts only domain-bound registered TEE signature | TEE/code governance compromise |
-| Result replay | Tender-specific monotonic nonce, expiry, terminal guard | Contract bug |
-| Result applied to reordered bids | Ordered bid root and close block signed and verified | Root implementation bug |
-| Invalid bid wins | TEE validates nonzero/ceiling and deterministic tests cover cases | Extension implementation defect |
-| TEE leaks plaintext in logs/result | Minimum result schema, structured allowlisted logs, evidence scan | TEE or proxy compromise |
-| Single TEE is unavailable | Recover same fixed computation through approved machine policy | Extended FCC outage locks progress |
-| Buyer exploits outage to refund | No post-bid timeout refund that invalidates frozen valid bids | Escrow liveness risk |
-| Fake TEE signature | Registered signer and code-version verification with domain separation | Registry/attestation compromise |
-| Underfunded tender opens | Exact token balance-delta accounting before `Open` | Unsupported token behavior |
-| Double settlement/reentrancy | Nonce/terminal state before external calls, guard, supported token allowlist | Unaudited code bug |
-| Public transfer reveals price | UI and docs explicitly classify winning amount as public | Commercial winner price is disclosed |
-| FTSO manipulation/stale price | Supported feed, timestamp/decimals bounds, public snapshot, fixed-point tests | Oracle/protocol risk and market volatility |
-| Forged FDC milestone | Verify official proof and exact tender/source/recipient/amount binding | Bad underlying data/API semantics |
-| Smart Account replay/custody | Supported instruction flow, nonce binding, no hidden app signer | Operator/protocol availability |
-| Ciphertext unavailable at close | Immutable storage/availability policy and pre-close retrieval checks | Off-chain storage outage if selected |
+| Plaintext reaches proxy/logs | ECIES before transport; body/log allowlist tests; no analytics or durable browser storage | Compromised vendor device or extension may disclose it |
+| Public ciphertext enables future recovery | Never store bid ciphertext on-chain or in evidence; bounded ephemeral transport | Network observer sees timing/size metadata |
+| Wrong machine key | Verified release data, fingerprint confirmation, tender-fixed key set | Compromised UI or registry discovery can mislead the user |
+| Cross-tender receipt replay | Full receipt domain, vendor nonce, expiry, signer registration | Encoding or verifier defect |
+| One machine acknowledges a different bid | Receipts must preserve a common 2-machine quorum over the same commitment | Two colluding/identically faulty machines |
+| TEE state rollback or omission | Ordered chain root, sequence/checkpoint validation before scoring | Loss of quorum can permanently halt a tender |
+| Buyer/client supplies favored winner | Market accepts only threshold signatures over its reconstructed result domain | Correlated TEE/code/governance compromise |
+| Split TEE outcomes | Group exact digest and require two distinct common-quorum signers | Liveness failure when no digest reaches threshold |
+| Result replay or rebinding | Tender nonce, expiry, terminal guard, full domain including root and FTSO snapshot | Contract or domain implementation defect |
+| Invalid credential/bid wins | Versioned schema, issuer domains, fixed bounds, golden vectors and adversarial tests | Extension defect or compromised trusted issuer |
+| FTSO stale/manipulated quote | Contract-read official feed, positive/freshness checks, fixed decimals/rounding, signed snapshot | Oracle/protocol risk and close-time volatility |
+| Smart Account/FDC replay | Exact user-op hash in XRPL memo, sender/account/nonce checks, official proof verification | Underlying protocol/executor availability or implementation defect |
+| Underfunded or unusual token | FTestXRP-only release, exact balance-delta and conservation checks | FAssets/protocol failure |
+| Double settlement/reentrancy | Nonce and terminal state before transfers, guard, no arbitrary token allowlist | Unaudited market defect |
+| Public award leaks commercial price | Winning amount explicitly classified as public before submission | Winner's commercial price is disclosed by design |
+| Proxy/RPC/relay outage | Public checkpoints, bounded retry, competing relay/browser recovery | Extended FCC or quorum outage locks escrow |
+| Buyer exploits outage for refund | No post-bid timeout refund or machine replacement after freeze | Availability is intentionally favored over unilateral recovery |
+| Admin changes live policy | Immutable tender binding and governance without live-tender/escrow authority | Deployment key can still misconfigure future tenders |
+| Fake evidence or mock fallback | Schema-validated public evidence tied to real Coston2 IDs; unavailable state on dependency failure | Review process can still miss an omission |
 
 ## 5. Compromise impact
 
-- Vendor wallet/browser: attacker can submit or disclose that vendor's bid.
-- Buyer wallet: attacker can create/fund/cancel where allowed but cannot forge a
-  registered TEE result without compromising another boundary.
-- Relay: attacker can waste its own gas or delay its runner only.
-- TEE/extension: attacker may learn all processed bids and sign an incorrect
-  result; on-chain binding limits reuse but cannot prove correct private
-  execution independently.
-- Extension governance/code-version authority: may approve malicious code for
-  future tenders; tender-fixed version policy must prevent retroactive changes.
-- Market contract: a bug may lock or misdirect test assets.
-- FAssets/FDC/FTSO/Smart Account infrastructure: dependent user journeys may
-  fail or return unsafe data according to the compromised subsystem.
+- **Vendor wallet/browser:** attacker can submit, alter, or disclose that
+  vendor's bid and public transaction.
+- **Buyer XRPL/EVM endpoint:** attacker can authorize buyer actions within its
+  account, but cannot forge a threshold FCC result without another compromise.
+- **One of three TEEs:** attacker can learn bids processed by that machine,
+  withhold receipts/results, or sign a false digest; one signature is
+  insufficient for acceptance or settlement.
+- **Two TEEs or a correlated extension/runtime flaw:** attacker may learn all
+  processed bids and produce a threshold false result. On-chain binding limits
+  reuse but does not prove correct private scoring.
+- **Proxy:** attacker can observe traffic, deny service, or serve stale public
+  metadata; encrypted payload confidentiality remains dependent on the target
+  TEE key. Body logging or key substitution is a critical failure.
+- **Relay:** attacker can delay only its own runner or submit data the contract
+  rejects.
+- **Market contract:** a defect may lock or misdirect all test escrow governed
+  by that deployment.
+- **FDC/FAssets/FTSO/Smart Account infrastructure:** the dependent XRP-native,
+  oracle, or settlement journey may fail according to the affected subsystem.
 
 ## 6. Operational requirements
 
-- Use Coston2 and disposable wallets until explicit mainnet approval.
-- Pin extension source, image/code version, and contract source commit.
-- Keep proxy/indexer credentials and TEE/wallet keys ignored and untracked.
-- Never log plaintext bids, ECIES secrets, full decrypted payloads, or sensitive
-  raw proxy responses.
-- Verify contract bytecode, extension identity/version, signer mapping,
-  transaction receipts, result binding, and settlement conservation.
-- Treat FCC/FDC/FTSO/RPC failure as unavailable state, not permission to mock.
-- Run current and full-history secret scans before public submission.
+- Use Coston2/XRPL testnet and disposable identities until a separate audited
+  mainnet process exists.
+- Pin extension source, image digest, toolchains, interfaces, registry
+  discovery, machine identities, and public-key fingerprints.
+- Freeze extension, code version, machine set, threshold, and key fingerprints
+  per tender before accepting bids.
+- Keep wallet/XRPL/TEE/proxy/indexer/tunnel credentials ignored and untracked.
+- Disable body logging and redact headers, ciphertext, plaintext, credentials,
+  signatures from private wallets, and raw provider responses.
+- Verify runtime bytecode, constructor arguments, registry wiring, machine
+  policy, result domain, FTSO units, Smart Account nonce, and conservation.
+- Treat FCC/FDC/FTSO/FAssets/RPC failure as unavailable state, never permission
+  to calculate a winner or substitute a value.
+- Run source, generated-artifact, evidence-schema, current-tree, and full-history
+  secret/privacy scans before release.
 
-## 7. Out of scope
+## 7. Out of scope and prohibited claims
 
-- Production-value custody or formal security assurance.
-- Privacy against compromised vendor/browser or compromised TEE code/runtime.
+- Production-value custody, formal audit, formal verification, or mainnet
+  readiness.
+- Zero-knowledge correctness or privacy against a compromised TEE/runtime.
 - Bidder anonymity, traffic-analysis resistance, collusion, bribery, Sybil, or
   transaction-order privacy.
-- Confidential ordinary ERC-20 transfer amounts.
-- Legal delivery, dispute arbitration, KYC, sanctions, or contract enforcement.
-- Correctness of arbitrary external APIs beyond the exact verified FDC claim.
+- Confidential winner, winning price, ERC-20 balances, or transaction graph.
+- Subjective service-quality judgment, legal delivery, disputes, KYC,
+  sanctions, or contract enforcement.
+- Correctness of arbitrary external APIs or credentials beyond the exact
+  issuer/FDC/FTSO statements the release verifies.

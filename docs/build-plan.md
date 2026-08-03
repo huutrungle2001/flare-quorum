@@ -1,150 +1,158 @@
-# VeilBid Flare Build Plan
+# VeilBid Flare Championship Build Plan
 
-> Status: Planned. Feasibility Gates A–E are the active prerequisite.
+> Status: Ready to start Phase 0 feasibility. Product scope and architecture are
+> decided; implementation and Coston2 evidence have not started.
+
+The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
+workspace sequencing, deliverables, and release engineering.
 
 ## 1. Delivery strategy
 
-The repository retains the verified Sepolia/Nox release as pre-hackathon
-baseline and builds the Flare edition in new workspaces. This prevents package,
-artifact, deployment, and evidence ambiguity while allowing the existing UI,
-indexer, relay, and documentation patterns to be reused deliberately.
+Build one vertical flagship product rather than a minimal FCC demo plus optional
+protocol widgets. Every production phase extends the same path:
 
-## 2. Target stack
+```text
+XRPL/FDC/Smart Account funding -> FTestXRP escrow -> private FCC bids ->
+FTSO-bound multi-criteria scoring -> threshold result -> FXRP settlement/exit
+```
 
-- Network: Flare Testnet Coston2 (`114`), followed by Flare Mainnet only after
-  testnet acceptance and explicit approval.
-- Contracts: Solidity with the official Flare starter/periphery contract pattern.
-- Confidential compute: Flare Compute Extension based on the official FCC
-  scaffold and supported TEE/proxy stack.
-- Extension implementation: Go by default; TypeScript is acceptable only if the
-  selected official framework path supports every required production check.
-- Client: React, viem/wagmi-compatible Flare network integration, injected
-  wallets, and FCC public-key/encryption utilities.
-- Asset: supported Coston2 test token first, then official FTestXRP.
-- Automation: stateless public close/request/result/finalize relay.
-- State: Flare chain events plus rebuildable caches; no application database.
+The historical Sepolia/Nox release remains isolated baseline. New Flare code,
+bindings, deployment, and evidence use separate authorities.
 
-Versions must be pinned from the chosen official examples at Gate A and recorded
-in lockfiles and evidence. Do not copy historical Nox versions into the Flare
-stack.
+## 2. Pinned target stack
 
-## 3. Milestones
+- Coston2 (`114`).
+- Foundry and Solidity `0.8.27` for Flare contracts.
+- Official FCC scaffold-derived Go extension and Docker stack.
+- React, viem, and generated TypeScript bindings.
+- Official Flare periphery/registry discovery.
+- FTestXRP/AssetManager, XRP/USD FTSO, FDC, and Smart Accounts.
+- Stateless Node relay and read-only console.
 
-### Milestone 0 — transition documentation
+Exact versions and upstream commit/image digests are produced by Gate 0; version
+placeholders are forbidden after that commit.
 
-- [x] Record Sepolia/Nox as the pre-hackathon baseline.
-- [x] Select Confidential Compute Apps as the primary bounty.
-- [x] Define the public/private boundary for public FXRP settlement.
-- [x] Define source priority, gates, target architecture, and evidence policy.
-- [x] Publish the transition commit to the private Summer Signal repository.
+## 3. Workspace sequence
 
-### Milestone 1 — FCC feasibility
+### Milestone 0 — championship planning
 
-- [ ] Scaffold `apps/fcc-extension/` from an official FCC example.
-- [ ] Scaffold `packages/flare-contracts/` with Coston2 configuration.
-- [ ] Pass Gate A registered result verification.
-- [ ] Pass Gate B ECIES bid round trip.
-- [ ] Pass Gate C deterministic private selection.
-- [ ] Pass Gate D public escrow settlement.
-- [ ] Pass Gate E recovery.
+- [x] Preserve historical baseline.
+- [x] Approve product thesis and flagship journey.
+- [x] Resolve architecture decisions.
+- [x] Define feasibility, verification, security, UX, evidence, and traction
+  gates.
+- [x] Publish private Summer Signal repository.
 
-Exit: a minimal two-vendor Coston2 lifecycle finalizes only through a registered
-TEE-signed result and exposes no losing plaintext.
+### Milestone 1 — FCC foundation
 
-### Milestone 2 — production Flare contracts
+- [ ] Pin official scaffold and toolchain.
+- [ ] Add `apps/fcc-extension`.
+- [ ] Add `packages/flare-contracts` feasibility sender/verifier.
+- [ ] Pass Gates 0–B: environment, registered result, private ingress, sealed
+  recovery.
 
-- [ ] Implement `VeilBidFlareMarket` tender lifecycle.
-- [ ] Implement ordered bid commitments and immutable submission slots.
-- [ ] Implement FCC request/result state and signer/code-version policy.
-- [ ] Implement escrow conservation, zero-winner refund, and replay guards.
-- [ ] Implement non-transferable public award receipt.
-- [ ] Add unit, invariant, signature, root-binding, lifecycle, and adversarial
-  tests.
+### Milestone 2 — confidential procurement engine
 
-Exit: no function accepts an independent winner decision and no forbidden
-plaintext state exists outside the TEE.
+- [ ] Freeze cross-language schemas and golden vectors.
+- [ ] Implement bid receipts, common quorum, and ordered root.
+- [ ] Implement credential validation and `SCORING_V1`.
+- [ ] Implement three-machine selection and two-signature result threshold.
+- [ ] Pass Gates C–E.
 
-### Milestone 3 — product migration
+### Milestone 3 — Flare economic path
 
-- [ ] Generate `packages/flare-bindings` from canonical Flare artifacts.
-- [ ] Switch the main web judge path to Coston2.
-- [ ] Implement FCC key discovery, ECIES encoding, and encrypted bid submission.
-- [ ] Implement buyer funding, vendor submission, public close, result polling,
-  finalization, and recovery.
-- [ ] Make unavailable/indexing/proxy states explicit without mock fallback.
-- [ ] Preserve wallet-free tender and evidence inspection.
+- [ ] Implement production `VeilBidFlareMarket` and receipt.
+- [ ] Integrate FTestXRP escrow and FAssets exit.
+- [ ] Integrate XRP/USD FTSO snapshot and conversion.
+- [ ] Integrate Smart Account `0xFE` plus FDC direct mint-and-fund.
+- [ ] Pass Gates F–G.
 
-Exit: the complete Coston2 judge path is usable and responsive.
+### Milestone 4 — generated consumers
 
-### Milestone 4 — FAssets interoperability
+- [ ] Add `packages/flare-bindings` and drift checks.
+- [ ] Migrate web judge path to Coston2.
+- [ ] Implement private vendor ingress and receipt UX.
+- [ ] Implement XRP-native and EVM buyer paths.
+- [ ] Implement Activity recovery and public Evidence workspace.
+- [ ] Migrate relay and console to Flare bindings.
 
-- [ ] Pass Gate F using FTestXRP.
-- [ ] Add FAssets registry/address discovery.
-- [ ] Add buyer funding and winner payout UX.
-- [ ] Add an XRP redemption path or guided proof-backed handoff.
-- [ ] Verify a real Coston2 lifecycle and document public settlement privacy.
+### Milestone 5 — verification and production presentation
 
-Exit: FAssets is essential to an XRP-native procurement journey, allowing the
-project to select the Interoperable Asset Products bounty.
+- [ ] Deploy and verify canonical Coston2 contracts/extension/machine policy.
+- [ ] Run full live/adversarial/recovery suites.
+- [ ] Publish sanitized evidence and performance benchmarks.
+- [ ] Deploy web and relay; verify desktop/mobile/keyboard behavior.
+- [ ] Complete user research, vendor tests, and pilot outreach.
+- [ ] Pass Gate H.
 
-### Milestone 5 — advanced Flare features
+### Milestone 6 — submission
 
-- [ ] Add fixed-schema private multi-criteria scoring.
-- [ ] Add FTSO snapshot normalization if multi-currency bids are shipped.
-- [ ] Add an FDC-bound milestone/payment release if a supported data source is
-  shipped.
-- [ ] Add a Flare Smart Account journey if the operator path is available and
-  independently verified.
-- [ ] Evaluate multi-TEE threshold result approval.
+- [ ] Publish live app, demo video, technical materials, Coston2 addresses,
+  extension/code/machine identifiers, work ledger, and roadmap.
+- [ ] Select Confidential Compute Apps.
+- [ ] Select Interoperable Asset Products only after the exact XRP-native
+  lifecycle evidence passes.
+- [ ] Complete claim/privacy/secret review.
 
-Each checkbox requires its own acceptance evidence. Features that do not pass
-remain roadmap items and are excluded from judge claims.
+## 4. Production packages
 
-### Milestone 6 — Coston2 release
+### `apps/fcc-extension`
 
-- [ ] Deploy a new release from a clean, pushed source commit.
-- [ ] Record contract addresses, extension ID, code/version hash, registered TEE
-  identities, transactions, blocks, and immutable wiring.
-- [ ] Verify source/runtime mapping and constructor/configuration state.
-- [ ] Run two-vendor, invalid, tie, no-valid, replay, expiry, outage/recovery,
-  and settlement tests.
-- [ ] Publish generated bindings and sanitized evidence together.
-- [ ] Deploy frontend and relay; run desktop/mobile/keyboard smoke checks.
+- private ingress adapter;
+- canonical schema and credential verification;
+- sealed tender/bid state;
+- deterministic scoring and result production;
+- allowlisted logs and health;
+- Go unit/model/Coston2 tests.
 
-### Milestone 7 — submission
+### `packages/flare-contracts`
 
-- [ ] Prepare a four-minute product demo.
-- [ ] Show pre-hackathon versus new-work ledger.
-- [ ] Publish accurate privacy and trust boundaries.
-- [ ] Include Coston2 addresses, extension identity/code version, transactions,
-  GitHub material, live app, roadmap, and user/partner feedback.
-- [ ] Select only the bounties whose acceptance gates passed.
+- market, receipt, and exact FCC registry interfaces;
+- bid receipt/result signature verification;
+- ordered root/quorum/FTSO/escrow lifecycle;
+- Foundry unit, fuzz, invariant, and live scripts;
+- Coston2 deployment and source/runtime verification.
 
-## 4. Validation commands
+### `packages/flare-bindings`
 
-Exact Flare workspace commands will be added by the scaffold commit. The target
-root interface is:
+- generated ABI/address/schema snapshots;
+- event codecs and public index;
+- readiness/result grouping rules;
+- FTSO/FAssets/Smart Account domain types.
+
+### Migrated applications
+
+- web: complete user and judge journeys;
+- relay: public close/request/threshold-result/finalize;
+- console: public inspection only.
+
+## 5. Target root commands
+
+Commands are introduced with their owning workspaces and become release gates:
 
 ```bash
 pnpm flare:compile
 pnpm flare:test
 pnpm flare:lint
 pnpm flare:build
+pnpm flare:schemas:check
 pnpm flare:bindings:check
 pnpm flare:extension:test
+pnpm flare:test:coston2
 pnpm flare:verify:coston2
 pnpm flare:evidence:validate
+pnpm flare:secret:scan
 ```
 
-These commands are planned names, not currently implemented scripts.
+They are planned names until the corresponding scaffold commit implements them.
 
-## 5. Scope controls
+## 6. Scope controls
 
-- FCC selection and verified finalization come before FAssets, FDC, FTSO, or
-  Smart Accounts.
-- Do not rebuild confidential ERC-7984 semantics under a new name in the MVP.
-- Do not add multi-currency scoring without deterministic fixed-point tests and
-  a supported FTSO feed set.
-- Do not add FDC unless a contract decision truly depends on the attested data.
-- Do not add a database for canonical lifecycle or hidden bid storage.
-- Do not add autonomous AI custody, subjective scoring, or winner authority.
+- No on-chain ciphertext fallback for the championship release.
+- No one-of-one TEE judge claim when a multi-machine environment is available.
+- No generic-token final demo.
+- No manual price in an USD-enabled tender.
+- No FDC call unrelated to the Smart Account/XRP user journey.
+- No AI or subjective scoring.
+- No app database as procurement authority.
+- No feature marked complete without live evidence and user-visible value.

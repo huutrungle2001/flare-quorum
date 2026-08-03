@@ -1,146 +1,189 @@
-# Flare Feasibility Plan
+# VeilBid Flare Championship Feasibility Plan
 
-> Status: Not started. Full Flare development is blocked until Gates A–E pass.
+> Status: Not started. Full product development is blocked until Gates 0–E
+> pass. Gates F–H are mandatory before the championship judge release.
 
-## 1. Purpose
+## 1. Rules
 
-The historical Nox release proves the product concept, not FCC compatibility.
-Flare uses a different execution, encryption, identity, signature, and recovery
-model. These gates must establish the new boundaries on Coston2 before the UI
-or full contract suite is ported.
+- Pin exact official source commits, images, interfaces, and registry discovery.
+- Use real Coston2 transactions for every network-dependent pass.
+- Label simulated versus hardware-backed TEE evidence exactly.
+- Save only public identifiers, hashes, statuses, and assertion booleans.
+- Never save bid plaintext/ciphertext, credentials, TEE/wallet/XRPL keys,
+  proxy/indexer secrets, or sensitive raw responses.
+- A kill condition pauses dependent full development; it is not converted into
+  a mock or weaker public claim without Product Plan approval.
 
-Every live gate records sanitized public identifiers only. Never save wallet
-keys, TEE private material, indexer credentials, plaintext bids, encrypted bid
-payloads, or sensitive proxy responses.
+## 2. Gate 0 — infrastructure and version pinning
 
-## 2. Gate A — FCC instruction and registered result
+Prove:
+
+- official FCC scaffold and example commit are reachable and pinned;
+- exact Go, Foundry, Solidity, Docker, Node, pnpm, and Flare dependency versions;
+- Coston2 registry/FCC configuration is resolved from supported sources;
+- proxy/indexer access and an HTTPS endpoint are available;
+- confidential/simulated TEE mode is explicitly identified;
+- at least three registered machines can serve one extension, or the exact
+  organizer infrastructure limit is recorded;
+- official FTestXRP, AssetManager, XRP/USD FTSO, MasterAccountController, FDC
+  verifier, and DA paths are discoverable.
+
+Kill condition: a mandatory service is unavailable or depends on undocumented,
+unverifiable addresses/credentials.
+
+## 3. Gate A — registered FCC result
 
 Prove on Coston2:
 
-1. Deploy an instruction-sender contract.
-2. Register a VeilBid test extension and permitted code version.
-3. Register a TEE machine through the supported FCC flow.
-4. Send a `HELLO_VEILBID` instruction.
-5. Retrieve a result and verify its domain-separated TEE signature on-chain.
-6. Bind the signature to `block.chainid`, target contract, and action ID.
+1. Deploy the minimal instruction sender.
+2. Register extension, governance, allowed code version, and TEE machine.
+3. Send a domain-bound action through the official registry.
+4. Retrieve the action result from the proxy.
+5. Verify the current FCC result-signing prefix/domain and registered signer
+   on-chain.
+6. Reject wrong chain, sender, action, payload, code version, and signer.
+7. Resume result retrieval from a fresh process.
 
-Kill condition: a result cannot be reliably mapped to a registered TEE identity
-and verified by the target contract.
+Kill condition: the target contract cannot verify and recover a result from a
+registered FCC identity without trusting an application server.
 
-## 3. Gate B — encrypted bid round trip
-
-Prove:
-
-1. Discover the intended TEE encryption public key.
-2. Encode a canonical bid containing tender ID, vendor, price, nonce, and rule
-   hash.
-3. ECIES-encrypt it before any chain or proxy submission.
-4. Decrypt only through the TEE node's supported decryption boundary.
-5. Return a commitment/status result without returning the price.
-6. Reject wrong tender, vendor, nonce, rule hash, malformed schema, and replay.
-
-Kill condition: plaintext appears in calldata, events, proxy logs, evidence, or
-an untrusted service boundary.
-
-## 4. Gate C — deterministic private selection
-
-Implement a two-to-eight-bid FCC action and prove:
-
-- Nonzero bids at or below the public ceiling are valid.
-- Lowest valid bid wins.
-- Earlier submission wins an exact tie.
-- Zero and over-ceiling bids cannot win.
-- No-valid-bid returns the zero sentinel.
-- Bid order and commitment root are deterministic.
-- The result contains winner and winning amount only, never losing values.
-- Replaying the same result or applying it to another tender fails.
-
-The signed result must bind:
-
-```text
-chainId, market, extensionId, codeVersion, tenderId, rulesHash,
-orderedBidRoot, closeBlock, winner, winningAmount, resultNonce, expiry
-```
-
-Kill condition: the client must calculate the winner or the TEE result can be
-rebound to different public state.
-
-## 5. Gate D — Coston2 escrow and settlement
-
-Prove with a supported Coston2 token first, then FTestXRP:
-
-1. Buyer escrow equals the public ceiling.
-2. Only a Gate-C-valid signed result can settle.
-3. Winner receives the public winning amount.
-4. Buyer receives the public remainder.
-5. A zero winner returns the full escrow.
-6. Double settlement and reentrancy cannot change balances twice.
-7. Unsupported assets and fee-on-transfer surprises are rejected or handled by
-   an explicitly proven balance-delta rule.
-
-Kill condition: settlement can be driven by a caller-provided winner/amount or
-the market cannot account for escrow conservation.
-
-## 6. Gate E — asynchronous recovery and availability
+## 4. Gate B — private bid ingress and sealed recovery
 
 Prove:
 
-- Close and FCC request are separate recoverable checkpoints.
-- A fresh process can resume from mined public state.
-- Proxy/indexer delay produces pending or unavailable state, not mock success.
-- A competing finalizer cannot settle twice.
-- Expired result envelopes can be safely recomputed without reopening bidding.
-- An unavailable TEE cannot enable buyer cancellation after valid bids are
-  frozen.
-- The recovery policy for replacing an unavailable TEE is explicit and does
-  not let the buyer select a favorable computation result.
+1. Vendor fetches and verifies the intended machine identity/key.
+2. Vendor canonicalizes and ECIES-encrypts `BID_SCHEMA_V1` off-chain.
+3. Authenticated proxy ingress forwards only opaque ciphertext to the TEE.
+4. TEE decrypts, validates binding/nonce/credential schema, seals state, and
+   returns a signed `BID_RECEIPT_V1`.
+5. Plaintext and ciphertext remain absent from chain, public proxy logs,
+   analytics, browser persistence, and evidence.
+6. TEE restarts and restores sealed state whose receipt root matches chain.
+7. Wrong key, tender, vendor, rule, nonce, schema, commitment, and replay fail.
 
-Kill condition: an outage requires plaintext persistence, bid resubmission, or
-an authority that can replace the winner.
+Kill condition: the supported FCC environment cannot provide private ingress
+and sealed recovery without permanently publishing ciphertext or storing
+plaintext in an application database.
 
-## 7. Gate F — meaningful FAssets integration
+## 5. Gate C — common multi-TEE bid quorum
 
-Required before selecting the Interoperable Asset Products bounty:
+Prove with three registered machines:
 
-- Resolve the official FTestXRP/AssetManager through supported Flare tooling.
-- Complete a real Coston2 fund, escrow, winner payout, and remainder/refund
-  lifecycle.
-- Complete or clearly demonstrate the relevant FXRP mint/redemption path.
-- Show why XRP interoperability changes the target-user journey.
-- If VeilBid directly consumes FDC, verify the corresponding XRPL payment or
-  milestone proof on-chain and bind it to one tender.
+- each bid receives valid receipts from a machine bitmap;
+- contract accepts a bid only while intersection across all accepted bids keeps
+  at least two machines;
+- forged, duplicate, wrong-machine, wrong-code, and mismatched-commitment
+  receipts fail;
+- the ordered root is identical in Solidity, Go, and TypeScript models;
+- loss of one machine still leaves the same complete bid set on two machines;
+- no machine/key/code policy changes after the first accepted bid.
 
-Kill condition: FTestXRP is merely displayed or substituted for a generic token
-without an XRP-native user journey.
+Kill condition: the contract can accept bids without a common computation
+quorum or two remaining machines can observe different accepted bid sets.
 
-## 8. Gate G — optional differentiated integrations
+## 6. Gate D — deterministic private scoring
 
-Each item has an independent gate:
+Implement `SCORING_V1` and prove:
 
-- **FTSO:** capture a timestamped feed snapshot and prove deterministic
-  fixed-point normalization inside the scoring rule.
-- **FDC milestone:** verify a supported Payment/Web2Json proof and release only
-  the bound milestone tranche.
-- **Smart Accounts:** execute a tender action authorized by an XRPL-native flow
-  with replay protection and no hidden custodial signer.
-- **Multi-TEE:** require threshold agreement on the same result digest and
-  define key distribution/recovery without duplicating plaintext logs.
+- required credential signatures gate eligibility;
+- XRP quote requires no conversion;
+- USD quote uses the exact bound XRP/USD snapshot;
+- zero, negative-equivalent, over-ceiling, late-delivery, short-warranty,
+  malformed, and unsupported bids cannot win;
+- weighted price/delivery/warranty penalty matches shared golden vectors;
+- lower penalty wins and earlier accepted bid wins exact ties;
+- permutations preserve expected semantic winner except the explicit tie rule;
+- checked math covers rounding, decimals, overflow, and zero denominators;
+- result returns only winner and public FXRP payout, never losing inputs or
+  component penalties.
 
-Failure of an optional gate removes its public claim; it must not block the
-verified Tier-1 FCC product.
+Kill condition: implementations disagree, client/buyer must calculate winner,
+or private scoring requires subjective/AI branching.
 
-## 9. Evidence outputs
+## 7. Gate E — threshold result and recovery
 
-Planned sanitized files:
+Prove:
+
+- close freezes root, common quorum, FTSO snapshot, and checkpoint;
+- each selected TEE independently rebuilds exact state and signs the same result;
+- market accepts two distinct registered compatible signers over one digest;
+- split results do not reach threshold;
+- wrong root/rule/feed/close block/winner/amount/nonce/expiry fails;
+- duplicate finalization cannot settle twice;
+- fresh relay/browser resumes close, request, collected results, and finalization;
+- one-machine outage remains recoverable through the fixed common quorum;
+- quorum loss cannot unlock a buyer timeout refund or winner override.
+
+Kill condition: one machine or an untrusted relay can unilaterally decide the
+championship result, or recovery changes the frozen input set.
+
+## 8. Gate F — FTSO and exact FTestXRP settlement
+
+Prove:
+
+- official FTestXRP/AssetManager and XRP/USD feed are resolved through supported
+  tooling;
+- close captures positive, fresh value/decimals/timestamp/block;
+- stale/unavailable feed pauses only USD-enabled close;
+- winning USD price rounds to the documented XRP payout;
+- buyer escrows exact public ceiling;
+- award plus remainder, or zero-winner refund, equals ceiling;
+- unsupported/rebasing/fee-on-transfer asset cannot enter the release;
+- reentrancy and token failure cannot settle partially or twice;
+- winner can follow the supported FAssets redemption path without VeilBid
+  receiving an XRPL secret.
+
+Kill condition: a generic test token or manually supplied price is required for
+the final lifecycle.
+
+## 9. Gate G — XRP-native Smart Account funding
+
+Prove on XRPL testnet and Coston2:
+
+1. Derive the PersonalAccount and nonce.
+2. Encode FTestXRP approval and `createTender`/funding calls.
+3. Commit the exact `PackedUserOperation` hash in an XRPL `0xFE` payment memo.
+4. Obtain and verify the FDC `XRPPayment` proof.
+5. Execute `executeDirectMintingWithData` atomically.
+6. Confirm PersonalAccount is buyer and tender escrow is funded.
+7. Reject wrong sender, nonce, operation bytes/hash, executor, payment, and
+   duplicate transaction ID.
+8. Exercise delayed mint and stuck-mint recovery without duplicate custody.
+
+Kill condition: VeilBid needs a custodial signer or the XRP payment/mint/tender
+actions cannot be cryptographically and atomically bound.
+
+## 10. Gate H — product, evidence, and user validation
+
+Prove:
+
+- wallet-free Coston2 finalized tender loads from canonical events;
+- XRP Buyer, Vendor, Public Finalizer, Activity, Evidence, and redemption flows
+  work on desktop and mobile;
+- no RPC/FCC/proxy/FDC/FTSO failure inserts mock success;
+- exact source/runtime/extension/code/machine/binding facts agree;
+- current and full-history secret/privacy scans pass;
+- at least five buyer/treasury interviews and five vendor usability sessions are
+  recorded honestly;
+- at least one pilot/design-partner signal or a transparent absence is reported;
+- a four-minute demo completes the flagship journey.
+
+Kill condition: the product is only a developer script, the judge path requires
+private credentials, or public claims exceed executed evidence.
+
+## 11. Planned evidence
 
 ```text
+evidence/coston2/gate-0-environment.json
 evidence/coston2/gate-a-fcc-result.json
-evidence/coston2/gate-b-encrypted-bid.json
-evidence/coston2/gate-c-private-selection.json
-evidence/coston2/gate-d-settlement.json
-evidence/coston2/gate-e-recovery.json
-evidence/coston2/gate-f-fassets.json
+evidence/coston2/gate-b-private-ingress.json
+evidence/coston2/gate-c-tee-quorum.json
+evidence/coston2/gate-d-private-scoring.json
+evidence/coston2/gate-e-threshold-recovery.json
+evidence/coston2/gate-f-ftso-fassets.json
+evidence/coston2/gate-g-smart-account.json
+evidence/coston2/gate-h-product.json
 ```
 
-Until these artifacts exist and pass their schemas, the associated capability
-must remain `planned` in README, UI, and submission copy.
+Until an artifact passes its schema and live assertions, its capability remains
+`NOT RUN` in `docs/verification.md` and `PLAN.md`.
