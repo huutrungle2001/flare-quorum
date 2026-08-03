@@ -14,8 +14,11 @@ The local `pkg/protocol` feasibility model now locks the Solidity-compatible
 ordered-root and bid-receipt vectors, canonical ABI encoding for
 `BID_SCHEMA_V1`/`BID_RECEIPT_V1`, and checked `SCORING_V1` eligibility, issuer
 credentials, XRP/USD conversion, penalties, and tie-breaking. That model is
-not yet connected to a private ingress/action handler and is not a live FCC
-claim.
+connected locally to the official direct-action envelope. The handler accepts
+only opaque ECIES, decrypts and signs through tee-node's loopback API, persists
+only the original ciphertext in a replay-safe sealed slot, and returns a public
+receipt. Unit/race/restart tests pass, but this is not a live FCC claim until a
+registered Coston2 machine and proxy exercise the same path.
 
 ```bash
 go test ./...
@@ -26,4 +29,6 @@ go build ./...
 The release image pins both stages by digest and defaults to production
 attestation (`MODE=0`). Local simulation must explicitly set `MODE=1`. Runtime
 ownership must come from `INITIAL_OWNER` or `FLARE_DEPLOYMENT_PRIVATE_KEY`; no
-development key is embedded in source or the image.
+development key is embedded in source or the image. Production deployment must
+mount a persistent private volume at `SEALED_STORE_DIR`; an ephemeral container
+filesystem cannot satisfy restart recovery.

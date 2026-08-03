@@ -135,6 +135,21 @@
       "sha256": "f407aeeae8149d80ff124f3ad345f2caf90b65f39989a9247880edbcbdbe5a55"
     },
     {
+      "id": "tee-proxy-authenticated-direct-endpoint",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-proxy/0c6d016b09948cba9a508ba357e592eb6088fd1c/internal/server/external.go",
+      "sha256": "f7aacc36edbb50f5b18bd30e369889030248f467cfc142035556c5c0ec68c816"
+    },
+    {
+      "id": "tee-node-extension-crypto-api",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/adc67a29eb7162f6f1b5dabcbca320009480695e/internal/extension/server/server.go",
+      "sha256": "ed62e21b6edb5ba498159f797869be0917575471936dc918c7a04c072a8da29a"
+    },
+    {
+      "id": "tee-node-ecies-and-signature-convention",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/adc67a29eb7162f6f1b5dabcbca320009480695e/pkg/utils/crypto.go",
+      "sha256": "4ca3745ad29fe18507abd5eb6b6f5ef0c2fdcbaab8e1430706f95d24cefc89d6"
+    },
+    {
       "id": "coston2-contract-registry",
       "url": "https://raw.githubusercontent.com/flare-foundation/flare-foundry-periphery-package/ca264d6a31ddfb53d1bef7cb7bd1942aa89d323a/src/coston2/ContractRegistry.sol",
       "sha256": "c72cbae671cd0f498b6ff9d45fdd1b123e519175bd18168c68e64681e2390e57"

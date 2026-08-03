@@ -66,6 +66,18 @@ can expose a hardened private-ingress path. If the official environment cannot
 support it, the architecture returns to planning; an on-chain ciphertext
 fallback is not considered championship-complete.
 
+**Current transport mapping:** The pinned 2026 FCC proxy exposes API-key
+protected `POST /direct`, removes the queued action body after the TEE fetches
+it, and exposes the signed `ActionResult` separately. VeilBid uses that direct
+queue only for opaque ECIES. The API key remains server-side; a vendor-facing
+gateway authenticates the vendor request without learning the plaintext. The
+extension calls only tee-node's loopback `/decrypt` and `/sign` endpoints and
+stores the original ECIES bytes in a private persistent volume keyed by a hash
+of chain/market/extension/tender/vendor. Exact ciphertext retry is idempotent;
+a different ciphertext for the same slot fails. This mapping remains local
+evidence until proxy body-log inspection and a real machine restart pass Gate
+B.
+
 ## ADR-004 — Canonical bid schema
 
 **Decision:** Use a versioned deterministic binary schema shared by generated

@@ -286,7 +286,7 @@ the championship product and requires Product Plan approval.
 | Documentation transition | COMPLETE |
 | Official version pinning | IN PROGRESS — core source/toolchain/discovery checks pass; proxy image release and live TEE stack remain |
 | FCC foundation operation | IMPLEMENTED LOCALLY — deterministic `PING_V1` tests pass; live Gate A not run |
-| FCC private ingress | NOT STARTED |
+| FCC private ingress | LOCAL IMPLEMENTATION — official direct envelope, loopback decrypt/sign, sealed ciphertext restart/replay tests; no live proxy/TEE proof |
 | Multi-TEE quorum | NOT STARTED |
 | Flare contracts | LOCAL FEASIBILITY — foundation sender plus FCC/FTestXRP/FTSO market lifecycle tests pass; no live deployment |
 | FAssets/FDC/Smart Account journey | NOT STARTED |

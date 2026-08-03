@@ -15,7 +15,10 @@ import (
 )
 
 func main() {
-	e := extension.New(config.ExtensionPort, config.SignPort)
+	e, err := extension.New(config.ExtensionPort, config.SignPort)
+	if err != nil {
+		logger.Fatalf("initialize extension: %v", err)
+	}
 
 	// Graceful shutdown.
 	sigChan := make(chan os.Signal, 1)
@@ -31,7 +34,7 @@ func main() {
 	}()
 
 	logger.Infof("starting extension server on :%d", config.ExtensionPort)
-	err := e.Server.ListenAndServe()
+	err = e.Server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		logger.Fatalf("server: %v", err)
 	}
