@@ -168,6 +168,12 @@ nonce, and expiry.
 Split results remain pending and become public evidence of disagreement. A
 relay never selects between them.
 
+If the one-hour result envelope expires, a permissionless retry keeps every
+closed-tender fact fixed but creates a new attempt nonce, expiry, and FCC
+request ID. Results from prior attempts are invalid. If no attempt settles
+within 24 hours of the first request, the buyer may record a failed-compute
+refund; this is never represented as a selected winner or successful FCC run.
+
 ## 8. XRP-native funding
 
 The flagship buyer uses Smart Account opcode `0xFE`:
@@ -199,14 +205,15 @@ selected TEE boundary.
 ## 10. Recovery
 
 - Browser/relay restart: rebuild public checkpoint from events.
-- Proxy queue loss: replay the fixed public FCC instruction under the same
-  request/recovery policy.
+- Proxy queue loss: after expiry, resend the fixed public FCC instruction with
+  a fresh attempt nonce and request ID.
 - One machine loss: remaining common quorum can compute and reach threshold.
 - Machine/key/code change: cannot affect an open/closed tender.
 - TEE sealed-state mismatch: machine refuses to sign; contract never lowers
   threshold.
 - Split TEE result: remain pending; investigate/recompute exact input.
-- Quorum loss: explicit liveness failure, no buyer timeout refund after bids.
+- Quorum loss: explicit liveness failure; after the fixed 24-hour grace the
+  buyer may recover escrow with no award and no success claim.
 - FTSO unavailable/stale: USD-enabled close pauses; no manual price.
 - FDC/Smart Account failure: use documented stuck-mint recovery; no app custody.
 - Competing finalizer: canonical reread and benign-race classification only.

@@ -31,6 +31,8 @@ ftsoValue
 ftsoDecimals
 ftsoTimestamp
 closeBlock
+selectionStartedAt
+selectionAttempt
 requestId
 resultNonce
 winnerBidId
@@ -110,11 +112,21 @@ not a caller-controlled contract state.
 - `submitBidReceipts(tenderId, receiptEnvelope[])`
 - `closeTender(tenderId)`
 - `requestSelection(tenderId)`
+- `retrySelection(tenderId)` only after the signed-result window expires; it
+  preserves the close checkpoint and creates a fresh attempt, nonce, and FCC
+  request ID
 - `finalizeTender(tenderId, SelectionResult, TeeSignature[])`
+- `refundExpiredSelection(tenderId)` only for the buyer after the fixed
+  24-hour grace measured from the first selection request
 - `cancelTender(tenderId)` only inside the permitted pre-bid boundary
 
 No write function accepts an independent winner, score, FTSO value, machine
 replacement, or settlement amount.
+
+Retry never changes rules, bids, root, quorum, machines, FTSO snapshot, or close
+block. Timeout refund is a public failure terminal state, not a successful
+selection fallback; it creates no award receipt and pays only the original
+escrow back to the buyer.
 
 ## 4. Creation and funding
 

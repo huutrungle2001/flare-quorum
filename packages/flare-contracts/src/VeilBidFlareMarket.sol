@@ -16,6 +16,8 @@ contract VeilBidFlareMarket {
     uint256 public constant TEE_COUNT = 3;
     uint8 public constant RESULT_THRESHOLD = 2;
     uint64 public constant FTSO_MAX_AGE = 300;
+    uint64 public constant RESULT_VALIDITY = 1 hours;
+    uint64 public constant SELECTION_REFUND_GRACE = 24 hours;
 
     bytes32 public constant RECEIPT_DOMAIN = keccak256("VEILBID_BID_RECEIPT_V1");
     bytes32 public constant RESULT_DOMAIN = keccak256("VEILBID_SELECTION_RESULT_V1");
@@ -70,6 +72,8 @@ contract VeilBidFlareMarket {
         uint256 ftsoValue;
         int8 ftsoDecimals;
         uint64 ftsoTimestamp;
+        uint64 selectionStartedAt;
+        uint32 selectionAttempt;
         uint256 resultNonce;
         uint64 resultExpiry;
         bytes32 requestId;
@@ -187,6 +191,8 @@ contract VeilBidFlareMarket {
     error NotBuyer();
     error NotEnoughTeeIdentities();
     error NotRegisteredTee();
+    error RefundNotReady();
+    error SelectionStillLive();
     error TenderDoesNotExist();
 
     event TenderCreated(uint256 indexed tenderId, address indexed buyer, bytes32 indexed rulesHash, uint256 ceiling);
@@ -197,6 +203,9 @@ contract VeilBidFlareMarket {
         uint256 indexed tenderId, uint64 closeBlock, uint256 ftsoValue, int8 ftsoDecimals, uint64 ftsoTimestamp
     );
     event SelectionRequested(uint256 indexed tenderId, bytes32 indexed requestId, uint256 indexed resultNonce);
+    event SelectionRetried(
+        uint256 indexed tenderId, bytes32 indexed requestId, uint256 indexed resultNonce, uint32 attempt
+    );
     event TenderAwarded(uint256 indexed tenderId, uint256 indexed winnerBidId, address indexed winner, uint256 amount);
     event TenderRefunded(uint256 indexed tenderId, address indexed buyer);
     event TenderCancelled(uint256 indexed tenderId, address indexed buyer);
@@ -413,9 +422,42 @@ contract VeilBidFlareMarket {
     function requestSelection(uint256 tenderId) external payable nonReentrant {
         Tender storage tender = _requireTender(tenderId);
         if (tender.status != TenderStatus.Closed) revert InvalidStatus(TenderStatus.Closed, tender.status);
-        tender.resultNonce =
-            uint256(keccak256(abi.encode(address(this), tenderId, tender.closeBlock, tender.orderedBidRoot)));
-        tender.resultExpiry = uint64(block.timestamp + 1 hours);
+        tender.selectionStartedAt = uint64(block.timestamp);
+        _dispatchSelection(tenderId, tender, msg.value, false);
+    }
+
+    function retrySelection(uint256 tenderId) external payable nonReentrant {
+        Tender storage tender = _requireTender(tenderId);
+        if (tender.status != TenderStatus.ComputePending) {
+            revert InvalidStatus(TenderStatus.ComputePending, tender.status);
+        }
+        if (block.timestamp <= tender.resultExpiry) revert SelectionStillLive();
+        _dispatchSelection(tenderId, tender, msg.value, true);
+    }
+
+    function refundExpiredSelection(uint256 tenderId) external nonReentrant {
+        Tender storage tender = _requireTender(tenderId);
+        if (tender.status != TenderStatus.ComputePending) {
+            revert InvalidStatus(TenderStatus.ComputePending, tender.status);
+        }
+        if (msg.sender != tender.buyer) revert NotBuyer();
+        if (
+            tender.selectionStartedAt == 0
+                || block.timestamp <= uint256(tender.selectionStartedAt) + SELECTION_REFUND_GRACE
+        ) revert RefundNotReady();
+        tender.status = TenderStatus.Refunded;
+        if (!paymentToken.transfer(tender.buyer, tender.publicCeilingXrp)) revert InvalidTokenTransfer();
+        emit TenderRefunded(tenderId, tender.buyer);
+    }
+
+    function _dispatchSelection(uint256 tenderId, Tender storage tender, uint256 fee, bool retrying) private {
+        ++tender.selectionAttempt;
+        tender.resultNonce = uint256(
+            keccak256(
+                abi.encode(address(this), tenderId, tender.closeBlock, tender.orderedBidRoot, tender.selectionAttempt)
+            )
+        );
+        tender.resultExpiry = uint64(block.timestamp + RESULT_VALIDITY);
         address[] memory teeIds = _commonTeeIds(tender);
         address[] memory cosigners = new address[](0);
         SelectionBidReference[] memory references = _selectionBidReferences(tenderId, tender);
@@ -449,10 +491,13 @@ contract VeilBidFlareMarket {
             cosignersThreshold: 0,
             claimBackAddress: msg.sender
         });
-        tender.requestId = teeExtensionRegistry.sendInstructions{value: msg.value}(teeIds, params);
+        tender.requestId = teeExtensionRegistry.sendInstructions{value: fee}(teeIds, params);
         if (tender.requestId == bytes32(0)) revert InvalidResult();
         tender.status = TenderStatus.ComputePending;
         emit SelectionRequested(tenderId, tender.requestId, tender.resultNonce);
+        if (retrying) {
+            emit SelectionRetried(tenderId, tender.requestId, tender.resultNonce, tender.selectionAttempt);
+        }
     }
 
     function finalizeTender(uint256 tenderId, SelectionResult calldata result, TeeActionProof[] calldata proofs)

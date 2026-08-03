@@ -118,6 +118,10 @@ contract FlareTokenMock is IERC20 {
             sender = nextSender;
         }
 
+        function setNextRequestId(bytes32 value) external {
+            nextRequestId = value;
+        }
+
         function sendInstructions(address[] calldata teeIds, TeeInstructionParams calldata params)
             external
             payable
@@ -387,6 +391,67 @@ contract FlareTokenMock is IERC20 {
             );
             market.finalizeTender(tenderId, result, proofs);
             if (tender.buyer == address(0)) revert("invalid fixture");
+        }
+
+        function testExpiredSelectionRetriesWithFreshRequestAndNonce() external {
+            (
+                uint256 tenderId,
+                VeilBidFlareMarket.Tender memory firstTender,
+                VeilBidFlareMarket.SelectionResult memory staleResult,
+                VeilBidFlareMarket.TeeActionProof[] memory staleProofs
+            ) = _preparedWinningSelection();
+            if (firstTender.selectionAttempt != 1 || firstTender.selectionStartedAt == 0) {
+                revert("first selection attempt missing");
+            }
+            vm.warp(firstTender.resultExpiry);
+            vm.expectRevert(VeilBidFlareMarket.SelectionStillLive.selector);
+            market.retrySelection(tenderId);
+
+            bytes32 secondRequestId = keccak256("veilbid-test-request-2");
+            registry.setNextRequestId(secondRequestId);
+            vm.warp(firstTender.resultExpiry + 1);
+            market.retrySelection(tenderId);
+            VeilBidFlareMarket.Tender memory secondTender = market.getTender(tenderId);
+            if (
+                secondTender.selectionAttempt != 2 || secondTender.requestId != secondRequestId
+                    || secondTender.resultNonce == firstTender.resultNonce
+                    || secondTender.selectionStartedAt != firstTender.selectionStartedAt
+            ) revert("retry binding mismatch");
+
+            vm.expectRevert(VeilBidFlareMarket.InvalidResult.selector);
+            market.finalizeTender(tenderId, staleResult, staleProofs);
+
+            VeilBidFlareMarket.SelectionResult memory result = _winningResult(tenderId, secondTender);
+            VeilBidFlareMarket.TeeActionProof[] memory proofs = new VeilBidFlareMarket.TeeActionProof[](2);
+            proofs[0] = _actionProof(result, secondTender.requestId, TEE_KEY_1);
+            proofs[1] = _actionProof(result, secondTender.requestId, TEE_KEY_2);
+            market.finalizeTender(tenderId, result, proofs);
+            if (market.getTender(tenderId).status != VeilBidFlareMarket.TenderStatus.Awarded) {
+                revert("retry did not settle");
+            }
+        }
+
+        function testBuyerCanRefundAfterFixedSelectionGrace() external {
+            uint256 tenderId = market.createTender(_terms());
+            VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
+            vm.warp(tender.bidDeadline + 1);
+            ftso.setTimestamp(uint64(block.timestamp));
+            market.closeTender(tenderId);
+            market.requestSelection(tenderId);
+            tender = market.getTender(tenderId);
+
+            vm.warp(uint256(tender.selectionStartedAt) + market.SELECTION_REFUND_GRACE());
+            vm.expectRevert(VeilBidFlareMarket.RefundNotReady.selector);
+            market.refundExpiredSelection(tenderId);
+            vm.warp(block.timestamp + 1);
+            market.refundExpiredSelection(tenderId);
+
+            if (token.balanceOf(address(this)) != 1_000 || token.balanceOf(address(market)) != 0) {
+                revert("expired selection refund mismatch");
+            }
+            if (market.getTender(tenderId).status != VeilBidFlareMarket.TenderStatus.Refunded) {
+                revert("expired selection not refunded");
+            }
         }
 
         function testZeroWinnerRefundsEntireEscrow() external {

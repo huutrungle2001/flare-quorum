@@ -123,8 +123,8 @@ verifiable.
 | Underfunded or unusual token | FTestXRP-only release, exact balance-delta and conservation checks | FAssets/protocol failure |
 | Double settlement/reentrancy | Nonce and terminal state before transfers, guard, no arbitrary token allowlist | Unaudited market defect |
 | Public award leaks commercial price | Winning amount explicitly classified as public before submission | Winner's commercial price is disclosed by design |
-| Proxy/RPC/relay outage | Public checkpoints, bounded retry, competing relay/browser recovery | Extended FCC or quorum outage locks escrow |
-| Buyer exploits outage for refund | No post-bid timeout refund or machine replacement after freeze | Availability is intentionally favored over unilateral recovery |
+| Proxy/RPC/relay outage | Public checkpoints, fresh attempt nonce/request after expiry, competing relay/browser recovery | Extended FCC or quorum outage prevents award |
+| Buyer exploits outage for refund | Public proxies, permissionless finalization/retry, fixed 24-hour grace from first request, no retry extension | If no threshold result becomes publicly retrievable before grace, fairness yields to bounded escrow recovery |
 | Admin changes live policy | Immutable tender binding and governance without live-tender/escrow authority | Deployment key can still misconfigure future tenders |
 | Fake evidence or mock fallback | Schema-validated public evidence tied to real Coston2 IDs; unavailable state on dependency failure | Review process can still miss an omission |
 

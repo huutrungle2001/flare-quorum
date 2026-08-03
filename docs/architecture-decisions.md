@@ -468,6 +468,28 @@ already produced by FCC. Verifying a custom application signature would add an
 unnecessary key-registration trust path and would not prove that the official
 FCC runtime processed the on-chain instruction.
 
+## ADR-020 — Bounded selection retry and non-success escrow recovery
+
+**Decision:** A selection attempt has a one-hour signed-result window. If it
+expires without a valid threshold result, anyone may pay the FCC instruction
+fee to retry against the same immutable root, quorum, machine set, FTSO
+snapshot, and close block. Each attempt increments `selectionAttempt` and
+derives a fresh `resultNonce`, result expiry, and FCC request ID, so a late
+result from an older attempt cannot settle the tender.
+
+The first attempt also freezes `selectionStartedAt`. After a fixed 24-hour
+grace from that timestamp, the buyer may terminate an unresolved selection and
+recover exactly the original FTestXRP escrow. Retries cannot extend this grace.
+The recovery path records `Refunded`, creates no award, and cannot submit or
+infer a winner; it is explicitly a failed-compute outcome rather than a success
+fallback.
+
+**Reason:** The earlier single one-hour request left escrow permanently locked
+if FCC or its public proxy quorum stayed unavailable. A fixed grace prevents
+third-party retry griefing from extending the lock, while permissionless retry
+keeps transient infrastructure failures recoverable without changing any
+procurement fact.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:
