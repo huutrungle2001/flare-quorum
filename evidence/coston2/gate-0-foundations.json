@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "gate": "0",
   "status": "IN_PROGRESS",
-  "recordedAt": "2026-08-03T20:12:51.865Z",
-  "sourceCommit": "d4d726fce8f4c5b27fe7098d9f36b9117d3f833f",
+  "recordedAt": "2026-08-03T20:19:54.007Z",
+  "sourceCommit": "80f22463f21e21ec3db57bbedf3b8563d5328f6e",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "blockNumber": "33591785",
-    "blockTimestamp": 1785787979
+    "blockNumber": "33592021",
+    "blockTimestamp": 1785788403
   },
   "publicIdentifiers": {
     "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
@@ -22,6 +22,7 @@
       "fdcRequestFeeConfigurations": "0x191a1282Ac700edE65c5B0AaF313BAcC3eA7fC7e",
       "flareSystemsManager": "0xA90Db6D10F856799b10ef2A77EBCbF460aC71e52",
       "relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE",
+      "voterRegistry": "0x6a0AF07b7972177B176d3D422555cbc98DfDe914",
       "assetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
       "fTestXRP": "0x0b6A3645c240605887a5532109323A3E12273dc7",
       "masterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c"
@@ -35,6 +36,7 @@
       "fdcRequestFeeConfigurations": 6173,
       "flareSystemsManager": 24278,
       "relay": 12676,
+      "voterRegistry": 16787,
       "assetManagerFXRP": 217,
       "fTestXRP": 177,
       "masterAccountController": 250
@@ -42,9 +44,9 @@
     "nextPublicExtensionId": "65922",
     "xrpUsdFeed": {
       "id": "0x015852502f55534400000000000000000000000000",
-      "value": "1080554",
+      "value": "1080624",
       "decimals": 6,
-      "timestamp": 1785787978
+      "timestamp": 1785788403
     },
     "fTestXRP": {
       "address": "0x0b6A3645c240605887a5532109323A3E12273dc7",
