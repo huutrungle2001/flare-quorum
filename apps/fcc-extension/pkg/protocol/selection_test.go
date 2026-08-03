@@ -73,3 +73,17 @@ func TestBidSlotBindsTypedMarket(t *testing.T) {
 		t.Fatal("bid slot did not bind market address")
 	}
 }
+
+func TestSelectionResultDigestTypeScriptGoldenVector(t *testing.T) {
+	var feed [21]byte
+	copy(feed[:], []byte("XRP/USD"))
+	digest, err := SelectionResultDigest(SelectionResult{
+		SchemaVersion: 1, ChainID: big.NewInt(114), Market: common.HexToAddress("0x1000000000000000000000000000000000000001"), ExtensionID: big.NewInt(65537), CodeVersion: common.HexToHash("0x1111"), TenderID: big.NewInt(42), RulesHash: common.HexToHash("0x2222"), OrderedBidRoot: common.HexToHash("0x3333"), QuorumBitmap: 7, FtsoFeedID: feed, FtsoValue: big.NewInt(250000), FtsoDecimals: 5, FtsoTimestamp: 1700000000, CloseBlock: 33500010, WinnerBidID: big.NewInt(1), Winner: common.HexToAddress("0x2000000000000000000000000000000000000002"), WinningAmountXrp: big.NewInt(400000), ResultNonce: big.NewInt(3), Expiry: 2000,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if digest.Hex() != "0xe323859bd3351602eb780752822de0adb41ffca6f2906f9095bb3b0a3baa9763" {
+		t.Fatalf("TypeScript result vector drift: %s", digest.Hex())
+	}
+}
