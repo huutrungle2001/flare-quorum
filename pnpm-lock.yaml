@@ -76,6 +76,9 @@ importers:
       '@veilbid/chain-bindings':
         specifier: workspace:*
         version: link:../../packages/chain-bindings
+      '@veilbid/flare-bindings':
+        specifier: workspace:*
+        version: link:../../packages/flare-bindings
       buffer:
         specifier: 6.0.3
         version: 6.0.3
