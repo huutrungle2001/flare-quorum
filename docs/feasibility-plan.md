@@ -84,17 +84,21 @@ plaintext in an application database.
 
 Prove with three registered machines:
 
-- each bid receives valid receipts from a machine bitmap;
-- contract accepts a bid only while intersection across all accepted bids keeps
-  at least two machines;
+- each bid receives three mutually consistent receipts from the three frozen
+  machines and therefore has the exact receipt bitmap `0x07`;
+- the contract accepts the three receipts atomically and rejects every partial
+  set, so no two-machine-only bid can enter public state or the ordered root;
 - forged, duplicate, wrong-machine, wrong-code, and mismatched-commitment
   receipts fail;
 - the ordered root is identical in Solidity, Go, and TypeScript models;
-- loss of one machine still leaves the same complete bid set on two machines;
-- no machine/key/code policy changes after the first accepted bid.
+- loss of any one machine after intake still leaves the same complete bid set on
+  either surviving pair, while loss of two machines fails closed;
+- the contract rechecks frozen machine status, extension, code version, and key
+  fingerprint at receipt acceptance, selection dispatch, and finalization.
 
-Kill condition: the contract can accept bids without a common computation
-quorum or two remaining machines can observe different accepted bid sets.
+Kill condition: the contract can accept a bid without all three frozen
+custodians, or any two remaining machines can observe different accepted bid
+sets.
 
 ## 6. Gate D — deterministic private scoring
 

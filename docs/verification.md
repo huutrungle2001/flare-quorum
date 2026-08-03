@@ -100,8 +100,8 @@ live identifiers.
   requests.
 - Wrong schema, chain, market, extension, code, tender, vendor, rules, nonce,
   credential domain, and commitment.
-- One-machine receipt, duplicate signer, expired receipt, repeated vendor, and
-  receipt set that collapses the common quorum.
+- One- or two-machine receipt set, duplicate signer, expired receipt, repeated
+  vendor, and three validly signed receipts that disagree on any bound field.
 - Missing, duplicate, reordered, corrupted, and rolled-back sealed state.
 - Proxy restart, TEE restart, queue loss, timeout, retry, and competing submitter.
 
