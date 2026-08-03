@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "gate": "A",
+  "status": "IN_PROGRESS",
+  "recordedAt": "2026-08-03T17:37:34.210Z",
+  "sourceCommit": "e48e04d11a007eb307e118913d9e1fb7dd0fc60a",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33588101",
+    "blockTimestamp": 1785778615,
+    "blockHash": "0xa4179a9eeebceee58806754cccc5fc8965e09232ab4a1646062e24b32c5617cf"
+  },
+  "publicIdentifiers": {
+    "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "foundationSender": "0x44A322A45e8D796d890271209D59d529501113B9",
+    "deploymentTransaction": "0x4bb293f3bc2ed3653d28482a8acf56d04a932b5e30672b3f1b598f37e8facb00",
+    "deploymentGasUsed": "557021",
+    "runtimeCodeSize": 2306,
+    "runtimeCodeHash": "0x059735f55c7c8df15e4c73b707f7cb772f03804aa4137f01e2acc76a363e7971",
+    "teeExtensionRegistry": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "teeMachineRegistry": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "0"
+  },
+  "assertions": {
+    "deploymentTransactionSucceeded": true,
+    "chainIdMatches": true,
+    "constructorRegistryBindingsMatch": true,
+    "runtimeLengthMatchesArtifact": true,
+    "runtimeHashMatchesArtifactWithImmutables": true,
+    "freshExtensionConfigured": false,
+    "registeredTeeResultRetrieved": false,
+    "registeredTeeResultVerifiedOnChain": false,
+    "freshProcessRecoveryVerified": false
+  },
+  "blockers": [
+    "FRESH_EXTENSION_NOT_REGISTERED",
+    "PRODUCTION_TEE_NOT_REGISTERED",
+    "FCC_RESULT_NOT_AVAILABLE"
+  ],
+  "notes": [
+    "This is a live Coston2 contract deployment, not a Gate A pass.",
+    "No extension ID has been attached and no TEE result has been requested or accepted.",
+    "No RPC URL, deployment key, signature, bid payload, or credential is recorded."
+  ]
+}

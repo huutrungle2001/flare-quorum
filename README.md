@@ -20,8 +20,9 @@ The project targets **Flare Summer Signal** with:
 > [!IMPORTANT]
 > The Flare edition is in Phase 0 feasibility validation. Live Coston2 registry,
 > FCC manager, FTestXRP, FTSO, FDC, Smart Account, toolchain, and source-pin
-> checks pass, while TEE registration infrastructure remains incomplete. No
-> Coston2 VeilBid release address or successful FCC lifecycle is claimed yet.
+> checks pass, while TEE registration infrastructure remains incomplete. The
+> Gate-A foundation sender is live and runtime-verified on Coston2; it is not a
+> product release and no successful FCC lifecycle is claimed yet.
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
@@ -95,8 +96,8 @@ accounting layer is research scope and must not be described as shipped.
 
 | Flare capability | Product role | Delivery status |
 |---|---|---|
-| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Planned, mandatory |
-| Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Planned, mandatory |
+| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Implemented/tested locally; live extension pending |
+| Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Market tested locally; Gate-A sender live; release pending |
 | FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Planned, mandatory |
 | Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Planned, mandatory |
 | FTSOv2 | Freeze XRP/USD close snapshot for XRP/USD bid normalization | Planned, mandatory |
