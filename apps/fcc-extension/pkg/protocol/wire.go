@@ -184,6 +184,16 @@ func BidCommitment(submission BidSubmission) (common.Hash, error) {
 }
 
 func BidReceiptDigest(receipt BidReceipt) (common.Hash, error) {
+	encoded, err := BidReceiptSigningMessage(receipt)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	return crypto.Keccak256Hash(encoded), nil
+}
+
+// BidReceiptSigningMessage is sent to tee-node /sign. The node hashes this
+// exact ABI payload once and applies the Ethereum signed-message prefix.
+func BidReceiptSigningMessage(receipt BidReceipt) ([]byte, error) {
 	encoded, err := receiptDigestArguments.Pack(
 		BidReceiptDomain,
 		receipt.SchemaVersion,
@@ -200,9 +210,9 @@ func BidReceiptDigest(receipt BidReceipt) (common.Hash, error) {
 		receipt.Expiry,
 	)
 	if err != nil {
-		return common.Hash{}, fmt.Errorf("encode bid receipt digest: %w", err)
+		return nil, fmt.Errorf("encode bid receipt signing message: %w", err)
 	}
-	return crypto.Keccak256Hash(encoded), nil
+	return encoded, nil
 }
 
 func mustWireTuple(components []abi.ArgumentMarshaling) abi.Type {
