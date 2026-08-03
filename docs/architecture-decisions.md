@@ -363,6 +363,33 @@ runtime pins. Separating provenance from the tested runtime combination avoids
 silently reproducing the stale registration/data-provider failures described by
 the organizer bulletin.
 
+## ADR-018 — Deterministic FCC foundation wire format
+
+**Decision:** The first VeilBid FCC extension operation is `PING_V1`, with a
+strict ABI tuple containing only `schemaVersion`, Coston2 `chainId`, market
+address, one-time request nonce, and an opaque payload hash. The extension
+returns the same public fields plus a binding hash over:
+
+```text
+keccak256(abi.encode(
+  keccak256("VEILBID_FCC_FOUNDATION_V1"),
+  OP_TYPE, OP_COMMAND, schemaVersion, chainId, market,
+  requestNonce, payloadHash
+))
+```
+
+The response is derived solely from the request, so independent TEE machines
+cannot diverge because of local counters or timestamps. Rejected requests use
+allowlisted error codes and never echo their bytes. The operation is a Phase 1
+compatibility probe, not a bid path or a live FCC claim; private ingress and
+selection remain gated by the real proxy, indexer, registration, and Coston2
+verification evidence.
+
+**Reason:** The scaffold's mutable greeting example was unsuitable for a
+multi-machine result quorum and its error logs could grow into a privacy leak.
+An explicit domain-bound ABI gives the contract, Go extension, and future
+TypeScript bindings one stable seam while keeping foundation evidence public-safe.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:

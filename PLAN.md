@@ -1,6 +1,8 @@
 # VeilBid Flare Championship Execution Plan
 
-> Status: Planning complete; implementation has not started.
+> Status: Phase 0 audit is implemented and pushed; FCC/TEE registration and
+> external infrastructure gates remain open. Phase 1 foundation code is local
+> and tested, but no Coston2 result is claimed until live evidence exists.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -86,7 +88,9 @@ All open design questions are resolved in
   requirements, and whether at least three registered TEE machines are
   available for one extension.
 - [x] Confirm real confidential hardware versus simulated TEE judge policy.
-- [ ] Pin the official FCC scaffold commit and all container digests.
+- [x] Pin the official FCC scaffold commit and record resolved container digests;
+  the upstream proxy Dockerfile still needs a VeilBid release image with pinned
+  stages before Gate 0 can pass.
 - [ ] Apply [`docs/fcc-coston2-operations.md`](docs/fcc-coston2-operations.md):
   resolve live `FlareTeeManager`, enforce the organizer minimum TEE/proxy
   revisions, use a fresh extension ID and `rRap`, and reach machine status `2`.
@@ -102,7 +106,9 @@ product code depends on it.
 
 ### Phase 1 — FCC vertical feasibility
 
-- [ ] Create `apps/fcc-extension` from the pinned scaffold.
+- [x] Create `apps/fcc-extension` from the pinned scaffold and replace the
+  greeting sample with a deterministic, public-safe `PING_V1` foundation
+  operation using the organizer-supported `tee-node` runtime line.
 - [ ] Create `packages/flare-contracts` with a minimal instruction sender.
 - [ ] Send and verify a domain-correct Coston2 result.
 - [ ] Implement private bid ingress through the supported proxy/TEE path.
@@ -276,7 +282,8 @@ the championship product and requires Product Plan approval.
 | Product thesis | DECIDED |
 | Architecture decisions | DECIDED |
 | Documentation transition | COMPLETE |
-| Official version pinning | IN PROGRESS — core source/toolchain/discovery checks pass; proxy image digests and live TEE stack remain |
+| Official version pinning | IN PROGRESS — core source/toolchain/discovery checks pass; proxy image release and live TEE stack remain |
+| FCC foundation operation | IMPLEMENTED LOCALLY — deterministic `PING_V1` tests pass; live Gate A not run |
 | FCC private ingress | NOT STARTED |
 | Multi-TEE quorum | NOT STARTED |
 | Flare contracts | NOT STARTED |

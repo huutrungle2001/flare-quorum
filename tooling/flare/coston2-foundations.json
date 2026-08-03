@@ -142,8 +142,13 @@
   "docker": {
     "teeNodeBuilder": "golang:1.25.1-trixie@sha256:ff83f3762390c2cccb53618ccc18af23e556aff9b1db4428637e9f63287c8171",
     "teeNodeRuntime": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
+    "proxyBaseImagesResolved": {
+      "builder": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
+      "runtime": "alpine:3.22@sha256:14358309a308569c32bdc37e2e0e9694be33a9d99e68afb0f5ff33cc1f695dce",
+      "redis": "redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2"
+    },
     "teeProxyUpstreamDockerfilePinned": false,
-    "policy": "VeilBid must add digests for both tee-proxy stages before building a release image"
+    "policy": "The upstream tee-proxy Dockerfile remains reference-only. VeilBid must vendor or reproduce its runtime with pinned stages before building a release image. Resolved digests above are an audit input, not a release claim."
   },
   "contracts": {
     "flareContractRegistry": "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019",

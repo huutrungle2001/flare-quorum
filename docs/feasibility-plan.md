@@ -1,9 +1,10 @@
 # VeilBid Flare Championship Feasibility Plan
 
 > Status: Gate 0 is in progress. Core source, toolchain, registry, contract,
-> asset, and feed checks pass; FCC proxy/indexer/registration requirements are
-> still open. Full product development is blocked until Gates 0–E pass. Gates
-> F–H are mandatory before the championship judge release.
+> asset, feed, and deterministic FCC foundation checks pass; FCC proxy/indexer/
+> registration requirements are still open. Full product development is
+> blocked until Gates 0–E pass. Gates F–H are mandatory before the championship
+> judge release.
 
 ## 1. Rules
 
@@ -44,7 +45,9 @@ unverifiable addresses/credentials, or the registration preflight in
 
 Prove on Coston2:
 
-1. Deploy the minimal instruction sender.
+1. Deploy the minimal instruction sender. The repository now includes a
+   local-only ABI-compatible `PING_V1` foundation operation; it is not live
+   Gate A evidence and does not process bids.
 2. Register extension, governance, allowed code version, and TEE machine.
 3. Send a domain-bound action through the official registry.
 4. Retrieve the action result from the proxy.
