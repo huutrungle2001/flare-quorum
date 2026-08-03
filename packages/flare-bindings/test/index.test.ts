@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isCoston2FlareDeployment, veilBidFlareMarketAbi } from "../src/index.ts";
+import { isCoston2FlareDeployment, veilBidFlareMarketAbi } from "../dist/index.js";
 
 test("Flare bindings expose only the planned Coston2 ABI", () => {
   assert.ok(Array.isArray(veilBidFlareMarketAbi));

@@ -1,5 +1,6 @@
 import type { Abi, Address, Hex } from "viem";
 import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { type: "json" };
+export * from "./protocol.js";
 
 export const coston2ChainId = 114;
 export const veilBidFlareMarketAbi = marketAbiJson as Abi;

@@ -9,7 +9,7 @@
     "generate": "node scripts/generate.mjs",
     "build": "tsc -p tsconfig.json",
     "lint": "tsc --noEmit -p tsconfig.json",
-    "test": "node --test test/*.test.ts"
+    "test": "pnpm build && node --test test/*.test.ts"
   },
   "exports": {
     ".": {
