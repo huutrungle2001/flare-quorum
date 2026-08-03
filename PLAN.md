@@ -129,14 +129,15 @@ verified on-chain.
 
 - [x] Freeze `BID_SCHEMA_V1`, `BID_RECEIPT_V1`, `SCORING_V1`, and
   `SELECTION_RESULT_V1` schemas in the Go/Solidity protocol fixtures.
-- [ ] Generate or drift-check Go/Solidity/TypeScript representations (Flare
-  ABI package is now scaffolded; full generated cross-language vectors remain).
+- [x] Generate or drift-check Go/Solidity/TypeScript representations (Flare
+  ABI is generated from Foundry output; protocol bindings are drift-tested).
 - [x] Implement machine-set/key/code-version tender binding.
 - [x] Implement receipt bitmap, common quorum, ordered root, and first-accepted
   tie rule.
 - [x] Implement credential issuer/type/signature validation.
 - [x] Implement checked fixed-point price, delivery, and warranty penalties.
-- [ ] Add deterministic golden vectors shared by all three languages.
+- [x] Add deterministic golden vectors shared by Go, Solidity, and TypeScript
+  for ordered roots and selection-result digests.
 - [ ] Run invalid, tie, permutation, boundary, overflow, and malformed-schema
   suites.
 
