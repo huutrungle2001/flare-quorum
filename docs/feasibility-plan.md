@@ -124,10 +124,15 @@ Prove:
 - duplicate finalization cannot settle twice;
 - fresh relay/browser resumes close, request, collected results, and finalization;
 - one-machine outage remains recoverable through the fixed common quorum;
-- quorum loss cannot unlock a buyer timeout refund or winner override.
+- an expired attempt can be retried only with a fresh nonce/request while every
+  frozen input remains identical, and late results from the old attempt fail;
+- retries cannot extend the fixed 24-hour grace measured from the first
+  request; after that grace, buyer recovery returns only the original escrow,
+  records failed-compute `Refunded`, and creates no winner or award receipt.
 
 Kill condition: one machine or an untrusted relay can unilaterally decide the
-championship result, or recovery changes the frozen input set.
+championship result, recovery changes the frozen input set, or a timeout path is
+presented as a successful FCC selection.
 
 ## 8. Gate F — FTSO and exact FTestXRP settlement
 

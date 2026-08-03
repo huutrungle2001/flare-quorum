@@ -153,6 +153,14 @@ fingerprints agree.
 - Configure FAssets/FDC/Smart Account executor paths with no VeilBid-custodied
   XRPL secret.
 
+The market deployment command is `pnpm flare:deploy:market`. It is intentionally
+non-runnable before every Gate 0–E evidence file has status `PASS`, all recorded
+assertions are true, and blocker lists are empty. It also requires a clean
+source commit and refuses to overwrite a prior Coston2 manifest. Runtime
+verification compares every non-immutable byte to the exact Foundry artifact;
+constructor calldata and the token, manager, FTSO, extension-registry, and
+award-receipt immutable bindings are checked independently on-chain.
+
 ### Verify live behavior
 
 - Compare runtime bytecode, source, constructor, immutables, registry wiring,

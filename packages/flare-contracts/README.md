@@ -24,3 +24,17 @@ forge test
 forge fmt --check
 forge build --sizes
 ```
+
+After live Gates 0–E are recorded as `PASS`, deploy the immutable market with:
+
+```bash
+pnpm flare:deploy:market
+```
+
+The command refuses a dirty worktree, missing/partial gate evidence, wrong
+chain, low gas balance, missing protocol bytecode, or an existing deployment
+artifact. It verifies constructor calldata, masks only compiler-declared
+immutable slots for a full runtime-logic comparison, then checks every
+immutable getter plus the separately deployed award-receipt binding. It writes
+a sanitized `verified:false` Coston2 candidate manifest and deployment evidence;
+promotion remains blocked until live Gates F–H pass.
