@@ -78,6 +78,15 @@ a different ciphertext for the same slot fails. This mapping remains local
 evidence until proxy body-log inspection and a real machine restart pass Gate
 B.
 
+The local consumer binding now reproduces tee-node's go-ethereum ECIES scheme
+byte-for-byte and verifies a shared Go/TypeScript decryption vector. The relay
+gateway accepts only a strict ciphertext envelope plus short-lived EIP-712
+authorization bound to market, tender, vendor, frozen TEE, submission nonce,
+and ciphertext hash. Its request type has no plaintext bid fields. Before
+forwarding it fails closed on closed/expired tenders, missing vendor admission,
+prior submission, signature drift, and TEE identity/key-fingerprint drift.
+This is implementation evidence, not a live Gate B pass.
+
 ## ADR-004 — Canonical bid schema
 
 **Decision:** Use a versioned deterministic binary schema shared by generated

@@ -7,6 +7,7 @@ export * from "./flare-funding-job.js";
 export * from "./flare-live.js";
 export * from "./flare-lifecycle.js";
 export * from "./flare-results.js";
+export * from "./flare-ingress.js";
 export * from "./live.js";
 export * from "./logger.js";
 export * from "./planner.js";

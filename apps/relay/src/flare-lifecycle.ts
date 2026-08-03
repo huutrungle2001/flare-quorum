@@ -58,6 +58,7 @@ export interface FlareTender {
   requestId: Hex;
   status: FlareTenderStatus;
   teeIds: readonly [Address, Address, Address];
+  teeKeyFingerprints: readonly [Hex, Hex, Hex];
 }
 
 export type FlareLifecycleAction =
@@ -109,6 +110,17 @@ export function parseFlareTender(tenderId: bigint, value: unknown): FlareTender 
   if (!Array.isArray(teeIds) || teeIds.length !== 3) throw new Error("MALFORMED_FLARE_TEE_SET");
   const parsedTeeIds = teeIds.map((id) => addressField(id, "FLARE_TEE_ID")) as [Address, Address, Address];
   if (new Set(parsedTeeIds.map((id) => id.toLowerCase())).size !== 3) throw new Error("DUPLICATE_FLARE_TEE_ID");
+  const teeKeyFingerprints = item.teeKeyFingerprints;
+  if (!Array.isArray(teeKeyFingerprints) || teeKeyFingerprints.length !== 3) {
+    throw new Error("MALFORMED_FLARE_TEE_KEY_SET");
+  }
+  const parsedTeeKeyFingerprints = teeKeyFingerprints.map((value) => hexField(value, "FLARE_TEE_KEY_FINGERPRINT")) as [Hex, Hex, Hex];
+  if (
+    new Set(parsedTeeKeyFingerprints).size !== 3 ||
+    parsedTeeKeyFingerprints.some((value) => !/^0x[0-9a-f]{64}$/.test(value) || /^0x0{64}$/.test(value))
+  ) {
+    throw new Error("MALFORMED_FLARE_TEE_KEY_SET");
+  }
   const record: FlareTender = {
     tenderId,
     buyer: addressField(item.buyer, "FLARE_BUYER"),
@@ -133,6 +145,7 @@ export function parseFlareTender(tenderId: bigint, value: unknown): FlareTender 
     requestId: hexField(item.requestId, "FLARE_REQUEST_ID"),
     status: status(item.status),
     teeIds: parsedTeeIds,
+    teeKeyFingerprints: parsedTeeKeyFingerprints,
   };
   if (
     !Number.isSafeInteger(record.approvedVendorCount)

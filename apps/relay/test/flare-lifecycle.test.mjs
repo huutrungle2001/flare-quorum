@@ -48,7 +48,9 @@ test("parses the current tender tuple and rejects duplicate frozen TEE identitie
   assert.equal(tender.tenderId, 7n);
   assert.equal(tender.status, "ComputePending");
   assert.equal(tender.selectionAttempt, 1);
+  assert.equal(tender.teeKeyFingerprints[2], `0x${"cc".repeat(32)}`);
   assert.throws(() => parseFlareTender(7n, rawTender(3, { teeIds: [ids[0], ids[0], ids[2]] })), /DUPLICATE_FLARE_TEE_ID/);
+  assert.throws(() => parseFlareTender(7n, rawTender(3, { teeKeyFingerprints: [`0x${"aa".repeat(32)}`, `0x${"aa".repeat(32)}`, `0x${"cc".repeat(32)}`] })), /MALFORMED_FLARE_TEE_KEY_SET/);
 });
 
 test("parses the exact generated getTender ABI primitive types", () => {

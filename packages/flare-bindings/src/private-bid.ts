@@ -198,6 +198,54 @@ export interface DeterministicEciesEntropy {
   iv: Hex;
 }
 
+export interface FlareBidIngressAuthorization {
+  market: Address;
+  tenderId: bigint;
+  vendor: Address;
+  teeId: Address;
+  submissionNonce: bigint;
+  ciphertext: Hex;
+  expiresAt: bigint;
+}
+
+export const flareBidIngressAuthorizationTypes = {
+  BidIngressAuthorization: [
+    { name: "tenderId", type: "uint256" },
+    { name: "vendor", type: "address" },
+    { name: "teeId", type: "address" },
+    { name: "submissionNonce", type: "uint256" },
+    { name: "ciphertextHash", type: "bytes32" },
+    { name: "expiresAt", type: "uint64" },
+  ],
+} as const;
+
+export function flareBidIngressTypedData(authorization: FlareBidIngressAuthorization) {
+  if (
+    !validAddress(authorization.market) || authorization.tenderId <= 0n || !validAddress(authorization.vendor) ||
+    !validAddress(authorization.teeId) || authorization.submissionNonce <= 0n ||
+    authorization.expiresAt <= 0n || authorization.expiresAt > uint64Max
+  ) throw new Error("INVALID_BID_INGRESS_AUTHORIZATION");
+  directBidInstruction(authorization.ciphertext);
+  return {
+    domain: {
+      name: "VeilBid Flare Bid Gateway",
+      version: "1",
+      chainId: 114,
+      verifyingContract: authorization.market,
+    },
+    types: flareBidIngressAuthorizationTypes,
+    primaryType: "BidIngressAuthorization" as const,
+    message: {
+      tenderId: authorization.tenderId,
+      vendor: authorization.vendor,
+      teeId: authorization.teeId,
+      submissionNonce: authorization.submissionNonce,
+      ciphertextHash: keccak256(authorization.ciphertext),
+      expiresAt: authorization.expiresAt,
+    },
+  };
+}
+
 function validHash(value: Hex): boolean {
   return bytes32Pattern.test(value) && !/^0x0{64}$/.test(value);
 }
