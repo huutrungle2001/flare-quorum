@@ -3,6 +3,7 @@ import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { typ
 import awardReceiptAbiJson from "../generated/abis/VeilBidFlareAwardReceipt.json" with { type: "json" };
 export * from "./protocol.js";
 export * from "./smart-account.js";
+export * from "./fdc.js";
 
 export const coston2ChainId = 114;
 export const veilBidFlareMarketAbi = marketAbiJson as Abi;
