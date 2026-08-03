@@ -8,6 +8,7 @@ import {
   getAddress,
   hexToBytes,
   isAddress,
+  isAddressEqual,
   keccak256,
   padHex,
   recoverMessageAddress,
@@ -163,6 +164,33 @@ export interface FlareTeePublicKey {
   y: Hex;
 }
 
+export interface FlareBidReceiptSetContext {
+  market: Address;
+  extensionId: bigint;
+  codeVersion: Hex;
+  tenderId: bigint;
+  rulesHash: Hex;
+  vendor: Address;
+  submissionNonce: bigint;
+  plaintextCommitment: Hex;
+  bidDeadline: bigint;
+  teeIds: readonly [Address, Address, Address];
+}
+
+export interface FlareContractBidReceipt {
+  schemaVersion: number;
+  vendor: Address;
+  submissionNonce: bigint;
+  plaintextCommitment: Hex;
+  teeId: Address;
+  expiry: bigint;
+}
+
+export interface PreparedFlareBidReceiptSet {
+  receipts: readonly [FlareContractBidReceipt, FlareContractBidReceipt, FlareContractBidReceipt];
+  signatures: readonly [Hex, Hex, Hex];
+}
+
 export interface DeterministicEciesEntropy {
   /** Test/vector hook. Production callers must omit this object. */
   ephemeralPrivateKey: Hex;
@@ -270,6 +298,60 @@ export async function recoverBidReceiptSigner(receipt: FlareBidReceipt): Promise
     message: { raw: bidReceiptDigest(receipt) },
     signature: receipt.signature,
   }));
+}
+
+function equalHex(left: Hex, right: Hex): boolean {
+  return left.toLowerCase() === right.toLowerCase();
+}
+
+/** Verifies all private-ingress bindings before exposing contract calldata. */
+export async function prepareBidReceiptSet(
+  received: readonly FlareBidReceipt[],
+  context: FlareBidReceiptSetContext,
+): Promise<PreparedFlareBidReceiptSet> {
+  if (
+    received.length !== 3 || new Set(context.teeIds.map((value) => value.toLowerCase())).size !== 3 ||
+    !validAddress(context.market) || context.extensionId < 0x10000n || !validHash(context.codeVersion) ||
+    context.tenderId <= 0n || !validHash(context.rulesHash) || !validAddress(context.vendor) ||
+    context.submissionNonce <= 0n || !validHash(context.plaintextCommitment) || context.bidDeadline <= 0n
+  ) throw new Error("INVALID_BID_RECEIPT_CONTEXT");
+  const ordered: FlareBidReceipt[] = [];
+  for (const teeId of context.teeIds) {
+    const candidates = received.filter((receipt) => isAddressEqual(receipt.teeId, teeId));
+    if (candidates.length !== 1) throw new Error("INVALID_BID_RECEIPT_SET");
+    ordered.push(candidates[0]);
+  }
+  const expiry = ordered[0].expiry;
+  for (const receipt of ordered) {
+    if (
+      receipt.schemaVersion !== 1 || receipt.chainId !== 114n || !isAddressEqual(receipt.market, context.market) ||
+      receipt.extensionId !== context.extensionId || !equalHex(receipt.codeVersion, context.codeVersion) ||
+      receipt.tenderId !== context.tenderId || !equalHex(receipt.rulesHash, context.rulesHash) ||
+      !isAddressEqual(receipt.vendor, context.vendor) || receipt.submissionNonce !== context.submissionNonce ||
+      !equalHex(receipt.plaintextCommitment, context.plaintextCommitment) || receipt.expiry !== expiry ||
+      receipt.expiry <= 0n || receipt.expiry > context.bidDeadline ||
+      !/^0x[0-9a-fA-F]{130}$/.test(receipt.signature)
+    ) throw new Error("INVALID_BID_RECEIPT_SET");
+    let signer: Address;
+    try {
+      signer = await recoverBidReceiptSigner(receipt);
+    } catch {
+      throw new Error("INVALID_BID_RECEIPT_SIGNATURE");
+    }
+    if (!isAddressEqual(signer, receipt.teeId)) throw new Error("INVALID_BID_RECEIPT_SIGNATURE");
+  }
+  const contractReceipt = (receipt: FlareBidReceipt): FlareContractBidReceipt => ({
+    schemaVersion: receipt.schemaVersion,
+    vendor: receipt.vendor,
+    submissionNonce: receipt.submissionNonce,
+    plaintextCommitment: receipt.plaintextCommitment,
+    teeId: receipt.teeId,
+    expiry: receipt.expiry,
+  });
+  return {
+    receipts: [contractReceipt(ordered[0]), contractReceipt(ordered[1]), contractReceipt(ordered[2])],
+    signatures: [ordered[0].signature, ordered[1].signature, ordered[2].signature],
+  };
 }
 
 function validatedPublicKeyBytes(publicKey: FlareTeePublicKey): Uint8Array {

@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { secp256k1 } from "@noble/curves/secp256k1";
 import { bytesToHex, hexToBytes } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 import {
   bidReceiptDigest,
   directBidInstruction,
   encryptPrivateBidForTee,
   privateBidCommitment,
+  prepareBidReceiptSet,
   teeIdentityFromPublicKey,
   teePublicKeyFingerprint,
   type FlarePrivateBidSubmission,
@@ -116,4 +118,52 @@ test("receipt digest remains compatible with the Go/Solidity golden vector", () 
     expiry: 900n,
     signature: "0x010203",
   }), "0xb22f48371a8f6813be92a51d188dee114c4f188a6d7f201e3712ae8878fed658");
+});
+
+test("three TEE receipts are signature-checked and normalized to frozen order", async () => {
+  const accounts = ["11", "22", "33"].map((byte) => privateKeyToAccount(`0x${byte.repeat(32)}`));
+  const context = {
+    market: canonicalBid.market,
+    extensionId: canonicalBid.extensionId,
+    codeVersion: canonicalBid.codeVersion,
+    tenderId: canonicalBid.tenderId,
+    rulesHash: "0x8969aa4d8ee1fde2fbf813214484c245419fd278b1b791fe05997813315f8cb2",
+    vendor: canonicalBid.vendor,
+    submissionNonce: canonicalBid.submissionNonce,
+    plaintextCommitment: privateBidCommitment(canonicalBid),
+    bidDeadline: canonicalBid.rules.bidDeadline,
+    teeIds: accounts.map((account) => account.address) as [typeof accounts[0]["address"], typeof accounts[0]["address"], typeof accounts[0]["address"]],
+  };
+  const receipts = await Promise.all(accounts.map(async (account) => {
+    const receipt = {
+      schemaVersion: 1,
+      chainId: 114n,
+      market: context.market,
+      extensionId: context.extensionId,
+      codeVersion: context.codeVersion,
+      tenderId: context.tenderId,
+      vendor: context.vendor,
+      submissionNonce: context.submissionNonce,
+      rulesHash: context.rulesHash,
+      plaintextCommitment: context.plaintextCommitment,
+      teeId: account.address,
+      expiry: context.bidDeadline,
+      signature: "0x" as const,
+    };
+    return {
+      ...receipt,
+      signature: await account.signMessage({ message: { raw: bidReceiptDigest(receipt) } }),
+    };
+  }));
+  const prepared = await prepareBidReceiptSet([receipts[2], receipts[0], receipts[1]], context);
+  assert.deepEqual(prepared.receipts.map((receipt) => receipt.teeId), context.teeIds);
+  assert.equal(prepared.signatures.length, 3);
+  await assert.rejects(
+    prepareBidReceiptSet([{ ...receipts[0], plaintextCommitment: `0x${"99".repeat(32)}` }, receipts[1], receipts[2]], context),
+    /INVALID_BID_RECEIPT_SET/,
+  );
+  await assert.rejects(
+    prepareBidReceiptSet([receipts[0], { ...receipts[1], signature: receipts[0].signature }, receipts[2]], context),
+    /INVALID_BID_RECEIPT_SIGNATURE/,
+  );
 });
