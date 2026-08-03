@@ -88,6 +88,11 @@ XRPL_TESTNET_RPC_URL=https://...
   browser bundles, or committed evidence.
 - Browser code receives only verified public network, contract, extension,
   machine identity/key fingerprint, registry, and feed configuration.
+- `/flare` is enabled only when `VITE_COSTON2_RPC_URL`,
+  `VITE_FLARE_MARKET_ADDRESS`, `VITE_FLARE_MARKET_DEPLOYMENT_BLOCK`, and
+  `VITE_FLARE_DEPLOYMENT_STATUS` are supplied from the sanitized release
+  manifest. `VITE_*` must never carry a private RPC, proxy credential, wallet
+  key, or indexer secret.
 
 ## 4. Feasibility deployment order
 
