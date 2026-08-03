@@ -18,6 +18,8 @@ contract VeilBidFlareMarket {
 
     bytes32 public constant RECEIPT_DOMAIN = keccak256("VEILBID_BID_RECEIPT_V1");
     bytes32 public constant RESULT_DOMAIN = keccak256("VEILBID_SELECTION_RESULT_V1");
+    bytes32 public constant EMPTY_BID_ROOT = keccak256("VEILBID_EMPTY_BID_ROOT_V1");
+    bytes32 public constant BID_ROOT_DOMAIN = keccak256("VEILBID_BID_ROOT_V1");
     // forge-lint: disable-next-line(unsafe-typecast)
     bytes32 public constant OP_TYPE_SELECTION = bytes32("VEILBID_SELECTION");
     // forge-lint: disable-next-line(unsafe-typecast)
@@ -246,6 +248,7 @@ contract VeilBidFlareMarket {
         tender.bidDeadline = terms.bidDeadline;
         tender.approvedVendorCount = uint8(terms.approvedVendors.length);
         tender.commonQuorumBitmap = 0x07;
+        tender.orderedBidRoot = EMPTY_BID_ROOT;
         tender.extensionId = terms.extensionId;
         tender.codeVersion = terms.codeVersion;
         tender.ftsoFeedId = terms.ftsoFeedId;
@@ -322,24 +325,27 @@ contract VeilBidFlareMarket {
             bidId = ++tender.bidCount;
             bidIdByVendor[tenderId][msg.sender] = bidId;
             hasSubmittedBid[tenderId][msg.sender] = true;
+            uint64 acceptedBlock = uint64(block.number);
             bidReferences[tenderId][bidId] = BidReference(
                 msg.sender,
                 receipt.submissionNonce,
                 receipt.plaintextCommitment,
                 existing | bit,
                 receipt.expiry,
-                uint64(block.number)
+                acceptedBlock
             );
             delete pendingBidReferences[tenderId][msg.sender];
             tender.commonQuorumBitmap = nextCommonQuorum;
             tender.orderedBidRoot = keccak256(
                 abi.encode(
+                    BID_ROOT_DOMAIN,
                     tender.orderedBidRoot,
+                    tenderId,
                     bidId,
                     msg.sender,
-                    receipt.submissionNonce,
                     receipt.plaintextCommitment,
-                    existing | bit
+                    existing | bit,
+                    acceptedBlock
                 )
             );
             emit BidReceiptAccepted(tenderId, bidId, msg.sender, existing | bit);

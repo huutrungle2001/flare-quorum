@@ -185,6 +185,19 @@ contract FlareTokenMock is IERC20 {
 
             VeilBidFlareMarket.BidReference memory bid = market.getBidReference(tenderId, 1);
             if (bid.vendor != vendor || bid.receiptBitmap != 3) revert("receipt quorum mismatch");
+            bytes32 expectedRoot = keccak256(
+                abi.encode(
+                    market.BID_ROOT_DOMAIN(),
+                    market.EMPTY_BID_ROOT(),
+                    tenderId,
+                    uint256(1),
+                    vendor,
+                    bid.plaintextCommitment,
+                    uint8(3),
+                    bid.acceptedBlock
+                )
+            );
+            if (market.getTender(tenderId).orderedBidRoot != expectedRoot) revert("ordered root mismatch");
 
             market.closeTender(tenderId);
             market.requestSelection(tenderId);

@@ -165,9 +165,11 @@ not procurement authority.
 receipt set is accepted and updates:
 
 ```text
-root_0 = keccak256("VEILBID_EMPTY_BID_ROOT_V1")
+EMPTY_ROOT = keccak256("VEILBID_EMPTY_BID_ROOT_V1")
+ROOT_DOMAIN = keccak256("VEILBID_BID_ROOT_V1")
+root_0 = EMPTY_ROOT
 root_n = keccak256(abi.encode(
-  "VEILBID_BID_ROOT_V1",
+  ROOT_DOMAIN,
   root_n-1,
   tenderId,
   bidId,
