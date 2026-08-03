@@ -89,6 +89,33 @@ export function gateStatus(assertions) {
   return Object.values(assertions).every(Boolean) ? "PASSED" : "IN_PROGRESS";
 }
 
+function isSha256Digest(value) {
+  return /^sha256:[0-9a-f]{64}$/.test(value ?? "");
+}
+
+export function verifyTeeProxyReleaseRecipe(source, recipe) {
+  if (!recipe || typeof source !== "string") return false;
+  const sourceDigest = `sha256:${recipe.sourceSha256}`;
+  const requiredFragments = [
+    `FROM --platform=${recipe.platform} ${recipe.builderImage} AS builder`,
+    `ADD --checksum=${sourceDigest}`,
+    recipe.sourceUrl,
+    `Revision=${recipe.sourceCommit}`,
+    `FROM --platform=${recipe.platform} ${recipe.runtimeImage}`,
+    "go mod verify",
+    "-buildvcs=false",
+    "USER 65532:65532",
+    'ENTRYPOINT ["/app/tee-proxy"]',
+  ];
+  return (
+    /^[0-9a-f]{40}$/.test(recipe.sourceCommit ?? "") &&
+    /^[0-9a-f]{64}$/.test(recipe.sourceSha256 ?? "") &&
+    isSha256Digest(recipe.builderImage?.split("@")[1]) &&
+    isSha256Digest(recipe.runtimeImage?.split("@")[1]) &&
+    requiredFragments.every((fragment) => source.includes(fragment))
+  );
+}
+
 export function normalizePrivateKey(value) {
   const trimmed = value?.trim();
   if (!trimmed) return null;
@@ -129,6 +156,15 @@ export async function inspectFoundations({
   fetchImplementation = fetch,
 }) {
   const manifest = readFoundationManifest(repositoryRoot);
+  const teeProxyRecipe = manifest.docker.teeProxyReleaseRecipe;
+  const teeProxyDockerfile = readFileSync(
+    resolve(repositoryRoot, teeProxyRecipe.dockerfile),
+    "utf8",
+  );
+  const teeProxyBuildInputsPinned = verifyTeeProxyReleaseRecipe(
+    teeProxyDockerfile,
+    teeProxyRecipe,
+  );
   const rpcUrl = environment[manifest.network.rpcEnvironmentVariable];
   if (!rpcUrl) throw new Error("COSTON2_RPC_URL_MISSING");
 
@@ -382,7 +418,10 @@ export async function inspectFoundations({
       BigInt(block.timestamp) >= BigInt(feedTimestamp) &&
       BigInt(block.timestamp) - BigInt(feedTimestamp) <= 300n,
     dockerDaemonAvailable: dockerCheck.ok,
-    teeProxyImagesDigestPinned: manifest.docker.teeProxyUpstreamDockerfilePinned,
+    teeProxyBuildInputsPinned,
+    teeProxyReleaseImageDigestRecorded: isSha256Digest(
+      teeProxyRecipe.releaseImageDigest,
+    ),
     stableProxyConfigured,
     stableProxyReachable,
     indexerConfigured,
@@ -394,7 +433,16 @@ export async function inspectFoundations({
   const blockers = [];
   addBlocker(blockers, assertions.deploymentKeyMatchesDeclaredWallet, "DEPLOYMENT_KEY_NOT_READY");
   addBlocker(blockers, assertions.dockerDaemonAvailable, "DOCKER_DAEMON_UNAVAILABLE");
-  addBlocker(blockers, assertions.teeProxyImagesDigestPinned, "TEE_PROXY_IMAGE_DIGESTS_UNPINNED");
+  addBlocker(
+    blockers,
+    assertions.teeProxyBuildInputsPinned,
+    "TEE_PROXY_BUILD_INPUTS_UNPINNED",
+  );
+  addBlocker(
+    blockers,
+    assertions.teeProxyReleaseImageDigestRecorded,
+    "TEE_PROXY_RELEASE_IMAGE_DIGEST_MISSING",
+  );
   addBlocker(blockers, assertions.stableProxyConfigured, "STABLE_PROXY_NOT_CONFIGURED");
   addBlocker(blockers, assertions.stableProxyReachable, "STABLE_PROXY_NOT_REACHABLE");
   addBlocker(blockers, assertions.indexerConfigured, "FCC_INDEXER_NOT_CONFIGURED");
@@ -455,13 +503,23 @@ export async function inspectFoundations({
         ]),
       ),
       sourceChecks,
+      teeProxyReleaseRecipe: {
+        dockerfile: teeProxyRecipe.dockerfile,
+        platform: teeProxyRecipe.platform,
+        sourceCommit: teeProxyRecipe.sourceCommit,
+        sourceSha256: teeProxyRecipe.sourceSha256,
+        builderImage: teeProxyRecipe.builderImage,
+        runtimeImage: teeProxyRecipe.runtimeImage,
+        releaseImageDigest: teeProxyRecipe.releaseImageDigest,
+      },
       configuredMachineCount: machineIds.length,
       productionMachineCount,
     },
     assertions,
     blockers,
     notes: [
-      "The official scaffold main branch is reference-only until its stale tee-node and tee-proxy pins are upgraded in the VeilBid extension.",
+      "The official scaffold main branch is reference-only; VeilBid pins the organizer-directed tee-node module and tee-proxy release recipe independently.",
+      "The tee-proxy build inputs are pinned, but Gate 0 remains incomplete until Docker builds the recipe and the immutable release image digest is recorded.",
       "No RPC URL, deployment key, indexer credential, proxy response, or machine secret is recorded.",
       "Simulated TEE mode is the declared Coston2 judging target; it is not hardware-backed confidentiality.",
     ],

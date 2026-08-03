@@ -88,9 +88,11 @@ All open design questions are resolved in
   requirements, and whether at least three registered TEE machines are
   available for one extension.
 - [x] Confirm real confidential hardware versus simulated TEE judge policy.
-- [x] Pin the official FCC scaffold commit and record resolved container digests;
-  the upstream proxy Dockerfile still needs a VeilBid release image with pinned
-  stages before Gate 0 can pass.
+- [x] Pin the official FCC scaffold commit and add a VeilBid tee-proxy release
+  recipe whose official source archive, builder, and runtime are checksum or
+  digest pinned.
+- [ ] Build that recipe on `linux/amd64` and record the resulting immutable
+  release image digest before Gate 0 passes.
 - [ ] Apply [`docs/fcc-coston2-operations.md`](docs/fcc-coston2-operations.md):
   resolve live `FlareTeeManager`, enforce the organizer minimum TEE/proxy
   revisions, use a fresh extension ID and `rRap`, and reach machine status `2`.

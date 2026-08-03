@@ -57,9 +57,13 @@ The 2026-08-03 foundation audit found this exact upstream drift:
   `v0.0.23` and Go `1.25.8`.
 
 The scaffold is therefore a reference, not a build-ready dependency snapshot.
-VeilBid must upgrade and test the node/proxy pins when instantiating the
-extension. The canonical public pin set and repeatable live checks are in
+VeilBid upgrades and tests the node/proxy pins independently. The proxy release
+recipe at `apps/fcc-extension/proxy/Dockerfile` downloads the exact official
+source archive, verifies its checksum, and pins both image stages. The canonical
+public pin set and repeatable live checks are in
 `tooling/flare/coston2-foundations.json` and `pnpm flare:foundations:check`.
+Gate 0 still requires a real `linux/amd64` image build and the resulting image
+digest; a pinned recipe alone is not deployment evidence.
 
 ## 3. Fresh registration workflow
 
@@ -165,6 +169,6 @@ the championship quorum requirement.
 The current partial live record is
 `evidence/coston2/gate-0-foundations.json`. It is explicitly
 `IN_PROGRESS`: source hashes, toolchains, manager interface, registry discovery,
-FTestXRP binding, and XRP/USD feed pass, while Docker, digest-pinned tee-proxy
-images, stable proxy reachability, indexer access, and three production machines
-remain blockers.
+FTestXRP binding, XRP/USD feed, indexer configuration, and tee-proxy build-input
+pinning pass. Docker/image build, stable proxy reachability, and three production
+machines remain blockers.
