@@ -52,6 +52,12 @@
       "commit": "6df972c64d34efe1d4497f0eafe6792d1f0862dd",
       "role": "result-signing and rRap registration reference; runtime pins require the same upgrade as the scaffold"
     },
+    "goFlareCommon": {
+      "repository": "https://github.com/flare-foundation/go-flare-common.git",
+      "commit": "09a10067e6a4",
+      "moduleVersion": "v1.2.2-0.20260727094511-09a10067e6a4",
+      "role": "canonical MachineManager ABI and TEE_ACTION_RESULT signing payload"
+    },
     "teeNode": {
       "repository": "https://github.com/flare-foundation/tee-node.git",
       "branch": "develop",
@@ -112,6 +118,21 @@
       "id": "tee-proxy-go-module",
       "url": "https://raw.githubusercontent.com/flare-foundation/tee-proxy/0c6d016b09948cba9a508ba357e592eb6088fd1c/go.mod",
       "sha256": "31a8d342fcdc5079b19a35d88cf9001e184de677b9cf6a0e76e533c6c952badb"
+    },
+    {
+      "id": "tee-machine-manager-abi",
+      "url": "https://raw.githubusercontent.com/flare-foundation/go-flare-common/09a10067e6a4/pkg/contracts/tee/machinemanager/machinemanager.abi",
+      "sha256": "33cadc3cf419d3cc8d5683ab156b4670f4d62a004b73a10c81344a4f1f531adb"
+    },
+    {
+      "id": "tee-action-result-signing-payload",
+      "url": "https://raw.githubusercontent.com/flare-foundation/go-flare-common/09a10067e6a4/pkg/signing/hash.go",
+      "sha256": "b0b20611ef107835a7e8b4e3d5dd5dd5c3f4f064ceff44aa7696858320b80f3f"
+    },
+    {
+      "id": "tee-action-result-prefixes",
+      "url": "https://raw.githubusercontent.com/flare-foundation/go-flare-common/09a10067e6a4/pkg/signing/prefixes.go",
+      "sha256": "f407aeeae8149d80ff124f3ad345f2caf90b65f39989a9247880edbcbdbe5a55"
     },
     {
       "id": "coston2-contract-registry",

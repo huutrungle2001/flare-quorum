@@ -288,7 +288,7 @@ the championship product and requires Product Plan approval.
 | FCC foundation operation | IMPLEMENTED LOCALLY — deterministic `PING_V1` tests pass; live Gate A not run |
 | FCC private ingress | NOT STARTED |
 | Multi-TEE quorum | NOT STARTED |
-| Flare contracts | FOUNDATION SENDER IMPLEMENTED LOCALLY — market/settlement contracts not started |
+| Flare contracts | LOCAL FEASIBILITY — foundation sender plus FCC/FTestXRP/FTSO market lifecycle tests pass; no live deployment |
 | FAssets/FDC/Smart Account journey | NOT STARTED |
 | FTSO scoring | NOT STARTED |
 | Coston2 deployment/evidence | NOT STARTED |

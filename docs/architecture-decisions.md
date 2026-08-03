@@ -390,6 +390,39 @@ multi-machine result quorum and its error logs could grow into a privacy leak.
 An explicit domain-bound ABI gives the contract, Go extension, and future
 TypeScript bindings one stable seam while keeping foundation evidence public-safe.
 
+## ADR-019 — Verify canonical FCC action results, not relay claims
+
+**Decision:** Market finalization reconstructs the exact current `tee-node`
+signature path from the pinned `go-flare-common` implementation:
+
+```text
+actionResultHash = keccak256(
+  keccak256(resultData) || actionId || keccak256(submissionTag) || statusByte
+)
+signedPayload = keccak256(abi.encode(
+  bytes32("TEE_ACTION_RESULT"), chainId, actionResultHash
+))
+signingHash = EthereumSignedMessage(signedPayload)
+```
+
+The contract constructs `resultData` itself from the submitted selection
+result, requires the recorded FCC request ID, accepts only the official
+`submit` or `threshold` tags with success status, and recovers distinct
+tender-fixed TEE identities. At creation it checks each machine's live status,
+extension ID, attested code hash, and public-key fingerprint through the
+official `MachineManager` facet. It rechecks status and extension membership at
+finalization.
+
+The relay cannot substitute a raw selection digest, a proxy signature, an
+application key, or an arbitrary action envelope. Local Foundry signatures are
+test vectors only; the capability remains unverified until real proxy responses
+from registered Coston2 machines settle the same contract.
+
+**Reason:** `ActionResult.Signature` is the registered TEE identity proof
+already produced by FCC. Verifying a custom application signature would add an
+unnecessary key-registration trust path and would not prove that the official
+FCC runtime processed the on-chain instruction.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:

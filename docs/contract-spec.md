@@ -1,6 +1,9 @@
 # VeilBid Flare Championship Contract Specification
 
-> Status: Target interface; implementation and Coston2 deployment pending.
+> Status: The first local Flare market slice implements receipt-quorum,
+> close-time FTSO, canonical FCC action-result verification, and public-token
+> escrow conservation. Private ingress, production scoring, Smart Account/FDC,
+> deployment, and Coston2 verification remain pending.
 
 ## 1. Core types
 
