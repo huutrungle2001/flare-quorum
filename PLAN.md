@@ -290,7 +290,7 @@ the championship product and requires Product Plan approval.
 | Multi-TEE quorum | NOT STARTED |
 | Flare contracts | LOCAL FEASIBILITY — foundation sender plus FCC/FTestXRP/FTSO market lifecycle tests pass; no live deployment |
 | FAssets/FDC/Smart Account journey | NOT STARTED |
-| FTSO scoring | NOT STARTED |
+| FTSO scoring | LOCAL GO MODEL — checked XRP/USD conversion, credentials, penalties, and tie tests pass; not wired to FCC |
 | Coston2 deployment/evidence | NOT STARTED |
 | User research/traction | NOT STARTED |
 

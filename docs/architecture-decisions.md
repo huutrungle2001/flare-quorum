@@ -210,10 +210,26 @@ totalPenalty =
   + warrantyWeightBps * warrantyPenalty
 ```
 
-`SCALE`, input units, rounding, overflow bounds, zero-denominator rules, issuer
-signature domains, and tie behavior are constants in `SCORING_V1`. Lowest total
-penalty wins. The result publishes winner and FXRP payout, not losing inputs or
-component penalties.
+`SCORING_V1` fixes `SCALE = 1_000_000_000`, weights to unsigned basis points
+that sum to `10_000`, and XRP/USD quote inputs to unsigned six-decimal units.
+USD payout conversion is
+`ceil(usdMicros * 10^ftsoDecimals / ftsoValue)` for nonnegative FTSO decimals,
+with the algebraically equivalent denominator adjustment for negative
+decimals. Supported FTSO decimals are `[-18, 18]`; an invalid shared snapshot
+fails the whole selection and can never be converted into a zero-winner refund.
+
+At most four credentials are allowed, with exactly one for every distinct
+required `(credentialType, issuer)` pair and no extras. Each issuer signs the
+Ethereum signed-message hash of a canonical digest binding chain, market,
+extension, code, tender, rules, vendor, type, validity, and nonce. Credentials
+must remain valid at the frozen evaluation checkpoint. Signatures must be
+canonical low-S secp256k1 signatures.
+
+All intermediate arithmetic uses checked arbitrary-precision integers in the
+Go reference, with the final payout bounded to `uint64` and the public escrow
+ceiling. Lowest total penalty wins; the lower canonical bid ID wins an exact
+tie. The result publishes winner and FXRP payout, not losing inputs or component
+penalties.
 
 ## ADR-010 — FTSO price snapshot
 

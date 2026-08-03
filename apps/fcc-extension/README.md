@@ -8,8 +8,12 @@ was bootstrapped from Flare's official `fce-extension-scaffold` at commit
 The current foundation operation is deliberately public-safe. `PING_V1`
 proves deterministic ABI decoding and binds the operation type, command,
 Coston2 chain ID, market address, one-time request nonce, and an opaque payload
-hash. It never accepts or returns a bid. Procurement logic is added only after
-the live FCC feasibility gates pass.
+hash. It never accepts or returns a bid.
+
+The local `pkg/protocol` feasibility model now locks the Solidity-compatible
+ordered-root vector and implements checked `SCORING_V1` eligibility, issuer
+credentials, XRP/USD conversion, penalties, and tie-breaking. That model is not
+yet connected to a private ingress/action handler and is not a live FCC claim.
 
 ```bash
 go test ./...
