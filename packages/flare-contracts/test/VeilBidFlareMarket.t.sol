@@ -352,7 +352,7 @@ contract FlareTokenMock is IERC20 {
                 submissionNonce: 1,
                 plaintextCommitment: keccak256("opaque-private-bid"),
                 teeId: teeId,
-                expiry: tender.resultExpiry
+                expiry: 900
             });
             VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
             bytes32 digest = keccak256(
@@ -401,7 +401,7 @@ contract FlareTokenMock is IERC20 {
                 winner: vendor,
                 winningAmountXrp: 400,
                 resultNonce: tender.resultNonce,
-                expiry: uint64(block.timestamp + 1 hours)
+                expiry: tender.resultExpiry
             });
         }
 
