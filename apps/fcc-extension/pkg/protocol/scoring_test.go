@@ -124,8 +124,10 @@ func scoringFixture(t *testing.T) (ScoringRules, CredentialDomainBinding, Privat
 	rules := ScoringRules{
 		SchemaVersion:       ScoringSchemaVersion,
 		CeilingXrpMicros:    1_000_000,
+		BidDeadline:         1_000,
 		AllowXRP:            true,
 		AllowUSD:            true,
+		FtsoFeedID:          [21]byte{'X', 'R', 'P', '/', 'U', 'S', 'D'},
 		MaxDeliveryDays:     10,
 		MinWarrantyDays:     12,
 		MaxWarrantyDays:     36,

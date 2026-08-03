@@ -39,22 +39,24 @@ var (
 )
 
 type CredentialRequirement struct {
-	CredentialType common.Hash
-	Issuer         common.Address
+	CredentialType common.Hash    `json:"credentialType" abi:"credentialType"`
+	Issuer         common.Address `json:"issuer" abi:"issuer"`
 }
 
 type ScoringRules struct {
-	SchemaVersion       uint16
-	CeilingXrpMicros    uint64
-	AllowXRP            bool
-	AllowUSD            bool
-	MaxDeliveryDays     uint16
-	MinWarrantyDays     uint16
-	MaxWarrantyDays     uint16
-	PriceWeightBPS      uint16
-	DeliveryWeightBPS   uint16
-	WarrantyWeightBPS   uint16
-	RequiredCredentials []CredentialRequirement
+	SchemaVersion       uint16                  `json:"schemaVersion" abi:"schemaVersion"`
+	CeilingXrpMicros    uint64                  `json:"ceilingXrpMicros" abi:"ceilingXrpMicros"`
+	BidDeadline         uint64                  `json:"bidDeadline" abi:"bidDeadline"`
+	AllowXRP            bool                    `json:"allowXrp" abi:"allowXrp"`
+	AllowUSD            bool                    `json:"allowUsd" abi:"allowUsd"`
+	FtsoFeedID          [21]byte                `json:"ftsoFeedId" abi:"ftsoFeedId"`
+	MaxDeliveryDays     uint16                  `json:"maxDeliveryDays" abi:"maxDeliveryDays"`
+	MinWarrantyDays     uint16                  `json:"minWarrantyDays" abi:"minWarrantyDays"`
+	MaxWarrantyDays     uint16                  `json:"maxWarrantyDays" abi:"maxWarrantyDays"`
+	PriceWeightBPS      uint16                  `json:"priceWeightBps" abi:"priceWeightBps"`
+	DeliveryWeightBPS   uint16                  `json:"deliveryWeightBps" abi:"deliveryWeightBps"`
+	WarrantyWeightBPS   uint16                  `json:"warrantyWeightBps" abi:"warrantyWeightBps"`
+	RequiredCredentials []CredentialRequirement `json:"requiredCredentials" abi:"requiredCredentials"`
 }
 
 type CredentialDomainBinding struct {
@@ -103,6 +105,9 @@ func (rules ScoringRules) Validate() error {
 	}
 	if rules.CeilingXrpMicros == 0 || (!rules.AllowXRP && !rules.AllowUSD) {
 		return errors.New("INVALID_PRICE_POLICY")
+	}
+	if rules.BidDeadline == 0 || (rules.AllowUSD && rules.FtsoFeedID == ([21]byte{})) {
+		return errors.New("INVALID_TENDER_CHECKPOINT")
 	}
 	if rules.MaxDeliveryDays == 0 || rules.MaxWarrantyDays < rules.MinWarrantyDays {
 		return errors.New("INVALID_SERVICE_POLICY")

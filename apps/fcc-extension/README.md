@@ -11,9 +11,11 @@ Coston2 chain ID, market address, one-time request nonce, and an opaque payload
 hash. It never accepts or returns a bid.
 
 The local `pkg/protocol` feasibility model now locks the Solidity-compatible
-ordered-root vector and implements checked `SCORING_V1` eligibility, issuer
-credentials, XRP/USD conversion, penalties, and tie-breaking. That model is not
-yet connected to a private ingress/action handler and is not a live FCC claim.
+ordered-root and bid-receipt vectors, canonical ABI encoding for
+`BID_SCHEMA_V1`/`BID_RECEIPT_V1`, and checked `SCORING_V1` eligibility, issuer
+credentials, XRP/USD conversion, penalties, and tie-breaking. That model is
+not yet connected to a private ingress/action handler and is not a live FCC
+claim.
 
 ```bash
 go test ./...

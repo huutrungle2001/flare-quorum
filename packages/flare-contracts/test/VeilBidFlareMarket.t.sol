@@ -252,6 +252,29 @@ contract FlareTokenMock is IERC20 {
             }
         }
 
+        function testBidReceiptDigestGoldenVectorMatchesGo() external view {
+            bytes32 digest = keccak256(
+                abi.encode(
+                    market.RECEIPT_DOMAIN(),
+                    uint16(1),
+                    uint256(114),
+                    0x2000000000000000000000000000000000000002,
+                    uint256(0x10001),
+                    bytes32(uint256(0x1234)),
+                    uint256(42),
+                    0x57c12e9878a9218766f316c084784bfd97b102512847a30f999d32a2c8a5e444,
+                    0x1000000000000000000000000000000000000001,
+                    uint256(7),
+                    0xb587b30b0b7743bc2e8179defb8431dac5d71cc616ef21909771cd785738c6aa,
+                    0x3000000000000000000000000000000000000003,
+                    uint64(900)
+                )
+            );
+            if (digest != 0xb22f48371a8f6813be92a51d188dee114c4f188a6d7f201e3712ae8878fed658) {
+                revert("Go/Solidity receipt drift");
+            }
+        }
+
         function testRejectsStaleFtsoSnapshotAtClose() external {
             uint256 tenderId = market.createTender(_terms());
             VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
@@ -324,6 +347,7 @@ contract FlareTokenMock is IERC20 {
 
         function _submitReceipt(uint256 tenderId, uint256 teeKey, address teeId) private {
             VeilBidFlareMarket.BidReceipt memory receipt = VeilBidFlareMarket.BidReceipt({
+                schemaVersion: 1,
                 vendor: vendor,
                 submissionNonce: 1,
                 plaintextCommitment: keccak256("opaque-private-bid"),
@@ -334,6 +358,7 @@ contract FlareTokenMock is IERC20 {
             bytes32 digest = keccak256(
                 abi.encode(
                     market.RECEIPT_DOMAIN(),
+                    receipt.schemaVersion,
                     market.COSTON2_CHAIN_ID(),
                     address(market),
                     tender.extensionId,

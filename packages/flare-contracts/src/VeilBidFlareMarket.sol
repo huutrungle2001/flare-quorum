@@ -77,6 +77,7 @@ contract VeilBidFlareMarket {
     }
 
     struct BidReceipt {
+        uint16 schemaVersion;
         address vendor;
         uint256 submissionNonce;
         bytes32 plaintextCommitment;
@@ -276,8 +277,8 @@ contract VeilBidFlareMarket {
         if (receipt.vendor != msg.sender || !isApprovedVendor[tenderId][msg.sender]) revert NotApprovedVendor();
         if (hasSubmittedBid[tenderId][msg.sender]) revert AlreadySubmitted();
         if (
-            receipt.submissionNonce == 0 || receipt.plaintextCommitment == bytes32(0) || receipt.teeId == address(0)
-                || receipt.expiry < block.timestamp
+            receipt.schemaVersion != 1 || receipt.submissionNonce == 0 || receipt.plaintextCommitment == bytes32(0)
+                || receipt.teeId == address(0) || receipt.expiry < block.timestamp
         ) revert InvalidReceipt();
         uint8 existing = receiptBitmapByVendor[tenderId][msg.sender];
         BidReference storage pending = pendingBidReferences[tenderId][msg.sender];
@@ -292,6 +293,7 @@ contract VeilBidFlareMarket {
         bytes32 digest = keccak256(
             abi.encode(
                 RECEIPT_DOMAIN,
+                receipt.schemaVersion,
                 COSTON2_CHAIN_ID,
                 address(this),
                 tender.extensionId,

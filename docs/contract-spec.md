@@ -139,15 +139,16 @@ contracts, never the release market.
 `submitBidReceipts` requires:
 
 1. Tender `Open` and unexpired.
-2. Caller is approved vendor with no accepted bid.
-3. Submission nonce is exact unused next nonce.
-4. Every receipt reconstructs the canonical `BID_RECEIPT_V1` digest.
-5. Signer is a distinct tender-fixed registered machine for fixed code version.
-6. Receipts agree on vendor, nonce, rule, and plaintext commitment.
-7. Receipt expiry has not passed.
-8. Valid signer bitmap intersected with current common quorum preserves at least
+2. Receipt schema version is exactly `1`.
+3. Caller is approved vendor with no accepted bid.
+4. Submission nonce is exact unused next nonce.
+5. Every receipt reconstructs the canonical `BID_RECEIPT_V1` digest.
+6. Signer is a distinct tender-fixed registered machine for fixed code version.
+7. Receipts agree on vendor, nonce, rule, and plaintext commitment.
+8. Receipt expiry has not passed.
+9. Valid signer bitmap intersected with current common quorum preserves at least
    two machines.
-9. Terminal bid reference is stored and ordered root updated once.
+10. Terminal bid reference is stored and ordered root updated once.
 
 The contract never receives bid plaintext or ciphertext.
 

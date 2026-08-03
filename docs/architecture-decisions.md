@@ -80,7 +80,8 @@ codeVersion
 tenderId
 vendor
 submissionNonce
-rulesHash
+rules                 // canonical public SCORING_V1 policy; rulesHash is derived
+receiptExpiry
 quoteCurrency       // XRP or USD in the championship release
 price               // uint64, 6 decimal fixed point
 deliveryDays        // uint16
@@ -89,9 +90,18 @@ credentialSet       // bounded issuer/type/signature tuples
 salt                // 128-bit or stronger random value
 ```
 
+The rules tuple fixes the escrow ceiling, deadline, enabled quote currencies,
+FTSO feed, service bounds, three weights, and at most four required credential
+issuer/type pairs. Its hash is `keccak256(abi.encode(RULES_DOMAIN, rules))`.
+Carrying the preimage lets the TEE validate policy without trusting a relay;
+the contract and public metadata expose the same non-secret policy.
+
 The plaintext commitment is
-`keccak256("VEILBID_BID_V1" || canonicalBidBytes)`. The random salt prevents
-practical enumeration of low-range bid values.
+`keccak256(abi.encode(BID_DOMAIN, canonicalBidTuple))`. The random salt prevents
+practical enumeration of low-range bid values. `BID_RECEIPT_V1` separately
+binds its schema version, chain, market, extension, code, tender, derived rules
+hash, vendor, nonce, plaintext commitment, TEE identity, and expiry. The
+receipt signature is excluded from its own digest.
 
 Unsupported fields, currencies, encodings, duplicate credentials, and unknown
 schema versions fail closed.
