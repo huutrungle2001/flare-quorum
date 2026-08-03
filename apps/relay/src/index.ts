@@ -1,6 +1,7 @@
 export * from "./config.js";
 export * from "./flare-config.js";
 export * from "./flare-live.js";
+export * from "./flare-lifecycle.js";
 export * from "./flare-results.js";
 export * from "./live.js";
 export * from "./logger.js";

@@ -20,6 +20,7 @@ test("Flare relay reads explicit Coston2 config without Sepolia fallback", () =>
   assert.deepEqual(config.fccProxyUrls, []);
   assert.equal(config.fccExtensionVersion, null);
   assert.equal(config.fccInstructionFeeWei, null);
+  assert.equal(config.actionBudget, 1);
 });
 
 test("Flare relay fails closed when market or deployment metadata is missing", () => {
@@ -87,4 +88,12 @@ test("Flare write modes require three secure FCC proxies, version, and fee", () 
     "https://three.example",
   ]);
   assert.equal(config.fccInstructionFeeWei, 1_000_000n);
+});
+
+test("Flare action budget is bounded and defaults to one", () => {
+  assert.throws(
+    () => loadFlareRelayConfig("health", { ...baseEnv, FLARE_ACTION_BUDGET: "0" }),
+    (error) => error instanceof FlareRelayConfigError && error.code === "invalid-flare-action-budget",
+  );
+  assert.equal(loadFlareRelayConfig("health", { ...baseEnv, FLARE_ACTION_BUDGET: "3" }).actionBudget, 3);
 });

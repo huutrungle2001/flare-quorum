@@ -12,6 +12,7 @@ export interface FlareRelayConfig {
   fccProxyUrls: readonly string[];
   fccExtensionVersion: string | null;
   fccInstructionFeeWei: bigint | null;
+  actionBudget: number;
 }
 
 function proxyUrl(value: string): string {
@@ -46,6 +47,16 @@ function positiveBigint(value: string | undefined, code: string): bigint | null 
   if (!/^[0-9]+$/.test(value)) throw new FlareRelayConfigError(code);
   const parsed = BigInt(value);
   if (parsed <= 0n) throw new FlareRelayConfigError(code);
+  return parsed;
+}
+
+function actionBudget(value: string | undefined): number {
+  if (value === undefined || value.trim() === "") return 1;
+  if (!/^[0-9]+$/.test(value)) throw new FlareRelayConfigError("invalid-flare-action-budget");
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed) || parsed < 1 || parsed > 100) {
+    throw new FlareRelayConfigError("invalid-flare-action-budget");
+  }
   return parsed;
 }
 
@@ -92,6 +103,7 @@ export function loadFlareRelayConfig(
     env.FLARE_FCC_INSTRUCTION_FEE_WEI,
     "invalid-fcc-instruction-fee",
   );
+  const configuredActionBudget = actionBudget(env.FLARE_ACTION_BUDGET);
   if ((mode === "once" || mode === "poll") && signerPrivateKey === null) {
     throw new FlareRelayConfigError("missing-flare-finalizer-private-key");
   }
@@ -117,5 +129,6 @@ export function loadFlareRelayConfig(
     fccProxyUrls,
     fccExtensionVersion,
     fccInstructionFeeWei,
+    actionBudget: configuredActionBudget,
   };
 }
