@@ -162,8 +162,12 @@ export function PrimaryNavigation({ wallet }: { wallet: WalletController }) {
   const isTenders =
     location.pathname === "/room" || legacyTenderRoute;
   const isDocs = location.pathname === "/docs";
+  const isFlare = location.pathname === "/flare";
   const items: NavigationItem[] = [
     { label: "TENDERS", to: "/room", active: isTenders },
+    ...(import.meta.env.VITE_FLARE_MARKET_ADDRESS
+      ? [{ label: "FLARE", to: "/flare", active: isFlare }]
+      : []),
     { label: "DOCS", to: "/docs", active: isDocs },
   ];
 
@@ -223,11 +227,11 @@ export function PrimaryNavigation({ wallet }: { wallet: WalletController }) {
         ))}
       </nav>
       <div className="topbar-actions">
-        <div className="network-pill" aria-label="Network: Ethereum Sepolia">
+        <div className="network-pill" aria-label={`Network: ${isFlare ? "Flare Coston2" : "Ethereum Sepolia"}`}>
           <span aria-hidden="true" />
-          <span className="network-label">SEPOLIA</span>
+          <span className="network-label">{isFlare ? "COSTON2" : "SEPOLIA"}</span>
         </div>
-        <HeaderWalletMenu wallet={wallet} />
+        {!isFlare && <HeaderWalletMenu wallet={wallet} />}
       </div>
     </header>
   );

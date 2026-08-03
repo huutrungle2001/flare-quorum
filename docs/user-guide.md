@@ -1,7 +1,9 @@
 # VeilBid Flare Championship User Guide
 
-> Status: target Coston2 experience. The checked-in app still serves the
-> historical Sepolia baseline until the Flare gates and verified release pass.
+> Status: target Coston2 experience. The checked-in `/flare` route now provides
+> a fail-closed wallet-free Coston2 evidence view, while buyer/vendor writes
+> remain disabled until the Flare gates and verified release pass. `/room`
+> remains the historical Sepolia baseline.
 
 ## 1. What the product will do
 
@@ -103,12 +105,14 @@ receipt set, or a common 2-machine quorum is unavailable.
    distinct approved machines agree.
 5. The market reconstructs the full domain, verifies threshold signatures,
    marks terminal state, and settles once.
-6. If another finalizer wins the race, reread chain state. If a dependency is
+6. If the one-hour result envelope expires, retry with a fresh attempt nonce and
+   request ID while preserving every frozen input. Old-attempt results fail.
+7. If another finalizer wins the race, reread chain state. If a dependency is
    unavailable, preserve the checkpoint and resume; never use a client-computed
    winner, manual price, replacement machine, or mock result.
-
-Losing the frozen quorum may lock the test escrow. There is no buyer timeout
-that overrides valid bids after close.
+8. If no threshold result is retrievable within 24 hours of the first request,
+   the buyer may recover only the original escrow. This records failed-compute
+   `Refunded`, creates no award, and is never displayed as FCC success.
 
 ## 7. Evidence and privacy labels
 

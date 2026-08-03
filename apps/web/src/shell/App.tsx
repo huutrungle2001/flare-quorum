@@ -30,6 +30,7 @@ import {
   PrivateBidsWorkspace,
   type BuyerSection,
 } from "../workspaces/CombinedWorkspaces";
+import { FlareRoom } from "../flare/FlareRoom";
 
 type RoomRole =
   | "PUBLIC"
@@ -880,6 +881,8 @@ export function App() {
   const page =
     location.pathname === "/docs" ? (
       <DocsPage />
+    ) : location.pathname === "/flare" ? (
+      <FlareRoom />
     ) : location.pathname === "/room" || legacyRoomLink ? (
       <TenderRoomApp wallet={wallet} />
     ) : (
