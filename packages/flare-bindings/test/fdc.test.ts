@@ -78,6 +78,11 @@ test("rejects a proof with wrong memo, destination tag, or domain", () => {
   const wrongDomain = structuredClone(proof);
   wrongDomain.data.sourceId = `0x${"99".repeat(32)}`;
   assert.throws(() => assertXrpPaymentProof(wrongDomain, expected), /FDC_PAYMENT_DOMAIN_MISMATCH/);
+
+  assert.throws(
+    () => assertXrpPaymentProof(proof, { ...expected, votingRound: 701n }),
+    /FDC_VOTING_ROUND_MISMATCH/,
+  );
 });
 
 test("rejects underfunded payment and empty Merkle proof", () => {

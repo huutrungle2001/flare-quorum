@@ -37,6 +37,11 @@
     },
     "viem": {
       "version": "2.47.6"
+    },
+    "flareWagmiPeriphery": {
+      "version": "3.6.0",
+      "integrity": "sha512-sC4c79yLGpsWQwe3IC+Ln61YzwyaYAmdkQzz3qN6rBC+Z13Z1yeRZz3FjPBN6zELu3/oTjIXOc5rfEFrPNrqPw==",
+      "role": "dev-only ABI drift oracle for the minimal FDC/FAssets/Smart Account bindings"
     }
   },
   "upstreams": {
@@ -96,6 +101,12 @@
       "repository": "https://github.com/flare-foundation/developer-hub.git",
       "branch": "main",
       "commit": "8120c460bf686ef4cb277fd710c93400c43fa580"
+    },
+    "flareViemStarter": {
+      "repository": "https://github.com/flare-foundation/flare-viem-starter.git",
+      "branch": "main",
+      "commit": "47d5c5341254140e63fa60c2d497bf3aa4a875c8",
+      "role": "official XRPPayment prepare, fee submission, voting-round, DA proof, and executeDirectMintingWithData reference"
     }
   },
   "sourceFiles": [
@@ -192,6 +203,9 @@
     "ftsoV2": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
     "fdcVerification": "0x906507E0B64bcD494Db73bd0459d1C667e14B933",
     "fdcHub": "0x48aC463d7975828989331F4De43341627b9c5f1D",
+    "fdcRequestFeeConfigurations": "0x191a1282Ac700edE65c5B0AaF313BAcC3eA7fC7e",
+    "flareSystemsManager": "0xA90Db6D10F856799b10ef2A77EBCbF460aC71e52",
+    "relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE",
     "assetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
     "fTestXRP": "0x0b6A3645c240605887a5532109323A3E12273dc7",
     "masterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c"
@@ -201,6 +215,9 @@
     "FtsoV2": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
     "FdcVerification": "0x906507E0B64bcD494Db73bd0459d1C667e14B933",
     "FdcHub": "0x48aC463d7975828989331F4De43341627b9c5f1D",
+    "FdcRequestFeeConfigurations": "0x191a1282Ac700edE65c5B0AaF313BAcC3eA7fC7e",
+    "FlareSystemsManager": "0xA90Db6D10F856799b10ef2A77EBCbF460aC71e52",
+    "Relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE",
     "AssetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
     "MasterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c"
   },

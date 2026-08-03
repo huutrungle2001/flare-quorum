@@ -20,6 +20,19 @@ const managerAbi = parseAbi([
 ]);
 const assetManagerAbi = parseAbi([
   "function fAsset() view returns (address)",
+  "function directMintingPaymentAddress() view returns (string)",
+  "function getDirectMintingFeeBIPS() view returns (uint256)",
+  "function getDirectMintingMinimumFeeUBA() view returns (uint256)",
+]);
+const fdcHubAbi = parseAbi([
+  "function fdcRequestFeeConfigurations() view returns (address)",
+]);
+const fdcVerificationAbi = parseAbi([
+  "function fdcProtocolId() view returns (uint8)",
+]);
+const flareSystemsManagerAbi = parseAbi([
+  "function firstVotingRoundStartTs() view returns (uint64)",
+  "function votingEpochDurationSeconds() view returns (uint64)",
 ]);
 const erc20MetadataAbi = parseAbi([
   "function symbol() view returns (string)",
@@ -163,6 +176,13 @@ export async function inspectFoundations({
     fTestXrpDecimals,
     feed,
     supportedFeedIds,
+    fdcFeeConfig,
+    fdcProtocolId,
+    firstVotingRoundStartTs,
+    votingEpochDurationSeconds,
+    directMintingPaymentAddress,
+    directMintingFeeBIPS,
+    directMintingMinimumFeeUBA,
   ] = await Promise.all([
     client.readContract({
       address: getAddress(manifest.contracts.flareTeeManager),
@@ -205,6 +225,48 @@ export async function inspectFoundations({
       address: getAddress(manifest.contracts.ftsoV2),
       abi: ftsoAbi,
       functionName: "getSupportedFeedIds",
+      blockNumber,
+    }),
+    client.readContract({
+      address: getAddress(manifest.contracts.fdcHub),
+      abi: fdcHubAbi,
+      functionName: "fdcRequestFeeConfigurations",
+      blockNumber,
+    }),
+    client.readContract({
+      address: getAddress(manifest.contracts.fdcVerification),
+      abi: fdcVerificationAbi,
+      functionName: "fdcProtocolId",
+      blockNumber,
+    }),
+    client.readContract({
+      address: getAddress(manifest.contracts.flareSystemsManager),
+      abi: flareSystemsManagerAbi,
+      functionName: "firstVotingRoundStartTs",
+      blockNumber,
+    }),
+    client.readContract({
+      address: getAddress(manifest.contracts.flareSystemsManager),
+      abi: flareSystemsManagerAbi,
+      functionName: "votingEpochDurationSeconds",
+      blockNumber,
+    }),
+    client.readContract({
+      address: getAddress(manifest.contracts.assetManagerFXRP),
+      abi: assetManagerAbi,
+      functionName: "directMintingPaymentAddress",
+      blockNumber,
+    }),
+    client.readContract({
+      address: getAddress(manifest.contracts.assetManagerFXRP),
+      abi: assetManagerAbi,
+      functionName: "getDirectMintingFeeBIPS",
+      blockNumber,
+    }),
+    client.readContract({
+      address: getAddress(manifest.contracts.assetManagerFXRP),
+      abi: assetManagerAbi,
+      functionName: "getDirectMintingMinimumFeeUBA",
       blockNumber,
     }),
   ]);
@@ -300,6 +362,17 @@ export async function inspectFoundations({
       fTestXrpSymbol === "FTestXRP" &&
       fTestXrpName === "FXRP" &&
       fTestXrpDecimals === 6,
+    fdcProtocolBindingsLive:
+      getAddress(fdcFeeConfig) ===
+        getAddress(manifest.contracts.fdcRequestFeeConfigurations) &&
+      fdcProtocolId === 200 &&
+      firstVotingRoundStartTs > 0n &&
+      votingEpochDurationSeconds > 0n,
+    fAssetsDirectMintingBindingsLive:
+      directMintingPaymentAddress.trim().length > 0 &&
+      directMintingFeeBIPS > 0n &&
+      directMintingFeeBIPS < 10_000n &&
+      directMintingMinimumFeeUBA > 0n,
     xrpUsdFeedIsLive:
       feedValue > 0n &&
       feedDecimals >= 0 &&
@@ -360,6 +433,20 @@ export async function inspectFoundations({
         symbol: fTestXrpSymbol,
         name: fTestXrpName,
         decimals: fTestXrpDecimals,
+      },
+      fdc: {
+        hub: manifest.contracts.fdcHub,
+        requestFeeConfigurations: getAddress(fdcFeeConfig),
+        verification: manifest.contracts.fdcVerification,
+        protocolId: Number(fdcProtocolId),
+        firstVotingRoundStartTs: Number(firstVotingRoundStartTs),
+        votingEpochDurationSeconds: Number(votingEpochDurationSeconds),
+      },
+      fAssetsDirectMinting: {
+        assetManager: manifest.contracts.assetManagerFXRP,
+        paymentAddress: directMintingPaymentAddress,
+        feeBIPS: directMintingFeeBIPS.toString(),
+        minimumFeeUBA: directMintingMinimumFeeUBA.toString(),
       },
       selectedUpstreamCommits: Object.fromEntries(
         Object.entries(manifest.upstreams).map(([name, source]) => [

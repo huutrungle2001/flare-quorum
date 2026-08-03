@@ -23,6 +23,7 @@
     "viem": "2.47.6"
   },
   "devDependencies": {
+    "@flarenetwork/flare-wagmi-periphery-package": "3.6.0",
     "@types/node": "24.10.1",
     "typescript": "5.9.3"
   }

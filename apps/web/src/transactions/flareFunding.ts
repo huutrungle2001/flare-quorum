@@ -2,6 +2,10 @@ import {
   assertXrpPaymentProof,
   buildMintAndFundPlan,
   encodeExecuteDirectMintingWithData,
+  quoteSmartAccountDirectMinting,
+  testXrpSourceId,
+  xrpPaymentAttestationType,
+  type DirectMintingQuote,
   type FlareTenderTerms,
   type PackedUserOperation,
   type XrpPaymentProof,
@@ -16,6 +20,7 @@ export interface FlareFundingPreparation {
   userOperationCommitment: Hex;
   memoData: Hex;
   proofExpectation: XrpPaymentProofExpectation;
+  paymentQuote: DirectMintingQuote;
 }
 
 export function prepareFlareFunding(input: {
@@ -27,23 +32,29 @@ export function prepareFlareFunding(input: {
   walletId: number;
   executorFee: bigint;
   assetManager: Address;
-  attestationType: Hex;
-  sourceId: Hex;
   transactionId: Hex;
   proofOwner: Address;
+  directMintingFeeBips: bigint;
+  directMintingMinimumFeeUBA: bigint;
   receivingAddressHash?: Hex;
   minimumReceivedAmount?: bigint;
 }): FlareFundingPreparation {
   const plan = buildMintAndFundPlan(input);
+  const paymentQuote = quoteSmartAccountDirectMinting(
+    input.terms.publicCeilingXrp + input.executorFee,
+    input.directMintingFeeBips,
+    input.directMintingMinimumFeeUBA,
+  );
   return {
     assetManager: input.assetManager,
     userOperation: plan.userOperation,
     userOperationData: plan.userOperationData,
     userOperationCommitment: plan.userOperationCommitment,
     memoData: plan.memoData,
+    paymentQuote,
     proofExpectation: {
-      attestationType: input.attestationType,
-      sourceId: input.sourceId,
+      attestationType: xrpPaymentAttestationType,
+      sourceId: testXrpSourceId,
       transactionId: input.transactionId,
       proofOwner: input.proofOwner,
       memoData: plan.memoData,

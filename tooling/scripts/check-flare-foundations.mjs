@@ -24,6 +24,8 @@ const requiredFoundationAssertions = [
   "managerInterfaceResponds",
   "registryDiscoveryMatches",
   "fTestXrpBindingMatches",
+  "fdcProtocolBindingsLive",
+  "fAssetsDirectMintingBindingsLive",
   "xrpUsdFeedIsLive",
 ];
 

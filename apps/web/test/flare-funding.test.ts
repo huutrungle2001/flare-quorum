@@ -33,14 +33,15 @@ describe("Flare funding preparation", () => {
       walletId: 3,
       executorFee: 25n,
       assetManager: "0x7000000000000000000000000000000000000007",
-      attestationType: `0x${"77".repeat(32)}`,
-      sourceId: `0x${"88".repeat(32)}`,
       transactionId: `0x${"99".repeat(32)}`,
       proofOwner: "0x7000000000000000000000000000000000000007",
+      directMintingFeeBips: 25n,
+      directMintingMinimumFeeUBA: 100_000n,
     });
     expect(preparation.memoData).toHaveLength(86);
     expect(preparation.proofExpectation.memoData).toBe(preparation.memoData);
     expect(preparation.userOperationCommitment).toMatch(/^0x[0-9a-f]{64}$/i);
+    expect(preparation.paymentQuote.paymentAmountUBA).toBe(1_100_025n);
   });
 
   it("does not encode a direct-mint call before an official proof validates", () => {
@@ -53,10 +54,10 @@ describe("Flare funding preparation", () => {
       walletId: 1,
       executorFee: 0n,
       assetManager: "0x7000000000000000000000000000000000000007",
-      attestationType: `0x${"77".repeat(32)}`,
-      sourceId: `0x${"88".repeat(32)}`,
       transactionId: `0x${"99".repeat(32)}`,
       proofOwner: "0x7000000000000000000000000000000000000007",
+      directMintingFeeBips: 25n,
+      directMintingMinimumFeeUBA: 100_000n,
     });
     expect(() => encodeFlareDirectMintingCall(preparation, { merkleProof: [], data: {} } as never)).toThrow("INVALID_FDC_PROOF");
   });

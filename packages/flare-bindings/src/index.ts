@@ -4,6 +4,8 @@ import awardReceiptAbiJson from "../generated/abis/VeilBidFlareAwardReceipt.json
 export * from "./protocol.js";
 export * from "./smart-account.js";
 export * from "./fdc.js";
+export * from "./fdc-client.js";
+export * from "./fassets.js";
 export * from "./fcc-result.js";
 export * from "./public-market.js";
 

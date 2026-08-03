@@ -1,4 +1,10 @@
-import { encodeFunctionData, type Address, type Hex } from "viem";
+import {
+  decodeAbiParameters,
+  encodeFunctionData,
+  toHex,
+  type Address,
+  type Hex,
+} from "viem";
 
 /** The Coston2 IXRPPayment proof shape from the pinned Flare periphery source. */
 export interface XrpPaymentRequestBody {
@@ -44,55 +50,63 @@ export interface XrpPaymentProofExpectation {
   transactionId: Hex;
   proofOwner: Address;
   memoData: Hex;
+  votingRound?: bigint;
   receivingAddressHash?: Hex;
   minimumReceivedAmount?: bigint;
 }
 
-const xrpPaymentProofParameter = {
+export const xrpPaymentResponseParameter = {
+  name: "data",
   type: "tuple",
   components: [
-    { name: "merkleProof", type: "bytes32[]" },
+    { name: "attestationType", type: "bytes32" },
+    { name: "sourceId", type: "bytes32" },
+    { name: "votingRound", type: "uint64" },
+    { name: "lowestUsedTimestamp", type: "uint64" },
     {
-      name: "data",
+      name: "requestBody",
       type: "tuple",
       components: [
-        { name: "attestationType", type: "bytes32" },
-        { name: "sourceId", type: "bytes32" },
-        { name: "votingRound", type: "uint64" },
-        { name: "lowestUsedTimestamp", type: "uint64" },
-        {
-          name: "requestBody",
-          type: "tuple",
-          components: [
-            { name: "transactionId", type: "bytes32" },
-            { name: "proofOwner", type: "address" },
-          ],
-        },
-        {
-          name: "responseBody",
-          type: "tuple",
-          components: [
-            { name: "blockNumber", type: "uint64" },
-            { name: "blockTimestamp", type: "uint64" },
-            { name: "sourceAddress", type: "string" },
-            { name: "sourceAddressHash", type: "bytes32" },
-            { name: "receivingAddressHash", type: "bytes32" },
-            { name: "intendedReceivingAddressHash", type: "bytes32" },
-            { name: "spentAmount", type: "int256" },
-            { name: "intendedSpentAmount", type: "int256" },
-            { name: "receivedAmount", type: "int256" },
-            { name: "intendedReceivedAmount", type: "int256" },
-            { name: "hasMemoData", type: "bool" },
-            { name: "firstMemoData", type: "bytes" },
-            { name: "hasDestinationTag", type: "bool" },
-            { name: "destinationTag", type: "uint256" },
-            { name: "status", type: "uint8" },
-          ],
-        },
+        { name: "transactionId", type: "bytes32" },
+        { name: "proofOwner", type: "address" },
+      ],
+    },
+    {
+      name: "responseBody",
+      type: "tuple",
+      components: [
+        { name: "blockNumber", type: "uint64" },
+        { name: "blockTimestamp", type: "uint64" },
+        { name: "sourceAddress", type: "string" },
+        { name: "sourceAddressHash", type: "bytes32" },
+        { name: "receivingAddressHash", type: "bytes32" },
+        { name: "intendedReceivingAddressHash", type: "bytes32" },
+        { name: "spentAmount", type: "int256" },
+        { name: "intendedSpentAmount", type: "int256" },
+        { name: "receivedAmount", type: "int256" },
+        { name: "intendedReceivedAmount", type: "int256" },
+        { name: "hasMemoData", type: "bool" },
+        { name: "firstMemoData", type: "bytes" },
+        { name: "hasDestinationTag", type: "bool" },
+        { name: "destinationTag", type: "uint256" },
+        { name: "status", type: "uint8" },
       ],
     },
   ],
 } as const;
+
+export const xrpPaymentProofParameter = {
+  name: "_payment",
+  type: "tuple",
+  components: [
+    { name: "merkleProof", type: "bytes32[]" },
+    xrpPaymentResponseParameter,
+  ],
+} as const;
+
+/** Official padded identifiers for IXRPPayment on XRPL Testnet. */
+export const xrpPaymentAttestationType = toHex("XRPPayment", { size: 32 });
+export const testXrpSourceId = toHex("testXRP", { size: 32 });
 
 /** Official AssetManager entry point used for Smart Account direct minting. */
 export const assetManagerDirectMintingAbi = [
@@ -138,6 +152,12 @@ export function assertXrpPaymentProof(
     throw new Error("FDC_PAYMENT_DOMAIN_MISMATCH");
   }
   if (
+    expected.votingRound !== undefined &&
+    response.votingRound !== expected.votingRound
+  ) {
+    throw new Error("FDC_VOTING_ROUND_MISMATCH");
+  }
+  if (
     payment.status !== 0 ||
     payment.blockNumber === 0n ||
     payment.blockTimestamp === 0n ||
@@ -172,4 +192,20 @@ export function encodeExecuteDirectMintingWithData(
     functionName: "executeDirectMintingWithData",
     args: [proof, userOperationData],
   });
+}
+
+/** Decode the DA layer's raw response into the exact IXRPPayment response tuple. */
+export function decodeXrpPaymentResponse(responseHex: Hex): XrpPaymentResponse {
+  if (!/^0x(?:[0-9a-fA-F]{2})+$/.test(responseHex)) {
+    throw new Error("MALFORMED_FDC_RESPONSE_HEX");
+  }
+  try {
+    const [decoded] = decodeAbiParameters(
+      [xrpPaymentResponseParameter],
+      responseHex,
+    );
+    return decoded as XrpPaymentResponse;
+  } catch {
+    throw new Error("MALFORMED_FDC_RESPONSE");
+  }
 }
