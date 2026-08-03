@@ -70,6 +70,11 @@ export interface FlareLifecycleSummary {
   actions: readonly FlareLifecycleAction[];
 }
 
+export interface FlareFinalizationSubmission {
+  transactionHash: Hex;
+  quorum: SelectionQuorum;
+}
+
 function status(value: unknown): FlareTenderStatus {
   const values: readonly FlareTenderStatus[] = [
     "FundingPending", "Open", "Closed", "ComputePending", "Awarded", "Refunded", "Cancelled",
@@ -240,7 +245,7 @@ export class FlareLifecycleRelay {
     return hash;
   }
 
-  async execute(action: FlareLifecycleAction): Promise<Hex | SelectionQuorum> {
+  async execute(action: FlareLifecycleAction): Promise<Hex | FlareFinalizationSubmission> {
     this.assertWritable();
     const instructionFee = this.config.fccInstructionFeeWei;
     if (instructionFee === null) throw new Error("FLARE_RELAY_FCC_CONFIG_MISSING");
@@ -288,8 +293,8 @@ export class FlareLifecycleRelay {
       context,
       expectedVersion: this.config.fccExtensionVersion,
     });
-    await this.write("finalizeTender", [action.tenderId, quorum.result, quorum.proofs]);
-    return quorum;
+    const transactionHash = await this.write("finalizeTender", [action.tenderId, quorum.result, quorum.proofs]);
+    return { transactionHash, quorum };
   }
 }
 

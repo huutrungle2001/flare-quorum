@@ -29,7 +29,16 @@ async function cycle(relay: FlareLifecycleRelay, dryRun: boolean): Promise<void>
   for (const action of actions) {
     try {
       const outcome = await relay.execute(action);
-      process.stdout.write(`${safeJson({ tenderId: action.tenderId, action: action.kind, outcome: typeof outcome === "string" ? outcome : "submitted" })}\n`);
+      process.stdout.write(`${safeJson({
+        tenderId: action.tenderId,
+        action: action.kind,
+        outcome: "submitted",
+        transactionHash: typeof outcome === "string" ? outcome : outcome.transactionHash,
+        ...(typeof outcome === "string" ? {} : {
+          resultDataHash: outcome.quorum.resultDataHash,
+          teeIds: outcome.quorum.teeIds,
+        }),
+      })}\n`);
     } catch (error) {
       if (error instanceof FccSelectionPendingError) {
         process.stdout.write(`${safeJson({ tenderId: action.tenderId, action: action.kind, outcome: "proof-pending" })}\n`);
