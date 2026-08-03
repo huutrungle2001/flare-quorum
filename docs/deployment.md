@@ -19,6 +19,17 @@ deployment artifacts as Coston2 evidence.
 
 ## 2. Phase 0: pin before building
 
+The public source/toolchain/discovery pin is
+`tooling/flare/coston2-foundations.json`. Run the repeatable partial check with:
+
+```bash
+pnpm flare:foundations:check
+```
+
+Collect sanitized evidence with `pnpm flare:foundations:collect`. The stricter
+`pnpm flare:gate:0` command fails until every external registration prerequisite
+also passes; an `IN_PROGRESS` evidence file is not a release gate pass.
+
 Record in a committed public dependency manifest:
 
 - official FCC scaffold commit, Go version, Docker image digests, public

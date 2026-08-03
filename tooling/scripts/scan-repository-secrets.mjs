@@ -16,7 +16,7 @@ const patterns = [
   {
     code: "PRIVATE_KEY_ASSIGNMENT",
     expression:
-      /\b(?:SEPOLIA_(?:VENDOR_)?PRIVATE_KEY|FINALIZER_PRIVATE_KEY|PRIVATE_KEY)\s*[:=]\s*["']?(?:0x)?[0-9a-fA-F]{64}\b/,
+      /\b(?:SEPOLIA_(?:VENDOR_)?PRIVATE_KEY|FLARE_DEPLOYMENT_PRIVATE_KEY|FINALIZER_PRIVATE_KEY|PRIVATE_KEY)\s*[:=]\s*["']?(?:0x)?[0-9a-fA-F]{64}\b/,
   },
   {
     code: "SEED_ASSIGNMENT",

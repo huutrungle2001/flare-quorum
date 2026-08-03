@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veilbid.local/schemas/coston2-foundations.schema.json",
+  "title": "VeilBid sanitized Coston2 Gate 0 evidence",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "gate",
+    "status",
+    "recordedAt",
+    "sourceCommit",
+    "network",
+    "publicIdentifiers",
+    "assertions",
+    "blockers",
+    "notes"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "gate": { "const": "0" },
+    "status": { "enum": ["IN_PROGRESS", "PASSED"] },
+    "recordedAt": { "type": "string", "format": "date-time" },
+    "sourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "network": {
+      "type": "object",
+      "required": ["name", "chainId", "blockNumber", "blockTimestamp"],
+      "properties": {
+        "name": { "const": "flare-coston2" },
+        "chainId": { "const": 114 },
+        "blockNumber": { "type": "string", "pattern": "^[0-9]+$" },
+        "blockTimestamp": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "publicIdentifiers": { "type": "object" },
+    "assertions": {
+      "type": "object",
+      "additionalProperties": { "type": "boolean" }
+    },
+    "blockers": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z0-9_]+$" },
+      "uniqueItems": true
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

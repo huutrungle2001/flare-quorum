@@ -1,7 +1,8 @@
 # VeilBid Flare Championship Build Plan
 
-> Status: Ready to start Phase 0 feasibility. Product scope and architecture are
-> decided; implementation and Coston2 evidence have not started.
+> Status: Phase 0 feasibility is in progress. Product scope and architecture are
+> decided; live foundation evidence exists, but FCC registration infrastructure
+> and the Coston2 VeilBid lifecycle have not passed.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.

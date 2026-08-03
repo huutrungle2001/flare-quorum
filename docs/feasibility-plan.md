@@ -1,7 +1,9 @@
 # VeilBid Flare Championship Feasibility Plan
 
-> Status: Not started. Full product development is blocked until Gates 0–E
-> pass. Gates F–H are mandatory before the championship judge release.
+> Status: Gate 0 is in progress. Core source, toolchain, registry, contract,
+> asset, and feed checks pass; FCC proxy/indexer/registration requirements are
+> still open. Full product development is blocked until Gates 0–E pass. Gates
+> F–H are mandatory before the championship judge release.
 
 ## 1. Rules
 

@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "gate": "0",
+  "status": "IN_PROGRESS",
+  "recordedAt": "2026-08-03T15:55:08.099Z",
+  "sourceCommit": "ee0a3abb966a2b5791cfe8eaea61d5d124384fb2",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33585950",
+    "blockTimestamp": 1785772517
+  },
+  "publicIdentifiers": {
+    "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "deployerGasBalanceWei": "1298668075535839180602",
+    "contracts": {
+      "flareContractRegistry": "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019",
+      "flareTeeManager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+      "ftsoV2": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+      "fdcVerification": "0x906507E0B64bcD494Db73bd0459d1C667e14B933",
+      "fdcHub": "0x48aC463d7975828989331F4De43341627b9c5f1D",
+      "assetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
+      "fTestXRP": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+      "masterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c"
+    },
+    "contractCodeSizes": {
+      "flareContractRegistry": 3197,
+      "flareTeeManager": 184,
+      "ftsoV2": 170,
+      "fdcVerification": 170,
+      "fdcHub": 10065,
+      "assetManagerFXRP": 217,
+      "fTestXRP": 177,
+      "masterAccountController": 250
+    },
+    "nextPublicExtensionId": "65922",
+    "xrpUsdFeed": {
+      "id": "0x015852502f55534400000000000000000000000000",
+      "value": "1083502",
+      "decimals": 6,
+      "timestamp": 1785772517
+    },
+    "fTestXRP": {
+      "address": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+      "symbol": "FTestXRP",
+      "name": "FXRP",
+      "decimals": 6
+    },
+    "selectedUpstreamCommits": {
+      "fccScaffold": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
+      "fccSignExample": "6df972c64d34efe1d4497f0eafe6792d1f0862dd",
+      "teeNode": "adc67a29eb7162f6f1b5dabcbca320009480695e",
+      "teeProxy": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
+      "flareSmartContracts": "b69873e1e1a0785e2450d811f35c7927a625716b",
+      "flareFoundryPeriphery": "ca264d6a31ddfb53d1bef7cb7bd1942aa89d323a",
+      "fassets": "6d5c103e4342f0fc7d3683a433a90349d544f774",
+      "smartAccounts": "fa301c58064355026d1d1453c2e9ef4a7e8884ca",
+      "developerHub": "8120c460bf686ef4cb277fd710c93400c43fa580"
+    },
+    "sourceChecks": [
+      {
+        "id": "fcc-coston2-addresses",
+        "matches": true
+      },
+      {
+        "id": "fcc-scaffold-go-module",
+        "matches": true
+      },
+      {
+        "id": "tee-node-go-module",
+        "matches": true
+      },
+      {
+        "id": "tee-proxy-go-module",
+        "matches": true
+      },
+      {
+        "id": "coston2-contract-registry",
+        "matches": true
+      },
+      {
+        "id": "coston2-ftso-interface",
+        "matches": true
+      },
+      {
+        "id": "coston2-fassets-deployment",
+        "matches": true
+      },
+      {
+        "id": "coston2-smart-accounts-deployment",
+        "matches": true
+      },
+      {
+        "id": "coston2-smart-accounts-config",
+        "matches": true
+      }
+    ],
+    "configuredMachineCount": 0,
+    "productionMachineCount": 0
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "deploymentKeyMatchesDeclaredWallet": true,
+    "deployerHasMinimumGas": true,
+    "allDiscoveredContractsHaveCode": true,
+    "pinnedSourceHashesMatch": true,
+    "nodeVersionPinned": true,
+    "pnpmVersionPinned": true,
+    "goVersionPinned": true,
+    "foundryVersionPinned": true,
+    "teeNodeMinimumSatisfied": true,
+    "managerInterfaceResponds": true,
+    "registryDiscoveryMatches": true,
+    "fTestXrpBindingMatches": true,
+    "xrpUsdFeedIsLive": true,
+    "dockerDaemonAvailable": false,
+    "teeProxyImagesDigestPinned": false,
+    "stableProxyConfigured": false,
+    "stableProxyReachable": false,
+    "indexerConfigured": false,
+    "threeProductionMachinesRegistered": false
+  },
+  "blockers": [
+    "DOCKER_DAEMON_UNAVAILABLE",
+    "TEE_PROXY_IMAGE_DIGESTS_UNPINNED",
+    "STABLE_PROXY_NOT_CONFIGURED",
+    "STABLE_PROXY_NOT_REACHABLE",
+    "FCC_INDEXER_NOT_CONFIGURED",
+    "THREE_PRODUCTION_MACHINES_NOT_VERIFIED"
+  ],
+  "notes": [
+    "The official scaffold main branch is reference-only until its stale tee-node and tee-proxy pins are upgraded in the VeilBid extension.",
+    "No RPC URL, deployment key, indexer credential, proxy response, or machine secret is recorded.",
+    "Simulated TEE mode is the declared Coston2 judging target; it is not hardware-backed confidentiality."
+  ]
+}

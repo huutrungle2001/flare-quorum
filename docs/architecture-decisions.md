@@ -342,6 +342,27 @@ lifecycle exercises it. The final demo must show:
 No document may claim private settlement, anonymous vendors, verified service
 delivery, zero-knowledge correctness, formal audit, or mainnet readiness.
 
+## ADR-017 — FCC upstream drift and runtime pins
+
+**Decision:** Treat the official FCC scaffold and examples as source references,
+not automatically current runtime lockfiles. The first 2026-08-03 foundation
+audit found their `main` branches still pinning `tee-node` `v0.0.21` and
+`tee-proxy` `v0.0.18`, below the organizer-supplied `tee-node >= v0.0.22`
+baseline.
+
+VeilBid pins the exact scaffold/example commits for provenance, but selects and
+tests the organizer-directed `develop` runtime line: `tee-node` `v0.0.24` at
+`adc67a29eb7162f6f1b5dabcbca320009480695e` and `tee-proxy` at
+`0c6d016b09948cba9a508ba357e592eb6088fd1c`. Both stages of the final proxy
+image must be digest-pinned before Gate 0 passes. If these commits drift or fail
+registration, the compatibility combination is re-researched and this ADR plus
+the foundation manifest are revised before extension deployment.
+
+**Reason:** A current scaffold commit can still contain operationally retired
+runtime pins. Separating provenance from the tested runtime combination avoids
+silently reproducing the stale registration/data-provider failures described by
+the organizer bulletin.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:

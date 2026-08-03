@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
-import { extname, join, resolve } from "node:path";
+import { extname, join, relative, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../..");
 const evidenceRoot = resolve(root, "evidence");
@@ -52,6 +52,61 @@ function inspect(value, path, violations) {
   }
 }
 
+function inspectCoston2Foundation(value, file, violations) {
+  const allowedTopLevel = new Set([
+    "schemaVersion",
+    "gate",
+    "status",
+    "recordedAt",
+    "sourceCommit",
+    "network",
+    "publicIdentifiers",
+    "assertions",
+    "blockers",
+    "notes",
+  ]);
+  for (const key of Object.keys(value)) {
+    if (!allowedTopLevel.has(key)) {
+      violations.push(`${file}.${key}: unexpected Gate 0 evidence field`);
+    }
+  }
+  if (value.schemaVersion !== 1 || value.gate !== "0") {
+    violations.push(`${file}: invalid Gate 0 schema identity`);
+  }
+  if (!["IN_PROGRESS", "PASSED"].includes(value.status)) {
+    violations.push(`${file}: invalid Gate 0 status`);
+  }
+  if (
+    value.network?.name !== "flare-coston2" ||
+    value.network?.chainId !== 114 ||
+    !/^\d+$/.test(value.network?.blockNumber ?? "")
+  ) {
+    violations.push(`${file}: invalid Coston2 network checkpoint`);
+  }
+  if (!/^[0-9a-f]{40}$/.test(value.sourceCommit ?? "")) {
+    violations.push(`${file}: invalid source commit`);
+  }
+  if (
+    !value.assertions ||
+    Object.values(value.assertions).some((entry) => typeof entry !== "boolean")
+  ) {
+    violations.push(`${file}: assertions must be Boolean`);
+  }
+  if (
+    !Array.isArray(value.blockers) ||
+    value.blockers.some((entry) => !/^[A-Z0-9_]+$/.test(entry))
+  ) {
+    violations.push(`${file}: blockers must be allowlisted codes`);
+  }
+  if (
+    value.status === "PASSED" &&
+    (!Object.values(value.assertions ?? {}).every(Boolean) ||
+      value.blockers.length !== 0)
+  ) {
+    violations.push(`${file}: a passed Gate 0 must have no failed assertion or blocker`);
+  }
+}
+
 const violations = [];
 for (const file of jsonFiles(evidenceRoot)) {
   const source = readFileSync(file, "utf8");
@@ -60,7 +115,14 @@ for (const file of jsonFiles(evidenceRoot)) {
       violations.push(`${file}: secret-like content`);
     }
   }
-  inspect(JSON.parse(source), file, violations);
+  const value = JSON.parse(source);
+  inspect(value, file, violations);
+  if (
+    relative(evidenceRoot, file) ===
+    "coston2/gate-0-foundations.json"
+  ) {
+    inspectCoston2Foundation(value, file, violations);
+  }
 }
 
 if (violations.length > 0) {

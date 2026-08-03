@@ -1,8 +1,10 @@
 # FCC Coston2 Operational Baseline
 
-> Status: pre-deployment checklist derived from the project-owner-supplied
+> Status: Phase 0 pre-deployment checks are in progress, derived from the
+> project-owner-supplied
 > [FCC redeploy message](original/fcc-coston2-redeploy-message.md) and current
-> official FCC sources. No VeilBid extension or TEE is registered yet.
+> official FCC sources. The live manager and core protocol discovery checks
+> pass; no VeilBid extension or TEE is registered yet.
 
 ## 1. Authority and drift rule
 
@@ -42,6 +44,22 @@ Version names alone are insufficient. Gate 0 records exact commits, Go module
 resolution, container digests, and a successful availability vote. If the
 scaffold's resolved module is older than the bulletin minimum, the gate remains
 blocked until a tested organizer-supported combination is pinned.
+
+The 2026-08-03 foundation audit found this exact upstream drift:
+
+- official scaffold `f48cafb889441a62e47c083f4be8dd7d3f456f83` and sign
+  example `6df972c64d34efe1d4497f0eafe6792d1f0862dd` still pin
+  `tee-node` `v0.0.21` and `tee-proxy` `v0.0.18`;
+- selected `tee-node` `develop` commit
+  `adc67a29eb7162f6f1b5dabcbca320009480695e` is tagged `v0.0.24`;
+- selected `tee-proxy` `develop` commit
+  `0c6d016b09948cba9a508ba357e592eb6088fd1c` resolves `tee-node`
+  `v0.0.23` and Go `1.25.8`.
+
+The scaffold is therefore a reference, not a build-ready dependency snapshot.
+VeilBid must upgrade and test the node/proxy pins when instantiating the
+extension. The canonical public pin set and repeatable live checks are in
+`tooling/flare/coston2-foundations.json` and `pnpm flare:foundations:check`.
 
 ## 3. Fresh registration workflow
 
@@ -133,3 +151,10 @@ Gate 0 cannot pass without all of:
 Three-machine availability, private ingress, and sealed recovery remain
 separate feasibility gates. A one-machine `PRODUCTION` result does not satisfy
 the championship quorum requirement.
+
+The current partial live record is
+`evidence/coston2/gate-0-foundations.json`. It is explicitly
+`IN_PROGRESS`: source hashes, toolchains, manager interface, registry discovery,
+FTestXRP binding, and XRP/USD feed pass, while Docker, digest-pinned tee-proxy
+images, stable proxy reachability, indexer access, and three production machines
+remain blockers.

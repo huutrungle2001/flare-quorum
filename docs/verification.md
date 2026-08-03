@@ -1,7 +1,8 @@
 # VeilBid Flare Championship Verification Plan
 
-> Status: all Flare implementation and Coston2 verification rows are `NOT RUN`.
-> Historical Sepolia/Nox artifacts are pre-hackathon baseline only.
+> Status: Gate 0 foundation verification is `IN PROGRESS`; all later Flare
+> implementation and Coston2 verification rows are `NOT RUN`. Historical
+> Sepolia/Nox artifacts are pre-hackathon baseline only.
 
 ## 1. Evidence policy
 
@@ -21,7 +22,7 @@ in-memory and save only an allowlisted pass/fail code.
 
 | Gate | Required live outcome | Minimum evidence | Status |
 |---|---|---|---|
-| 0 — Foundations | Official access, live FCC manager, current indexer, stable proxy URL, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | NOT RUN |
+| 0 — Foundations | Official access, live FCC manager, current indexer, stable proxy URL, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | IN PROGRESS — core live discovery passes; registration stack remains blocked |
 | A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | NOT RUN |
 | B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext and survives sealed restart | Commitment/receipt IDs, redaction assertions, restart checkpoint | NOT RUN |
 | C — Common quorum | Three fixed machines acknowledge bids and at least two remain common to every accepted bid | Machine fingerprints, receipt bitmaps, common bitmap, rejection cases | NOT RUN |
@@ -61,6 +62,7 @@ stop conditions defined in [`PLAN.md`](../PLAN.md).
 ## 4. Planned evidence set
 
 ```text
+evidence/coston2/gate-0-foundations.json
 evidence/coston2/foundations.release.json
 evidence/coston2/fcc-registered-result.release.json
 evidence/coston2/private-ingress-sealed-restart.release.json

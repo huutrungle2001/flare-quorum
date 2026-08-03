@@ -69,7 +69,7 @@ assert.deepEqual(generated.contracts, manifest.contracts);
 
 assert.match(readme, /Flare Testnet Coston2 \(`114`\)/);
 assert.match(readme, /Primary bounty:\*\* Confidential Compute Apps/);
-assert.match(readme, /currently in planning and feasibility validation/i);
+assert.match(readme, /in Phase 0 feasibility validation/i);
 assert.match(readme, /pre-hackathon baseline/i);
 assert.match(readme, /sepolia\.release\.json/);
 assert.match(readme, /multi-criteria offers to a fixed Flare TEE quorum/i);

@@ -85,15 +85,15 @@ All open design questions are resolved in
 - [ ] Confirm organizer-supported FCC environment, indexer access, proxy
   requirements, and whether at least three registered TEE machines are
   available for one extension.
-- [ ] Confirm real confidential hardware versus simulated TEE judge policy.
+- [x] Confirm real confidential hardware versus simulated TEE judge policy.
 - [ ] Pin the official FCC scaffold commit and all container digests.
 - [ ] Apply [`docs/fcc-coston2-operations.md`](docs/fcc-coston2-operations.md):
   resolve live `FlareTeeManager`, enforce the organizer minimum TEE/proxy
   revisions, use a fresh extension ID and `rRap`, and reach machine status `2`.
 - [ ] Obtain current indexer credentials and a named Cloudflare Tunnel or
   reserved ngrok domain; quick-tunnel URLs are forbidden for registration.
-- [ ] Pin Go, Foundry, Solidity, Node, pnpm, viem, and Flare periphery versions.
-- [ ] Record official Coston2 registry, FCC, FAssets, FTSO, and Smart Account
+- [x] Pin Go, Foundry, Solidity, Node, pnpm, viem, and Flare periphery versions.
+- [x] Record official Coston2 registry, FCC, FAssets, FTSO, and Smart Account
   discovery paths without hardcoding undocumented addresses.
 - [ ] Obtain disposable Coston2, XRPL testnet, and executor identities.
 
@@ -276,7 +276,7 @@ the championship product and requires Product Plan approval.
 | Product thesis | DECIDED |
 | Architecture decisions | DECIDED |
 | Documentation transition | COMPLETE |
-| Official version pinning | NOT STARTED |
+| Official version pinning | IN PROGRESS — core source/toolchain/discovery checks pass; proxy image digests and live TEE stack remain |
 | FCC private ingress | NOT STARTED |
 | Multi-TEE quorum | NOT STARTED |
 | Flare contracts | NOT STARTED |

@@ -18,8 +18,10 @@ The project targets **Flare Summer Signal** with:
 - **Target settlement asset:** FTestXRP on Coston2 and FXRP on Flare Mainnet.
 
 > [!IMPORTANT]
-> The Flare edition is currently in planning and feasibility validation. No
-> Coston2 release address or successful FCC lifecycle is claimed yet.
+> The Flare edition is in Phase 0 feasibility validation. Live Coston2 registry,
+> FCC manager, FTestXRP, FTSO, FDC, Smart Account, toolchain, and source-pin
+> checks pass, while TEE registration infrastructure remains incomplete. No
+> Coston2 VeilBid release address or successful FCC lifecycle is claimed yet.
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
