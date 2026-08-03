@@ -275,6 +275,36 @@ contract FlareTokenMock is IERC20 {
             }
         }
 
+        function testSelectionResultDigestGoldenVectorMatchesTypeScript() external view {
+            VeilBidFlareMarket.SelectionResult memory result = VeilBidFlareMarket.SelectionResult({
+                schemaVersion: 1,
+                chainId: 114,
+                market: address(0x1000000000000000000000000000000000000001),
+                extensionId: 0x10001,
+                codeVersion: bytes32(uint256(0x1111)),
+                tenderId: 42,
+                rulesHash: bytes32(uint256(0x2222)),
+                orderedBidRoot: bytes32(uint256(0x3333)),
+                quorumBitmap: 7,
+                ftsoFeedId: bytes21(0x5852502f5553440000000000000000000000000000),
+                ftsoValue: 250000,
+                ftsoDecimals: 5,
+                ftsoTimestamp: 1700000000,
+                closeBlock: 33500010,
+                winnerBidId: 1,
+                winner: address(0x2000000000000000000000000000000000000002),
+                winningAmountXrp: 400000,
+                resultNonce: 3,
+                expiry: 2000
+            });
+            if (
+                market.resultDigest(result)
+                    != bytes32(0xe323859bd3351602eb780752822de0adb41ffca6f2906f9095bb3b0a3baa9763)
+            ) {
+                revert("TypeScript result vector drift");
+            }
+        }
+
         function testRejectsStaleFtsoSnapshotAtClose() external {
             uint256 tenderId = market.createTender(_terms());
             VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
