@@ -50,6 +50,8 @@ export interface FlarePublicTender {
   ftsoValue: bigint;
   ftsoDecimals: number;
   ftsoTimestamp: bigint;
+  selectionStartedAt: bigint;
+  selectionAttempt: number;
   resultNonce: bigint;
   resultExpiry: bigint;
   requestId: Hex;
@@ -95,6 +97,8 @@ interface FlareTenderRecord {
   ftsoValue: bigint;
   ftsoDecimals: number;
   ftsoTimestamp: bigint;
+  selectionStartedAt: bigint;
+  selectionAttempt: number;
   resultNonce: bigint;
   resultExpiry: bigint;
   requestId: Hex;

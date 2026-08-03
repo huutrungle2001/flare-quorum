@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { veilBidFlareMarketAbi } from "@veilbid/flare-bindings";
+import { decodeFunctionResult, encodeFunctionResult } from "viem";
 import {
   parseFlareTender,
   planFlareLifecycle,
@@ -14,6 +16,7 @@ const ids = [
 function rawTender(status, overrides = {}) {
   return {
     buyer: "0x4000000000000000000000000000000000000004",
+    metadataHash: `0x${"10".repeat(32)}`,
     rulesHash: `0x${"11".repeat(32)}`,
     publicCeilingXrp: 1_000_000n,
     bidDeadline: 2_000n,
@@ -29,12 +32,13 @@ function rawTender(status, overrides = {}) {
     ftsoDecimals: 5,
     ftsoTimestamp: 1_900n,
     selectionStartedAt: 1_500n,
-    selectionAttempt: 1n,
+    selectionAttempt: 1,
     resultNonce: 4n,
     resultExpiry: 2_500n,
     requestId: `0x${"44".repeat(32)}`,
     status,
     teeIds: ids,
+    teeKeyFingerprints: [`0x${"aa".repeat(32)}`, `0x${"bb".repeat(32)}`, `0x${"cc".repeat(32)}`],
     ...overrides,
   };
 }
@@ -43,8 +47,24 @@ test("parses the current tender tuple and rejects duplicate frozen TEE identitie
   const tender = parseFlareTender(7n, rawTender(3));
   assert.equal(tender.tenderId, 7n);
   assert.equal(tender.status, "ComputePending");
-  assert.equal(tender.selectionAttempt, 1n);
+  assert.equal(tender.selectionAttempt, 1);
   assert.throws(() => parseFlareTender(7n, rawTender(3, { teeIds: [ids[0], ids[0], ids[2]] })), /DUPLICATE_FLARE_TEE_ID/);
+});
+
+test("parses the exact generated getTender ABI primitive types", () => {
+  const encoded = encodeFunctionResult({
+    abi: veilBidFlareMarketAbi,
+    functionName: "getTender",
+    result: rawTender(3),
+  });
+  const decoded = decodeFunctionResult({
+    abi: veilBidFlareMarketAbi,
+    functionName: "getTender",
+    data: encoded,
+  });
+  assert.equal(typeof decoded.selectionAttempt, "number");
+  assert.equal(typeof decoded.selectionStartedAt, "bigint");
+  assert.equal(parseFlareTender(7n, decoded).selectionAttempt, 1);
 });
 
 test("plans urgent finalization, retry, request, and deadline close without trusting a winner", () => {

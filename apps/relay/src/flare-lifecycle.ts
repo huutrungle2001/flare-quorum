@@ -52,7 +52,7 @@ export interface FlareTender {
   ftsoDecimals: number;
   ftsoTimestamp: bigint;
   selectionStartedAt: bigint;
-  selectionAttempt: bigint;
+  selectionAttempt: number;
   resultNonce: bigint;
   resultExpiry: bigint;
   requestId: Hex;
@@ -122,14 +122,19 @@ export function parseFlareTender(tenderId: bigint, value: unknown): FlareTender 
     ftsoDecimals: Number(item.ftsoDecimals),
     ftsoTimestamp: bigintField(item.ftsoTimestamp, "FLARE_FTSO_TIMESTAMP"),
     selectionStartedAt: bigintField(item.selectionStartedAt, "FLARE_SELECTION_STARTED"),
-    selectionAttempt: bigintField(item.selectionAttempt, "FLARE_SELECTION_ATTEMPT"),
+    selectionAttempt: Number(item.selectionAttempt),
     resultNonce: bigintField(item.resultNonce, "FLARE_RESULT_NONCE"),
     resultExpiry: bigintField(item.resultExpiry, "FLARE_RESULT_EXPIRY"),
     requestId: hexField(item.requestId, "FLARE_REQUEST_ID"),
     status: status(item.status),
     teeIds: parsedTeeIds,
   };
-  if (!Number.isSafeInteger(record.approvedVendorCount) || !Number.isSafeInteger(record.commonQuorumBitmap)) {
+  if (
+    !Number.isSafeInteger(record.approvedVendorCount)
+    || !Number.isSafeInteger(record.commonQuorumBitmap)
+    || !Number.isSafeInteger(record.selectionAttempt)
+    || record.selectionAttempt < 0
+  ) {
     throw new Error("MALFORMED_FLARE_TENDER_COUNTS");
   }
   return record;
