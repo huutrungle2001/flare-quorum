@@ -86,12 +86,24 @@ FCC_INDEXER_PORT=3306
 FCC_INDEXER_DATABASE=indexer
 FCC_INDEXER_USER=...
 FCC_INDEXER_PASSWORD=...
+FCC_PROXY_REDIS_ENDPOINT=redis:6379
+PROXY_PRIVATE_KEY=...
+FCC_DIRECT_API_KEY=...
 XRPL_TESTNET_RPC_URL=https://...
 VERIFIER_URL_TESTNET=https://fdc-verifiers-testnet.flare.network
 VERIFIER_API_KEY_TESTNET=...
 COSTON2_DA_LAYER_URL=https://ctn2-data-availability.flare.network
 FLARE_FUNDING_EXECUTOR_PRIVATE_KEY=0x...
 ```
+
+Generate the ignored runtime proxy configuration with
+`pnpm flare:proxy:config`. The command writes
+`.local/fcc/extension-proxy.coston2.toml` with mode `0600`, does not print any
+credential, and takes the Coston2 system addresses from the pinned foundation
+manifest. The config keeps the internal port private, requires an API key for
+`POST /direct`, and explicitly labels/accepts simulated-TEE attestation. Mount
+the file read-only at `/app/config/config.toml`; never copy it into the image or
+evidence.
 
 - Use disposable Coston2/XRPL testnet identities and C2FLR for gas.
 - Keep deployer, executor, XRPL, TEE, proxy, indexer, Redis, and tunnel secrets

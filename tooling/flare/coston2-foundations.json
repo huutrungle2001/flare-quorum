@@ -216,6 +216,7 @@
     "fdcRequestFeeConfigurations": "0x191a1282Ac700edE65c5B0AaF313BAcC3eA7fC7e",
     "flareSystemsManager": "0xA90Db6D10F856799b10ef2A77EBCbF460aC71e52",
     "relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE",
+    "voterRegistry": "0x6a0AF07b7972177B176d3D422555cbc98DfDe914",
     "assetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
     "fTestXRP": "0x0b6A3645c240605887a5532109323A3E12273dc7",
     "masterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c"
@@ -228,6 +229,7 @@
     "FdcRequestFeeConfigurations": "0x191a1282Ac700edE65c5B0AaF313BAcC3eA7fC7e",
     "FlareSystemsManager": "0xA90Db6D10F856799b10ef2A77EBCbF460aC71e52",
     "Relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE",
+    "VoterRegistry": "0x6a0AF07b7972177B176d3D422555cbc98DfDe914",
     "AssetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
     "MasterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c"
   },

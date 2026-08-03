@@ -12,6 +12,19 @@ proxy signing key through its configured runtime environment variable. Never
 publish port `6661`; only the external port `6662` belongs behind the stable
 HTTPS ingress.
 
+Render the ignored, owner-readable Coston2 config from `.env.local` without
+printing its values:
+
+```bash
+pnpm flare:proxy:config
+```
+
+The result is `.local/fcc/extension-proxy.coston2.toml`. It enables authenticated
+private ingress using `FCC_DIRECT_API_KEY`, verifies the simulated-TEE
+`magic_pass` challenge explicitly, and contains the indexer credentials because
+the official proxy currently reads those fields from TOML. Mount it read-only
+and never copy it into an image or evidence directory.
+
 When Docker is available, build for the pinned target platform:
 
 ```bash
