@@ -221,6 +221,37 @@ contract FlareTokenMock is IERC20 {
             }
         }
 
+        function testOrderedBidRootGoldenVectorMatchesGo() external view {
+            bytes32 root = market.EMPTY_BID_ROOT();
+            root = keccak256(
+                abi.encode(
+                    market.BID_ROOT_DOMAIN(),
+                    root,
+                    uint256(42),
+                    uint256(1),
+                    0x1000000000000000000000000000000000000001,
+                    bytes32(uint256(0x1111)),
+                    uint8(3),
+                    uint64(33_500_001)
+                )
+            );
+            root = keccak256(
+                abi.encode(
+                    market.BID_ROOT_DOMAIN(),
+                    root,
+                    uint256(42),
+                    uint256(2),
+                    0x2000000000000000000000000000000000000002,
+                    bytes32(uint256(0x2222)),
+                    uint8(7),
+                    uint64(33_500_009)
+                )
+            );
+            if (root != 0xd17b22ee6e48c6ac79cb32c203de07402bfcc9cb79a1f330c043ffa5ed327f77) {
+                revert("Go/Solidity root drift");
+            }
+        }
+
         function testRejectsStaleFtsoSnapshotAtClose() external {
             uint256 tenderId = market.createTender(_terms());
             VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
