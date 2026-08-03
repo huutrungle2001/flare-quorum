@@ -109,7 +109,9 @@ product code depends on it.
 - [x] Create `apps/fcc-extension` from the pinned scaffold and replace the
   greeting sample with a deterministic, public-safe `PING_V1` foundation
   operation using the organizer-supported `tee-node` runtime line.
-- [ ] Create `packages/flare-contracts` with a minimal instruction sender.
+- [x] Create `packages/flare-contracts` with a minimal instruction sender whose
+  ABI tuple and binding vector match the Go extension; deployment and live
+  registry verification remain open.
 - [ ] Send and verify a domain-correct Coston2 result.
 - [ ] Implement private bid ingress through the supported proxy/TEE path.
 - [ ] Return and verify one TEE-signed `BidReceipt`.
@@ -286,7 +288,7 @@ the championship product and requires Product Plan approval.
 | FCC foundation operation | IMPLEMENTED LOCALLY — deterministic `PING_V1` tests pass; live Gate A not run |
 | FCC private ingress | NOT STARTED |
 | Multi-TEE quorum | NOT STARTED |
-| Flare contracts | NOT STARTED |
+| Flare contracts | FOUNDATION SENDER IMPLEMENTED LOCALLY — market/settlement contracts not started |
 | FAssets/FDC/Smart Account journey | NOT STARTED |
 | FTSO scoring | NOT STARTED |
 | Coston2 deployment/evidence | NOT STARTED |
