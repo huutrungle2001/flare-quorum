@@ -172,7 +172,12 @@ The caller cannot supply the FTSO snapshot.
 
 - requires `Closed` and no accepted terminal result;
 - targets machines in the frozen common quorum through official FCC contracts;
-- sends exact public tender/root/rules/FTSO/close/result-nonce binding;
+- sends an ABI-encoded `SelectionRequest` tuple containing the exact public
+  tender/root/rules/FTSO/close/result-nonce/expiry binding, the public ceiling
+  and bid deadline needed by the extension's deterministic scoring policy, and
+  the ordered public bid references (vendor, commitment, receipt bitmap,
+  accepted block, and submission nonce). No bid quote, plaintext, or
+  ciphertext is included;
 - records request/action checkpoint for recovery;
 - advances to `ComputePending`.
 

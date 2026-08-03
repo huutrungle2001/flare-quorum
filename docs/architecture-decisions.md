@@ -319,6 +319,11 @@ and funding capability rather than decorative integrations.
 1. `closeTender` freezes receipt root, common quorum, FTSO snapshot, and close
    checkpoint.
 2. `requestSelection` sends the fixed action to every TEE in the common quorum.
+   The action message is a versioned tuple. It carries only public tender
+   policy/checkpoint fields and ordered bid references; sealed bid payloads are
+   fetched by the extension from its private store using a domain-separated
+   slot. The request also freezes a one-hour result expiry so every machine
+   signs the same envelope.
 3. A stateless relay polls public proxy endpoints for results.
 4. It groups results by digest and submits signatures only when the configured
    threshold agrees.
