@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "gate": "A",
+  "recordedAt": "2026-07-25T15:29:23.634Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "contract": "0x2d3ce8a9bb18941786a1d760fae176aa2ee7834e",
+    "transactions": {
+      "deploy": "0x19d1d20f3cc9dbfc57790b42ea0351414cdd66343409efc1c486ae450192cfc9",
+      "submit": "0x49466034971da3c39ca10d390a1479f2f9c87e62bbcc2d5733190795afe49aa9",
+      "compare": "0xdeff56e138cde4f813b39065293af7c1d2bb41c5bc2032510009227a17604b39"
+    },
+    "blocks": {
+      "deploy": "11348539",
+      "submit": "11348541",
+      "compare": "11348543"
+    }
+  },
+  "assertions": {
+    "noxDeploymentPresent": true,
+    "contractDeployed": true,
+    "storedInLaterBlock": true,
+    "contractAclPersisted": true,
+    "vendorViewerPersisted": true,
+    "vendorDecryptVerifiedInMemory": true,
+    "encryptedComparisonVerifiedInMemory": true
+  },
+  "blockers": [],
+  "notes": [
+    "Confidential test values, handles, and proofs were kept in memory and omitted from this artifact."
+  ]
+}

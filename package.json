@@ -1,0 +1,65 @@
+{
+  "name": "veilbid",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "devDependencies": {
+    "pnpm": "10.33.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@hono/node-server": "2.0.12",
+      "ws": "8.21.1"
+    }
+  },
+  "scripts": {
+    "build": "pnpm compile && pnpm bindings:check && pnpm docs:check && pnpm --filter @veilbid/chain-bindings --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room build",
+    "bindings:build": "pnpm --filter @veilbid/chain-bindings build",
+    "bindings:check": "pnpm --filter @veilbid/auction-house bindings:check",
+    "bindings:generate": "pnpm --filter @veilbid/auction-house bindings:generate",
+    "compile": "pnpm --filter @veilbid/auction-house build",
+    "finalizer:dry": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/cli.js dry-run",
+    "finalizer:health": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/cli.js health",
+    "finalizer:once": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/cli.js once",
+    "finalizer:poll": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/cli.js poll",
+    "lint": "pnpm lint:scripts && pnpm docs:check && pnpm bindings:build && pnpm --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room lint",
+    "lint:scripts": "node --check apps/web/scripts/smoke-production.mjs && node --check apps/web/scripts/smoke-keyboard.mjs",
+    "mcp": "pnpm bindings:build && pnpm --filter @veilbid/operator-console build && node --env-file-if-exists=.env.local apps/console/dist/mcp-stdio.js",
+    "secret:scan": "node tooling/scripts/scan-repository-secrets.mjs",
+    "test": "pnpm bindings:build && pnpm --filter @veilbid/auction-house --filter @veilbid/chain-bindings --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room test",
+    "test:contracts": "pnpm --filter @veilbid/auction-house test",
+    "test:gate-e-static": "pnpm --filter @veilbid/auction-house test:gate-e-static",
+    "test:model": "pnpm --filter @veilbid/auction-house test:model",
+    "test:nox": "pnpm --filter @veilbid/auction-house test:feasibility:nox",
+    "test:ui": "pnpm bindings:build && pnpm --filter @veilbid/tender-room test",
+    "test:production": "node apps/web/scripts/smoke-production.mjs",
+    "test:keyboard": "node apps/web/scripts/smoke-keyboard.mjs",
+    "test:sepolia:a": "pnpm --filter @veilbid/auction-house test:sepolia:a",
+    "test:sepolia:b": "pnpm --filter @veilbid/auction-house test:sepolia:b",
+    "test:sepolia:c": "pnpm --filter @veilbid/auction-house test:sepolia:c",
+    "test:sepolia:d": "pnpm --filter @veilbid/auction-house test:sepolia:d",
+    "test:sepolia:e:safe": "pnpm --filter @veilbid/auction-house test:sepolia:e:safe",
+    "test:sepolia:e:authority": "pnpm --filter @veilbid/auction-house test:sepolia:e:authority",
+    "test:sepolia:market:eoa": "pnpm --filter @veilbid/auction-house test:sepolia:eoa",
+    "test:sepolia:market:refund": "pnpm --filter @veilbid/auction-house test:sepolia:refund",
+    "test:sepolia:market:safe": "pnpm --filter @veilbid/auction-house test:sepolia:safe",
+    "test:sepolia:market:safe-viewer": "pnpm --filter @veilbid/auction-house test:sepolia:safe-viewer",
+    "test:sepolia:safe-unwrap": "pnpm --filter @veilbid/auction-house test:sepolia:safe-unwrap",
+    "test:sepolia:release:two-vendor": "pnpm --filter @veilbid/auction-house test:sepolia:release:two-vendor",
+    "preflight:release": "pnpm --filter @veilbid/auction-house preflight:release",
+    "deploy:release": "pnpm --filter @veilbid/auction-house deploy:release",
+    "upgrade:review-market": "pnpm --filter @veilbid/auction-house upgrade:review-market",
+    "deploy:safe-unwrap-preparation": "pnpm --filter @veilbid/auction-house deploy:safe-unwrap-preparation",
+    "docs:check": "node tooling/scripts/check-release-docs.mjs",
+    "publish:sources:release": "pnpm --filter @veilbid/auction-house publish:sources:release",
+    "test:preflight": "node --env-file-if-exists=.env.local tooling/scripts/preflight.mjs",
+    "evidence:validate": "node tooling/scripts/validate-evidence.mjs",
+    "verify:deployment": "pnpm --filter @veilbid/auction-house verify:deployment:release",
+    "verify:deployment:release": "pnpm --filter @veilbid/auction-house verify:deployment:release",
+    "verify:deployment:test": "pnpm --filter @veilbid/auction-house verify:deployment:test"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "generator": "packages/contracts/scripts/generate-bindings.mjs",
+  "contracts": [
+    {
+      "contractName": "VeilBidMarket",
+      "abi": "abis/VeilBidMarket.json",
+      "sha256": "0fe556076046bd2e6c5400f85bd9e963af377183dbf42bf427eb7b6e1a8b11d7"
+    },
+    {
+      "contractName": "VeilBidAwardReceipt",
+      "abi": "abis/VeilBidAwardReceipt.json",
+      "sha256": "c6ebe52d3afbf4c4962782c0d35bf1d3f60e66a5387fac301e3bed9c941ff457"
+    },
+    {
+      "contractName": "VeilBidSafePreparationModule",
+      "abi": "abis/VeilBidSafePreparationModule.json",
+      "sha256": "99074925719b2e908f6ceefc24aee5c86fa00c0a94c5b373e79e4ab4b2f2af3e"
+    },
+    {
+      "contractName": "VeilBidSafeModuleFactory",
+      "abi": "abis/VeilBidSafeModuleFactory.json",
+      "sha256": "ef249f0a31701b2993649979095b5d6ad819ab3403101149dc0aa834b4a7b9ae"
+    },
+    {
+      "contractName": "VeilBidSafeUnwrapPreparation",
+      "abi": "abis/VeilBidSafeUnwrapPreparation.json",
+      "sha256": "cef7270059f4bd355adfc231f696e66fa505eb59a06a6ec12d04c9adfeadf3f6"
+    },
+    {
+      "contractName": "VeilBidTestUSDC",
+      "abi": "abis/VeilBidTestUSDC.json",
+      "sha256": "8e2a1c558cfc734750c0dcd19d433b07beaaf2136118039febdda263e9e17d14"
+    },
+    {
+      "contractName": "VeilBidConfidentialUSDC",
+      "abi": "abis/VeilBidConfidentialUSDC.json",
+      "sha256": "124faf19533a7df4797a30703ffecda233491461f1b53eb9562401b284396761"
+    }
+  ],
+  "deployments": [
+    {
+      "network": "ethereum-sepolia",
+      "chainId": 11155111,
+      "kind": "test-e2e",
+      "verified": false,
+      "addresses": "addresses/sepolia.test.json",
+      "sha256": "bfc9ae3e7104685d43d0e7c4e026c0fc917f75cac337040ce7d6fbc63c6155c8"
+    },
+    {
+      "network": "ethereum-sepolia",
+      "chainId": 11155111,
+      "kind": "release",
+      "verified": true,
+      "addresses": "addresses/sepolia.release.json",
+      "sha256": "7629c729a09119dc24972c7f4ce7984d85eaec8057db27f9873467650e6ccd4a"
+    }
+  ]
+}

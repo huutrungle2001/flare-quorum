@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-07-25T18:18:25Z",
+  "network": "ethereum-sepolia",
+  "chainId": 11155111,
+  "implementationCommit": "fb49742",
+  "observedBlock": "11349356",
+  "deploymentKind": "test-e2e",
+  "deploymentVerified": false,
+  "dryRun": {
+    "discovered": 0,
+    "budget": 3,
+    "processed": 0,
+    "remaining": 0
+  },
+  "assertions": {
+    "rpcReachable": true,
+    "marketRuntimePresent": true,
+    "readOnlyHealthPassed": true,
+    "boundedFinalizedIndexPassed": true,
+    "sequentialBudgetTestsPassed": true,
+    "benignRaceTestsPassed": true,
+    "sanitizedLogTestsPassed": true,
+    "unverifiedWriteDefaultDenied": true,
+    "liveWriteExecuted": false
+  },
+  "notes": [
+    "Health is intentionally degraded because the reusable E2E manifest remains explicitly unverified.",
+    "No transaction was submitted because the finalized index contained no ready action.",
+    "Live close/finalize evidence remains pending and is not inferred from unit coverage."
+  ]
+}

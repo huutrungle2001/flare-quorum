@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "suite": "release-deployment-preflight",
+  "recordedAt": "2026-07-25T18:57:35.737Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111
+  },
+  "publicIdentifiers": {
+    "sourceCommit": "4a7d1e6cd638034dc84234f8f7ee85ea0303d3cd",
+    "upstreamCommit": "4a7d1e6cd638034dc84234f8f7ee85ea0303d3cd",
+    "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "vendor": "0x4d2809486012076B2212C829742BD95eF5992dB0",
+    "latestBlock": "11349553",
+    "artifactCreationCodeHashes": {
+      "contracts/test-assets/VeilBidTestAssets.sol:VeilBidTestUSDC": "0xaba3df9235d73e4c8771bf2478dd337c1e2a5e8267eaad4d47245349da85292a",
+      "contracts/test-assets/VeilBidTestAssets.sol:VeilBidConfidentialUSDC": "0x2e739dd07e7c8d6072ed79691e618982a6e772ce09e56a51f689de80bfec73d0",
+      "contracts/market/VeilBidMarket.sol:VeilBidMarket": "0x5d6b0d0c0bddc45fa750313fb42f5e8abb40d4f60d688607d2f6eb9200cc49aa",
+      "contracts/receipt/VeilBidAwardReceipt.sol:VeilBidAwardReceipt": "0xf32d034e33ac0a52a59859bdeb75773a08b70e1853ffe0909cc9fc93b20e28f8",
+      "contracts/safe/VeilBidSafePreparationModule.sol:VeilBidSafePreparationModule": "0x152d4d15b10f19e52c191c00e4c73a1e114bf38d9ebe7ee40f050e7d64a4e341"
+    },
+    "buildInputHashes": {
+      "contracts/test-assets/VeilBidTestAssets.sol:VeilBidTestUSDC": "bf48ef92140a940eeb352aa710f5c52cbb66a3d86582137d7b6b440eec28375f",
+      "contracts/test-assets/VeilBidTestAssets.sol:VeilBidConfidentialUSDC": "bf48ef92140a940eeb352aa710f5c52cbb66a3d86582137d7b6b440eec28375f",
+      "contracts/market/VeilBidMarket.sol:VeilBidMarket": "29a16e5a5caff3b6a6194be72a7d4888a86608ebf5c5337b33ae2d3f95949425",
+      "contracts/receipt/VeilBidAwardReceipt.sol:VeilBidAwardReceipt": "29a16e5a5caff3b6a6194be72a7d4888a86608ebf5c5337b33ae2d3f95949425",
+      "contracts/safe/VeilBidSafePreparationModule.sol:VeilBidSafePreparationModule": "a3aa026652a796634978a51a0f9b5754efc84c1964b336a52f0b3ed47c4338dd"
+    }
+  },
+  "assertions": {
+    "chainIdVerified": true,
+    "credentialsConfigured": true,
+    "distinctActorsVerified": true,
+    "deployerBalanceSufficient": true,
+    "vendorBalanceSufficient": true,
+    "worktreeClean": true,
+    "upstreamSynchronized": true,
+    "environmentFileUntracked": true,
+    "artifactsCompiled": true,
+    "releaseManifestSafe": true
+  },
+  "blockers": [],
+  "notes": [
+    "RPC credentials, private keys, exact wallet balances, and transaction signatures are omitted.",
+    "The deployer threshold is 0.02 Sepolia ETH and the secondary vendor threshold is 0.001 Sepolia ETH.",
+    "This command is read-only with respect to Ethereum Sepolia."
+  ]
+}

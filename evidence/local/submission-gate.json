@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "suite": "submission-release-gate",
+  "recordedAt": "2026-07-25T19:40:55.000Z",
+  "publicIdentifiers": {
+    "sourceCommit": "0eb4287090ed253285ce6f35559c22ef031b9dc9",
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "observedBlock": "11349760",
+    "deploymentKind": "release",
+    "deploymentVerified": true,
+    "productionUrl": "https://veilbid-three.vercel.app"
+  },
+  "assertions": {
+    "allWorkspaceTestsPassed": true,
+    "allTypedLintPassed": true,
+    "contractCompilationPassed": true,
+    "viteBuildPassed": true,
+    "bindingDriftCheckPassed": true,
+    "sourceAndDeploymentVerificationPassed": true,
+    "safeAndModuleWiringPassed": true,
+    "relayReleaseHealthPassed": true,
+    "relayDryRunPassed": true,
+    "repositoryAndHistorySecretScanPassed": true,
+    "evidenceValidationPassed": true,
+    "productionSmokeEvidencePassed": true,
+    "documentationClaimReviewPassed": true
+  },
+  "blockers": [],
+  "notes": [
+    "The final internal gate ran from the repository root on the recorded source commit.",
+    "The verified relay found no pending finalized lifecycle action.",
+    "Production publication steps requiring a public GitHub repository, a real-person video, an X post, and a DoraHacks account remain user-controlled submission actions."
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "suite": "release-deployment-consistency",
+  "recordedAt": "2026-07-29T05:58:04.738Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "sourceProvider": "sourcify-v2"
+  },
+  "publicIdentifiers": {
+    "sourceCommit": "9c0ca190dd4a875a9adbe18b615f40600dc37eaf",
+    "contracts": {
+      "VeilBidTestUSDC": "0xeE9A2B02C8700596b4814923c4086786c63A9D01",
+      "VeilBidConfidentialUSDC": "0xE55b2f4630E9b1d48C7Fd8001527BA5dCD9192b1",
+      "VeilBidMarket": "0x720ac8Ae5dE78590FF5184E53130460033228afc",
+      "VeilBidAwardReceipt": "0x7B51DE3579F61741eDA8602D79AAD3f175451656",
+      "VeilBidSafePreparationModule": "0x60a3ed162b13E7Fd8b0139547Aa1B38F41a774C0",
+      "VeilBidSafeModuleFactory": "0x6C09f72FF67eE0bfAD7D45DFFde5bd06228050BE",
+      "VeilBidSafeUnwrapPreparation": "0x779bacA165500e34aF65BF01AF4C2F2a997C9ff9",
+      "VeilBidDemoSafe": "0xBF39C8C9C196f1a06bB122abea350eC63AB3fbA0"
+    },
+    "runtimeCodeHashes": {
+      "VeilBidTestUSDC": "0x7ccebc305e06c85ab54bf7ab78dc6088c367d48913e4315cf95ed628ba2bb23b",
+      "VeilBidConfidentialUSDC": "0x7289d274edebf5d22635aa58800787224504fe8838e3e411b23192635ca06f4c",
+      "VeilBidMarket": "0xf1cbb45b9b8d7133f59e35d4001f404f76791013ef00b3c13656bdb5923142ae",
+      "VeilBidAwardReceipt": "0xb8e9bccae2e4063f0844f1bb8ff39b035d7f1853f6a3731701d26e83d7320309",
+      "VeilBidSafePreparationModule": "0xd44103eb21cddaea28ddefe9dbdbffdaad74196bf7dea678f77f257fa6e372ea",
+      "VeilBidSafeModuleFactory": "0x1bfef00ffdfdd224780462d32743e34c1c1d78713a8e67ccc8976d4d1f35a2ef",
+      "VeilBidSafeUnwrapPreparation": "0xf4664946be465869cebd8c018a7b2bff21b74fc69d85b910be892a4bac26e7d5",
+      "VeilBidDemoSafe": "0xd7d408ebcd99b2b70be43e20253d6d92a8ea8fab29bd3be7f55b10032331fb4c"
+    },
+    "runtimeCodeBytes": {
+      "VeilBidTestUSDC": "1881",
+      "VeilBidConfidentialUSDC": "8944",
+      "VeilBidMarket": "11612",
+      "VeilBidAwardReceipt": "4106",
+      "VeilBidSafePreparationModule": "3724",
+      "VeilBidSafeModuleFactory": "5368",
+      "VeilBidSafeUnwrapPreparation": "1861",
+      "VeilBidDemoSafe": "171"
+    },
+    "deploymentTransactions": {
+      "VeilBidTestUSDC": "0xbd617306d48cd0f79b2d6a4233db9e8ae5469a2e2401ee4715cc20b5748fb689",
+      "VeilBidConfidentialUSDC": "0x9987f8ac8b51cc53a5d3fd6588635a617c0be18f1925dddfd1cfb913047e4519",
+      "VeilBidMarket": "0x53709f0a3ab43b9bb1221253ee956c4793cef196ab36dfcc5230b4b09e1c1377",
+      "VeilBidAwardReceipt": "0x53709f0a3ab43b9bb1221253ee956c4793cef196ab36dfcc5230b4b09e1c1377",
+      "VeilBidSafePreparationModule": "0xe78356bca15f20aceecc0f7c3ced687a969558995b79a9b37199b1e80c85e297",
+      "VeilBidSafeModuleFactory": "0x31a82a114e808341c112b76b5d8481b9a0f4fc2e19551c34c301dc7b959fba84",
+      "VeilBidSafeUnwrapPreparation": "0xab9ac639f83ca1f8bc38e5e693574aad97630c80cb5ddb7f78737d00a5e994ce",
+      "VeilBidDemoSafe": "0xa32805e2a9fa3d80889d0099a1e4994cf5b6317d7914218fbd7a19b01f2c0109"
+    },
+    "configurationTransactions": {
+      "enableModule": "0xac3c147f5547e2e686fbf1d7ea33184f2ac3f32ab639f5ebdbfb1736143dd7d5",
+      "configureMarket": "0x2c34de081a5a06afb75786762c073dd708f37ae09209669ceb70c5dc9a0e1d53",
+      "authorizeMarket": "0xbdc1200c473a61e2c94252c98ce558feaf7de5803cff93090d2e55f96cdcd6b3"
+    },
+    "blocks": {
+      "VeilBidTestUSDC": "11356264",
+      "VeilBidConfidentialUSDC": "11356267",
+      "VeilBidMarket": "11362155",
+      "VeilBidAwardReceipt": "11362155",
+      "VeilBidSafePreparationModule": "11362157",
+      "VeilBidSafeModuleFactory": "11362159",
+      "VeilBidSafeUnwrapPreparation": "11361538",
+      "VeilBidDemoSafe": "11356272",
+      "configuration:enableModule": "11362162",
+      "configuration:configureMarket": "11362164",
+      "configuration:authorizeMarket": "11362167"
+    },
+    "sourceMappings": {
+      "VeilBidTestUSDC": {
+        "creationMatch": "exact_match",
+        "runtimeMatch": "exact_match",
+        "repositoryUrl": "https://repo.sourcify.dev/11155111/0xeE9A2B02C8700596b4814923c4086786c63A9D01"
+      },
+      "VeilBidConfidentialUSDC": {
+        "creationMatch": "exact_match",
+        "runtimeMatch": "exact_match",
+        "repositoryUrl": "https://repo.sourcify.dev/11155111/0xE55b2f4630E9b1d48C7Fd8001527BA5dCD9192b1"
+      },
+      "VeilBidMarket": {
+        "creationMatch": "exact_match",
+        "runtimeMatch": "exact_match",
+        "repositoryUrl": "https://repo.sourcify.dev/11155111/0x720ac8Ae5dE78590FF5184E53130460033228afc"
+      },
+      "VeilBidAwardReceipt": {
+        "creationMatch": null,
+        "runtimeMatch": "exact_match",
+        "repositoryUrl": "https://repo.sourcify.dev/11155111/0x7B51DE3579F61741eDA8602D79AAD3f175451656"
+      },
+      "VeilBidSafePreparationModule": {
+        "creationMatch": "exact_match",
+        "runtimeMatch": "exact_match",
+        "repositoryUrl": "https://repo.sourcify.dev/11155111/0x60a3ed162b13E7Fd8b0139547Aa1B38F41a774C0"
+      },
+      "VeilBidSafeModuleFactory": {
+        "creationMatch": "exact_match",
+        "runtimeMatch": "exact_match",
+        "repositoryUrl": "https://repo.sourcify.dev/11155111/0x6C09f72FF67eE0bfAD7D45DFFde5bd06228050BE"
+      },
+      "VeilBidSafeUnwrapPreparation": {
+        "creationMatch": "exact_match",
+        "runtimeMatch": "exact_match",
+        "repositoryUrl": "https://repo.sourcify.dev/11155111/0x779bacA165500e34aF65BF01AF4C2F2a997C9ff9"
+      },
+      "VeilBidDemoSafe": {
+        "creationMatch": "exact_match",
+        "runtimeMatch": "exact_match",
+        "repositoryUrl": "https://repo.sourcify.dev/11155111/0xBF39C8C9C196f1a06bB122abea350eC63AB3fbA0"
+      }
+    }
+  },
+  "assertions": {
+    "releaseManifestVerified": true,
+    "chainIdVerified": true,
+    "allRuntimeCodePresent": true,
+    "runtimeBytecodeMatchesArtifacts": true,
+    "constructorCalldataMatchesArtifacts": true,
+    "deploymentReceiptsVerified": true,
+    "configurationReceiptsVerified": true,
+    "marketRelationshipsVerified": true,
+    "wrapperConfigurationVerified": true,
+    "moduleConfigurationVerified": true,
+    "unwrapPreparationConfigurationVerified": true,
+    "safeConfigurationVerified": true,
+    "releaseOperationalStateVerified": true,
+    "topLevelSourceMappingsExact": true,
+    "embeddedReceiptSourceMappingVerified": true,
+    "safeSourceMappingExact": true,
+    "manifestPromoted": true
+  },
+  "blockers": [],
+  "notes": [
+    "Runtime logic comparisons mask Solidity immutable slots, exclude only the compiler CBOR metadata trailer, and separately verify every immutable relationship through public getters.",
+    "Full deployed and creation bytecode are checked against Sourcify's exact canonical recompilation; constructor arguments are also checked against the current local ABI.",
+    "The embedded receipt has exact runtime mapping and shares the exact Market creation transaction; Sourcify does not report a separate top-level creation match for this internal CREATE.",
+    "No credentials, private keys, signatures, confidential handles, proofs, bid values, or balances are recorded."
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "gate": "B",
+  "recordedAt": "2026-07-25T15:38:44.485Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "cases": [
+      {
+        "name": "valid-minimum",
+        "contract": "0x81dafd6519e1f8532b5fd0e449f7351e7d138213",
+        "transactions": {
+          "deploy": "0x668f322a326db7dd089220fa15c600d873dcf23ec601f67fc9b771de349cd3fe",
+          "submissions": [
+            "0x1c362fc9bad8f99150988436757d9f2c554185e0098bc1397739e381e64eb11a",
+            "0xe712c523676399842696e1be8bd52df81c3cb7e8f804ee06e1f48089008ebfa3",
+            "0x7300d24df947d2be65c8dfe9e553cfa2a3f75233eb885a09006f47c0b2df3c5c"
+          ],
+          "seal": "0x57889040f6a639e1cbb41afcd75f3497fda3117d402e19f9fbe3cef1304bf1aa"
+        },
+        "blocks": {
+          "deploy": "11348552",
+          "submissions": [
+            "11348554",
+            "11348555",
+            "11348556"
+          ],
+          "seal": "11348558"
+        }
+      },
+      {
+        "name": "invalid-exclusion",
+        "contract": "0x58d601f2a23ef07c9156547779ee43afa9e8fd75",
+        "transactions": {
+          "deploy": "0xd046f4ccb96fcb320971cd64cfcee1c04637968eb47f33646b335d3821e7ab9e",
+          "submissions": [
+            "0x2bbc356ea75169274e48cce13b397b7c9297b3410304e7e0413c648a4a3bf7a7",
+            "0x69ccb986ffa4944c80e0909067dca16a340993fe2896bc2f8e944e626bde8c58",
+            "0x06bee5c5a4309de1d9524e7aef620c4644e812dbf59233b1c555f60267f10912"
+          ],
+          "seal": "0x6437dc4b1671a9b6f92dd267d01b4c4ea6cc98d1a46d87e3adeab942acde2635"
+        },
+        "blocks": {
+          "deploy": "11348560",
+          "submissions": [
+            "11348562",
+            "11348563",
+            "11348564"
+          ],
+          "seal": "11348565"
+        }
+      },
+      {
+        "name": "earlier-tie",
+        "contract": "0x2fe09083c2df56401d3bd359390522814bc3b854",
+        "transactions": {
+          "deploy": "0xb27e200d6305b3595be439b5b160981895674cceb1031d943cfdaa1249157552",
+          "submissions": [
+            "0x3ff1701850252193654bd75e653402ae8e2973c2fe9d0d42f953a40078ca41ee",
+            "0x17ae7ece271320db6dfc68a4fa345626814085cacc266bc0f7b363046d31c4b9",
+            "0x13566dcdc2660fd84056e402a90912de2981ad3986bd3ef1aa971fe9fc01934b"
+          ],
+          "seal": "0xf00bd70716b531a8092626efc237a6041a5dc78712bda38df037bcc4a36a9f25"
+        },
+        "blocks": {
+          "deploy": "11348566",
+          "submissions": [
+            "11348567",
+            "11348568",
+            "11348570"
+          ],
+          "seal": "11348571"
+        }
+      },
+      {
+        "name": "no-valid-bid",
+        "contract": "0xb54b00d8ce7cc5afb49d352405d740c3f88e6a41",
+        "transactions": {
+          "deploy": "0x6f00aa740d17077a87eac683346cf5475d2f2e49d5bf5b7f8d1440e424793b79",
+          "submissions": [
+            "0x2dca58ae72b0c2b33997fa905bfac844f0b7df19616d5208dde7d523ddf8d955",
+            "0x3396c58c64312022ca221c2390d96e15e75dbe3655bb3d8ab823a13faf44c463"
+          ],
+          "seal": "0x3334a1698785dfca6867962a1c86ff1c2177017b3eec1b2178cbc48c320c2fc0"
+        },
+        "blocks": {
+          "deploy": "11348573",
+          "submissions": [
+            "11348575",
+            "11348576"
+          ],
+          "seal": "11348577"
+        }
+      },
+      {
+        "name": "permutation-one",
+        "contract": "0x0e87d7d347f3a4696efaec7bc65bca1d1c1ac9aa",
+        "transactions": {
+          "deploy": "0xb8d70d5eb1c4af270bf94d2cd18ec5e9ab3da61771718c6d15fe34b31ac64915",
+          "submissions": [
+            "0xf44b360cea669eed9355bbd335b9481b8f104f653d26e3544e25289f341f8139",
+            "0x7e1cbcfb0f2170ea1ef67c8553b971b6cfd4fb5f2e9d472f26919c9a0220ab15",
+            "0xc4c6c159e3d0a300a525a055198ad43081f14897651a0126f41c47214ded38eb",
+            "0x33c4e67c13c209677cbf249fe2153739a3a20b91324f220c98bef1e0ef1770fa"
+          ],
+          "seal": "0x3a09a9e6cfd9270ecc5ca56a9b11a6440716738c6d2d5d0a84a9645454138759"
+        },
+        "blocks": {
+          "deploy": "11348587",
+          "submissions": [
+            "11348588",
+            "11348590",
+            "11348591",
+            "11348592"
+          ],
+          "seal": "11348594"
+        }
+      },
+      {
+        "name": "permutation-two",
+        "contract": "0x35ad5b32e9b6b77ce57d01b1678da3550458fa50",
+        "transactions": {
+          "deploy": "0x265eeb5d2e6455f17c6dddd5c5705bf726c8e26732c695352555b854925bdb1f",
+          "submissions": [
+            "0x7c83dfc46c9a83d100502b3bbd6b8deb23597398ad965bdb40fb774fc7d9806d",
+            "0x77dedcbe7ff7cadd255f067e23d2ede8e26e47be3e1521914b5d7f0031b2de99",
+            "0xa0a05cb8c13c1bbcd3cbdd8d735a6cc7ac3e6bbf1cfd077fdd6727b7179ba1e6",
+            "0x97df3d9a1dbcc6b0a349d6f3af1d4e51540fc7d7a570a5798f4ee8ea275ba3e6"
+          ],
+          "seal": "0xd7e051b7d590f3a45974e9ba1db9602ed2331e8a6567a55b004add534cad6181"
+        },
+        "blocks": {
+          "deploy": "11348596",
+          "submissions": [
+            "11348598",
+            "11348599",
+            "11348600",
+            "11348601"
+          ],
+          "seal": "11348602"
+        }
+      }
+    ]
+  },
+  "assertions": {
+    "allCasesExecuted": true,
+    "validMinimumVerifiedInMemory": true,
+    "invalidBidExclusionVerifiedInMemory": true,
+    "earlierTiePriorityVerifiedInMemory": true,
+    "noValidBidVerifiedInMemory": true,
+    "permutationMinimumVerifiedInMemory": true,
+    "deterministicModelCasesPassed": true,
+    "noPlaintextShadowStateFound": true
+  },
+  "blockers": [],
+  "notes": [
+    "Confidential case inputs, outputs, handles, and proofs were kept in memory and omitted from this artifact.",
+    "The deterministic model separately covers 2000 generated bid sets.",
+    "The live run stopped during CASE_4_DECRYPT.",
+    "The sanitized live run resumed from previously mined transactions."
+  ]
+}

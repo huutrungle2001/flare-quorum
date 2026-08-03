@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "suite": "iexec-nox-hackathon-hello-world",
+  "recordedAt": "2026-07-27T06:40:51.075Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "wallet": "0x82342063DdfC86fC91333c31E2Ab65b4d6B34A55",
+    "publicKey": "0x04cb22cb1a57389bcea83cc6bd05c793a4f8b63f0d566f697370debf5f1ecbaa3714727d56f39a12341d0e5b7293b2356611fa17ff9b03ac084049d16cca1555a5",
+    "contract": "0x010eb2319DaF5EC65B0bdB8a321Ece8F29847941",
+    "transactions": {
+      "deploy": "0x785352dff6e24b361389b179a8abae35e55919b54922d23e61612e415e89b8f0",
+      "deposit": "0xd93063a07c82a97aede6ea38068777124120b64afeee3636f1a4a6492417a98a",
+      "withdraw": "0xae22947db2495d0f1e5376141dec02247984b4efa614428af0615d45608414ac"
+    },
+    "blocks": {
+      "deploy": "11359919",
+      "deposit": "11359920",
+      "withdraw": "11359921"
+    },
+    "runtimeCodeHash": "0x1444714f73efb221da22f38e28f17472a9b5aced548abc6031260e24912c5004"
+  },
+  "assertions": {
+    "contractDeployed": true,
+    "ownerMatchesJourneyWallet": true,
+    "encryptedDepositConfirmed": true,
+    "ownerDecryptedDepositResult": true,
+    "encryptedWithdrawalConfirmed": true,
+    "ownerDecryptedWithdrawalResult": true
+  },
+  "blockers": [],
+  "notes": [
+    "This follows the official iExec Nox Hello World confidential piggy-bank journey.",
+    "The public wallet and transaction identifiers are retained for organizer verification.",
+    "Private keys, plaintext amounts, encrypted handles, input proofs, signatures, RPC credentials, and decrypted values are omitted."
+  ]
+}

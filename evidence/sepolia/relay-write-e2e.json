@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "suite": "relay-write-e2e",
+  "recordedAt": "2026-07-26T18:24:13.038Z",
+  "network": "ethereum-sepolia",
+  "chainId": 11155111,
+  "deploymentKind": "release",
+  "deploymentVerified": true,
+  "publicIdentifiers": {
+    "safe": "0xBF39C8C9C196f1a06bB122abea350eC63AB3fbA0",
+    "market": "0x969F93642054130e87AFC8D380eec850617A6048",
+    "tenderId": "3",
+    "transactions": {
+      "safeCreateTender": "0x19f5a5140192c85dbfcc508bf4f531c1089f472289d4384cd5ef06812bcaf714",
+      "relayFunding": "0xfbb9b0fb63a3bb36872e3a7ac5e54a2a1de34f3f902fe41e79beaaf0f8ddaf06",
+      "submitBid": "0x0251b8308bb70ff99b03ca8ed3ebb897b89cda48870060ac85d5c0a0758c1b6e",
+      "relayClose": "0x6ac4a464b852eabd6855ce17c59fb3fc1b34e4327ab091443f3642bc86573237",
+      "relayFinalize": "0x36b59ca4a3f1b838468b04901ed25930d437ac9e5fccbc625e7dcdf89cc2a1bf"
+    },
+    "blocks": {
+      "safeCreateTender": "11356363",
+      "relayFunding": "11356365",
+      "submitBid": "11356367",
+      "relayClose": "11356368",
+      "relayFinalize": "11356369"
+    }
+  },
+  "assertions": {
+    "releaseModuleEnabled": true,
+    "releaseMarketOperatorEnabled": true,
+    "safeCreatedTender": true,
+    "atomicSafeBatchVerified": true,
+    "exactFundingConfirmed": true,
+    "relayFundingSubmitted": true,
+    "vendorBidSubmitted": true,
+    "relayCloseSubmitted": true,
+    "relayFinalizeSubmitted": true,
+    "proofDerivedAward": true,
+    "relayWriteLifecycleCompleted": true
+  },
+  "blockers": [],
+  "notes": [
+    "This is a real Sepolia write test using the canonical release contracts and a disposable Safe-funded tender.",
+    "Bid values, balances, handles, proofs, signatures, RPC credentials, and wallet secrets were kept in memory and omitted."
+  ]
+}

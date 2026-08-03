@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "gate": "E",
+  "recordedAt": "2026-07-25T16:12:09.357Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "safe-protocol-kit-8.0.4"
+  },
+  "packages": {
+    "safeProtocolKit": "8.0.4",
+    "safeAccount": "1.4.1"
+  },
+  "publicIdentifiers": {
+    "owner": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "safe": "0xC85A99090106725B55bE1d522ab51bf7BD44B752",
+    "transactions": {
+      "deploySafe": "0x2d6a5100611b4e2db61972509671d080a73cf9b9ec58dd56237f54669d297b45"
+    },
+    "blocks": {
+      "deploySafe": "11348749"
+    }
+  },
+  "assertions": {
+    "safeDeployed": true,
+    "safeVersionVerified": true,
+    "ownerSetVerified": true,
+    "thresholdOneVerified": true
+  },
+  "blockers": [],
+  "notes": [
+    "This is a separate VeilBid threshold-1 demo Safe deployed through the official Protocol Kit.",
+    "Wallet secrets and Safe transaction signatures were omitted from this artifact."
+  ]
+}

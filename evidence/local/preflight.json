@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "gate": "PREFLIGHT",
+  "recordedAt": "2026-07-26T18:45:21.840Z",
+  "environment": {
+    "node": "v24.18.0",
+    "pnpm": "10.33.0",
+    "docker": null,
+    "dockerCompose": null,
+    "sepoliaRpcConfigured": true,
+    "sepoliaPrivateKeyConfigured": true
+  },
+  "packages": {
+    "noxProtocolContracts": "0.2.4",
+    "noxConfidentialContracts": "0.2.2",
+    "noxHandle": "0.1.0-beta.13",
+    "noxHardhatPlugin": "0.1.0",
+    "hardhat": "3.11.1",
+    "solidity": "0.8.35"
+  },
+  "assertions": {
+    "node24": true,
+    "localNoxAvailable": false,
+    "sepoliaConfigurationPresent": true
+  },
+  "blockers": []
+}

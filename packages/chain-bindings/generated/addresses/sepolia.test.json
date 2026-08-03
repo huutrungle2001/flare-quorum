@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "network": "ethereum-sepolia",
+  "chainId": 11155111,
+  "kind": "test-e2e",
+  "verified": false,
+  "sourceCommit": "5eb30d8d9d8a32d7ca8c3061047056f4e093057f",
+  "contracts": {
+    "VeilBidTestUSDC": {
+      "address": "0xb08d9a2d1185f19539a7e36c5e924ff9c5b140f5",
+      "deploymentTransaction": "0x2c40466d647e00a95de3485c0e54f37c671764ec1fb22778d0b6ca664d54b237",
+      "deploymentBlock": "11348863"
+    },
+    "VeilBidConfidentialUSDC": {
+      "address": "0x8cce8d9a130380b410b0d3765d904089b3faa2a5",
+      "deploymentTransaction": "0xbbbb492abc98fedf08c41e8dbafd280a908319462edfaaa20dda83b1cd2cfc41",
+      "deploymentBlock": "11348864"
+    },
+    "VeilBidMarket": {
+      "address": "0xb7d29544bf11abfd16d8dbcd1209c7ceba973cba",
+      "deploymentTransaction": "0x12f37b327ca8c8ff5a071acb6003f897de087d7e5ed12cd454403899a7872d06",
+      "deploymentBlock": "11348865"
+    },
+    "VeilBidAwardReceipt": {
+      "address": "0x4Ba43a46078F8f7EF9127A55F08457114BfBF472",
+      "deploymentTransaction": "0x12f37b327ca8c8ff5a071acb6003f897de087d7e5ed12cd454403899a7872d06",
+      "deploymentBlock": "11348865"
+    },
+    "VeilBidSafePreparationModule": {
+      "address": "0x10fdf4c547e8483db3503f79b3c33ed15a1b9cba",
+      "deploymentTransaction": "0xf176db550609a9964fd1f0c3b9b4ae353989a336c0d065fcd281bc6af2314b17",
+      "deploymentBlock": "11348939",
+      "enabled": false
+    },
+    "VeilBidDemoSafe": {
+      "address": "0xC85A99090106725B55bE1d522ab51bf7BD44B752",
+      "deploymentTransaction": "0x2d6a5100611b4e2db61972509671d080a73cf9b9ec58dd56237f54669d297b45",
+      "deploymentBlock": "11348749"
+    }
+  },
+  "evidence": [
+    "evidence/sepolia/market-eoa.json",
+    "evidence/sepolia/market-refund.json",
+    "evidence/sepolia/market-safe.json"
+  ],
+  "notes": [
+    "This manifest records a reusable E2E test deployment, not the canonical release deployment.",
+    "Source and runtime bytecode verification are still pending, so consumers must preserve verified=false."
+  ]
+}

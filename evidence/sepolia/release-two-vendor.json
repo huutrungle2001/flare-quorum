@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "suite": "release-two-vendor-lifecycle",
+  "recordedAt": "2026-07-27T14:26:50.667Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "safe-1.4.1-and-official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "sourceCommit": "9c0ca190dd4a875a9adbe18b615f40600dc37eaf",
+    "owner": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "safe": "0xBF39C8C9C196f1a06bB122abea350eC63AB3fbA0",
+    "vendors": [
+      "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+      "0x4d2809486012076B2212C829742BD95eF5992dB0"
+    ],
+    "tenderId": "1",
+    "metadataHash": "0xff80ca61c9b2514a5bd1385f8c719428877b009c0596c6d1ec6886f343dbc09f",
+    "bidDeadline": "1785162756",
+    "moduleNonce": "11362195",
+    "contracts": {
+      "VeilBidTestUSDC": "0xeE9A2B02C8700596b4814923c4086786c63A9D01",
+      "VeilBidConfidentialUSDC": "0xE55b2f4630E9b1d48C7Fd8001527BA5dCD9192b1",
+      "VeilBidMarket": "0x720ac8Ae5dE78590FF5184E53130460033228afc",
+      "VeilBidAwardReceipt": "0x7B51DE3579F61741eDA8602D79AAD3f175451656",
+      "VeilBidDemoSafe": "0xBF39C8C9C196f1a06bB122abea350eC63AB3fbA0",
+      "VeilBidSafePreparationModule": "0x60a3ed162b13E7Fd8b0139547Aa1B38F41a774C0"
+    },
+    "transactions": {
+      "faucet": "0xd228d2ee0d6674fd4733d0f31d6b7da8198f4807bf094ec2b35b0ab22ec79267",
+      "approveWrapper": "0xe6242c15ab08512306852d17853401105ac21583ea3a149835a57b3ee3bd0221",
+      "wrapToSafe": "0xa2cf1f6187c3a07eb2af3957181fbe4019dfa3ddd26782c7f873d0c6ae2d8d6e",
+      "safeCreateTender": "0x997df387c4291830e61880bc75219282abc3cee23b215bbf08f5106a79815b91",
+      "confirmFunding": "0xd5b40ac522ae6bdaa9bed3549dce9cfc24fcc578b239d6439bb6b08b00f056ff",
+      "submitFirstBid": "0xcb4dad0defa03106df44e2f2f021c2ef01a4878843f86054ca56b7f100c82ee6",
+      "submitSecondBid": "0xc45d79b0491da2718996aa3803626cea66dc985d6a363a3ca37b121ce0bdfcc7",
+      "closeTender": "0x440c6cf70284863712ef82ae6ff65402a53fc75b1975df2dff7c60458e4c2238",
+      "finalizeTender": "0x1fe05a7900cfb69e5e2c005907431f1dc2d2428827bc0a97d46128967c763559"
+    },
+    "blocks": {
+      "faucet": "11362190",
+      "approveWrapper": "11362192",
+      "wrapToSafe": "11362194",
+      "safeCreateTender": "11362196",
+      "confirmFunding": "11362199",
+      "submitFirstBid": "11362201",
+      "submitSecondBid": "11362203",
+      "closeTender": "11362206",
+      "finalizeTender": "11362208"
+    }
+  },
+  "assertions": {
+    "verifiedReleaseReused": true,
+    "releaseSafeOperational": true,
+    "safePreparationAndFundingVerified": true,
+    "atomicSafeBatchVerified": true,
+    "exactFundingProofOpenedTender": true,
+    "twoDistinctVendorsSubmitted": true,
+    "perVendorBidAclVerified": true,
+    "bothVendorBidsDecryptedInMemory": true,
+    "deadlineEnforced": true,
+    "earlyCloseAfterAllVendorsVerified": true,
+    "winnerOnlyPublicDecryptionVerified": true,
+    "lowerSecondBidSelectedByProof": true,
+    "confidentialWinnerSettlementVerifiedInMemory": true,
+    "losingVendorBalanceUnchangedInMemory": true,
+    "awardReceiptVerified": true,
+    "reviewViewerBoundAtCreation": true,
+    "openReviewViewerDenied": true,
+    "automaticPostFinalizeReviewVerifiedInMemory": true,
+    "replayRejected": true,
+    "releaseSafeStatePreserved": true
+  },
+  "blockers": [],
+  "notes": [
+    "Bid prices, confidential balances, handles, proofs, signatures, RPC credentials, and wallet secrets are asserted only in memory and omitted.",
+    "The Safe owner also acts as the first approved vendor EOA; the buyer remains the distinct Safe address and the second vendor is a separate EOA.",
+    "The lower second bid must become the proof-derived public winner while both bid values remain confidential by default.",
+    "The release module and Safe-to-Market operator authorization remain enabled after this lifecycle."
+  ]
+}

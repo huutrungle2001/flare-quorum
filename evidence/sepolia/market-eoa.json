@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "suite": "production-market-eoa",
+  "recordedAt": "2026-07-25T16:35:15.740Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "buyer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "vendor": "0x4d2809486012076B2212C829742BD95eF5992dB0",
+    "tenderId": "1",
+    "contracts": {
+      "Underlying": "0xb08d9a2d1185f19539a7e36c5e924ff9c5b140f5",
+      "Wrapper": "0x8cce8d9a130380b410b0d3765d904089b3faa2a5",
+      "Market": "0xb7d29544bf11abfd16d8dbcd1209c7ceba973cba",
+      "Receipt": "0x4Ba43a46078F8f7EF9127A55F08457114BfBF472"
+    },
+    "transactions": {
+      "deployUnderlying": "0x2c40466d647e00a95de3485c0e54f37c671764ec1fb22778d0b6ca664d54b237",
+      "deployWrapper": "0xbbbb492abc98fedf08c41e8dbafd280a908319462edfaaa20dda83b1cd2cfc41",
+      "deployMarket": "0x12f37b327ca8c8ff5a071acb6003f897de087d7e5ed12cd454403899a7872d06",
+      "faucet": "0x5b64e01d2c24df207cca9f709b24fe42b2e5c9f93dc4f1de9b0f9e74e89cfcba",
+      "approveWrapper": "0x29559a49dd71e9a326627d1c10bc7a0b471608db0c5a6b5defe868d60e255abd",
+      "wrapConfidential": "0xabb3f0d7dfaf4d5b3ad952d21b29eb27a1072b47d2907aec0d6651bc0f1e907a",
+      "authorizeMarket": "0x787e90fb4b48ec5f34b60fb0b91366fc472f0f11236df1cc52138e449e278fd8",
+      "createTender": "0x43834dc5320801644cb5a66250d21678ad75e5410cf8be6c0641436ed3d3d7af",
+      "confirmFunding": "0x0db84304e85a004763df595095fe25455a0d7b64c9bb2ad6a00574015255ae0b",
+      "submitBid": "0x0fbd140da6300dd8f13cd4388ca1b0dddc1dd26edf1331721a14fdf4c0ea22ae",
+      "closeTender": "0x11d1bd6f25df4e0c74edd9ca28201046f38e8576e5daa828b079321f1a1387b4",
+      "finalizeTender": "0x4a13532e5af96410bf5518d4946f02dd6a7a3e52e20f6cf3de2d22930712774a",
+      "grantBuyerViewer": "0x6a9645ac567fa6656fe3106532bb928ed121654865dee87f493368d70761f3da"
+    },
+    "blocks": {
+      "deployUnderlying": "11348863",
+      "deployWrapper": "11348864",
+      "deployMarket": "11348865",
+      "faucet": "11348866",
+      "approveWrapper": "11348868",
+      "wrapConfidential": "11348869",
+      "authorizeMarket": "11348870",
+      "createTender": "11348871",
+      "confirmFunding": "11348872",
+      "submitBid": "11348874",
+      "closeTender": "11348884",
+      "finalizeTender": "11348886",
+      "grantBuyerViewer": "11348888"
+    }
+  },
+  "assertions": {
+    "productionContractsDeployed": true,
+    "officialWrapperUsed": true,
+    "exactFundingProofOpenedTender": true,
+    "fundingProofReplayRejected": true,
+    "unapprovedVendorRejected": true,
+    "duplicateVendorRejected": true,
+    "vendorOnlyOpenBidAclVerified": true,
+    "vendorBidDecryptionVerifiedInMemory": true,
+    "deadlineEnforced": true,
+    "winnerOnlyPublicDecryptionVerified": true,
+    "proofDerivedWinnerVerified": true,
+    "confidentialSettlementVerifiedInMemory": true,
+    "awardReceiptVerified": true,
+    "finalizeReplayRejected": true,
+    "postCloseBuyerGrantVerifiedInMemory": true
+  },
+  "blockers": [],
+  "notes": [
+    "Bid prices, balances, handles, proofs, signatures, RPC credentials, and wallet secrets were kept in memory and omitted.",
+    "This suite uses the canonical Auction House production contracts rather than feasibility contracts."
+  ]
+}

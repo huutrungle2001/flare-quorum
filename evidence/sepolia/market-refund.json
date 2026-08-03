@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "suite": "production-market-refund",
+  "recordedAt": "2026-07-25T16:43:37.136Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "buyer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "vendor": "0x4d2809486012076B2212C829742BD95eF5992dB0",
+    "tenderIds": {
+      "refund": "2",
+      "cancel": "3"
+    },
+    "contracts": {
+      "Market": "0xb7d29544bf11abfd16d8dbcd1209c7ceba973cba",
+      "Underlying": "0xb08d9a2d1185f19539a7e36c5e924ff9c5b140f5",
+      "Wrapper": "0x8cce8d9a130380b410b0d3765d904089b3faa2a5"
+    },
+    "transactions": {
+      "faucet": "0xd18cf559d9a6f9d932224c1e3d1af273d1022584cd0d685b5991080abd68a36b",
+      "approveWrapper": "0x3d1c2d301f4c9c9252c01235d705ce842406b1e3aa495659072d4dc7e9003c8a",
+      "wrapConfidential": "0x7ee9f1e3e24e446ba7eb36b24d2866b04c01a4dffa6dc0ff8cfc0c1bcdcb6687",
+      "refundCreate": "0x619510a4effb5cf92299bfc33e4c74374d53226f633b994430ee26a280da74f6",
+      "refundConfirmFunding": "0x21d41d92f31f61f2bf30d62630f6164918b436529f09e2cf889ff4bd4941325a",
+      "refundSubmitInvalidBid": "0xa8a75ff18e3c145082afd2e43422b1fd00618af52a0895bb7b29e4ee16c39e4e",
+      "refundClose": "0x4d2ba92f95b5243f792486e94570ed145d5ef2e51ea1f1979d507141105c417b",
+      "refundFinalize": "0xd1e15495dbd0407934b0a0a5b942f7e1da37ebe6421478ba910951b9876947ef",
+      "cancelCreate": "0x69a3a58d6a73972ecd4eb1e34f0616afef142d4a049037b37dbdadadc057497d",
+      "cancelConfirmFunding": "0xc187d207c008e10c05da2af162476a9f0fc036fe5e30eab64624f34927a8725e",
+      "cancelTender": "0x4a19f713d06a1388da1c0bb7e40bce9c0c002a1397a693a4b464c05f73e7ce72"
+    },
+    "blocks": {
+      "faucet": "11348903",
+      "approveWrapper": "11348905",
+      "wrapConfidential": "11348906",
+      "refundCreate": "11348909",
+      "refundConfirmFunding": "11348911",
+      "refundSubmitInvalidBid": "11348913",
+      "refundClose": "11348918",
+      "refundFinalize": "11348919",
+      "cancelCreate": "11348921",
+      "cancelConfirmFunding": "11348923",
+      "cancelTender": "11348926"
+    }
+  },
+  "assertions": {
+    "canonicalTestDeploymentReused": true,
+    "invalidBidAcceptedWithoutPrivateBranch": true,
+    "buyerCannotCancelAfterBid": true,
+    "noValidWinnerProofVerified": true,
+    "fullConfidentialRefundVerifiedInMemory": true,
+    "refundReplayRejected": true,
+    "closedTenderCannotCancel": true,
+    "preBidBuyerCancellationVerified": true,
+    "cancellationRefundVerifiedInMemory": true,
+    "cancellationReplayRejected": true
+  },
+  "blockers": [],
+  "notes": [
+    "Bid prices, balances, handles, proofs, signatures, RPC credentials, and wallet secrets were kept in memory and omitted.",
+    "This suite reuses the production-contract test deployment in market-eoa.json; it is not a canonical release deployment."
+  ]
+}

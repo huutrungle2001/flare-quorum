@@ -1,0 +1,25 @@
+{
+  "name": "@veilbid/settlement-relay",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dry-run": "node dist/cli.js dry-run",
+    "health": "node dist/cli.js health",
+    "lint": "tsc --noEmit",
+    "once": "node dist/cli.js once",
+    "poll": "node dist/cli.js poll",
+    "test": "pnpm build && node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@iexec-nox/handle": "0.1.0-beta.13",
+    "@veilbid/chain-bindings": "workspace:*",
+    "viem": "2.47.6"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "suite": "production-market-safe-viewer",
+  "recordedAt": "2026-07-25T17:09:42.146Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "safe-1.4.1-and-official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "owner": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "safe": "0xC85A99090106725B55bE1d522ab51bf7BD44B752",
+    "vendor": "0x4d2809486012076B2212C829742BD95eF5992dB0",
+    "tenderId": "5",
+    "contracts": {
+      "Market": "0xb7d29544bf11abfd16d8dbcd1209c7ceba973cba",
+      "Wrapper": "0x8cce8d9a130380b410b0d3765d904089b3faa2a5",
+      "Module": "0x10fdf4c547e8483db3503f79b3c33ed15a1b9cba"
+    },
+    "transactions": {
+      "enableModule": "0x7d1c75b6dc136b95366842d02d6767a5b93dc6a8148ab777b466df582ebb15ee",
+      "authorizeMarket": "0x26c4028ceedfd24e4bc80a97cf2c17f5d0a082354b063b20e8d919186f616b80",
+      "prepareInput": "0x87696467b35ed665deeb90ed1cee4062083d3ceaedbde84a97eaf81dbec01ee9",
+      "safeCreateTender": "0x4654a3b0b473a38506cc22718878f05851ac1cca173444f474c8663a02d5ffea",
+      "confirmFunding": "0x9fb69149868286df2a93aa4e29b7c2d9a90d724cdf4c86f30b377d6a17754b50",
+      "submitBid": "0x98a7681b9ef6a666e60277de3fae9204eecfe304ffd1b22b4d64d2315b4595c2",
+      "closeTender": "0x41de631136dd9ea56210a136ffc7ad0cdfcf51724117b8185dcf98504c303fb3",
+      "finalizeTender": "0x4bec8b09a8b97480bc7f4dc3e681c8e0e83bfa174504b63c7196e698b4e8bcd9",
+      "safeGrantViewer": "0x700bfec269af7a3cee409a90c02ecaad49072400e2b465f18c27ef8a9a62457e",
+      "disableModule": "0xe17dd78be878a290c595d2208fd8e981fd3448d62a8457adbd4d3a66bd94d3cf",
+      "revokeMarketOperator": "0x2caf3e61a370f5c77020f31c94d0fa215a9bcc2e20177d45e3284a1c6a37f6b4"
+    },
+    "blocks": {
+      "enableModule": "11349028",
+      "authorizeMarket": "11349029",
+      "prepareInput": "11349030",
+      "safeCreateTender": "11349031",
+      "confirmFunding": "11349032",
+      "submitBid": "11349033",
+      "closeTender": "11349044",
+      "finalizeTender": "11349046",
+      "safeGrantViewer": "11349049",
+      "disableModule": "11349051",
+      "revokeMarketOperator": "11349052"
+    }
+  },
+  "assertions": {
+    "existingProductionDeploymentReused": true,
+    "safePreparationAndFundingVerified": true,
+    "exactFundingProofOpenedTender": true,
+    "vendorBidAclAndDecryptionVerifiedInMemory": true,
+    "openBuyerViewerGrantRejected": true,
+    "proofDerivedSafeAwardVerified": true,
+    "vendorSettlementVerifiedInMemory": true,
+    "ownerDirectViewerGrantRejected": true,
+    "safeThresholdViewerGrantVerifiedInMemory": true,
+    "safeAuthorityPreserved": true,
+    "cleanupRevokedModuleAndOperator": true
+  },
+  "blockers": [],
+  "notes": [
+    "Bid prices, balances, handles, proofs, signatures, RPC credentials, and wallet secrets were omitted.",
+    "The viewer grant was executed by a normal threshold-authorized Safe transaction after award.",
+    "The production module and market operator permission were disabled again after the suite."
+  ]
+}

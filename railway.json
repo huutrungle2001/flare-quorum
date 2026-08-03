@@ -1,0 +1,23 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "RAILPACK",
+    "buildCommand": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build",
+    "watchPatterns": [
+      ".nvmrc",
+      "apps/relay/**",
+      "package.json",
+      "packages/chain-bindings/**",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "railway.json"
+    ]
+  },
+  "deploy": {
+    "startCommand": "node apps/relay/dist/cli.js poll",
+    "healthcheckPath": "/live",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ALWAYS",
+    "restartPolicyMaxRetries": 10
+  }
+}

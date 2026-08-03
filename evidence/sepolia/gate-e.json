@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "gate": "E",
+  "recordedAt": "2026-07-25T16:16:09.718Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "safe-1.4.1-and-official-nox-testnet"
+  },
+  "packages": {
+    "safeProtocolKit": "8.0.4",
+    "safeAccount": "1.4.1"
+  },
+  "publicIdentifiers": {
+    "owner": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "safe": "0xC85A99090106725B55bE1d522ab51bf7BD44B752",
+    "contracts": {
+      "Underlying": "0x3419418272e55b276802ab10b197e7baaf77b647",
+      "Wrapper": "0x81a1c3f21c99d14bc035d9625c57859743ab2a12",
+      "Module": "0x86965ffa4782b08c27decd9a4d4b342c5e1c5728",
+      "Consumer": "0x581f2ddaed3564d1fe99df4ec78c1e0d9da98c80"
+    },
+    "transactions": {
+      "deployUnderlying": "0xc4d4cb6bd0399532fef3092cd6eaf88ab88b1a881cbfe1fbddda343fe4b60e3e",
+      "deployWrapper": "0x0ce1b70c4aabb42cc64f09c52fb44b3b60a62c36df843be1f527724028f3bf26",
+      "deployModule": "0x37d464a88b4874cb0455105d49e4bdf2262f07f57c2c15b264f349ebf6e34cd0",
+      "deployConsumer": "0x653b81c4cbb95e9cada3c0b15ac294586af5888404c255a551c79d180d68c0fc",
+      "mintUnderlying": "0x651109b61773c59d453d3cfac94dba57da15c9212a5466be7344fe94e2d275a1",
+      "approveWrapper": "0xe92cfca453ab18e573840e1c3bb988ad446509f680eabfa6cfc686711bc44cea",
+      "wrapToSafe": "0x0774112e1f6a9a563b9c73af5b7b0a42c9a742c901c711ca612a766234981fa5",
+      "enableModule": "0xb9e7acfc35e5b571ea39b3bf39306340e88bea979116f939d07bddf9bfce729e",
+      "configureMarket": "0x284572fa9953602ac6ff7a2953e67dac6daa85cb91175364b8733e4b43746435",
+      "authorizeOperator": "0xeae2f518c3d55bbf294e9eb87cf3c4d4967a0c509869e42d636f5cce696db2f2",
+      "prepareInput": "0x83d70026057b5867113e63e258640b94665cf6ab7a9f9db1cc2b6e32822f66d6",
+      "safeAuthorizedFunding": "0x6f812116e0e25e14f4fa9fb48175ae51f2ddf4225eea16084edb65ae9981030c",
+      "confirmFunding": "0x80f7749cd1b16ad007e0cee1f118ed6d6de3c71e9c309731868840825c0749df",
+      "disableModule": "0xb94890cbe84ed86cb842ff639a9eb768e66dbcc0fca7029deb699d56947ca121",
+      "reenableModule": "0xd1ef00e2d871438804d98dbd1f66703a2146984c35c0950c9d4206a36700c4ec",
+      "prepareAfterReenable": "0x68e1b11c3c27d6e152803571c1da2a7a8e500051a826da42e315bd5d5c23e6bd",
+      "finalDisableModule": "0x298f6397c58df5e376b9d3914240314c868bc333d4e2a78a9bd0868d8d6f968d",
+      "revokeOperator": "0x0f03d04b0b53a9e07ec573be6959d002749b1afa0aca52646d561170f606a241"
+    },
+    "blocks": {
+      "deployUnderlying": "11348769",
+      "deployWrapper": "11348771",
+      "deployModule": "11348772",
+      "deployConsumer": "11348773",
+      "mintUnderlying": "11348774",
+      "approveWrapper": "11348775",
+      "wrapToSafe": "11348777",
+      "enableModule": "11348778",
+      "configureMarket": "11348779",
+      "authorizeOperator": "11348781",
+      "prepareInput": "11348783",
+      "safeAuthorizedFunding": "11348784",
+      "confirmFunding": "11348787",
+      "disableModule": "11348789",
+      "reenableModule": "11348791",
+      "prepareAfterReenable": "11348792",
+      "finalDisableModule": "11348793",
+      "revokeOperator": "11348794"
+    }
+  },
+  "assertions": {
+    "safeModuleEnabledByThreshold": true,
+    "marketConfiguredBySafe": true,
+    "safeOperatorAuthorizedByThreshold": true,
+    "wrongConsumerRejected": true,
+    "wrongActionRejected": true,
+    "nonceReplayRejected": true,
+    "preparedAclScoped": true,
+    "preparationDidNotMoveSafeFunds": true,
+    "directOwnerFundingRejected": true,
+    "safeAuthorizedFundingExecuted": true,
+    "exactFundingProofVerified": true,
+    "consumedInputReplayRejected": true,
+    "revokeBlockedNewPreparation": true,
+    "revokePreservedSafeState": true,
+    "reenableRestoredPreparation": true,
+    "moduleExecutionSurfaceAbsent": true,
+    "cleanupRevokedModuleAndOperator": true
+  },
+  "blockers": [],
+  "notes": [
+    "Confidential values, balance identifiers, prepared inputs, proofs, signatures, and wallet secrets were omitted from this artifact.",
+    "The threshold-1 Safe is a browser-demo limitation; higher thresholds remain executable through Safe Wallet.",
+    "The module was disabled and its token operator authorization was revoked after the assertions."
+  ]
+}

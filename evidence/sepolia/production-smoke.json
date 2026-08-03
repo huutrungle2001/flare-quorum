@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "suite": "production-frontend-smoke",
+  "recordedAt": "2026-07-28T17:42:20.686Z",
+  "publicIdentifiers": {
+    "sourceCommit": "5b8abc43a05e1c796b027c044016b65a88243332",
+    "provider": "vercel",
+    "project": "veilbid",
+    "deploymentId": "HcBrVP8PDVBrtphHnE7opN6g6fNB",
+    "canonicalUrl": "https://veilbid-three.vercel.app",
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "deploymentKind": "release",
+    "deploymentVerified": true,
+    "market": "0x720ac8Ae5dE78590FF5184E53130460033228afc",
+    "tenderId": "1",
+    "observedBlock": "11370120"
+  },
+  "routeStatuses": {
+    "/": 200,
+    "/room": 200,
+    "/docs": 200
+  },
+  "visualChecks": {
+    "desktop": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "92981f79bad8b1176a8c94ba448c7820186a8fc30a5c16489bab73f59738ab74"
+    },
+    "mobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "844637c646f6c17adfede8ef89fb143c0d515893697e78290d228a1973a6256a"
+    },
+    "docsDesktop": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "0f06b2cc3e7e8e7ec25df7a9701e0848316bae9a28dfd685437919b3331ea425"
+    },
+    "docsMobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "ed1fb3b2700d0af85a0c2689ab4d969011ebff870be1bf6a119b8a84ddaa9d45"
+    }
+  },
+  "assertions": {
+    "allRoutesReturned200": true,
+    "canonicalMarketBundled": true,
+    "desktopLandingRendered": true,
+    "sharedNavigationRendered": true,
+    "evidenceRemovedFromPrimaryNavigation": true,
+    "walletControlRendered": true,
+    "docsGuideRendered": true,
+    "docsSidebarRendered": true,
+    "mobileTenderNavigationActive": true,
+    "mobileReleaseLabelRendered": true,
+    "walletFreeCanonicalTenderLoaded": true,
+    "awardedStateRendered": true,
+    "noPublicStateFailureRendered": true,
+    "desktopScreenshotCaptured": true,
+    "mobileScreenshotCaptured": true,
+    "docsDesktopScreenshotCaptured": true,
+    "docsMobileScreenshotCaptured": true
+  },
+  "blockers": [],
+  "notes": [
+    "The production SPA loaded the canonical verified Sepolia release without a wallet.",
+    "Desktop and mobile screenshots are local smoke artifacts; only their public-safe viewport and digest metadata are committed.",
+    "No wallet secrets, RPC credentials, confidential values, handles, proofs, or signatures are recorded."
+  ]
+}

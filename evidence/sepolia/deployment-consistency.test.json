@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "suite": "test-deployment-consistency",
+  "recordedAt": "2026-07-25T17:01:32.127Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111
+  },
+  "publicIdentifiers": {
+    "contracts": {
+      "VeilBidTestUSDC": "0xb08d9a2d1185f19539a7e36c5e924ff9c5b140f5",
+      "VeilBidConfidentialUSDC": "0x8cce8d9a130380b410b0d3765d904089b3faa2a5",
+      "VeilBidMarket": "0xb7d29544bf11abfd16d8dbcd1209c7ceba973cba",
+      "VeilBidAwardReceipt": "0x4Ba43a46078F8f7EF9127A55F08457114BfBF472",
+      "VeilBidSafePreparationModule": "0x10fdf4c547e8483db3503f79b3c33ed15a1b9cba",
+      "VeilBidDemoSafe": "0xC85A99090106725B55bE1d522ab51bf7BD44B752"
+    },
+    "runtimeCodeHashes": {
+      "VeilBidTestUSDC": "0x324c98394a4ed37ef72f8776fe1fed3ce7d86005c3fa754a5df58585d2fcc279",
+      "VeilBidConfidentialUSDC": "0x036579db657d76e2df69bfe72a1281cde4b3dc6a6266739d161940e835f7ab40",
+      "VeilBidMarket": "0x4cd9e4350ab8924f2a4e29f2593ab7b94113b5626897ad13bc91ba100eae5ca7",
+      "VeilBidAwardReceipt": "0xa40ca6e4b7fec6be987346977f7129fcd9c2c4e302a2b0ae536b86365b8e6303",
+      "VeilBidSafePreparationModule": "0x37a1b94c24d42fd9fced3e6efaf231264c8165a38378919379dd54ee45d04052",
+      "VeilBidDemoSafe": "0xd7d408ebcd99b2b70be43e20253d6d92a8ea8fab29bd3be7f55b10032331fb4c"
+    },
+    "runtimeCodeBytes": {
+      "VeilBidTestUSDC": "1881",
+      "VeilBidConfidentialUSDC": "8944",
+      "VeilBidMarket": "11117",
+      "VeilBidAwardReceipt": "4106",
+      "VeilBidSafePreparationModule": "3125",
+      "VeilBidDemoSafe": "171"
+    },
+    "deploymentTransactions": {
+      "VeilBidTestUSDC": "0x2c40466d647e00a95de3485c0e54f37c671764ec1fb22778d0b6ca664d54b237",
+      "VeilBidConfidentialUSDC": "0xbbbb492abc98fedf08c41e8dbafd280a908319462edfaaa20dda83b1cd2cfc41",
+      "VeilBidMarket": "0x12f37b327ca8c8ff5a071acb6003f897de087d7e5ed12cd454403899a7872d06",
+      "VeilBidSafePreparationModule": "0xf176db550609a9964fd1f0c3b9b4ae353989a336c0d065fcd281bc6af2314b17",
+      "VeilBidAwardReceipt": "0x12f37b327ca8c8ff5a071acb6003f897de087d7e5ed12cd454403899a7872d06",
+      "VeilBidDemoSafe": "0x2d6a5100611b4e2db61972509671d080a73cf9b9ec58dd56237f54669d297b45"
+    },
+    "blocks": {
+      "VeilBidTestUSDC": "11348863",
+      "VeilBidConfidentialUSDC": "11348864",
+      "VeilBidMarket": "11348865",
+      "VeilBidSafePreparationModule": "11348939",
+      "VeilBidAwardReceipt": "11348865",
+      "VeilBidDemoSafe": "11348749"
+    }
+  },
+  "assertions": {
+    "chainIdVerified": true,
+    "allRuntimeCodePresent": true,
+    "runtimeBytecodeMatchesArtifacts": true,
+    "deploymentReceiptsVerified": true,
+    "marketRelationshipsVerified": true,
+    "wrapperConfigurationVerified": true,
+    "moduleConfigurationVerified": true,
+    "safeConfigurationVerified": true,
+    "cleanupStateVerified": true,
+    "manifestRemainsUnverified": true
+  },
+  "blockers": [],
+  "notes": [
+    "Runtime comparisons mask Solidity immutable slots and separately verify every immutable relationship through public getters.",
+    "This verifies consistency of the E2E test deployment; it does not publish explorer source verification or promote the deployment to release status."
+  ]
+}

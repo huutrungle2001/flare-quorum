@@ -1,0 +1,11 @@
+{
+  "buildCommand": "pnpm --filter @veilbid/chain-bindings build && pnpm --filter @veilbid/tender-room build",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "apps/web/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "gate": "E",
+  "recordedAt": "2026-07-25T16:09:46Z",
+  "environment": {
+    "network": "compile-only",
+    "runtime": "solc-0.8.35"
+  },
+  "packages": {
+    "safeProtocolKit": "8.0.4",
+    "safeAccount": "1.4.1"
+  },
+  "assertions": {
+    "contractsCompiled": true,
+    "moduleExecutionSelectorsAbsent": true,
+    "typescriptChecksPassed": true,
+    "sepoliaRuntimeExecuted": false
+  },
+  "blockers": [],
+  "notes": [
+    "The preparation module ABI contains no Safe execution or arbitrary execute function.",
+    "Safe authority, funding, nonce binding, and revoke assertions remain pending on Sepolia."
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "suite": "safe-confidential-unwrap",
+  "recordedAt": "2026-07-27T12:27:08.492Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "safe-1.4.1-and-official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "owner": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "safe": "0xBF39C8C9C196f1a06bB122abea350eC63AB3fbA0",
+    "contracts": {
+      "Token": "0xeE9A2B02C8700596b4814923c4086786c63A9D01",
+      "Wrapper": "0xE55b2f4630E9b1d48C7Fd8001527BA5dCD9192b1",
+      "SafeUnwrapPreparation": "0x779bacA165500e34aF65BF01AF4C2F2a997C9ff9"
+    },
+    "transactions": {
+      "fundSafe": "0xe55aed3270af7dde63e99ae604691c4d3230361965532b4e36121058c177a73b",
+      "partialUnwrapSafe": "0xe978067c4635e5a960c4c711f257860f4db6bce4497654eceb3b8e792e4532e1",
+      "partialFinalize": "0xe645bccabc9cea99b15c6314175b3952722f2c26ea6b8ddd46bf0e180a85f567",
+      "fullUnwrapSafe": "0xf4dfa3085a07b8da76a4f7084c0ba71317d0f66537b8b9825d8ae5fd42acb53e",
+      "fullFinalize": "0x296dea7c1b0703768baefcc44a1d2d5dfdc357ecf0a97ea6116895dcf3bec848"
+    },
+    "blocks": {
+      "fundSafe": "11361609",
+      "partialUnwrapSafe": "11361610",
+      "partialFinalize": "11361612",
+      "fullUnwrapSafe": "11361613",
+      "fullFinalize": "11361615"
+    }
+  },
+  "assertions": {
+    "releaseManifestVerified": true,
+    "preparationBoundToCanonicalWrapper": true,
+    "safeAuthorityVerified": true,
+    "fundingUsedSafeThresholdBatch": true,
+    "partialPreparationAndUnwrapAtomic": true,
+    "partialNonceAndHandleReplayProtected": true,
+    "partialRequestCreated": true,
+    "partialAmountVerifiedInMemory": true,
+    "partialFinalizationReleasedExactAmount": true,
+    "fullUnwrapUsedSafeThresholdBatch": true,
+    "fullRequestCreated": true,
+    "fullAmountVerifiedPositiveInMemory": true,
+    "fullFinalizationReleasedExactAmount": true,
+    "safeAuthorityPreserved": true
+  },
+  "blockers": [],
+  "notes": [
+    "A threshold-authorized Safe batch funds test vcUSDC before exercising partial and full unwrap.",
+    "Partial unwrap validates an owner-encrypted amount through the dedicated preparation adapter and consumes it atomically in the same Safe transaction.",
+    "Full unwrap consumes the Safe's current confidential balance handle without first revealing the balance.",
+    "Decrypted amounts are asserted only in memory. Balances, handles, proofs, signatures, RPC credentials, and private keys are omitted."
+  ]
+}

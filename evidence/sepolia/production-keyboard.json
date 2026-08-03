@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "suite": "production-keyboard-navigation",
+  "recordedAt": "2026-07-28T17:42:28.332Z",
+  "publicIdentifiers": {
+    "testCommit": "5b8abc43a05e1c796b027c044016b65a88243332",
+    "deploymentSourceCommit": "5b8abc43a05e1c796b027c044016b65a88243332",
+    "deploymentId": "HcBrVP8PDVBrtphHnE7opN6g6fNB",
+    "canonicalUrl": "https://veilbid-three.vercel.app",
+    "browser": "Google Chrome 149.0.7827.200",
+    "viewport": "1280x900"
+  },
+  "observations": {
+    "expectedFocusOrder": [
+      "SKIP TO CONTENT",
+      "VEILBID",
+      "TENDERS",
+      "DOCS",
+      "◇CONNECT WALLET"
+    ],
+    "observedFocusOrder": [
+      "SKIP TO CONTENT",
+      "VEILBID",
+      "TENDERS",
+      "DOCS",
+      "◇CONNECT WALLET"
+    ],
+    "activeRouteSequence": [
+      "DOCS",
+      "TENDERS"
+    ],
+    "docsContrast": {
+      "checked": 226,
+      "failures": []
+    }
+  },
+  "assertions": {
+    "primaryNavigationKeyboardReachable": true,
+    "everyFocusTargetVisible": true,
+    "everyFocusIndicatorVisible": true,
+    "skipLinkVisibleOnFocus": true,
+    "walletSelectorOpenedByKeyboard": true,
+    "reverseTraversalReturnedToDocs": true,
+    "docsActivatedByKeyboard": true,
+    "docsSidebarRemainsSticky": true,
+    "docsTextMeetsWcagContrast": true,
+    "tenderWorkspaceNavigationRemainsSticky": true,
+    "publicMetadataBadgeHasExplicitContrast": true,
+    "headerPersistedAcrossRoutes": true
+  },
+  "blockers": [],
+  "notes": [
+    "A real headless Chrome session used Tab, Shift+Tab, Enter, Space, and Escape to traverse the production navigation and wallet selector.",
+    "The smoke records public labels and route assertions only; it does not connect a wallet or access confidential state."
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veilbid.local/schemas/feasibility.schema.json",
+  "title": "VeilBid sanitized feasibility evidence",
+  "type": "object",
+  "required": ["schemaVersion", "gate", "recordedAt", "assertions", "blockers"],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "gate": {
+      "enum": ["PREFLIGHT", "A", "B", "C", "D", "E"]
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "environment": {
+      "type": "object"
+    },
+    "packages": {
+      "type": "object"
+    },
+    "publicIdentifiers": {
+      "type": "object"
+    },
+    "assertions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "gate": "B",
+  "recordedAt": "2026-07-25T14:57:19Z",
+  "environment": {
+    "network": "local-hardhat",
+    "runtime": "official-nox-hardhat-plugin"
+  },
+  "assertions": {
+    "contractCompiled": true,
+    "deterministicModelCasesPassed": true,
+    "noPlaintextShadowStateFound": true,
+    "officialRuntimeExecuted": false,
+    "encryptedValidMinimumVerified": false,
+    "encryptedInvalidBidExclusionVerified": false,
+    "encryptedTiePriorityVerified": false,
+    "encryptedPermutationMinimumVerified": false
+  },
+  "blockers": [
+    "DOCKER_REQUIRED_FOR_LOCAL_NOX"
+  ],
+  "notes": [
+    "The deterministic model passed 2000 generated bid sets.",
+    "Representative encrypted runtime cases compile but did not execute because the official plugin could not connect to Docker.",
+    "No mock runtime or plaintext production-state fallback was used."
+  ]
+}

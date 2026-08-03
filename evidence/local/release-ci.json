@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "suite": "clean-environment-release-ci",
+  "recordedAt": "2026-07-25T19:53:51.000Z",
+  "publicIdentifiers": {
+    "provider": "github-actions",
+    "workflow": "Release CI",
+    "event": "push",
+    "runId": "30172407364",
+    "jobId": "89715611334",
+    "sourceCommit": "5258186c05d19c998d434004df9a7e45932bad3a",
+    "url": "https://github.com/huutrungle2001/Veilbid/actions/runs/30172407364",
+    "runner": "ubuntu-latest",
+    "nodeVersion": "24.18.0",
+    "pnpmVersion": "10.33.0"
+  },
+  "assertions": {
+    "fullHistoryCheckoutPassed": true,
+    "lockedInstallPassed": true,
+    "cleanContractCompilationPassed": true,
+    "workspaceTestsPassed": true,
+    "typedLintPassed": true,
+    "releaseBuildPassed": true,
+    "bindingDriftCheckPassed": true,
+    "fullHistorySecretScanPassed": true,
+    "evidenceValidationPassed": true,
+    "node24ActionRuntimesUsed": true
+  },
+  "blockers": [],
+  "notes": [
+    "The successful run started from a fresh GitHub-hosted runner with no local build artifacts or environment file.",
+    "An earlier run exposed a missing chain-bindings build dependency; root test, lint, relay, MCP, and UI commands now build that dependency explicitly.",
+    "The final run completed without the deprecated Node.js 20 action-runtime annotation."
+  ]
+}

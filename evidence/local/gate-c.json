@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "gate": "C",
+  "recordedAt": "2026-07-25T15:00:52Z",
+  "environment": {
+    "network": "local-hardhat",
+    "runtime": "official-nox-hardhat-plugin"
+  },
+  "assertions": {
+    "contractCompiled": true,
+    "finalizeAcceptsProofOnly": true,
+    "officialRuntimeExecuted": false,
+    "winnerOnlyPubliclyDecryptable": false,
+    "correctProofVerified": false,
+    "tamperedProofRejected": false,
+    "wrongTenderRejected": false,
+    "replayRejected": false,
+    "reloadRecoveryVerified": false
+  },
+  "blockers": [
+    "DOCKER_REQUIRED_FOR_LOCAL_NOX"
+  ],
+  "notes": [
+    "Package inspection confirmed that Nox.publicDecrypt derives plaintext from the signed decryption proof.",
+    "The spike accepts no client-provided plaintext winner.",
+    "Runtime proof and recovery assertions compile but require the official Docker-backed Nox stack."
+  ]
+}

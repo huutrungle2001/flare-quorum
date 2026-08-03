@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-07-25T18:25:45Z",
+  "network": "ethereum-sepolia",
+  "chainId": 11155111,
+  "implementationCommit": "7e06942",
+  "observedFinalizedBlock": "11349379",
+  "deploymentVerified": false,
+  "publicTenderCount": 5,
+  "tools": [
+    "list_tenders",
+    "get_tender",
+    "explain_tender_readiness",
+    "inspect_settlement_evidence",
+    "inspect_bid_viewer"
+  ],
+  "assertions": {
+    "stdioHandshakePassed": true,
+    "strictInputValidationPassed": true,
+    "publicSepoliaQueryPassed": true,
+    "signerSurfaceAbsent": true,
+    "writeSurfaceAbsent": true,
+    "privateDecryptionSurfaceAbsent": true,
+    "encryptedHandlesReturned": false,
+    "rawProviderErrorsReturned": false
+  },
+  "notes": [
+    "The server is read-only by construction and exposes no opt-in signer implementation.",
+    "The reusable E2E deployment remains explicitly unverified; release verification is still pending."
+  ]
+}

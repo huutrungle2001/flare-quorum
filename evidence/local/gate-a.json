@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "gate": "A",
+  "recordedAt": "2026-07-25T14:53:49Z",
+  "environment": {
+    "network": "local-hardhat",
+    "runtime": "official-nox-hardhat-plugin"
+  },
+  "assertions": {
+    "contractCompiled": true,
+    "officialRuntimeExecuted": false,
+    "crossBlockReuseVerified": false,
+    "contractAclPersisted": false,
+    "vendorDecryptVerified": false,
+    "sepoliaTransactionPairVerified": false
+  },
+  "blockers": [
+    "DOCKER_REQUIRED_FOR_LOCAL_NOX",
+    "SEPOLIA_CONFIGURATION_MISSING"
+  ],
+  "notes": [
+    "The official plugin stopped before tests because it could not connect to a Docker daemon.",
+    "No mock runtime or success fallback was used."
+  ]
+}

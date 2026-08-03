@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "gate": "C",
+  "recordedAt": "2026-07-25T15:44:46.118Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "secondVendor": "0x4d2809486012076B2212C829742BD95eF5992dB0",
+    "contracts": {
+      "primaryTender": "0xf4ebe24b510a7b61465ea4f5280537f45a02c8cd",
+      "bindingTender": "0x391b3bf6a4f1641b012e8e5a39c2f60b683c549e"
+    },
+    "transactions": {
+      "fundSecondVendor": "0xdcac78f5a6e94e56f9f9a3c0ea4f265e55325293b952241e47ffc89be89812b7",
+      "deployprimaryTender": "0x91c685ed299fa7b57c20fd7f6d49ce2b2fd4c5ee8e8971cc56975902729b0411",
+      "deploybindingTender": "0xc2d0974b108d00ac2de2f4d92b6bfd8b07793a1130c6d1c3e9dbb9e129a7f24f",
+      "primaryBidOne": "0x9b7d835d0488a911b4e5fd40f2dd899b6e97df82a850328ddeca4c2ef0805c8b",
+      "primaryBidTwo": "0x265b83dfbd39cacfc2a3a628d3a405fb6dbfc252c2233fcd82a6b5468b8c8d7e",
+      "bindingBid": "0x7b3034bdb2ee72f788f75542995eb72c580647d5286ab6bc64674bcb6c4bd990",
+      "primaryClose": "0xcf7ef29fb5a75bd40d5596eccbe972459abb21c65d4cc9d481283e0a0ab8275d",
+      "bindingClose": "0xa64b9e0e9812cc7857810a72dc2d7e10a73db12b12169a0bac343b7f28bcb86e",
+      "finalize": "0xa84f824d50647cdf5a6ce269203704a65f7a6bedec9286d77684c7fdd81596ec"
+    },
+    "blocks": {
+      "fundSecondVendor": "11348616",
+      "deployprimaryTender": "11348617",
+      "deploybindingTender": "11348618",
+      "primaryBidOne": "11348620",
+      "primaryBidTwo": "11348621",
+      "bindingBid": "11348622",
+      "primaryClose": "11348623",
+      "bindingClose": "11348624",
+      "finalize": "11348626"
+    }
+  },
+  "assertions": {
+    "contractsDeployed": true,
+    "winnerOnlyPubliclyDecryptable": true,
+    "correctProofVerified": true,
+    "tamperedProofRejected": true,
+    "wrongTenderRejected": true,
+    "replayRejected": true,
+    "reloadRecoveryVerified": true,
+    "storedWinnerVerified": true
+  },
+  "blockers": [],
+  "notes": [
+    "Confidential inputs, handles, decrypted values, proofs, signatures, and wallet secrets were kept out of this artifact.",
+    "The secondary test wallet secret is stored only in ignored local environment configuration."
+  ]
+}

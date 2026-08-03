@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "suite": "production-market-safe",
+  "recordedAt": "2026-07-25T16:50:35.938Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "safe-1.4.1-and-official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "owner": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "safe": "0xC85A99090106725B55bE1d522ab51bf7BD44B752",
+    "tenderId": "4",
+    "contracts": {
+      "Market": "0xb7d29544bf11abfd16d8dbcd1209c7ceba973cba",
+      "Underlying": "0xb08d9a2d1185f19539a7e36c5e924ff9c5b140f5",
+      "Wrapper": "0x8cce8d9a130380b410b0d3765d904089b3faa2a5",
+      "Module": "0x10fdf4c547e8483db3503f79b3c33ed15a1b9cba"
+    },
+    "transactions": {
+      "deployModule": "0xf176db550609a9964fd1f0c3b9b4ae353989a336c0d065fcd281bc6af2314b17",
+      "enableModule": "0x64bdece9659330f6681eb929c9ffc33f6bcd3e8dcfae247b37066e9b2c087553",
+      "configureMarket": "0x2d5f6d8a651f5d66642549d59ef4546769c8865972c5be3fbbe87641cd4d907c",
+      "authorizeMarket": "0x177f91c75d48c7b0fc2a3bbf3fff96744bb9dc1e7e24d4533e59e9e777d517f5",
+      "faucet": "0x7a08ab5cc237ba08ce94595f04cfe8856e014528d48d18f9e226f0c544c0cd03",
+      "approveWrapper": "0xe3b52b1d5ba6a846802cc149004d01a2ad3ac05ccd165c695b7f25bed3f44e33",
+      "wrapToSafe": "0x9bfeb6c73dfb05c0d3f98c9491a5c8a258b53ce9504364f617a3250a18f9c454",
+      "prepareInput": "0x84186b5524b91b015e68d6d4bcbacb03a84e708d7dd1f07501c19b849ea79309",
+      "safeCreateTender": "0xfa7e1165e81420b976373bf7ab7455b541adb23c0b27011b7f3944926c930f5d",
+      "confirmFunding": "0x8ea303923b3c3263de9c7d709ca5eaef1859c5ac8c53fa22c9a56191e2e32c23",
+      "safeCancelTender": "0x1d1e9505b46b017863415de6428b38c7f13964db15e4da0a45f00ab9e714193d",
+      "disableModule": "0xce14727d413d88b1ad9bab2287551239985ec3da54303fdf60041c7c2ed31d4b",
+      "revokeMarketOperator": "0x68f1b43faafdecedd13bb6e5369a1a36268edfb7cada273ff224daf2769b514e"
+    },
+    "blocks": {
+      "deployModule": "11348939",
+      "enableModule": "11348940",
+      "configureMarket": "11348941",
+      "authorizeMarket": "11348942",
+      "faucet": "11348943",
+      "approveWrapper": "11348944",
+      "wrapToSafe": "11348945",
+      "prepareInput": "11348946",
+      "safeCreateTender": "11348948",
+      "confirmFunding": "11348949",
+      "safeCancelTender": "11348950",
+      "disableModule": "11348951",
+      "revokeMarketOperator": "11348953"
+    }
+  },
+  "assertions": {
+    "productionModuleDeployed": true,
+    "moduleEnabledBySafe": true,
+    "marketConfiguredBySafe": true,
+    "marketOperatorAuthorizedBySafe": true,
+    "fullTenderTermsBound": true,
+    "wrongActionRejected": true,
+    "preparationDidNotMoveFunds": true,
+    "directOwnerCreateRejected": true,
+    "safeThresholdCreateFunded": true,
+    "exactFundingProofOpenedTender": true,
+    "safeThresholdCancelExecuted": true,
+    "preparedInputReplayRejected": true,
+    "safeAuthorityPreserved": true,
+    "cleanupRevokedModuleAndOperator": true
+  },
+  "blockers": [],
+  "notes": [
+    "Balances, handles, proofs, signatures, RPC credentials, and wallet secrets were omitted.",
+    "The threshold-1 Safe is the documented browser-demo configuration; all spending calls still used normal Safe transactions.",
+    "The production module and wrapper operator permission were removed after the suite."
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "suite": "canonical-release-gate",
+  "recordedAt": "2026-07-25T19:26:08.000Z",
+  "publicIdentifiers": {
+    "sourceCommit": "0f8b9db760bc7549aa4cd6760e9d4b36a794463a",
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "observedBlock": "11349691",
+    "deploymentKind": "release",
+    "deploymentVerified": true
+  },
+  "assertions": {
+    "allWorkspaceTestsPassed": true,
+    "allTypedLintPassed": true,
+    "contractCompilationPassed": true,
+    "viteBuildPassed": true,
+    "vinextBuildPassed": true,
+    "bindingDriftCheckPassed": true,
+    "sourceMappingCheckPassed": true,
+    "deploymentVerificationPassed": true,
+    "relayReleaseHealthPassed": true,
+    "relayDryRunPassed": true,
+    "repositorySecretScanPassed": true,
+    "evidenceValidationPassed": true
+  },
+  "notes": [
+    "The gate ran from the repository root using the documented test, lint, build, source, deployment, relay, secret, and evidence commands.",
+    "The relay discovered no pending finalized action after the canonical two-vendor lifecycle.",
+    "Docker-backed local Nox remains optional under the approved Sepolia-first strategy; real Nox behavior is evidenced on Ethereum Sepolia."
+  ]
+}

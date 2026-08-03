@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "suite": "generic-safe-onboarding",
+  "recordedAt": "2026-07-27T06:01:32.818Z",
+  "environment": {
+    "network": "ethereum-sepolia",
+    "chainId": 11155111,
+    "runtime": "safe-1.4.1-and-official-nox-testnet"
+  },
+  "publicIdentifiers": {
+    "owner": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "safe": "0xC85A99090106725B55bE1d522ab51bf7BD44B752",
+    "module": "0x9cfc89132f35bd8Fca41d06F0a9e149117bAa9F0",
+    "tenderId": "4",
+    "contracts": {
+      "Factory": "0x0Fd3E77A93BE3E1b05a17b2860D492f4244414d4",
+      "Market": "0x969F93642054130e87AFC8D380eec850617A6048",
+      "Token": "0xeE9A2B02C8700596b4814923c4086786c63A9D01",
+      "Wrapper": "0xE55b2f4630E9b1d48C7Fd8001527BA5dCD9192b1"
+    },
+    "transactions": {
+      "setupSafe": "0x0ff1728b2784d08071114a058716cc554d8f3280166aa2aa44a83e93230f891d",
+      "fundSafe": "0x5b16ca771fa94200213caf6dafaea549f106a1571a681fa65826b8836a282903",
+      "createTender": "0x5b5340cc4ee75845e14895fc12421c6d155255c267e76a27c97ee3005cb167e2"
+    },
+    "blocks": {
+      "setupSafe": "11359729",
+      "fundSafe": "11359730",
+      "createTender": "11359733"
+    }
+  },
+  "assertions": {
+    "factoryBoundToCanonicalMarket": true,
+    "moduleAddressDeterministic": true,
+    "setupUsedSafeThresholdBatch": true,
+    "moduleBoundToSelectedSafe": true,
+    "moduleEnabledBySelectedSafe": true,
+    "marketConfiguredBySelectedSafe": true,
+    "operatorAuthorizedBySelectedSafe": true,
+    "fundingUsedSafeThresholdBatch": true,
+    "confidentialBalancePresent": true,
+    "tenderUsedSafeThresholdBatch": true,
+    "tenderBuyerIsSelectedSafe": true,
+    "safeAuthorityPreserved": true
+  },
+  "blockers": [],
+  "notes": [
+    "The suite uses an independently deployed Sepolia test Safe owned by the release test account.",
+    "Setup, Safe-owned faucet/wrap, and tender creation all execute through normal Safe transactions.",
+    "Balances, handles, proofs, signatures, RPC credentials, private keys, and bid values are omitted."
+  ]
+}

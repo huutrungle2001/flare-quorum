@@ -1,0 +1,162 @@
+# VeilBid Flare Repository Layout
+
+> Status: Transition target. Historical workspaces exist; Flare workspaces are
+> created only after their feasibility gate begins.
+
+## 1. Target structure
+
+```text
+VeilBid/
+├── apps/
+│   ├── web/                 # shared UI, migrated to Coston2 judge path
+│   ├── relay/               # stateless public lifecycle automation
+│   ├── console/             # read-only public inspection
+│   └── fcc-extension/       # new FCC TEE extension and proxy integration
+├── packages/
+│   ├── flare-contracts/     # new Flare contracts/tests/deployments
+│   ├── flare-bindings/      # new generated Coston2/Flare bindings
+│   ├── contracts/           # historical Sepolia/Nox baseline
+│   └── chain-bindings/      # historical Sepolia/Nox bindings
+├── evidence/
+│   ├── coston2/             # new Summer Signal evidence
+│   ├── sepolia/             # historical pre-hackathon evidence
+│   ├── local/               # historical local baseline evidence
+│   └── schemas/
+├── tooling/scripts/
+├── docs/
+├── AGENTS.md
+├── DESIGNS.md
+├── README.md
+└── SECURITY.md
+```
+
+`apps/fcc-extension`, `packages/flare-contracts`,
+`packages/flare-bindings`, and `evidence/coston2` are planned paths and may not
+exist yet. Documentation must not imply otherwise.
+
+## 2. Workspace responsibilities
+
+### `apps/fcc-extension`
+
+New official-scaffold-based confidential-compute workspace:
+
+- canonical bid schema and command identifiers;
+- TEE-only decryption and deterministic selection;
+- minimal signed result construction;
+- structured allowlisted logs;
+- proxy/indexer integration and health;
+- extension unit, deterministic model, and Coston2 E2E tests.
+
+It must not hold wallet custody, submit a winner outside its deterministic rule,
+or persist plaintext bid state beyond the documented TEE lifecycle.
+
+### `packages/flare-contracts`
+
+New authority for:
+
+- `VeilBidFlareMarket` and award receipt;
+- FCC registry/instruction/result interfaces;
+- optional milestone/FAssets integrations;
+- unit, invariant, signature, adversarial, and Coston2 tests;
+- Flare deployment manifests, source publication, and verification;
+- artifact input for `packages/flare-bindings`.
+
+It imports no artifact or address from the historical Nox deployment.
+
+### `packages/flare-bindings`
+
+Generated boundary for Coston2/Flare addresses, ABIs, event codecs, public
+indexing, readiness, and domain types. Generated content comes only from
+verified Flare production artifacts and manifests.
+
+### `apps/web`
+
+Reused product shell and UX patterns, migrated to:
+
+- Coston2 wallet/network handling;
+- FCC identity/key discovery and encrypted bid submission;
+- Coston2 event-derived tender explorer;
+- public result/signature/extension evidence;
+- Flare asset funding and optional XRP-native journeys.
+
+During transition, legacy Sepolia code remains identifiable and must not be
+presented as the Flare judge path.
+
+### `apps/relay`
+
+Migrated stateless finalizer for close, FCC request, public result retrieval,
+and finalize. It contains no database, plaintext bid, TEE key, or winner logic.
+
+### `apps/console`
+
+Read-only public inspection. New tools may inspect extension identity, code
+version, result binding, Flare settlement, and evidence, but never decrypt bids
+or sign writes.
+
+### Historical baseline workspaces
+
+`packages/contracts` and `packages/chain-bindings` remain the exact Nox/Sepolia
+implementation. They support regression and prove what existed before Summer
+Signal. They are not inputs to Coston2 deployment or Flare bindings.
+
+## 3. Dependency direction
+
+```mermaid
+flowchart LR
+    FC[packages/flare-contracts] -->|generate| FB[packages/flare-bindings]
+    FB --> WEB[apps/web]
+    FB --> RELAY[apps/relay]
+    FB --> CONSOLE[apps/console]
+    EXT[apps/fcc-extension] -->|signed result schema| FC
+    FC -.->|public evidence| C2[evidence/coston2]
+    EXT -.->|sanitized evidence| C2
+    WEB -.->|sanitized smoke| C2
+
+    OLD[packages/contracts] --> OLD_BIND[packages/chain-bindings]
+    OLD -.-> SEP[evidence/sepolia]
+```
+
+Rules:
+
+- Result schemas and operation identifiers have one canonical shared source or
+  generated representation; Solidity and extension copies are drift-checked.
+- Flare contracts do not depend on the extension runtime.
+- Apps consume bindings through package exports, never relative source paths.
+- Evidence is output and never runtime state.
+- Historical and Flare deployment/binding graphs do not cross.
+
+## 4. Canonical ownership
+
+| Artifact | Target owner |
+|---|---|
+| Flare production Solidity | `packages/flare-contracts/src/` or chosen scaffold-equivalent |
+| Flare contract tests | `packages/flare-contracts/test/` |
+| Coston2 manifest | `packages/flare-contracts/deployments/coston2.release.json` |
+| FCC extension business logic | `apps/fcc-extension/` |
+| Canonical encrypted/result schemas | Flare shared schema source selected during Gate B |
+| Generated Flare bindings | `packages/flare-bindings/generated/` |
+| Coston2 public index | `packages/flare-bindings/src/index/` |
+| Browser-session bid plaintext | `apps/web` memory only |
+| Finalizer runtime | `apps/relay/` |
+| Public inspection tools | `apps/console/` |
+| Coston2 evidence | `evidence/coston2/` |
+| Historical Nox release | `packages/contracts`, `packages/chain-bindings`, `evidence/sepolia` |
+| Product/security/deployment truth | root docs and `docs/` |
+
+## 5. Root orchestration
+
+`pnpm-workspace.yaml` already discovers `apps/*` and `packages/*`, so new
+workspaces can be added without changing discovery. Root `flare:*` scripts will
+orchestrate only new Flare workspaces. Existing unprefixed scripts continue to
+exercise the historical baseline until a deliberate migration commit changes
+their authority.
+
+## 6. Generated and secret material
+
+Ignored outputs include build artifacts, caches, extension runtime state,
+proxy/Redis state, local environment files, tunnels, credentials, raw encrypted
+payloads, private evidence, and wallet/TEE/XRPL key material.
+
+Committed extension configuration may contain only public registry addresses,
+extension IDs, approved code/version hashes, TEE public identities/keys intended
+for clients, and sanitized deployment identifiers.

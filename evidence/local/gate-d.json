@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "gate": "D",
+  "recordedAt": "2026-07-25T15:07:20Z",
+  "environment": {
+    "network": "local-hardhat",
+    "runtime": "official-nox-hardhat-plugin"
+  },
+  "assertions": {
+    "contractCompiled": true,
+    "officialWrapperIntegrated": true,
+    "typescriptChecksPassed": true,
+    "officialRuntimeExecuted": false,
+    "exactFundingProofVerified": false,
+    "underfundedAttemptRejected": false,
+    "singleWinnerRemainderVerified": false,
+    "singleFullRefundVerified": false,
+    "splitTransientAclVerified": false,
+    "splitWinnerRemainderVerified": false,
+    "splitFullRefundVerified": false,
+    "doubleSettlementRejected": false
+  },
+  "blockers": [
+    "DOCKER_REQUIRED_FOR_LOCAL_NOX"
+  ],
+  "notes": [
+    "The spike integrates the official ERC-7984 wrapper and compiles both single-contract and split-custody tests.",
+    "Official ERC-7984 source inspection shows that an underfunded transfer returns an encrypted zero rather than publicly reverting.",
+    "The spike therefore requires a public proof of an encrypted exact-budget equality before exposing funded state or allowing settlement.",
+    "The proof reveals only whether escrow equals the already-public ceiling; confidential balance and settlement values remain unsaved.",
+    "The official plugin stopped before tests because it could not connect to a Docker daemon. No mock runtime or success fallback was used."
+  ]
+}
