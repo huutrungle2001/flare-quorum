@@ -33,3 +33,14 @@ pnpm test:production https://veilbid-three.vercel.app
 review, Activity, and Safe writes always require an explicitly connected
 wallet. Tender Room does not determine winners or own canonical lifecycle
 state.
+
+## Coston2 migration boundary
+
+The Flare consumer adapters are isolated under `src/transactions/flareFunding.ts`
+and `src/public-market/loadFlareMarket.ts`. They use the generated Coston2
+bindings, require explicit `VITE_COSTON2_RPC_URL`,
+`VITE_FLARE_MARKET_ADDRESS`, and `VITE_FLARE_MARKET_DEPLOYMENT_BLOCK`, and fail
+closed when a verified release manifest is absent. They do not fall back to
+Sepolia data, fabricate FDC proofs, or enable writes from a planned market.
+The existing UI remains the historical Sepolia baseline until a verified
+Coston2 market and FCC gates authorize the final route switch.

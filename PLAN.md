@@ -165,6 +165,9 @@ selection and conserves the public escrow.
 - [x] Freeze the official Smart Account `0xFE` packed-user-operation builder and
   recovery `0xE0` memo encoder in the Flare bindings (local vectors only; no
   XRPL payment or FDC proof has been claimed).
+- [x] Add the official nested `IXRPPayment.Proof` binding, domain/memo/payment
+  validator, and `executeDirectMintingWithData` encoder (local codec vectors
+  only; no FDC proof has been claimed).
 - [ ] Obtain the FDC `XRPPayment` proof.
 - [ ] Execute `executeDirectMintingWithData` atomically.
 - [ ] Handle delayed mint, duplicate nonce, hash mismatch, and stuck-mint
@@ -176,6 +179,9 @@ custodial VeilBid signer.
 
 ### Phase 5 — product UI and automation
 
+- [x] Add fail-closed Coston2 public-market and XRP funding consumer adapters;
+  the browser route remains on the verified Sepolia baseline until a Flare
+  release manifest and live gates pass.
 - [ ] Replace the Sepolia judge path with verified Coston2 bindings.
 - [ ] Build XRP-native Buyer, EVM Buyer, Vendor, Public, Activity, and Evidence
   workspaces.
