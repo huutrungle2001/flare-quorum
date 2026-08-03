@@ -4,6 +4,7 @@ import awardReceiptAbiJson from "../generated/abis/VeilBidFlareAwardReceipt.json
 export * from "./protocol.js";
 export * from "./smart-account.js";
 export * from "./fdc.js";
+export * from "./fcc-result.js";
 
 export const coston2ChainId = 114;
 export const veilBidFlareMarketAbi = marketAbiJson as Abi;
