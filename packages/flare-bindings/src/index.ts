@@ -2,6 +2,7 @@ import type { Abi, Address, Hex } from "viem";
 import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { type: "json" };
 import awardReceiptAbiJson from "../generated/abis/VeilBidFlareAwardReceipt.json" with { type: "json" };
 export * from "./protocol.js";
+export * from "./smart-account.js";
 
 export const coston2ChainId = 114;
 export const veilBidFlareMarketAbi = marketAbiJson as Abi;

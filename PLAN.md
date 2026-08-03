@@ -162,6 +162,9 @@ selection and conserves the public escrow.
 - [ ] Derive the user's PersonalAccount and current nonce.
 - [ ] Build the approval + create/fund `PackedUserOperation`.
 - [ ] Commit the user-op hash in an XRPL testnet `0xFE` payment memo.
+- [x] Freeze the official Smart Account `0xFE` packed-user-operation builder and
+  recovery `0xE0` memo encoder in the Flare bindings (local vectors only; no
+  XRPL payment or FDC proof has been claimed).
 - [ ] Obtain the FDC `XRPPayment` proof.
 - [ ] Execute `executeDirectMintingWithData` atomically.
 - [ ] Handle delayed mint, duplicate nonce, hash mismatch, and stuck-mint
