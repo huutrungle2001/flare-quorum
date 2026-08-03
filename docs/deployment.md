@@ -157,8 +157,9 @@ fingerprints agree.
 
 ### Synchronize atomically
 
-- Generate `packages/flare-bindings/generated/` from the verified manifest and
-  exact artifacts.
+- Generate `packages/flare-bindings/generated/` from the Flare Foundry artifact
+  with `pnpm bindings:flare:generate`; the package remains `planned` until a
+  Coston2 deployment manifest and runtime verification are present.
 - Point web, relay, and console only at generated Coston2 bindings.
 - Commit manifest, source mapping, bindings, schemas, and sanitized evidence as
   one release unit; never rewrite an old release manifest.

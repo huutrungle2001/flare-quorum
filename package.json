@@ -20,6 +20,7 @@
   "scripts": {
     "build": "pnpm compile && pnpm bindings:check && pnpm docs:check && pnpm --filter @veilbid/fcc-extension --filter @veilbid/flare-contracts --filter @veilbid/flare-bindings --filter @veilbid/chain-bindings --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room build",
     "bindings:build": "pnpm --filter @veilbid/chain-bindings build",
+    "bindings:flare:generate": "pnpm --filter @veilbid/flare-contracts build && pnpm --filter @veilbid/flare-bindings generate",
     "bindings:check": "pnpm --filter @veilbid/auction-house bindings:check",
     "bindings:generate": "pnpm --filter @veilbid/auction-house bindings:generate",
     "compile": "pnpm --filter @veilbid/auction-house build",
