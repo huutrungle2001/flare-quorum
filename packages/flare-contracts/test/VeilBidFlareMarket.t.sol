@@ -344,6 +344,51 @@ contract FlareTokenMock is IERC20 {
             market.finalizeTender(tenderId, result, proofs);
         }
 
+        function testRejectsDuplicateResultSigner() external {
+            (
+                uint256 tenderId,
+                VeilBidFlareMarket.Tender memory tender,
+                VeilBidFlareMarket.SelectionResult memory result,
+                VeilBidFlareMarket.TeeActionProof[] memory proofs
+            ) = _preparedWinningSelection();
+            proofs[1] = _actionProof(result, tender.requestId, TEE_KEY_1);
+            vm.expectRevert(VeilBidFlareMarket.InvalidResult.selector);
+            market.finalizeTender(tenderId, result, proofs);
+        }
+
+        function testRejectsResultExpiryDriftEvenWithValidSignatures() external {
+            (
+                uint256 tenderId,
+                VeilBidFlareMarket.Tender memory tender,
+                VeilBidFlareMarket.SelectionResult memory result,
+                VeilBidFlareMarket.TeeActionProof[] memory proofs
+            ) = _preparedWinningSelection();
+            result.expiry += 1;
+            proofs[0] = _actionProof(result, tender.requestId, TEE_KEY_1);
+            proofs[1] = _actionProof(result, tender.requestId, TEE_KEY_2);
+            vm.expectRevert(VeilBidFlareMarket.InvalidResult.selector);
+            market.finalizeTender(tenderId, result, proofs);
+        }
+
+        function testFinalizationReplayCannotSettleTwice() external {
+            (
+                uint256 tenderId,
+                VeilBidFlareMarket.Tender memory tender,
+                VeilBidFlareMarket.SelectionResult memory result,
+                VeilBidFlareMarket.TeeActionProof[] memory proofs
+            ) = _preparedWinningSelection();
+            market.finalizeTender(tenderId, result, proofs);
+            vm.expectRevert(
+                abi.encodeWithSelector(
+                    VeilBidFlareMarket.InvalidStatus.selector,
+                    VeilBidFlareMarket.TenderStatus.ComputePending,
+                    VeilBidFlareMarket.TenderStatus.Awarded
+                )
+            );
+            market.finalizeTender(tenderId, result, proofs);
+            if (tender.buyer == address(0)) revert("invalid fixture");
+        }
+
         function testZeroWinnerRefundsEntireEscrow() external {
             uint256 tenderId = market.createTender(_terms());
             VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
@@ -389,6 +434,27 @@ contract FlareTokenMock is IERC20 {
                 teeKeyFingerprints: fingerprints,
                 ftsoFeedId: XRP_USD_FEED
             });
+        }
+
+        function _preparedWinningSelection()
+            private
+            returns (
+                uint256 tenderId,
+                VeilBidFlareMarket.Tender memory tender,
+                VeilBidFlareMarket.SelectionResult memory result,
+                VeilBidFlareMarket.TeeActionProof[] memory proofs
+            )
+        {
+            tenderId = market.createTender(_terms());
+            _submitReceipt(tenderId, TEE_KEY_1, teeIds[0]);
+            _submitReceipt(tenderId, TEE_KEY_2, teeIds[1]);
+            market.closeTender(tenderId);
+            market.requestSelection(tenderId);
+            tender = market.getTender(tenderId);
+            result = _winningResult(tenderId, tender);
+            proofs = new VeilBidFlareMarket.TeeActionProof[](2);
+            proofs[0] = _actionProof(result, tender.requestId, TEE_KEY_1);
+            proofs[1] = _actionProof(result, tender.requestId, TEE_KEY_2);
         }
 
         function _submitReceipt(uint256 tenderId, uint256 teeKey, address teeId) private {
