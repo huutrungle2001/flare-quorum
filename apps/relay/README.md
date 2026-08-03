@@ -36,6 +36,25 @@ FCC instruction fee. URLs with credentials, query strings, fragments, or
 non-TLS public transport are rejected. The finalizer has no bid-decryption
 capability and raw proxy bodies are bounded and never logged.
 
+### Ciphertext-only vendor ingress
+
+`flare-ingress-cli.js` is the server-side bridge between the browser and the
+three authenticated FCC `/direct` endpoints. `GET
+/flare/ingress/tenders/:tenderId/machines` publishes only the three public
+encryption keys after rereading one Coston2 block and matching the market's
+immutable manager, production status, extension ID, code hash, registered
+proxy URL, TEE identity, and frozen key fingerprint. `POST
+/flare/ingress/bids` accepts only the strict EIP-712-authorized ciphertext
+envelope and returns only the public action ID, target TEE ID, and expiry.
+
+The server authenticates the vendor before doing admission RPC reads, bounds
+request and proxy-response bodies, rate limits the socket peer, uses exact
+origin CORS, keeps all three `/direct` API keys server-side, disables redirects,
+and strips the proxy response that contains the ciphertext. It never persists
+or logs a request body. A vendor calls the endpoint separately for all three
+tender-frozen machines, obtains three TEE-signed receipts through the result
+flow, and submits the atomic receipt set on-chain.
+
 ## Commands
 
 Build first, then load the root `.env.local`:
@@ -52,6 +71,9 @@ pnpm flare:relay:health
 pnpm flare:relay:dry-run
 pnpm flare:relay:once
 pnpm flare:relay:poll
+
+# Ciphertext-only FCC ingress server
+pnpm flare:ingress
 ```
 
 The Coston2 commands use:
@@ -66,6 +88,13 @@ FLARE_FCC_PROXY_URLS                    # exactly three comma-separated URLs
 FLARE_FCC_EXTENSION_VERSION
 FLARE_FCC_INSTRUCTION_FEE_WEI
 FLARE_ACTION_BUDGET                     # 1 by default, maximum 100
+
+# Additional server-only ingress configuration
+FLARE_TEE_MANAGER                       # verified market constructor binding
+FLARE_FCC_DIRECT_API_KEYS               # three comma-separated values; never VITE_*
+FLARE_INGRESS_WEB_ORIGIN                # exact HTTPS web origin
+FLARE_INGRESS_HOST                      # loopback by default
+FLARE_INGRESS_PORT                      # 8788 by default; PORT is fallback
 ```
 
 `health` and `dry-run` remain read-only. `once` and `poll` are intentionally

@@ -23,9 +23,10 @@ flowchart LR
     SA -->|mint FXRP + approve + create/fund| Market[VeilBidFlareMarket]
 
     EVM[EVM buyer recovery path] --> Market
-    Vendor[Approved vendor] -->|ECIES private ingress| P1[TEE proxy 1]
-    Vendor -->|ECIES private ingress| P2[TEE proxy 2]
-    Vendor -->|ECIES private ingress| P3[TEE proxy 3]
+    Vendor[Approved vendor] -->|EIP-712 + ECIES ciphertext only| Ingress[Stateless ingress gateway]
+    Ingress -->|authenticated /direct| P1[TEE proxy 1]
+    Ingress -->|authenticated /direct| P2[TEE proxy 2]
+    Ingress -->|authenticated /direct| P3[TEE proxy 3]
 
     P1 --> T1[Registered TEE 1]
     P2 --> T2[Registered TEE 2]
@@ -89,12 +90,21 @@ The vendor:
    identities/keys;
 2. encodes `BID_SCHEMA_V1` deterministically with a strong random salt;
 3. ECIES-encrypts separately to each selected machine;
-4. submits through authenticated HTTPS private ingress;
+4. signs a short-lived EIP-712 authorization over each ciphertext hash and
+   submits through the HTTPS ciphertext-only gateway; the gateway rereads the
+   frozen manager/machine/key bindings and supplies the server-only `/direct`
+   API key;
 5. receives signed `BID_RECEIPT_V1` responses;
 6. submits the receipt set to the market before deadline.
 
 Each TEE decrypts and validates only inside confidential execution, then seals
 the bid. Public receipts contain commitment/binding only.
+
+The gateway can observe ciphertext and traffic metadata but has no decryption
+key. It keeps no bid database, never logs or returns ciphertext, rejects
+plaintext-shaped fields, and returns only the proxy action ID needed to poll a
+TEE-signed receipt. Its three proxy URLs must exactly match the registered
+machine URLs at the same Coston2 block used for key discovery/admission.
 
 ### Common quorum
 

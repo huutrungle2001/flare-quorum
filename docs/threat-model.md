@@ -1,7 +1,7 @@
 # VeilBid Flare Championship Threat Model
 
-> Status: accepted target security model for the planned Coston2 release.
-> Implementation, review, and live evidence have not started. The historical
+> Status: accepted security model with local implementation and adversarial
+> tests in progress; live Coston2 review/evidence has not started. Historical
 > Sepolia/Nox evidence does not establish the security of this architecture.
 
 ## 1. Security objectives
@@ -28,7 +28,7 @@ VeilBid Flare aims to:
 | Asset/data | Intended visibility | Authority |
 |---|---|---|
 | Bid price, delivery, warranty, credentials, salt | Private | Submitting vendor and approved TEE quorum |
-| Encrypted bid transport payload | Private in transit; never committed on-chain | Vendor and target TEE connection |
+| Encrypted bid transport payload | Confidential ciphertext; never committed on-chain or retained | Vendor, ciphertext-only gateway, proxy, and target TEE connection |
 | Sealed bid state | Opaque outside confidential runtime | Tender-fixed TEE identity/code policy |
 | Salted commitment, vendor, receipt bitmap, timing | Public | Canonical market contract |
 | TEE encryption/signing secrets | Private | FCC-attested TEE boundary |

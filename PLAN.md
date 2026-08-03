@@ -202,7 +202,8 @@ custodial VeilBid signer.
   quorum, rule version, FTSO snapshot, and result digest.
 - [ ] Build sealed bid composer with no plaintext persistence.
 - [ ] Build public result/settlement and FXRP redemption journey.
-- [ ] Implement stateless close/request/result/finalize relay.
+- [x] Implement and unit-test stateless close/request/result/finalize relay and
+  ciphertext-only vendor ingress; live Coston2 operation remains pending.
 - [ ] Add explicit RPC/FCC/proxy/FDC/FTSO unavailable and recovery states.
 - [ ] Complete responsive, keyboard, reduced-motion, and privacy-copy review.
 

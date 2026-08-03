@@ -96,6 +96,15 @@ COSTON2_DA_LAYER_URL=https://ctn2-data-availability.flare.network
 FLARE_FUNDING_EXECUTOR_PRIVATE_KEY=0x...
 ```
 
+The vendor ingress is a separate server process (`pnpm flare:ingress`) and is
+enabled only for a verified market. It additionally requires the verified
+`FLARE_TEE_MANAGER`, exactly three `FLARE_FCC_PROXY_URLS`, their matching three
+server-only `FLARE_FCC_DIRECT_API_KEYS`, and an exact
+`FLARE_INGRESS_WEB_ORIGIN`. API keys must be injected through local/host secret
+storage and must never be placed in `VITE_*`, logs, evidence, or screenshots.
+The configured proxy order must match the tender's frozen TEE order and each
+URL must equal that machine's on-chain registered URL.
+
 Generate the ignored runtime proxy configuration with
 `pnpm flare:proxy:config`. The command writes
 `.local/fcc/extension-proxy.coston2.toml` with mode `0600`, does not print any
