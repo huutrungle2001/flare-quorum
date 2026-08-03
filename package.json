@@ -73,6 +73,8 @@
     "flare:relay:health": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js health",
     "flare:relay:dry-run": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js dry-run",
     "flare:relay:once": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js once",
-    "flare:relay:poll": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js poll"
+    "flare:relay:poll": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js poll",
+    "flare:funding:health": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-funding-cli.js health",
+    "flare:funding:execute": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-funding-cli.js execute"
   }
 }

@@ -98,10 +98,10 @@ accounting layer is research scope and must not be described as shipped.
 |---|---|---|
 | Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Implemented/tested locally; live extension pending |
 | Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Market tested locally; Gate-A sender live; release pending |
-| FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Planned, mandatory |
-| Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Planned, mandatory |
+| FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Direct-mint executor implemented/tested locally; live lifecycle pending |
+| Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Request/fee/round/DA proof path implemented/tested locally; live proof pending |
 | FTSOv2 | Freeze XRP/USD close snapshot for XRP/USD bid normalization | Planned, mandatory |
-| Flare Smart Accounts | Atomically mint FXRP and create/fund tender from an XRPL instruction | Planned, mandatory |
+| Flare Smart Accounts | Atomically mint FXRP and create/fund tender from an XRPL instruction | Exact `0xFE` batch and receipt verifier implemented/tested locally; live execution pending |
 | Multi-TEE threshold | Fixed three-machine bid custody and two matching selection results | Planned championship gate |
 
 Every integration must be exercised by the single flagship product journey and

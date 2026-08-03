@@ -1,5 +1,9 @@
 export * from "./config.js";
 export * from "./flare-config.js";
+export * from "./flare-funding-config.js";
+export * from "./flare-funding-chain.js";
+export * from "./flare-funding-executor.js";
+export * from "./flare-funding-job.js";
 export * from "./flare-live.js";
 export * from "./flare-lifecycle.js";
 export * from "./flare-results.js";
@@ -8,3 +12,4 @@ export * from "./logger.js";
 export * from "./planner.js";
 export * from "./runner.js";
 export * from "./types.js";
+export * from "./xrpl-finality.js";

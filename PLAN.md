@@ -170,6 +170,11 @@ selection and conserves the public escrow.
 - [x] Add the official nested `IXRPPayment.Proof` binding, domain/memo/payment
   validator, and `executeDirectMintingWithData` encoder (local codec vectors
   only; no FDC proof has been claimed).
+- [x] Implement the dedicated fail-closed funding executor: XRPL three-ledger
+  finality, registry discovery, live FDC fee/request/round/finalization, DA raw
+  proof decoding, fee-aware amount validation, PersonalAccount/nonce checks,
+  exact approve/create batch, delayed-mint classification, and three-event
+  success proof (local production-shaped tests only; Gate G remains unrun).
 - [ ] Obtain the FDC `XRPPayment` proof.
 - [ ] Execute `executeDirectMintingWithData` atomically.
 - [ ] Handle delayed mint, duplicate nonce, hash mismatch, and stuck-mint
@@ -305,7 +310,7 @@ the championship product and requires Product Plan approval.
 | FCC private ingress | LOCAL IMPLEMENTATION — official direct envelope, loopback decrypt/sign, sealed ciphertext restart/replay tests; no live proxy/TEE proof |
 | Multi-TEE quorum | NOT STARTED |
 | Flare contracts | LOCAL FEASIBILITY — foundation sender plus FCC/FTestXRP/FTSO market lifecycle tests pass; no live deployment |
-| FAssets/FDC/Smart Account journey | NOT STARTED |
+| FAssets/FDC/Smart Account journey | LOCAL EXECUTOR COMPLETE — live registry/FDC/direct-mint bindings pass; real XRPL payment, FDC proof, and Gate G execution pending |
 | FTSO scoring | LOCAL GO MODEL — checked XRP/USD conversion, credentials, penalties, and tie tests pass; not wired to FCC |
 | Coston2 deployment/evidence | NOT STARTED |
 | User research/traction | NOT STARTED |

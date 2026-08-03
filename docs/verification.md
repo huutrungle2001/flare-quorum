@@ -37,6 +37,11 @@ No later gate converts an earlier failure into success. Private ingress, FCC
 selection, FTestXRP conservation, and the XRP-native flagship path are product
 stop conditions defined in [`PLAN.md`](../PLAN.md).
 
+Gate G now has a locally tested production-shaped executor and ABI drift suite,
+but remains `NOT RUN`: only a real XRPL testnet payment, Coston2 FDC request and
+proof, AssetManager direct mint, Smart Account execution, and market tender
+receipt can change that status.
+
 ## 3. Mandatory release matrix
 
 | Area | Passing condition | Status |

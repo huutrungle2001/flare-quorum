@@ -1,8 +1,9 @@
 # VeilBid Flare Championship Feasibility Plan
 
 > Status: Gate 0 is in progress. Core source, toolchain, registry, contract,
-> asset, feed, and deterministic FCC foundation checks pass; FCC proxy/indexer/
-> registration requirements are still open. Full product development is
+> asset, FDC/direct-mint, feed, and deterministic FCC foundation checks pass;
+> indexer configuration is present, while Docker, stable proxy, image pinning,
+> and registration requirements remain open. Full product development is
 > blocked until Gates 0–E pass. Gates F–H are mandatory before the championship
 > judge release.
 

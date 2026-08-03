@@ -87,6 +87,10 @@ FCC_INDEXER_DATABASE=indexer
 FCC_INDEXER_USER=...
 FCC_INDEXER_PASSWORD=...
 XRPL_TESTNET_RPC_URL=https://...
+VERIFIER_URL_TESTNET=https://fdc-verifiers-testnet.flare.network
+VERIFIER_API_KEY_TESTNET=...
+COSTON2_DA_LAYER_URL=https://ctn2-data-availability.flare.network
+FLARE_FUNDING_EXECUTOR_PRIVATE_KEY=0x...
 ```
 
 - Use disposable Coston2/XRPL testnet identities and C2FLR for gas.
@@ -165,6 +169,41 @@ fingerprints agree.
   logging disabled, strict size/rate/time bounds, and no plaintext database.
 - Configure FAssets/FDC/Smart Account executor paths with no VeilBid-custodied
   XRPL secret.
+
+The funding service uses a dedicated disposable Coston2 executor identity. It
+does not fall back to `FLARE_DEPLOYMENT_PRIVATE_KEY` or
+`FLARE_FINALIZER_PRIVATE_KEY`. `pnpm flare:funding:health` performs registry,
+bytecode, finalized-market, FTestXRP, fee, and direct-mint-address checks without
+writing. After Gate G prerequisites exist, pipe one public-safe version-1 job
+to `pnpm flare:funding:execute`; decimal integer fields are strings and unknown
+fields are rejected:
+
+```json
+{
+  "version": 1,
+  "xrplTransactionId": "0x<32-byte-public-tx-id>",
+  "personalAccount": "0x<derived-account>",
+  "nonce": "0",
+  "walletId": 0,
+  "executorFeeUBA": "0",
+  "terms": {
+    "metadataHash": "0x<bytes32>",
+    "rulesHash": "0x<bytes32>",
+    "publicCeilingXrp": "1000000",
+    "bidDeadline": "<unix-seconds>",
+    "approvedVendors": ["0x<vendor>"],
+    "extensionId": "<registered-id>",
+    "codeVersion": "0x<bytes32>",
+    "teeIds": ["0x<tee-1>", "0x<tee-2>", "0x<tee-3>"],
+    "teeKeyFingerprints": ["0x<key-1>", "0x<key-2>", "0x<key-3>"],
+    "ftsoFeedId": "0x015852502f55534400000000000000000000000000"
+  }
+}
+```
+
+The command emits no raw proof, XRPL source address, credential, provider body,
+or secret. Exit code `2` means `DirectMintingDelayed`; the tender is not funded
+and the same XRPL payment must be resumed after `executionAllowedAt`.
 
 The market deployment command is `pnpm flare:deploy:market`. It is intentionally
 non-runnable before every Gate 0–E evidence file has status `PASS`, all recorded

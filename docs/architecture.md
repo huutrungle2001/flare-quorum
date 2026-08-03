@@ -182,9 +182,21 @@ The flagship buyer uses Smart Account opcode `0xFE`:
 2. encode approval plus `createTender`/funding calls in a `PackedUserOperation`;
 3. commit `keccak256(userOp)` in the XRPL payment memo;
 4. deliver bytes to the executor;
-5. FDC proves the `XRPPayment`;
+5. the executor waits for three validated XRPL ledgers, requests the official
+   FDC `XRPPayment` proof with itself as `proofOwner`, pays the live request
+   fee, and waits for Relay finalization;
 6. `executeDirectMintingWithData` verifies hash/sender/nonce, mints FTestXRP,
    and atomically executes the calls.
+
+The executor does not accept arbitrary user-operation bytes. It rebuilds the
+approval plus tender-creation batch from the canonical public job, checks the
+gross payment can cover the current percentage/minimum minting fee plus the
+requested escrow and memo executor fee, and binds every registry read to
+Coston2. A successful transaction is still not a successful funding result
+unless the AssetManager, MasterAccountController, and market emit the expected
+mint, user-operation, and tender events. A rate-limited mint is reported as
+`delayed` and must be resumed with the same XRPL payment; it never becomes a
+sample or optimistic success state.
 
 The PersonalAccount is the on-chain buyer. VeilBid has no XRPL key or custodial
 signer. Direct EVM funding remains a recovery and developer path.

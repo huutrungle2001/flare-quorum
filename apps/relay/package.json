@@ -10,6 +10,8 @@
     "health": "node dist/cli.js health",
     "flare-dry-run": "node dist/flare-cli.js dry-run",
     "flare-health": "node dist/flare-cli.js health",
+    "flare-funding-health": "node dist/flare-funding-cli.js health",
+    "flare-funding-execute": "node dist/flare-funding-cli.js execute",
     "lint": "tsc --noEmit",
     "once": "node dist/cli.js once",
     "poll": "node dist/cli.js poll",

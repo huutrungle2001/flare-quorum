@@ -120,6 +120,8 @@ verifiable.
 | Invalid credential/bid wins | Versioned schema, issuer domains, fixed bounds, golden vectors and adversarial tests | Extension defect or compromised trusted issuer |
 | FTSO stale/manipulated quote | Contract-read official feed, positive/freshness checks, fixed decimals/rounding, signed snapshot | Oracle/protocol risk and close-time volatility |
 | Smart Account/FDC replay | Exact user-op hash in XRPL memo, sender/account/nonce checks, official proof verification | Underlying protocol/executor availability or implementation defect |
+| Malicious or over-broad funding executor | Dedicated key; exact public job schema; deterministic approve/create batch; proofOwner, XRPL-source/PersonalAccount, nonce, fee, round, memo, and contract-address-bound receipt checks | Dedicated executor key can delay or waste its own gas; protocol defects remain |
+| FDC/API data leakage | Credentials remain server-side; bounded parsers emit only stable error codes and sanitized public transaction/round identifiers | External verifier/DA/RPC operators observe request metadata |
 | Underfunded or unusual token | FTestXRP-only release, exact balance-delta and conservation checks | FAssets/protocol failure |
 | Double settlement/reentrancy | Nonce and terminal state before transfers, guard, no arbitrary token allowlist | Unaudited market defect |
 | Public award leaks commercial price | Winning amount explicitly classified as public before submission | Winner's commercial price is disclosed by design |

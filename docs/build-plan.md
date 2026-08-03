@@ -65,7 +65,8 @@ placeholders are forbidden after that commit.
 - [ ] Implement production `VeilBidFlareMarket` and receipt.
 - [ ] Integrate FTestXRP escrow and FAssets exit.
 - [ ] Integrate XRP/USD FTSO snapshot and conversion.
-- [ ] Integrate Smart Account `0xFE` plus FDC direct mint-and-fund.
+- [x] Implement and locally verify the Smart Account `0xFE` plus FDC direct
+  mint-and-fund executor; live Gate G execution remains required.
 - [ ] Pass Gates F–G.
 
 ### Milestone 4 — generated consumers

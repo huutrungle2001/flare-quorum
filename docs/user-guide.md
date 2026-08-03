@@ -139,7 +139,10 @@ Every workflow labels data as one of:
 - **Stale/unavailable FTSO:** a USD-enabled tender cannot close with a manual
   replacement price.
 - **FDC/Smart Account delayed:** keep the XRPL and user-op checkpoints; do not
-  mark the tender funded until atomic execution succeeds.
+  send another payment with the same nonce or mark the tender funded. The
+  executor reports the public `executionAllowedAt`; resume the same payment and
+  operation only after that time. Success requires the mint, user-operation,
+  and tender-created events in one Coston2 receipt.
 - **Split or expired TEE results:** request the same frozen computation again;
   the caller cannot choose among digests.
 - **RPC/indexer/relay unavailable:** recover from canonical chain state with

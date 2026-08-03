@@ -509,6 +509,42 @@ practice as registrations accumulate. Constant-time binding removes that
 liveness dependency without allowing an owner or relay to substitute a foreign
 extension.
 
+## ADR-022 — Dedicated fail-closed FDC funding executor
+
+**Decision:** The XRP-native funding executor is a separate Coston2 writer with
+its own disposable key. It never falls back to the deployer or FCC finalizer
+key and never receives an XRPL seed. A submitted job contains only the public
+XRPL transaction ID, PersonalAccount/nonce, memo fee, and canonical public
+tender terms. The executor deterministically rebuilds the only allowed batch:
+exact FTestXRP approval followed by `VeilBidFlareMarket.createTender`.
+
+Before writing, it resolves FdcHub, fee configuration, FdcVerification,
+FlareSystemsManager, Relay, AssetManagerFXRP, FTestXRP, and
+MasterAccountController through the official registry at a finalized Coston2
+checkpoint. It then:
+
+1. requires three validated XRPL ledgers;
+2. binds the `XRPPayment` proof to the executor EOA;
+3. reads and pays the current on-chain FDC request fee;
+4. derives the voting round from the mined request block timestamp;
+5. waits for Relay finalization and decodes the DA v1 raw proof;
+6. checks transaction, source, owner, round, memo, no destination tag, and a
+   fee-aware minimum received amount;
+7. verifies the XRPL source derives the expected PersonalAccount and rereads
+   the nonce immediately before simulation/submission; and
+8. reports success only when one receipt contains contract-address-bound
+   `DirectMintingExecutedToSmartAccount`, `UserOperationExecuted`, and
+   `TenderCreated` events with the exact expected fields.
+
+`DirectMintingDelayed` is a distinct non-success outcome. Verifier/DA/API
+credentials, raw proofs, source addresses, and provider errors are not emitted
+by the CLI. The minimal local ABIs are drift-tested against the exact
+`@flarenetwork/flare-wagmi-periphery-package@3.6.0` package.
+
+**Reason:** This makes FDC, FAssets, and Smart Accounts essential to tender
+creation while preventing an executor from becoming a generic arbitrary-call
+relayer or a source of fabricated success evidence.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:
