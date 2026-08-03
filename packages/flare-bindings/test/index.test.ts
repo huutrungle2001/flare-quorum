@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isCoston2FlareDeployment, veilBidFlareMarketAbi } from "../dist/index.js";
+import { isCoston2FlareDeployment, veilBidFlareAwardReceiptAbi, veilBidFlareMarketAbi } from "../dist/index.js";
 
 test("Flare bindings expose only the planned Coston2 ABI", () => {
   assert.ok(Array.isArray(veilBidFlareMarketAbi));
@@ -8,6 +8,7 @@ test("Flare bindings expose only the planned Coston2 ABI", () => {
   const getTender = veilBidFlareMarketAbi.find((item) => item.type === "function" && item.name === "getTender");
   assert.equal(getTender?.type, "function");
   assert.equal((getTender?.outputs?.[0] as { components?: readonly { name?: string }[] })?.components?.some((component) => component.name === "resultExpiry"), true);
+  assert.ok(veilBidFlareAwardReceiptAbi.some((item) => item.type === "function" && item.name === "getAward"));
   assert.equal(isCoston2FlareDeployment({ chainId: 114, status: "planned" }), true);
   assert.equal(isCoston2FlareDeployment({ chainId: 1, status: "verified" }), false);
 });

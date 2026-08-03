@@ -5,7 +5,8 @@
   "source": "packages/flare-contracts/src/VeilBidFlareMarket.sol",
   "deployment": "packages/flare-contracts/deployments/coston2.release.json",
   "abis": {
-    "VeilBidFlareMarket": "generated/abis/VeilBidFlareMarket.json"
+    "VeilBidFlareMarket": "generated/abis/VeilBidFlareMarket.json",
+    "VeilBidFlareAwardReceipt": "generated/abis/VeilBidFlareAwardReceipt.json"
   },
   "privacy": "Public ABI only; sealed bids, credentials, ciphertext, and TEE secrets are excluded."
 }

@@ -209,6 +209,19 @@
   },
   {
     "type": "function",
+    "name": "awardReceipt",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract VeilBidFlareAwardReceipt"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "bidIdByVendor",
     "inputs": [
       {

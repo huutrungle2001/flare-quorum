@@ -9,7 +9,10 @@ Implemented and locally verified:
 - `VeilBidFlareMarket`: exact FTestXRP-style ERC-20 escrow, three production
   TEE/code/public-key binding through the live manager interface, two-receipt
   common quorum, close-time FTSO snapshot, FCC selection request, canonical
-  `TEE_ACTION_RESULT` verification, and award/refund conservation.
+  `TEE_ACTION_RESULT` verification, and award/refund conservation;
+- `VeilBidFlareAwardReceipt`: a non-transferable public award record binding
+  the winner, payout, rules hash, ordered root, and exact selection-result
+  digest. Refunds never mint a receipt.
 
 These contracts are not a verified Coston2 release yet. The test suite uses
 local protocol mocks and deterministic Foundry keys only. Deployment addresses

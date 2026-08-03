@@ -2,6 +2,7 @@
 pragma solidity ^0.8.27;
 
 import {VeilBidFlareMarket} from "../src/VeilBidFlareMarket.sol";
+import {VeilBidFlareAwardReceipt} from "../src/VeilBidFlareAwardReceipt.sol";
 import {IERC20} from "../src/interfaces/IERC20.sol";
 import {IFtsoV2} from "../src/interfaces/IFtsoV2.sol";
 import {IFlareTeeManager} from "../src/interfaces/IFlareTeeManager.sol";
@@ -10,6 +11,7 @@ import {ITeeExtensionRegistry} from "../src/interfaces/ITeeExtensionRegistry.sol
 interface Vm {
     function addr(uint256 privateKey) external returns (address);
     function expectRevert(bytes4 selector) external;
+    function expectRevert(bytes calldata reason) external;
     function prank(address sender) external;
     function sign(uint256 privateKey, bytes32 digest) external returns (uint8 v, bytes32 r, bytes32 s);
     function warp(uint256 timestamp) external;
@@ -216,6 +218,17 @@ contract FlareTokenMock is IERC20 {
             if (token.balanceOf(vendor) != 400) revert("winner payout mismatch");
             if (token.balanceOf(address(this)) != 600) revert("buyer remainder mismatch");
             if (token.balanceOf(address(market)) != 0) revert("escrow not conserved");
+            VeilBidFlareAwardReceipt receipt = market.awardReceipt();
+            if (receipt.ownerOf(tenderId) != vendor) revert("award receipt owner mismatch");
+            VeilBidFlareAwardReceipt.Award memory award = receipt.getAward(tenderId);
+            if (
+                award.winnerBidId != 1 || award.amount != 400 || award.rulesHash != tender.rulesHash
+                    || award.orderedBidRoot != tender.orderedBidRoot
+                    || award.resultDigest != market.resultDigest(result)
+            ) revert("award receipt binding mismatch");
+            vm.expectRevert(VeilBidFlareAwardReceipt.ReceiptIsNonTransferable.selector);
+            vm.prank(vendor);
+            receipt.transferFrom(vendor, address(this), tenderId);
             if (market.getTender(tenderId).status != VeilBidFlareMarket.TenderStatus.Awarded) {
                 revert("not awarded");
             }
@@ -354,6 +367,9 @@ contract FlareTokenMock is IERC20 {
             if (market.getTender(tenderId).status != VeilBidFlareMarket.TenderStatus.Refunded) {
                 revert("not refunded");
             }
+            VeilBidFlareAwardReceipt receipt = market.awardReceipt();
+            vm.expectRevert(abi.encodeWithSelector(VeilBidFlareAwardReceipt.ReceiptDoesNotExist.selector, tenderId));
+            receipt.ownerOf(tenderId);
         }
 
         function _terms() private view returns (VeilBidFlareMarket.TenderTerms memory terms) {

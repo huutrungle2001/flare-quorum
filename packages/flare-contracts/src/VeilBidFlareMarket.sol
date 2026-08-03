@@ -5,6 +5,7 @@ import {IERC20} from "./interfaces/IERC20.sol";
 import {IFtsoV2} from "./interfaces/IFtsoV2.sol";
 import {IFlareTeeManager} from "./interfaces/IFlareTeeManager.sol";
 import {ITeeExtensionRegistry} from "./interfaces/ITeeExtensionRegistry.sol";
+import {VeilBidFlareAwardReceipt} from "./VeilBidFlareAwardReceipt.sol";
 
 /// @title VeilBidFlareMarket
 /// @notice FTestXRP escrow and threshold-result verifier for Coston2.
@@ -159,6 +160,7 @@ contract VeilBidFlareMarket {
     IFlareTeeManager public immutable teeManager;
     IFtsoV2 public immutable ftso;
     ITeeExtensionRegistry public immutable teeExtensionRegistry;
+    VeilBidFlareAwardReceipt public immutable awardReceipt;
     uint256 public tenderCount;
 
     mapping(uint256 => Tender) private tenders;
@@ -230,6 +232,7 @@ contract VeilBidFlareMarket {
         teeManager = teeManager_;
         ftso = ftso_;
         teeExtensionRegistry = teeExtensionRegistry_;
+        awardReceipt = new VeilBidFlareAwardReceipt();
     }
 
     function createTender(TenderTerms calldata terms) external nonReentrant returns (uint256 tenderId) {
@@ -507,8 +510,23 @@ contract VeilBidFlareMarket {
         if (valid < RESULT_THRESHOLD) revert InvalidResult();
         tender.status = result.winnerBidId == 0 ? TenderStatus.Refunded : TenderStatus.Awarded;
         uint256 buyerRemainder = tender.publicCeilingXrp - result.winningAmountXrp;
-        if (result.winnerBidId != 0 && !paymentToken.transfer(result.winner, result.winningAmountXrp)) {
-            revert InvalidTokenTransfer();
+        if (result.winnerBidId != 0) {
+            awardReceipt.mint(
+                VeilBidFlareAwardReceipt.Award({
+                    tenderId: tenderId,
+                    winnerBidId: result.winnerBidId,
+                    buyer: tender.buyer,
+                    winner: result.winner,
+                    paymentToken: address(paymentToken),
+                    amount: result.winningAmountXrp,
+                    rulesHash: tender.rulesHash,
+                    orderedBidRoot: tender.orderedBidRoot,
+                    resultDigest: _resultDigest(result),
+                    finalizedAt: 0,
+                    finalizedBlock: 0
+                })
+            );
+            if (!paymentToken.transfer(result.winner, result.winningAmountXrp)) revert InvalidTokenTransfer();
         }
         if (!paymentToken.transfer(tender.buyer, buyerRemainder)) revert InvalidTokenTransfer();
         if (result.winnerBidId == 0) emit TenderRefunded(tenderId, tender.buyer);
