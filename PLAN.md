@@ -113,9 +113,12 @@ product code depends on it.
   ABI tuple and binding vector match the Go extension; deployment and live
   registry verification remain open.
 - [ ] Send and verify a domain-correct Coston2 result.
-- [ ] Implement private bid ingress through the supported proxy/TEE path.
-- [ ] Return and verify one TEE-signed `BidReceipt`.
-- [ ] Prove sealed persistence across process restart.
+- [x] Implement private bid ingress through the supported proxy/TEE path (local
+  loopback crypto client and sealed store; live proxy proof remains open).
+- [x] Return and verify one TEE-signed `BidReceipt` in the local extension
+  harness; live registered-TEE verification remains open.
+- [x] Prove sealed persistence across process restart in the local sealed-store
+  tests; live three-machine recovery remains open.
 - [ ] Prove three-machine selection and two matching signatures, or stop and
   document the exact infrastructure limitation.
 
@@ -124,14 +127,15 @@ verified on-chain.
 
 ### Phase 2 — deterministic procurement protocol
 
-- [ ] Freeze `BID_SCHEMA_V1`, `BID_RECEIPT_V1`, `SCORING_V1`, and
-  `SELECTION_RESULT_V1` schemas.
-- [ ] Generate or drift-check Go/Solidity/TypeScript representations.
-- [ ] Implement machine-set/key/code-version tender binding.
-- [ ] Implement receipt bitmap, common quorum, ordered root, and first-accepted
+- [x] Freeze `BID_SCHEMA_V1`, `BID_RECEIPT_V1`, `SCORING_V1`, and
+  `SELECTION_RESULT_V1` schemas in the Go/Solidity protocol fixtures.
+- [ ] Generate or drift-check Go/Solidity/TypeScript representations (Flare
+  ABI package is now scaffolded; full generated cross-language vectors remain).
+- [x] Implement machine-set/key/code-version tender binding.
+- [x] Implement receipt bitmap, common quorum, ordered root, and first-accepted
   tie rule.
-- [ ] Implement credential issuer/type/signature validation.
-- [ ] Implement checked fixed-point price, delivery, and warranty penalties.
+- [x] Implement credential issuer/type/signature validation.
+- [x] Implement checked fixed-point price, delivery, and warranty penalties.
 - [ ] Add deterministic golden vectors shared by all three languages.
 - [ ] Run invalid, tie, permutation, boundary, overflow, and malformed-schema
   suites.

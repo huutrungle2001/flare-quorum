@@ -18,7 +18,7 @@
     }
   },
   "scripts": {
-    "build": "pnpm compile && pnpm bindings:check && pnpm docs:check && pnpm --filter @veilbid/fcc-extension --filter @veilbid/flare-contracts --filter @veilbid/chain-bindings --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room build",
+    "build": "pnpm compile && pnpm bindings:check && pnpm docs:check && pnpm --filter @veilbid/fcc-extension --filter @veilbid/flare-contracts --filter @veilbid/flare-bindings --filter @veilbid/chain-bindings --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room build",
     "bindings:build": "pnpm --filter @veilbid/chain-bindings build",
     "bindings:check": "pnpm --filter @veilbid/auction-house bindings:check",
     "bindings:generate": "pnpm --filter @veilbid/auction-house bindings:generate",
@@ -27,11 +27,11 @@
     "finalizer:health": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/cli.js health",
     "finalizer:once": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/cli.js once",
     "finalizer:poll": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/cli.js poll",
-    "lint": "pnpm lint:scripts && pnpm docs:check && pnpm bindings:build && pnpm --filter @veilbid/fcc-extension --filter @veilbid/flare-contracts --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room lint",
+    "lint": "pnpm lint:scripts && pnpm docs:check && pnpm bindings:build && pnpm --filter @veilbid/fcc-extension --filter @veilbid/flare-contracts --filter @veilbid/flare-bindings --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room lint",
     "lint:scripts": "node --check apps/web/scripts/smoke-production.mjs && node --check apps/web/scripts/smoke-keyboard.mjs",
     "mcp": "pnpm bindings:build && pnpm --filter @veilbid/operator-console build && node --env-file-if-exists=.env.local apps/console/dist/mcp-stdio.js",
     "secret:scan": "node tooling/scripts/scan-repository-secrets.mjs",
-    "test": "pnpm bindings:build && pnpm test:tooling && pnpm --filter @veilbid/fcc-extension --filter @veilbid/flare-contracts --filter @veilbid/auction-house --filter @veilbid/chain-bindings --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room test",
+    "test": "pnpm bindings:build && pnpm test:tooling && pnpm --filter @veilbid/fcc-extension --filter @veilbid/flare-contracts --filter @veilbid/flare-bindings --filter @veilbid/auction-house --filter @veilbid/chain-bindings --filter @veilbid/operator-console --filter @veilbid/settlement-relay --filter @veilbid/tender-room test",
     "test:contracts": "pnpm --filter @veilbid/auction-house test",
     "test:gate-e-static": "pnpm --filter @veilbid/auction-house test:gate-e-static",
     "test:model": "pnpm --filter @veilbid/auction-house test:model",

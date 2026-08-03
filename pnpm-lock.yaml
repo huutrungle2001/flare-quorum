@@ -169,6 +169,19 @@ importers:
         specifier: 2.47.6
         version: 2.47.6(typescript@5.9.3)(zod@3.25.76)
 
+  packages/flare-bindings:
+    dependencies:
+      viem:
+        specifier: 2.47.6
+        version: 2.47.6(typescript@5.9.3)(zod@4.4.3)
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   packages/flare-contracts: {}
 
 packages:

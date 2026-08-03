@@ -1,0 +1,11 @@
+{
+  "network": "coston2",
+  "chainId": 114,
+  "status": "planned",
+  "source": "packages/flare-contracts/src/VeilBidFlareMarket.sol",
+  "deployment": "packages/flare-contracts/deployments/coston2.release.json",
+  "abis": {
+    "VeilBidFlareMarket": "generated/abis/VeilBidFlareMarket.json"
+  },
+  "privacy": "Public ABI only; sealed bids, credentials, ciphertext, and TEE secrets are excluded."
+}
