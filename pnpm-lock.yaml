@@ -15,6 +15,9 @@ importers:
       pnpm:
         specifier: 10.33.0
         version: 10.33.0
+      viem:
+        specifier: 2.47.6
+        version: 2.47.6(typescript@5.9.3)(zod@4.4.3)
 
   apps/console:
     dependencies:

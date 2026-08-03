@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "rpcEnvironmentVariable": "COSTON2_RPC_URL",
+    "declaredDeployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "minimumGasBalanceWei": "100000000000000000"
+  },
+  "toolchains": {
+    "node": {
+      "version": "24.18.0",
+      "archive": "node-v24.18.0-linux-x64.tar.xz",
+      "sha256": "55aa7153f9d88f28d765fcdad5ae6945b5c0f98a36881703817e4c450fa76742",
+      "source": "https://nodejs.org/dist/v24.18.0/"
+    },
+    "pnpm": {
+      "version": "10.33.0"
+    },
+    "go": {
+      "version": "1.25.8",
+      "archive": "go1.25.8.linux-amd64.tar.gz",
+      "sha256": "ceb5e041bbc3893846bd1614d76cb4681c91dadee579426cf21a63f2d7e03be6",
+      "source": "https://go.dev/dl/go1.25.8.linux-amd64.tar.gz"
+    },
+    "foundry": {
+      "version": "1.7.1",
+      "commit": "4072e48705af9d93e3c0f6e29e93b5e9a40caed8",
+      "archive": "foundry_v1.7.1_linux_amd64.tar.gz",
+      "sha256": "cf7e688ed0c4c48adffca788b496076e31060b67ac5afe1e43dbb5499c20c88b",
+      "source": "https://github.com/foundry-rs/foundry/releases/download/v1.7.1/foundry_v1.7.1_linux_amd64.tar.gz"
+    },
+    "solidity": {
+      "version": "0.8.27",
+      "optimizer": true,
+      "optimizerRuns": 200
+    },
+    "viem": {
+      "version": "2.47.6"
+    }
+  },
+  "upstreams": {
+    "fccScaffold": {
+      "repository": "https://github.com/flare-foundation/fce-extension-scaffold.git",
+      "branch": "main",
+      "commit": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
+      "role": "reference scaffold; its tee-node v0.0.21 and tee-proxy v0.0.18 pins are below the organizer baseline and must not be copied unchanged"
+    },
+    "fccSignExample": {
+      "repository": "https://github.com/flare-foundation/fce-sign.git",
+      "branch": "main",
+      "commit": "6df972c64d34efe1d4497f0eafe6792d1f0862dd",
+      "role": "result-signing and rRap registration reference; runtime pins require the same upgrade as the scaffold"
+    },
+    "teeNode": {
+      "repository": "https://github.com/flare-foundation/tee-node.git",
+      "branch": "develop",
+      "commit": "adc67a29eb7162f6f1b5dabcbca320009480695e",
+      "tag": "v0.0.24",
+      "minimumOrganizerVersion": "0.0.22"
+    },
+    "teeProxy": {
+      "repository": "https://github.com/flare-foundation/tee-proxy.git",
+      "branch": "develop",
+      "commit": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
+      "teeNodeModuleVersion": "0.0.23"
+    },
+    "flareSmartContracts": {
+      "repository": "https://github.com/flare-foundation/flare-smart-contracts-v2.git",
+      "branch": "main",
+      "commit": "b69873e1e1a0785e2450d811f35c7927a625716b"
+    },
+    "flareFoundryPeriphery": {
+      "repository": "https://github.com/flare-foundation/flare-foundry-periphery-package.git",
+      "branch": "main",
+      "commit": "ca264d6a31ddfb53d1bef7cb7bd1942aa89d323a",
+      "tag": "0.1.52"
+    },
+    "fassets": {
+      "repository": "https://github.com/flare-foundation/fassets.git",
+      "branch": "main",
+      "commit": "6d5c103e4342f0fc7d3683a433a90349d544f774"
+    },
+    "smartAccounts": {
+      "repository": "https://github.com/flare-foundation/flare-smart-accounts.git",
+      "branch": "main",
+      "commit": "fa301c58064355026d1d1453c2e9ef4a7e8884ca"
+    },
+    "developerHub": {
+      "repository": "https://github.com/flare-foundation/developer-hub.git",
+      "branch": "main",
+      "commit": "8120c460bf686ef4cb277fd710c93400c43fa580"
+    }
+  },
+  "sourceFiles": [
+    {
+      "id": "fcc-coston2-addresses",
+      "url": "https://raw.githubusercontent.com/flare-foundation/fce-extension-scaffold/f48cafb889441a62e47c083f4be8dd7d3f456f83/config/coston2/deployed-addresses.json",
+      "sha256": "c158350ea5a9bbba8c6485a680252b8f401bc2e25ea10830101eb6d0b40b022e"
+    },
+    {
+      "id": "fcc-scaffold-go-module",
+      "url": "https://raw.githubusercontent.com/flare-foundation/fce-extension-scaffold/f48cafb889441a62e47c083f4be8dd7d3f456f83/go/go.mod",
+      "sha256": "76eb9f5e4e1994a913a272e3b0b7114656ac9fcdbdc331a58326736821d1f5d9"
+    },
+    {
+      "id": "tee-node-go-module",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/adc67a29eb7162f6f1b5dabcbca320009480695e/go.mod",
+      "sha256": "4b9b20a58b6ffa7c4dfa157d1d6c20671a40e81064925a3aeb0ef6cd121b7ca5"
+    },
+    {
+      "id": "tee-proxy-go-module",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-proxy/0c6d016b09948cba9a508ba357e592eb6088fd1c/go.mod",
+      "sha256": "31a8d342fcdc5079b19a35d88cf9001e184de677b9cf6a0e76e533c6c952badb"
+    },
+    {
+      "id": "coston2-contract-registry",
+      "url": "https://raw.githubusercontent.com/flare-foundation/flare-foundry-periphery-package/ca264d6a31ddfb53d1bef7cb7bd1942aa89d323a/src/coston2/ContractRegistry.sol",
+      "sha256": "c72cbae671cd0f498b6ff9d45fdd1b123e519175bd18168c68e64681e2390e57"
+    },
+    {
+      "id": "coston2-ftso-interface",
+      "url": "https://raw.githubusercontent.com/flare-foundation/flare-foundry-periphery-package/ca264d6a31ddfb53d1bef7cb7bd1942aa89d323a/src/coston2/FtsoV2Interface.sol",
+      "sha256": "8bd90bf25954337cf929c24c6a19b52c18909fdfe5aeb9fd3df9cf6450e3a5a5"
+    },
+    {
+      "id": "coston2-fassets-deployment",
+      "url": "https://raw.githubusercontent.com/flare-foundation/fassets/6d5c103e4342f0fc7d3683a433a90349d544f774/deployment/deploys/coston2.json",
+      "sha256": "cf0636252b1c08f842827a8800849ebfd620191ae02e349ee5927cebff1a06b6"
+    },
+    {
+      "id": "coston2-smart-accounts-deployment",
+      "url": "https://raw.githubusercontent.com/flare-foundation/flare-smart-accounts/fa301c58064355026d1d1453c2e9ef4a7e8884ca/deployment/deploys/coston2.json",
+      "sha256": "2cb86dffc65c38b638cfb03e150b26b6c3276538bad3ef9bf107efcfdca43a88"
+    },
+    {
+      "id": "coston2-smart-accounts-config",
+      "url": "https://raw.githubusercontent.com/flare-foundation/flare-smart-accounts/fa301c58064355026d1d1453c2e9ef4a7e8884ca/deployment/chain-config/coston2.json",
+      "sha256": "b9ad8d5f37aef5b7aa03fdc67eba54f781d11fc55f0d788f23202a7007ac5f12"
+    }
+  ],
+  "docker": {
+    "teeNodeBuilder": "golang:1.25.1-trixie@sha256:ff83f3762390c2cccb53618ccc18af23e556aff9b1db4428637e9f63287c8171",
+    "teeNodeRuntime": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
+    "teeProxyUpstreamDockerfilePinned": false,
+    "policy": "VeilBid must add digests for both tee-proxy stages before building a release image"
+  },
+  "contracts": {
+    "flareContractRegistry": "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019",
+    "flareTeeManager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "ftsoV2": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+    "fdcVerification": "0x906507E0B64bcD494Db73bd0459d1C667e14B933",
+    "fdcHub": "0x48aC463d7975828989331F4De43341627b9c5f1D",
+    "assetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
+    "fTestXRP": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+    "masterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c"
+  },
+  "registryNames": {
+    "FlareContractRegistry": "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019",
+    "FtsoV2": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+    "FdcVerification": "0x906507E0B64bcD494Db73bd0459d1C667e14B933",
+    "FdcHub": "0x48aC463d7975828989331F4De43341627b9c5f1D",
+    "AssetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
+    "MasterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c"
+  },
+  "xrpUsdFeed": {
+    "name": "XRP/USD",
+    "id": "0x015852502f55534400000000000000000000000000"
+  },
+  "externalRequirements": {
+    "simulatedTee": true,
+    "stableProxyEnvironmentVariable": "EXT_PROXY_URL",
+    "machineIdsEnvironmentVariable": "VEILBID_FCC_TEE_IDS",
+    "indexerEnvironmentVariables": [
+      "FCC_INDEXER_HOST",
+      "FCC_INDEXER_USER",
+      "FCC_INDEXER_PASSWORD"
+    ],
+    "forbiddenProxyHostnameSuffix": "trycloudflare.com",
+    "requiredMachineCount": 3,
+    "requiredMachineStatus": 2
+  }
+}
