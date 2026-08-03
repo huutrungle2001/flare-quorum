@@ -5,7 +5,10 @@ Sepolia/Nox contracts remain isolated in `packages/contracts`.
 
 Implemented and locally verified:
 
-- `VeilBidFoundationSender`: the public-safe Gate A compatibility sender;
+- `VeilBidFoundationSender`: the historical deployed-but-unregistered Gate A
+  compatibility sender retained for evidence reproduction;
+- `VeilBidFoundationSenderV2`: the fresh-registration sender whose explicit,
+  owner-only extension-ID binding is constant-time and registry-verified;
 - `VeilBidFlareMarket`: exact FTestXRP-style ERC-20 escrow, three production
   TEE/code/public-key binding through the live manager interface, two-receipt
   common quorum, close-time FTSO snapshot, FCC selection request, canonical
@@ -18,6 +21,10 @@ These contracts are not a verified Coston2 release yet. The test suite uses
 local protocol mocks and deterministic Foundry keys only. Deployment addresses
 must not be published until the live extension, manager wiring, runtime
 bytecode, constructor arguments, and end-to-end evidence pass.
+
+Never register the V1 foundation sender. A fresh Gate-A run deploys V2,
+registers that exact address, and calls `setExtensionIdExplicit` with the ID
+returned by the live registry.
 
 ```bash
 forge test

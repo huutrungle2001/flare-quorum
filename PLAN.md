@@ -110,8 +110,10 @@ product code depends on it.
   greeting sample with a deterministic, public-safe `PING_V1` foundation
   operation using the organizer-supported `tee-node` runtime line.
 - [x] Create `packages/flare-contracts` with a minimal instruction sender whose
-  ABI tuple and binding vector match the Go extension; deploy it on Coston2 and
+  ABI tuple and binding vector match the Go extension; deploy V1 on Coston2 and
   verify its runtime plus both live manager/registry constructor bindings.
+  Keep V1 unregistered and use the tested constant-time V2 replacement for the
+  fresh Gate-A registration.
 - [ ] Send and verify a domain-correct Coston2 result.
 - [x] Implement private bid ingress through the supported proxy/TEE path (local
   loopback crypto client and sealed store; live proxy proof remains open).

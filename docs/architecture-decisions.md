@@ -490,6 +490,25 @@ third-party retry griefing from extending the lock, while permissionless retry
 keeps transient infrastructure failures recoverable without changing any
 procurement fact.
 
+## ADR-021 — Constant-time extension-ID binding
+
+**Decision:** Fresh FCC sender contracts never discover their extension by
+scanning from public ID `65536`. The Gate-A replacement exposes only
+`setExtensionIdExplicit(id)`, callable by its immutable deployment owner, and
+accepts the ID once only when it is already allocated and the live extension
+registry maps it back to that exact sender address.
+
+The deployed V1 foundation sender remains unchanged so its runtime evidence is
+reproducible, but it is permanently excluded from registration. The final
+market already receives the extension ID explicitly and checks the same
+registry mapping during tender creation, so it requires no discovery setter.
+
+**Reason:** The current Coston2 public ID was `65922` on 2026-08-04. A loop over
+every historical ID has unbounded growth and can become undeployable in
+practice as registrations accumulate. Constant-time binding removes that
+liveness dependency without allowing an owner or relay to substitute a foreign
+extension.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:

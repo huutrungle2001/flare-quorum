@@ -45,9 +45,11 @@ unverifiable addresses/credentials, or the registration preflight in
 
 Prove on Coston2:
 
-1. Deploy the minimal instruction sender. The repository now includes a
-   local-only ABI-compatible `PING_V1` foundation operation; it is not live
-   Gate A evidence and does not process bids.
+1. Deploy the minimal `VeilBidFoundationSenderV2`, register its fresh extension
+   ID, and bind that exact ID with the constant-time registry-verified setter.
+   Its ABI-compatible `PING_V1` operation does not process bids. The live but
+   unregistered V1 deployment is compatibility evidence only and cannot
+   satisfy this step.
 2. Register extension, governance, allowed code version, and TEE machine.
 3. Send a domain-bound action through the official registry.
 4. Retrieve the action result from the proxy.

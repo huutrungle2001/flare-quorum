@@ -66,16 +66,26 @@ extension. The canonical public pin set and repeatable live checks are in
 Because the redeploy may have cleared prior registrations:
 
 1. start without a reused `config/extension.env`;
-2. run `pre-build` to create a fresh `EXTENSION_ID` and instruction sender;
-3. start the current TEE/proxy stack against Coston2;
-4. run `post-build`;
-5. ensure registration invokes `register-tee -command rRap`;
-6. verify the capital `R` generated a fresh attestation challenge;
-7. save the new extension/machine identifiers only after on-chain confirmation.
+2. deploy `VeilBidFoundationSenderV2`, then register that exact sender to create
+   a fresh `EXTENSION_ID`;
+3. call `setExtensionIdExplicit(EXTENSION_ID)` as the deployment owner and
+   require the live registry to map that ID back to the V2 sender;
+4. start the current TEE/proxy stack against Coston2;
+5. run `post-build`;
+6. ensure registration invokes `register-tee -command rRap`;
+7. verify the capital `R` generated a fresh attestation challenge;
+8. save the new extension/machine identifiers only after on-chain confirmation.
 
 Reusing a historical extension ID, machine record, challenge, or address is a
 failure. Re-running `pre-build --force` casually is also forbidden because it
 can detach a machine from the expected extension.
+
+The deployed V1 sender at `0x44A322A45e8D796d890271209D59d529501113B9`
+remains public evidence of manager/constructor compatibility only. It is
+unregistered and uses the scaffold's historical scan-based `setExtensionId()`;
+do not register it. Public extension IDs were already above `65900` during the
+2026-08-04 live check, so every fresh VeilBid sender uses the constant-time V2
+binding and separately verifies the registry mapping.
 
 ## 4. Stable public proxy URL
 

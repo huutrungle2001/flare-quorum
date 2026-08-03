@@ -4,14 +4,14 @@ pragma solidity ^0.8.27;
 import {ITeeExtensionRegistry} from "./interfaces/ITeeExtensionRegistry.sol";
 import {ITeeMachineRegistry} from "./interfaces/ITeeMachineRegistry.sol";
 
-/// @title VeilBidFoundationSender
-/// @notice Historical public-safe FCC compatibility sender deployed for Gate A preparation.
-/// @dev This V1 runtime is retained so its deployed-but-unregistered evidence remains reproducible.
-///      Fresh registrations must deploy VeilBidFoundationSenderV2 and bind the explicit registry ID.
-contract VeilBidFoundationSender {
+/// @title VeilBidFoundationSenderV2
+/// @notice Constant-time FCC compatibility sender used for a fresh Gate A registration.
+/// @dev V1 remains in source solely so its deployed-but-unregistered evidence is reproducible.
+contract VeilBidFoundationSenderV2 {
     uint256 private constant FIRST_PUBLIC_EXTENSION_ID = 0x10000;
     uint256 public constant COSTON2_CHAIN_ID = 114;
     uint16 public constant FOUNDATION_SCHEMA_VERSION = 1;
+    uint16 public constant FOUNDATION_SENDER_VERSION = 2;
 
     // forge-lint: disable-next-line(unsafe-typecast)
     bytes32 public constant OP_TYPE = bytes32("VEILBID_FOUNDATION");
@@ -21,6 +21,7 @@ contract VeilBidFoundationSender {
 
     ITeeExtensionRegistry public immutable teeExtensionRegistry;
     ITeeMachineRegistry public immutable teeMachineRegistry;
+    address public immutable owner;
 
     uint256 private extensionId;
 
@@ -32,11 +33,14 @@ contract VeilBidFoundationSender {
         bytes32 payloadHash;
     }
 
-    error InvalidRegistry();
     error ExtensionIdAlreadySet();
-    error ExtensionIdNotFound();
+    error InvalidExtensionId();
+    error InvalidRegistry();
     error InvalidRequest();
     error NoTeeSelected();
+    error Unauthorized();
+
+    event ExtensionIdConfigured(uint256 indexed extensionId);
 
     constructor(ITeeExtensionRegistry extensionRegistry, ITeeMachineRegistry machineRegistry) {
         if (address(extensionRegistry) == address(0) || address(machineRegistry) == address(0)) {
@@ -47,18 +51,23 @@ contract VeilBidFoundationSender {
         }
         teeExtensionRegistry = extensionRegistry;
         teeMachineRegistry = machineRegistry;
+        owner = msg.sender;
     }
 
-    function setExtensionId() external {
+    /// @notice Binds the exact ID returned by the live registry without scanning historical IDs.
+    /// @dev The registry mapping is authoritative; an owner cannot bind an unassigned or foreign ID.
+    function setExtensionIdExplicit(uint256 candidate) external {
+        if (msg.sender != owner) revert Unauthorized();
         if (extensionId != 0) revert ExtensionIdAlreadySet();
         uint256 nextId = teeExtensionRegistry.nextPublicExtensionId();
-        for (uint256 candidate = FIRST_PUBLIC_EXTENSION_ID; candidate < nextId; ++candidate) {
-            if (teeExtensionRegistry.getTeeExtensionInstructionsSender(candidate) == address(this)) {
-                extensionId = candidate;
-                return;
-            }
+        if (
+            candidate < FIRST_PUBLIC_EXTENSION_ID || candidate >= nextId
+                || teeExtensionRegistry.getTeeExtensionInstructionsSender(candidate) != address(this)
+        ) {
+            revert InvalidExtensionId();
         }
-        revert ExtensionIdNotFound();
+        extensionId = candidate;
+        emit ExtensionIdConfigured(candidate);
     }
 
     function getExtensionId() external view returns (uint256) {
