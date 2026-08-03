@@ -13,14 +13,17 @@ import {VeilBidFlareAwardReceipt} from "./VeilBidFlareAwardReceipt.sol";
 contract VeilBidFlareMarket {
     uint256 public constant COSTON2_CHAIN_ID = 114;
     uint256 public constant MAX_BIDS = 8;
+    uint256 public constant MAX_CREDENTIAL_REQUIREMENTS = 4;
     uint256 public constant TEE_COUNT = 3;
     uint8 public constant RESULT_THRESHOLD = 2;
+    uint16 public constant SCORING_WEIGHT_BPS = 10_000;
     uint64 public constant FTSO_MAX_AGE = 300;
     uint64 public constant RESULT_VALIDITY = 1 hours;
     uint64 public constant SELECTION_REFUND_GRACE = 24 hours;
 
     bytes32 public constant RECEIPT_DOMAIN = keccak256("VEILBID_BID_RECEIPT_V1");
     bytes32 public constant RESULT_DOMAIN = keccak256("VEILBID_SELECTION_RESULT_V1");
+    bytes32 public constant RULES_DOMAIN = keccak256("VEILBID_RULES_V1");
     bytes32 public constant EMPTY_BID_ROOT = keccak256("VEILBID_EMPTY_BID_ROOT_V1");
     bytes32 public constant BID_ROOT_DOMAIN = keccak256("VEILBID_BID_ROOT_V1");
     // forge-lint: disable-next-line(unsafe-typecast)
@@ -31,6 +34,7 @@ contract VeilBidFlareMarket {
     bytes32 public constant TEE_ACTION_RESULT_PREFIX = bytes32("TEE_ACTION_RESULT");
     bytes32 public constant SUBMIT_TAG_HASH = keccak256("submit");
     bytes32 public constant THRESHOLD_TAG_HASH = keccak256("threshold");
+    bytes21 public constant XRP_USD_FEED_ID = 0x015852502f55534400000000000000000000000000;
 
     enum TenderStatus {
         FundingPending,
@@ -42,17 +46,35 @@ contract VeilBidFlareMarket {
         Cancelled
     }
 
+    struct CredentialRequirement {
+        bytes32 credentialType;
+        address issuer;
+    }
+
+    struct ScoringPolicy {
+        uint16 schemaVersion;
+        uint64 ceilingXrpMicros;
+        uint64 bidDeadline;
+        bool allowXrp;
+        bool allowUsd;
+        bytes21 ftsoFeedId;
+        uint16 maxDeliveryDays;
+        uint16 minWarrantyDays;
+        uint16 maxWarrantyDays;
+        uint16 priceWeightBps;
+        uint16 deliveryWeightBps;
+        uint16 warrantyWeightBps;
+        CredentialRequirement[] requiredCredentials;
+    }
+
     struct TenderTerms {
         bytes32 metadataHash;
-        bytes32 rulesHash;
-        uint256 publicCeilingXrp;
-        uint64 bidDeadline;
+        ScoringPolicy scoringPolicy;
         address[] approvedVendors;
         uint256 extensionId;
         bytes32 codeVersion;
         address[3] teeIds;
         bytes32[3] teeKeyFingerprints;
-        bytes21 ftsoFeedId;
     }
 
     struct Tender {
@@ -174,6 +196,7 @@ contract VeilBidFlareMarket {
     mapping(uint256 => mapping(address => uint256)) public bidIdByVendor;
     mapping(uint256 => mapping(address => BidReference)) private pendingBidReferences;
     mapping(uint256 => mapping(uint256 => BidReference)) private bidReferences;
+    mapping(uint256 => ScoringPolicy) private scoringPolicies;
 
     error AlreadySubmitted();
     error BidDeadlineNotReached();
@@ -184,6 +207,7 @@ contract VeilBidFlareMarket {
     error InvalidFeed();
     error InvalidReceipt();
     error InvalidResult();
+    error InvalidScoringPolicy();
     error InvalidStatus(TenderStatus expected, TenderStatus actual);
     error InvalidTender();
     error InvalidTokenTransfer();
@@ -245,16 +269,15 @@ contract VeilBidFlareMarket {
     }
 
     function createTender(TenderTerms calldata terms) external nonReentrant returns (uint256 tenderId) {
-        if (
-            terms.metadataHash == bytes32(0) || terms.rulesHash == bytes32(0) || terms.publicCeilingXrp == 0
-                || terms.publicCeilingXrp > type(uint64).max
-        ) {
-            revert InvalidTender();
-        }
-        if (terms.bidDeadline <= block.timestamp || terms.bidDeadline > block.timestamp + 30 days) {
-            revert InvalidDeadline();
-        }
+        if (terms.metadataHash == bytes32(0)) revert InvalidTender();
+        _validateScoringPolicy(terms.scoringPolicy);
         if (terms.approvedVendors.length == 0 || terms.approvedVendors.length > MAX_BIDS) revert InvalidTender();
+        for (uint256 i; i < terms.approvedVendors.length; ++i) {
+            if (terms.approvedVendors[i] == address(0)) revert InvalidAddress();
+            for (uint256 j; j < i; ++j) {
+                if (terms.approvedVendors[i] == terms.approvedVendors[j]) revert InvalidAddress();
+            }
+        }
         if (terms.extensionId < 0x10000 || terms.codeVersion == bytes32(0)) revert InvalidCodeVersion();
         if (teeExtensionRegistry.getTeeExtensionInstructionsSender(terms.extensionId) != address(this)) {
             revert InvalidCodeVersion();
@@ -278,12 +301,12 @@ contract VeilBidFlareMarket {
                 if (terms.teeIds[i] == terms.teeIds[j]) revert NotEnoughTeeIdentities();
             }
         }
-        if (terms.ftsoFeedId == bytes21(0)) revert InvalidFeed();
+        uint256 publicCeilingXrp = terms.scoringPolicy.ceilingXrpMicros;
         uint256 balanceBefore = paymentToken.balanceOf(address(this));
-        if (!paymentToken.transferFrom(msg.sender, address(this), terms.publicCeilingXrp)) {
+        if (!paymentToken.transferFrom(msg.sender, address(this), publicCeilingXrp)) {
             revert InvalidTokenTransfer();
         }
-        if (paymentToken.balanceOf(address(this)) - balanceBefore != terms.publicCeilingXrp) {
+        if (paymentToken.balanceOf(address(this)) - balanceBefore != publicCeilingXrp) {
             revert InvalidTokenTransfer();
         }
 
@@ -291,26 +314,26 @@ contract VeilBidFlareMarket {
         Tender storage tender = tenders[tenderId];
         tender.buyer = msg.sender;
         tender.metadataHash = terms.metadataHash;
-        tender.rulesHash = terms.rulesHash;
-        tender.publicCeilingXrp = terms.publicCeilingXrp;
-        tender.bidDeadline = terms.bidDeadline;
+        tender.rulesHash = _scoringPolicyHash(terms.scoringPolicy);
+        tender.publicCeilingXrp = publicCeilingXrp;
+        tender.bidDeadline = terms.scoringPolicy.bidDeadline;
         tender.approvedVendorCount = uint8(terms.approvedVendors.length);
         tender.commonQuorumBitmap = 0x07;
         tender.orderedBidRoot = EMPTY_BID_ROOT;
         tender.extensionId = terms.extensionId;
         tender.codeVersion = terms.codeVersion;
-        tender.ftsoFeedId = terms.ftsoFeedId;
+        tender.ftsoFeedId = terms.scoringPolicy.ftsoFeedId;
         tender.status = TenderStatus.Open;
+        _storeScoringPolicy(tenderId, terms.scoringPolicy);
         for (uint256 i; i < TEE_COUNT; ++i) {
             tender.teeIds[i] = terms.teeIds[i];
             tender.teeKeyFingerprints[i] = terms.teeKeyFingerprints[i];
         }
         for (uint256 i; i < terms.approvedVendors.length; ++i) {
             address vendor = terms.approvedVendors[i];
-            if (vendor == address(0) || isApprovedVendor[tenderId][vendor]) revert InvalidAddress();
             isApprovedVendor[tenderId][vendor] = true;
         }
-        emit TenderCreated(tenderId, msg.sender, terms.rulesHash, terms.publicCeilingXrp);
+        emit TenderCreated(tenderId, msg.sender, tender.rulesHash, publicCeilingXrp);
     }
 
     function submitBidReceipt(uint256 tenderId, BidReceipt calldata receipt, bytes calldata signature)
@@ -407,13 +430,18 @@ contract VeilBidFlareMarket {
         if (block.timestamp < tender.bidDeadline && tender.bidCount < tender.approvedVendorCount) {
             revert BidDeadlineNotReached();
         }
-        (uint256 feedValue, int8 feedDecimals, uint64 feedTimestamp) = ftso.getFeedById(tender.ftsoFeedId);
-        if (feedValue == 0 || feedTimestamp > block.timestamp || block.timestamp - feedTimestamp > FTSO_MAX_AGE) {
-            revert InvalidFeed();
+        if (scoringPolicies[tenderId].allowUsd) {
+            (uint256 feedValue, int8 feedDecimals, uint64 feedTimestamp) = ftso.getFeedById(tender.ftsoFeedId);
+            if (
+                feedValue == 0 || feedDecimals < -18 || feedDecimals > 18 || feedTimestamp > block.timestamp
+                    || block.timestamp - feedTimestamp > FTSO_MAX_AGE
+            ) {
+                revert InvalidFeed();
+            }
+            tender.ftsoValue = feedValue;
+            tender.ftsoDecimals = feedDecimals;
+            tender.ftsoTimestamp = feedTimestamp;
         }
-        tender.ftsoValue = feedValue;
-        tender.ftsoDecimals = feedDecimals;
-        tender.ftsoTimestamp = feedTimestamp;
         tender.status = TenderStatus.Closed;
         tender.closeBlock = uint64(block.number);
         emit TenderClosed(tenderId, tender.closeBlock, tender.ftsoValue, tender.ftsoDecimals, tender.ftsoTimestamp);
@@ -597,6 +625,15 @@ contract VeilBidFlareMarket {
         return bidReferences[tenderId][bidId];
     }
 
+    function getScoringPolicy(uint256 tenderId) external view returns (ScoringPolicy memory) {
+        _requireTender(tenderId);
+        return scoringPolicies[tenderId];
+    }
+
+    function scoringPolicyHash(ScoringPolicy calldata policy) external pure returns (bytes32) {
+        return _scoringPolicyHash(policy);
+    }
+
     function resultDigest(SelectionResult calldata result) external pure returns (bytes32) {
         return _resultDigest(result);
     }
@@ -631,6 +668,58 @@ contract VeilBidFlareMarket {
     function _requireTender(uint256 tenderId) internal view returns (Tender storage tender) {
         tender = tenders[tenderId];
         if (tender.buyer == address(0)) revert TenderDoesNotExist();
+    }
+
+    function _validateScoringPolicy(ScoringPolicy calldata policy) internal view {
+        if (
+            policy.schemaVersion != 1 || policy.ceilingXrpMicros == 0 || policy.bidDeadline <= block.timestamp
+                || policy.bidDeadline > block.timestamp + 30 days || (!policy.allowXrp && !policy.allowUsd)
+                || policy.maxDeliveryDays == 0 || policy.maxWarrantyDays < policy.minWarrantyDays
+                || uint256(policy.priceWeightBps) + policy.deliveryWeightBps + policy.warrantyWeightBps
+                    != SCORING_WEIGHT_BPS
+                || (policy.warrantyWeightBps != 0 && policy.maxWarrantyDays == policy.minWarrantyDays)
+                || policy.requiredCredentials.length > MAX_CREDENTIAL_REQUIREMENTS
+        ) revert InvalidScoringPolicy();
+        if (policy.allowUsd) {
+            if (policy.ftsoFeedId != XRP_USD_FEED_ID) revert InvalidScoringPolicy();
+        } else if (policy.ftsoFeedId != bytes21(0)) {
+            revert InvalidScoringPolicy();
+        }
+        for (uint256 i; i < policy.requiredCredentials.length; ++i) {
+            CredentialRequirement calldata requirement = policy.requiredCredentials[i];
+            if (requirement.credentialType == bytes32(0) || requirement.issuer == address(0)) {
+                revert InvalidScoringPolicy();
+            }
+            for (uint256 j; j < i; ++j) {
+                CredentialRequirement calldata previous = policy.requiredCredentials[j];
+                if (requirement.credentialType == previous.credentialType && requirement.issuer == previous.issuer) {
+                    revert InvalidScoringPolicy();
+                }
+            }
+        }
+    }
+
+    function _storeScoringPolicy(uint256 tenderId, ScoringPolicy calldata source) internal {
+        ScoringPolicy storage destination = scoringPolicies[tenderId];
+        destination.schemaVersion = source.schemaVersion;
+        destination.ceilingXrpMicros = source.ceilingXrpMicros;
+        destination.bidDeadline = source.bidDeadline;
+        destination.allowXrp = source.allowXrp;
+        destination.allowUsd = source.allowUsd;
+        destination.ftsoFeedId = source.ftsoFeedId;
+        destination.maxDeliveryDays = source.maxDeliveryDays;
+        destination.minWarrantyDays = source.minWarrantyDays;
+        destination.maxWarrantyDays = source.maxWarrantyDays;
+        destination.priceWeightBps = source.priceWeightBps;
+        destination.deliveryWeightBps = source.deliveryWeightBps;
+        destination.warrantyWeightBps = source.warrantyWeightBps;
+        for (uint256 i; i < source.requiredCredentials.length; ++i) {
+            destination.requiredCredentials.push(source.requiredCredentials[i]);
+        }
+    }
+
+    function _scoringPolicyHash(ScoringPolicy calldata policy) internal pure returns (bytes32) {
+        return keccak256(abi.encode(RULES_DOMAIN, policy));
     }
 
     function _teeIndex(Tender storage tender, address teeId) internal view returns (uint8) {

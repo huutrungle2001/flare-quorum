@@ -92,6 +92,19 @@
   },
   {
     "type": "function",
+    "name": "MAX_CREDENTIAL_REQUIREMENTS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "OP_COMMAND_SELECT",
     "inputs": [],
     "outputs": [
@@ -170,6 +183,32 @@
   },
   {
     "type": "function",
+    "name": "RULES_DOMAIN",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "SCORING_WEIGHT_BPS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16",
+        "internalType": "uint16"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "SELECTION_REFUND_GRACE",
     "inputs": [],
     "outputs": [
@@ -229,6 +268,19 @@
         "name": "",
         "type": "bytes32",
         "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "XRP_USD_FEED_ID",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes21",
+        "internalType": "bytes21"
       }
     ],
     "stateMutability": "view"
@@ -311,19 +363,88 @@
             "internalType": "bytes32"
           },
           {
-            "name": "rulesHash",
-            "type": "bytes32",
-            "internalType": "bytes32"
-          },
-          {
-            "name": "publicCeilingXrp",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "bidDeadline",
-            "type": "uint64",
-            "internalType": "uint64"
+            "name": "scoringPolicy",
+            "type": "tuple",
+            "internalType": "struct VeilBidFlareMarket.ScoringPolicy",
+            "components": [
+              {
+                "name": "schemaVersion",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "ceilingXrpMicros",
+                "type": "uint64",
+                "internalType": "uint64"
+              },
+              {
+                "name": "bidDeadline",
+                "type": "uint64",
+                "internalType": "uint64"
+              },
+              {
+                "name": "allowXrp",
+                "type": "bool",
+                "internalType": "bool"
+              },
+              {
+                "name": "allowUsd",
+                "type": "bool",
+                "internalType": "bool"
+              },
+              {
+                "name": "ftsoFeedId",
+                "type": "bytes21",
+                "internalType": "bytes21"
+              },
+              {
+                "name": "maxDeliveryDays",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "minWarrantyDays",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "maxWarrantyDays",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "priceWeightBps",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "deliveryWeightBps",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "warrantyWeightBps",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "requiredCredentials",
+                "type": "tuple[]",
+                "internalType": "struct VeilBidFlareMarket.CredentialRequirement[]",
+                "components": [
+                  {
+                    "name": "credentialType",
+                    "type": "bytes32",
+                    "internalType": "bytes32"
+                  },
+                  {
+                    "name": "issuer",
+                    "type": "address",
+                    "internalType": "address"
+                  }
+                ]
+              }
+            ]
           },
           {
             "name": "approvedVendors",
@@ -349,11 +470,6 @@
             "name": "teeKeyFingerprints",
             "type": "bytes32[3]",
             "internalType": "bytes32[3]"
-          },
-          {
-            "name": "ftsoFeedId",
-            "type": "bytes21",
-            "internalType": "bytes21"
           }
         ]
       }
@@ -572,6 +688,104 @@
             "name": "acceptedBlock",
             "type": "uint64",
             "internalType": "uint64"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getScoringPolicy",
+    "inputs": [
+      {
+        "name": "tenderId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct VeilBidFlareMarket.ScoringPolicy",
+        "components": [
+          {
+            "name": "schemaVersion",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "ceilingXrpMicros",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "bidDeadline",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "allowXrp",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "allowUsd",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "ftsoFeedId",
+            "type": "bytes21",
+            "internalType": "bytes21"
+          },
+          {
+            "name": "maxDeliveryDays",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "minWarrantyDays",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "maxWarrantyDays",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "priceWeightBps",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "deliveryWeightBps",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "warrantyWeightBps",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "requiredCredentials",
+            "type": "tuple[]",
+            "internalType": "struct VeilBidFlareMarket.CredentialRequirement[]",
+            "components": [
+              {
+                "name": "credentialType",
+                "type": "bytes32",
+                "internalType": "bytes32"
+              },
+              {
+                "name": "issuer",
+                "type": "address",
+                "internalType": "address"
+              }
+            ]
           }
         ]
       }
@@ -961,6 +1175,104 @@
   },
   {
     "type": "function",
+    "name": "scoringPolicyHash",
+    "inputs": [
+      {
+        "name": "policy",
+        "type": "tuple",
+        "internalType": "struct VeilBidFlareMarket.ScoringPolicy",
+        "components": [
+          {
+            "name": "schemaVersion",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "ceilingXrpMicros",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "bidDeadline",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "allowXrp",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "allowUsd",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "ftsoFeedId",
+            "type": "bytes21",
+            "internalType": "bytes21"
+          },
+          {
+            "name": "maxDeliveryDays",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "minWarrantyDays",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "maxWarrantyDays",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "priceWeightBps",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "deliveryWeightBps",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "warrantyWeightBps",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "requiredCredentials",
+            "type": "tuple[]",
+            "internalType": "struct VeilBidFlareMarket.CredentialRequirement[]",
+            "components": [
+              {
+                "name": "credentialType",
+                "type": "bytes32",
+                "internalType": "bytes32"
+              },
+              {
+                "name": "issuer",
+                "type": "address",
+                "internalType": "address"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "submitBidReceipt",
     "inputs": [
       {
@@ -1326,6 +1638,11 @@
   {
     "type": "error",
     "name": "InvalidResult",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidScoringPolicy",
     "inputs": []
   },
   {

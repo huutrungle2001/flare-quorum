@@ -102,6 +102,10 @@ contract FlareTokenMock is IERC20 {
             timestamp = nextTimestamp;
         }
 
+        function setDecimals(int8 nextDecimals) external {
+            decimals = nextDecimals;
+        }
+
         function getFeedById(bytes21) external view override returns (uint256, int8, uint64) {
             return (value, decimals, timestamp);
         }
@@ -149,7 +153,7 @@ contract FlareTokenMock is IERC20 {
         uint256 private constant TEE_KEY_2 = 0x2222;
         uint256 private constant TEE_KEY_3 = 0x3333;
         uint256 private constant VENDOR_KEY = 0x4444;
-        bytes21 private constant XRP_USD_FEED = bytes21("XRP/USD");
+        bytes21 private constant XRP_USD_FEED = 0x015852502f55534400000000000000000000000000;
 
         FlareTokenMock private token;
         FlareTeeManagerMock private manager;
@@ -331,6 +335,91 @@ contract FlareTokenMock is IERC20 {
             market.closeTender(tenderId);
         }
 
+        function testPublicScoringPolicyIsValidatedHashedAndStored() external {
+            VeilBidFlareMarket.TenderTerms memory terms = _terms();
+            uint256 tenderId = market.createTender(terms);
+            VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
+            VeilBidFlareMarket.ScoringPolicy memory stored = market.getScoringPolicy(tenderId);
+            if (
+                tender.rulesHash != market.scoringPolicyHash(stored) || stored.schemaVersion != 1
+                    || stored.ceilingXrpMicros != 1_000 || stored.bidDeadline != tender.bidDeadline || !stored.allowXrp
+                    || !stored.allowUsd || stored.ftsoFeedId != market.XRP_USD_FEED_ID()
+                    || stored.priceWeightBps != 6_000 || stored.deliveryWeightBps != 2_500
+                    || stored.warrantyWeightBps != 1_500 || stored.requiredCredentials.length != 0
+            ) revert("public scoring policy mismatch");
+        }
+
+        function testScoringPolicyHashMatchesGoAndTypeScript() external view {
+            VeilBidFlareMarket.CredentialRequirement[] memory credentials =
+                new VeilBidFlareMarket.CredentialRequirement[](0);
+            VeilBidFlareMarket.ScoringPolicy memory policy = VeilBidFlareMarket.ScoringPolicy({
+                schemaVersion: 1,
+                ceilingXrpMicros: 1_000,
+                bidDeadline: 1_700_000_000,
+                allowXrp: true,
+                allowUsd: true,
+                ftsoFeedId: XRP_USD_FEED,
+                maxDeliveryDays: 30,
+                minWarrantyDays: 12,
+                maxWarrantyDays: 36,
+                priceWeightBps: 6_000,
+                deliveryWeightBps: 2_500,
+                warrantyWeightBps: 1_500,
+                requiredCredentials: credentials
+            });
+            if (market.scoringPolicyHash(policy) != 0x8969aa4d8ee1fde2fbf813214484c245419fd278b1b791fe05997813315f8cb2)
+            {
+                revert("Go/TypeScript scoring policy hash drift");
+            }
+        }
+
+        function testRejectsInvalidPublicScoringPolicy() external {
+            VeilBidFlareMarket.TenderTerms memory terms = _terms();
+            terms.scoringPolicy.deliveryWeightBps = 2_499;
+            vm.expectRevert(VeilBidFlareMarket.InvalidScoringPolicy.selector);
+            market.createTender(terms);
+
+            terms = _terms();
+            terms.scoringPolicy.ftsoFeedId = bytes21("XRP/USD");
+            vm.expectRevert(VeilBidFlareMarket.InvalidScoringPolicy.selector);
+            market.createTender(terms);
+
+            terms = _terms();
+            terms.scoringPolicy.requiredCredentials = new VeilBidFlareMarket.CredentialRequirement[](2);
+            VeilBidFlareMarket.CredentialRequirement memory requirement = VeilBidFlareMarket.CredentialRequirement({
+                credentialType: keccak256("qualified-vendor"), issuer: address(0x1234)
+            });
+            terms.scoringPolicy.requiredCredentials[0] = requirement;
+            terms.scoringPolicy.requiredCredentials[1] = requirement;
+            vm.expectRevert(VeilBidFlareMarket.InvalidScoringPolicy.selector);
+            market.createTender(terms);
+        }
+
+        function testXrpOnlyTenderDoesNotDependOnFtso() external {
+            VeilBidFlareMarket.TenderTerms memory terms = _terms();
+            terms.scoringPolicy.allowUsd = false;
+            terms.scoringPolicy.ftsoFeedId = bytes21(0);
+            uint256 tenderId = market.createTender(terms);
+            VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
+            vm.warp(tender.bidDeadline + 1);
+            ftso.setTimestamp(0);
+            market.closeTender(tenderId);
+            tender = market.getTender(tenderId);
+            if (tender.ftsoValue != 0 || tender.ftsoDecimals != 0 || tender.ftsoTimestamp != 0) {
+                revert("XRP-only tender captured an FTSO value");
+            }
+        }
+
+        function testRejectsUnsupportedFtsoDecimals() external {
+            uint256 tenderId = market.createTender(_terms());
+            VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
+            vm.warp(tender.bidDeadline + 1);
+            ftso.setTimestamp(uint64(block.timestamp));
+            ftso.setDecimals(19);
+            vm.expectRevert(VeilBidFlareMarket.InvalidFeed.selector);
+            market.closeTender(tenderId);
+        }
+
         function testRejectsWrongActionResultBinding() external {
             uint256 tenderId = market.createTender(_terms());
             _submitReceipt(tenderId, TEE_KEY_1, teeIds[0]);
@@ -487,17 +576,31 @@ contract FlareTokenMock is IERC20 {
             vendors[0] = vendor;
             bytes32[3] memory fingerprints =
                 [manager.fingerprint(teeIds[0]), manager.fingerprint(teeIds[1]), manager.fingerprint(teeIds[2])];
+            VeilBidFlareMarket.CredentialRequirement[] memory credentials =
+                new VeilBidFlareMarket.CredentialRequirement[](0);
+            VeilBidFlareMarket.ScoringPolicy memory policy = VeilBidFlareMarket.ScoringPolicy({
+                schemaVersion: 1,
+                ceilingXrpMicros: 1_000,
+                bidDeadline: uint64(block.timestamp + 1 days),
+                allowXrp: true,
+                allowUsd: true,
+                ftsoFeedId: XRP_USD_FEED,
+                maxDeliveryDays: 30,
+                minWarrantyDays: 12,
+                maxWarrantyDays: 36,
+                priceWeightBps: 6_000,
+                deliveryWeightBps: 2_500,
+                warrantyWeightBps: 1_500,
+                requiredCredentials: credentials
+            });
             terms = VeilBidFlareMarket.TenderTerms({
                 metadataHash: keccak256("metadata"),
-                rulesHash: keccak256("rules"),
-                publicCeilingXrp: 1_000,
-                bidDeadline: uint64(block.timestamp + 1 days),
+                scoringPolicy: policy,
                 approvedVendors: vendors,
                 extensionId: 0x10001,
                 codeVersion: keccak256("veilbid-fcc-v1"),
                 teeIds: teeIds,
-                teeKeyFingerprints: fingerprints,
-                ftsoFeedId: XRP_USD_FEED
+                teeKeyFingerprints: fingerprints
             });
         }
 

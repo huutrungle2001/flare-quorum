@@ -12,9 +12,21 @@ function fixture() {
     executorFeeUBA: "0",
     terms: {
       metadataHash: `0x${"22".repeat(32)}`,
-      rulesHash: `0x${"33".repeat(32)}`,
-      publicCeilingXrp: "1000000",
-      bidDeadline: "2000000000",
+      scoringPolicy: {
+        schemaVersion: 1,
+        ceilingXrpMicros: "1000000",
+        bidDeadline: "2000000000",
+        allowXrp: true,
+        allowUsd: true,
+        ftsoFeedId: "0x015852502f55534400000000000000000000000000",
+        maxDeliveryDays: 30,
+        minWarrantyDays: 12,
+        maxWarrantyDays: 36,
+        priceWeightBps: 6000,
+        deliveryWeightBps: 2500,
+        warrantyWeightBps: 1500,
+        requiredCredentials: [],
+      },
       approvedVendors: ["0x2000000000000000000000000000000000000002"],
       extensionId: "65922",
       codeVersion: `0x${"44".repeat(32)}`,
@@ -28,7 +40,6 @@ function fixture() {
         `0x${"66".repeat(32)}`,
         `0x${"77".repeat(32)}`,
       ],
-      ftsoFeedId: "0x015852502f55534400000000000000000000000000",
     },
   };
 }
@@ -36,7 +47,7 @@ function fixture() {
 test("parses a public-safe deterministic mint-and-fund job", () => {
   const parsed = parseFlareFundingJob(fixture());
   assert.equal(parsed.nonce, 7n);
-  assert.equal(parsed.terms.publicCeilingXrp, 1_000_000n);
+  assert.equal(parsed.terms.scoringPolicy.ceilingXrpMicros, 1_000_000n);
   assert.equal(parsed.terms.extensionId, 65_922n);
 });
 
@@ -51,4 +62,7 @@ test("rejects unknown fields, JSON numbers for large integers, and duplicate TEE
   const duplicate = fixture();
   duplicate.terms.teeIds[1] = duplicate.terms.teeIds[0];
   assert.throws(() => parseFlareFundingJob(duplicate), /INVALID_TEE_IDS/);
+  const invalidPolicy = fixture();
+  invalidPolicy.terms.scoringPolicy.priceWeightBps = 5999;
+  assert.throws(() => parseFlareFundingJob(invalidPolicy), /INVALID_FLARE_SCORING_POLICY/);
 });

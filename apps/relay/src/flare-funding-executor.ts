@@ -1,6 +1,7 @@
 import {
   assertXrpPaymentProof,
   buildMintAndFundPlan,
+  calculateFlareRulesHash,
   calculateFdcVotingRound,
   inspectDirectMintingReceipt,
   prepareXrpPaymentRequest,
@@ -193,7 +194,7 @@ export class FlareFundingExecutor {
       executorFee: job.executorFeeUBA,
     });
     const requiredMintedAmountUBA =
-      job.terms.publicCeilingXrp + job.executorFeeUBA;
+      job.terms.scoringPolicy.ceilingXrpMicros + job.executorFeeUBA;
     const quote = quoteSmartAccountDirectMinting(
       requiredMintedAmountUBA,
       network.directMintingFeeBips,
@@ -304,8 +305,8 @@ export class FlareFundingExecutor {
     }).find((event) =>
       event.address.toLowerCase() === this.config.marketAddress.toLowerCase() &&
       event.args.buyer.toLowerCase() === job.personalAccount.toLowerCase() &&
-      event.args.rulesHash.toLowerCase() === job.terms.rulesHash.toLowerCase() &&
-      event.args.ceiling === job.terms.publicCeilingXrp
+      event.args.rulesHash.toLowerCase() === calculateFlareRulesHash(job.terms.scoringPolicy).toLowerCase() &&
+      event.args.ceiling === job.terms.scoringPolicy.ceilingXrpMicros
     );
     if (!tender) throw new Error("TENDER_CREATION_NOT_PROVEN");
     return {

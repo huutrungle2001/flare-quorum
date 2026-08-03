@@ -95,6 +95,30 @@ func TestBidAndReceiptWireGoldenVectors(t *testing.T) {
 	}
 }
 
+func TestPublicScoringPolicyHashMatchesSolidityAndTypeScript(t *testing.T) {
+	rules := ScoringRules{
+		SchemaVersion:     1,
+		CeilingXrpMicros:  1_000,
+		BidDeadline:       1_700_000_000,
+		AllowXRP:          true,
+		AllowUSD:          true,
+		FtsoFeedID:        [21]byte{0x01, 'X', 'R', 'P', '/', 'U', 'S', 'D'},
+		MaxDeliveryDays:   30,
+		MinWarrantyDays:   12,
+		MaxWarrantyDays:   36,
+		PriceWeightBPS:    6_000,
+		DeliveryWeightBPS: 2_500,
+		WarrantyWeightBPS: 1_500,
+	}
+	hash, err := RulesHash(rules)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hash.Hex() != "0x8969aa4d8ee1fde2fbf813214484c245419fd278b1b791fe05997813315f8cb2" {
+		t.Fatalf("public scoring policy hash drifted: %s", hash)
+	}
+}
+
 func TestBidReceiptDigestIgnoresTransportSignatureOnly(t *testing.T) {
 	receipt := BidReceipt{
 		SchemaVersion:       1,

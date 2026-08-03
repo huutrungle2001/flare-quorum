@@ -3,9 +3,21 @@ import { prepareFlareFunding, encodeFlareDirectMintingCall } from "../src/transa
 
 const terms = {
   metadataHash: `0x${"11".repeat(32)}` as const,
-  rulesHash: `0x${"22".repeat(32)}` as const,
-  publicCeilingXrp: 1_000_000n,
-  bidDeadline: 2_000n,
+  scoringPolicy: {
+    schemaVersion: 1,
+    ceilingXrpMicros: 1_000_000n,
+    bidDeadline: 2_000n,
+    allowXrp: true,
+    allowUsd: true,
+    ftsoFeedId: "0x015852502f55534400000000000000000000000000" as const,
+    maxDeliveryDays: 30,
+    minWarrantyDays: 12,
+    maxWarrantyDays: 36,
+    priceWeightBps: 6_000,
+    deliveryWeightBps: 2_500,
+    warrantyWeightBps: 1_500,
+    requiredCredentials: [],
+  },
   approvedVendors: ["0x3000000000000000000000000000000000000003"] as const,
   extensionId: 65_537n,
   codeVersion: `0x${"33".repeat(32)}` as const,
@@ -19,7 +31,6 @@ const terms = {
     `0x${"55".repeat(32)}`,
     `0x${"66".repeat(32)}`,
   ] as const,
-  ftsoFeedId: "0x015852502f55534400000000000000000000000000" as const,
 };
 
 describe("Flare funding preparation", () => {

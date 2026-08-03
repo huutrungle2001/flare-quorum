@@ -1,9 +1,10 @@
 # VeilBid Flare Championship Contract Specification
 
-> Status: The first local Flare market slice implements receipt-quorum,
-> close-time FTSO, canonical FCC action-result verification, and public-token
-> escrow conservation. Private ingress, production scoring, Smart Account/FDC,
-> deployment, and Coston2 verification remain pending.
+> Status: The local Flare market slice implements canonical public scoring
+> policy, receipt quorum, conditional close-time FTSO, canonical FCC
+> action-result verification, and public-token escrow conservation. Private
+> ingress and Smart Account/FDC execution are implemented and tested locally;
+> live FCC deployment and end-to-end Coston2 verification remain pending.
 
 ## 1. Core types
 
@@ -39,6 +40,28 @@ winnerBidId
 winner
 winningAmountXrp
 ```
+
+### Public scoring policy
+
+```text
+schemaVersion              // exactly 1
+ceilingXrpMicros            // uint64 FTestXRP escrow ceiling
+bidDeadline                 // bounded future unix seconds
+allowXrp
+allowUsd
+ftsoFeedId                  // official Coston2 XRP/USD ID iff USD is enabled
+maxDeliveryDays
+minWarrantyDays
+maxWarrantyDays
+priceWeightBps
+deliveryWeightBps
+warrantyWeightBps           // all weights sum to 10_000
+requiredCredentials[]       // at most four unique (type, issuer) pairs
+```
+
+The complete policy is stored on-chain. `rulesHash` is derived only as
+`keccak256(abi.encode(RULES_DOMAIN, scoringPolicy))`; no client, relay, or
+Smart Account job can supply an independent rule hash.
 
 ### Bid receipt
 
@@ -106,10 +129,11 @@ not a caller-controlled contract state.
 
 ## 3. Target writes
 
-- `createTender(TenderTerms, MachinePolicy, ScoringPolicy)`
-- `createTenderAndFund(...)` for atomic buyer/Smart Account execution
-- `confirmFunding(tenderId)` when separate balance-delta confirmation is needed
-- `submitBidReceipts(tenderId, receiptEnvelope[])`
+- `createTender(TenderTerms)` where `TenderTerms` contains the complete public
+  `ScoringPolicy`; an FTestXRP approval plus this call is the atomic Smart
+  Account batch
+- `submitBidReceipt(tenderId, receipt, signature)` until a matching receipt
+  threshold accepts the vendor's bid
 - `closeTender(tenderId)`
 - `requestSelection(tenderId)`
 - `retrySelection(tenderId)` only after the signed-result window expires; it
@@ -142,6 +166,8 @@ escrow back to the buyer.
 - Threshold is exactly two in championship mode.
 - XRP/USD feed ID is official when USD quotes are enabled.
 - Exact FTestXRP ceiling reaches escrow before `Open`.
+- The market derives `rulesHash` from the validated policy and exposes the
+  immutable policy through `getScoringPolicy` at finalized blocks.
 
 Generic assets and one-machine policy are accepted only by isolated feasibility
 contracts, never the release market.
@@ -171,9 +197,11 @@ early close is enabled. It:
 
 - freezes bid count, ordered root, common quorum, rules, and close block;
 - rejects future bid receipts;
-- reads and stores official XRP/USD value/decimals/timestamp when USD quotes are
-  enabled;
+- reads and stores the hard-bound official Coston2 XRP/USD
+  `0x015852502f55534400000000000000000000000000` value/decimals/timestamp when
+  USD quotes are enabled;
 - enforces positive value and configured freshness;
+- performs no oracle call and stores a zero snapshot for XRP-only policy;
 - advances to `Closed`.
 
 The caller cannot supply the FTSO snapshot.

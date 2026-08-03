@@ -150,12 +150,16 @@ for every golden vector without exposing losing fields.
 
 ### Phase 3 — Flare market and escrow
 
-- [ ] Implement `VeilBidFlareMarket` lifecycle and exact FTestXRP escrow.
+- [x] Implement the local `VeilBidFlareMarket` lifecycle and exact FTestXRP
+  escrow model; live Coston2 proof remains required by the phase exit.
 - [ ] Resolve FTestXRP/AssetManager through supported Flare tooling.
-- [ ] Implement FTSO XRP/USD snapshot, freshness, decimals, and bounds.
-- [ ] Implement asynchronous close/request/result/finalize recovery.
-- [ ] Verify distinct threshold signers over the exact same domain digest.
-- [ ] Implement winner payout, buyer remainder, zero-winner refund, and receipt.
+- [x] Implement contract-canonical public scoring policy plus conditional FTSO
+  XRP/USD snapshot, official feed, freshness, decimals, and bounds locally.
+- [x] Implement asynchronous close/request/result/finalize recovery locally.
+- [x] Verify distinct threshold signers over the exact same domain digest in
+  Foundry; registered live-machine verification remains pending.
+- [x] Implement and unit-test winner payout, buyer remainder, zero-winner
+  refund, and receipt.
 - [ ] Add unit, fuzz, invariant, reentrancy, signer, root, nonce, and expiry tests.
 
 Exit: a two-vendor Coston2 tender settles FTestXRP only through threshold FCC
@@ -311,9 +315,9 @@ the championship product and requires Product Plan approval.
 | FCC foundation operation | IMPLEMENTED LOCALLY — deterministic `PING_V1` tests pass; live Gate A not run |
 | FCC private ingress | LOCAL IMPLEMENTATION — official direct envelope, loopback decrypt/sign, sealed ciphertext restart/replay tests; no live proxy/TEE proof |
 | Multi-TEE quorum | NOT STARTED |
-| Flare contracts | LOCAL FEASIBILITY — foundation sender plus FCC/FTestXRP/FTSO market lifecycle tests pass; no live deployment |
+| Flare contracts | LOCAL IMPLEMENTATION — contract-derived/stored public scoring policy, FCC/FTestXRP/conditional-FTSO lifecycle, payout and recovery tests pass; no live deployment |
 | FAssets/FDC/Smart Account journey | LOCAL EXECUTOR COMPLETE — live registry/FDC/direct-mint bindings pass; real XRPL payment, FDC proof, and Gate G execution pending |
-| FTSO scoring | LOCAL GO MODEL — checked XRP/USD conversion, credentials, penalties, and tie tests pass; not wired to FCC |
+| FTSO scoring | LOCAL CROSS-STACK IMPLEMENTATION — contract policy hash matches Go/TypeScript, XRP/USD conversion and scoring vectors pass; no live FCC/FTSO lifecycle |
 | Coston2 deployment/evidence | NOT STARTED |
 | User research/traction | NOT STARTED |
 

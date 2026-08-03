@@ -100,7 +100,7 @@ accounting layer is research scope and must not be described as shipped.
 | Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Market tested locally; Gate-A sender live; release pending |
 | FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Direct-mint executor implemented/tested locally; live lifecycle pending |
 | Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Request/fee/round/DA proof path implemented/tested locally; live proof pending |
-| FTSOv2 | Freeze XRP/USD close snapshot for XRP/USD bid normalization | Planned, mandatory |
+| FTSOv2 | Freeze XRP/USD close snapshot for XRP/USD bid normalization | Canonical policy/feed and conditional snapshot tested locally; live close pending |
 | Flare Smart Accounts | Atomically mint FXRP and create/fund tender from an XRPL instruction | Exact `0xFE` batch and receipt verifier implemented/tested locally; live execution pending |
 | Multi-TEE threshold | Fixed three-machine bid custody and two matching selection results | Planned championship gate |
 

@@ -9,6 +9,11 @@ import {
   type Hex,
 } from "viem";
 import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { type: "json" };
+import {
+  assertFlareScoringPolicy,
+  calculateFlareRulesHash,
+  type FlareScoringPolicy,
+} from "./smart-account.js";
 
 const marketAbi = marketAbiJson as Abi;
 const finalityDepth = 12n;
@@ -35,6 +40,7 @@ export interface Coston2PublicTender {
   buyer: Address;
   metadataHash: Hex;
   rulesHash: Hex;
+  scoringPolicy: FlareScoringPolicy;
   publicCeilingXrp: bigint;
   bidDeadline: bigint;
   closeBlock: bigint;
@@ -216,11 +222,17 @@ function decodeAwardFacts(logs: readonly Coston2PublicLog[]): Map<bigint, AwardF
 function mapTender(
   tenderId: bigint,
   record: Coston2TenderRecord,
+  scoringPolicy: FlareScoringPolicy,
   award: AwardFact | undefined,
 ): Coston2PublicTender {
+  assertFlareScoringPolicy(scoringPolicy);
+  if (calculateFlareRulesHash(scoringPolicy).toLowerCase() !== record.rulesHash.toLowerCase()) {
+    throw new Error("COSTON2_SCORING_POLICY_HASH_MISMATCH");
+  }
   return {
     ...record,
     tenderId,
+    scoringPolicy,
     status: tenderStatus(record.status),
     winnerBidId: award?.winnerBidId ?? null,
     winner: award?.winner ?? null,
@@ -283,16 +295,26 @@ export async function loadCoston2PublicMarket(
   const awards = decodeAwardFacts(logs);
   const tenders: Coston2PublicTender[] = [];
   for (let tenderId = 1n; tenderId <= tenderCount; tenderId += 1n) {
-    const record = await reader.readContract({
-      address: config.marketAddress,
-      abi: marketAbi,
-      functionName: "getTender",
-      args: [tenderId],
-      blockNumber: safeBlock,
-    });
+    const [record, scoringPolicy] = await Promise.all([
+      reader.readContract({
+        address: config.marketAddress,
+        abi: marketAbi,
+        functionName: "getTender",
+        args: [tenderId],
+        blockNumber: safeBlock,
+      }),
+      reader.readContract({
+        address: config.marketAddress,
+        abi: marketAbi,
+        functionName: "getScoringPolicy",
+        args: [tenderId],
+        blockNumber: safeBlock,
+      }),
+    ]);
     tenders.push(mapTender(
       tenderId,
       record as Coston2TenderRecord,
+      scoringPolicy as FlareScoringPolicy,
       awards.get(tenderId),
     ));
   }

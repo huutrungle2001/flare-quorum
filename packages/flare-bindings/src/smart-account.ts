@@ -3,6 +3,7 @@ import {
   encodeAbiParameters,
   encodeFunctionData,
   keccak256,
+  stringToHex,
   toHex,
   zeroHash,
   type Address,
@@ -18,13 +19,62 @@ const erc20ApproveAbi = [{
 const marketCreateTenderAbi = [{
   type: "function", name: "createTender", stateMutability: "nonpayable",
   inputs: [{ name: "terms", type: "tuple", components: [
-    { name: "metadataHash", type: "bytes32" }, { name: "rulesHash", type: "bytes32" },
-    { name: "publicCeilingXrp", type: "uint256" }, { name: "bidDeadline", type: "uint64" },
+    { name: "metadataHash", type: "bytes32" },
+    { name: "scoringPolicy", type: "tuple", components: [
+      { name: "schemaVersion", type: "uint16" }, { name: "ceilingXrpMicros", type: "uint64" },
+      { name: "bidDeadline", type: "uint64" }, { name: "allowXrp", type: "bool" },
+      { name: "allowUsd", type: "bool" }, { name: "ftsoFeedId", type: "bytes21" },
+      { name: "maxDeliveryDays", type: "uint16" }, { name: "minWarrantyDays", type: "uint16" },
+      { name: "maxWarrantyDays", type: "uint16" }, { name: "priceWeightBps", type: "uint16" },
+      { name: "deliveryWeightBps", type: "uint16" }, { name: "warrantyWeightBps", type: "uint16" },
+      { name: "requiredCredentials", type: "tuple[]", components: [
+        { name: "credentialType", type: "bytes32" }, { name: "issuer", type: "address" },
+      ] },
+    ] },
     { name: "approvedVendors", type: "address[]" }, { name: "extensionId", type: "uint256" },
     { name: "codeVersion", type: "bytes32" }, { name: "teeIds", type: "address[3]" },
-    { name: "teeKeyFingerprints", type: "bytes32[3]" }, { name: "ftsoFeedId", type: "bytes21" },
+    { name: "teeKeyFingerprints", type: "bytes32[3]" },
   ] }], outputs: [{ name: "tenderId", type: "uint256" }],
 }] as const;
+
+const scoringPolicyParameter = [{ type: "tuple", components: [
+  { name: "schemaVersion", type: "uint16" }, { name: "ceilingXrpMicros", type: "uint64" },
+  { name: "bidDeadline", type: "uint64" }, { name: "allowXrp", type: "bool" },
+  { name: "allowUsd", type: "bool" }, { name: "ftsoFeedId", type: "bytes21" },
+  { name: "maxDeliveryDays", type: "uint16" }, { name: "minWarrantyDays", type: "uint16" },
+  { name: "maxWarrantyDays", type: "uint16" }, { name: "priceWeightBps", type: "uint16" },
+  { name: "deliveryWeightBps", type: "uint16" }, { name: "warrantyWeightBps", type: "uint16" },
+  { name: "requiredCredentials", type: "tuple[]", components: [
+    { name: "credentialType", type: "bytes32" }, { name: "issuer", type: "address" },
+  ] },
+]}] as const;
+
+const rulesDomain = keccak256(stringToHex("VEILBID_RULES_V1"));
+export const coston2XrpUsdFeedId = "0x015852502f55534400000000000000000000000000" as const;
+const zeroFeedId = `0x${"00".repeat(21)}`;
+const zeroAddress = "0x0000000000000000000000000000000000000000";
+const bytes32Pattern = /^0x[0-9a-fA-F]{64}$/;
+
+export interface FlareCredentialRequirement {
+  credentialType: Hex;
+  issuer: Address;
+}
+
+export interface FlareScoringPolicy {
+  schemaVersion: number;
+  ceilingXrpMicros: bigint;
+  bidDeadline: bigint;
+  allowXrp: boolean;
+  allowUsd: boolean;
+  ftsoFeedId: Hex;
+  maxDeliveryDays: number;
+  minWarrantyDays: number;
+  maxWarrantyDays: number;
+  priceWeightBps: number;
+  deliveryWeightBps: number;
+  warrantyWeightBps: number;
+  requiredCredentials: readonly FlareCredentialRequirement[];
+}
 
 export const personalAccountExecuteUserOpAbi = [{
   type: "function", name: "executeUserOp", stateMutability: "payable",
@@ -48,15 +98,54 @@ const packedUserOperationParameter = [{ type: "tuple", components: [
 
 export interface FlareTenderTerms {
   metadataHash: Hex;
-  rulesHash: Hex;
-  publicCeilingXrp: bigint;
-  bidDeadline: bigint;
+  scoringPolicy: FlareScoringPolicy;
   approvedVendors: readonly Address[];
   extensionId: bigint;
   codeVersion: Hex;
   teeIds: readonly [Address, Address, Address];
   teeKeyFingerprints: readonly [Hex, Hex, Hex];
-  ftsoFeedId: Hex;
+}
+
+function uint16(value: number): boolean {
+  return Number.isInteger(value) && value >= 0 && value <= 65_535;
+}
+
+export function assertFlareScoringPolicy(policy: FlareScoringPolicy): void {
+  const credentials = policy.requiredCredentials;
+  if (
+    policy.schemaVersion !== 1 || policy.ceilingXrpMicros <= 0n || policy.ceilingXrpMicros > 0xffff_ffff_ffff_ffffn ||
+    policy.bidDeadline <= 0n || policy.bidDeadline > 0xffff_ffff_ffff_ffffn ||
+    (!policy.allowXrp && !policy.allowUsd) || !uint16(policy.maxDeliveryDays) || policy.maxDeliveryDays === 0 ||
+    !uint16(policy.minWarrantyDays) || !uint16(policy.maxWarrantyDays) ||
+    policy.maxWarrantyDays < policy.minWarrantyDays || !uint16(policy.priceWeightBps) ||
+    !uint16(policy.deliveryWeightBps) || !uint16(policy.warrantyWeightBps) ||
+    policy.priceWeightBps + policy.deliveryWeightBps + policy.warrantyWeightBps !== 10_000 ||
+    (policy.warrantyWeightBps !== 0 && policy.maxWarrantyDays === policy.minWarrantyDays) ||
+    !Array.isArray(credentials) || credentials.length > 4
+  ) throw new Error("INVALID_FLARE_SCORING_POLICY");
+  const feed = policy.ftsoFeedId.toLowerCase();
+  if (
+    (policy.allowUsd && feed !== coston2XrpUsdFeedId.toLowerCase()) ||
+    (!policy.allowUsd && feed !== zeroFeedId)
+  ) throw new Error("INVALID_FLARE_SCORING_POLICY");
+  const seen = new Set<string>();
+  for (const requirement of credentials) {
+    const key = `${requirement.credentialType.toLowerCase()}:${requirement.issuer.toLowerCase()}`;
+    if (
+      !bytes32Pattern.test(requirement.credentialType) || /^0x0{64}$/.test(requirement.credentialType) ||
+      !/^0x[0-9a-fA-F]{40}$/.test(requirement.issuer) || requirement.issuer.toLowerCase() === zeroAddress ||
+      seen.has(key)
+    ) throw new Error("INVALID_FLARE_SCORING_POLICY");
+    seen.add(key);
+  }
+}
+
+export function calculateFlareRulesHash(policy: FlareScoringPolicy): Hex {
+  assertFlareScoringPolicy(policy);
+  return keccak256(encodeAbiParameters(
+    [{ type: "bytes32" }, scoringPolicyParameter[0]],
+    [rulesDomain, policy],
+  ));
 }
 
 export interface PackedUserOperation {
@@ -88,12 +177,13 @@ export function buildMintAndFundPlan(input: {
   walletId: number;
   executorFee: bigint;
 }): MintAndFundPlan {
-  if (input.nonce < 0n || input.terms.publicCeilingXrp <= 0n) throw new Error("INVALID_USER_OPERATION");
+  assertFlareScoringPolicy(input.terms.scoringPolicy);
+  if (input.nonce < 0n || !bytes32Pattern.test(input.terms.metadataHash)) throw new Error("INVALID_USER_OPERATION");
   if (!Number.isInteger(input.walletId) || input.walletId < 0 || input.walletId > 255) throw new Error("INVALID_WALLET_ID");
   if (input.executorFee < 0n || input.executorFee > 0xffff_ffff_ffff_ffffn) throw new Error("INVALID_EXECUTOR_FEE");
 
   const calls = [
-    { target: input.fTestXrp, value: 0n as const, data: encodeFunctionData({ abi: erc20ApproveAbi, functionName: "approve", args: [input.market, input.terms.publicCeilingXrp] }) },
+    { target: input.fTestXrp, value: 0n as const, data: encodeFunctionData({ abi: erc20ApproveAbi, functionName: "approve", args: [input.market, input.terms.scoringPolicy.ceilingXrpMicros] }) },
     { target: input.market, value: 0n as const, data: encodeFunctionData({ abi: marketCreateTenderAbi, functionName: "createTender", args: [input.terms] }) },
   ] as const;
   const callData = encodeFunctionData({ abi: personalAccountExecuteUserOpAbi, functionName: "executeUserOp", args: [calls] });

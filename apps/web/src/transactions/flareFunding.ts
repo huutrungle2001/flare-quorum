@@ -41,7 +41,7 @@ export function prepareFlareFunding(input: {
 }): FlareFundingPreparation {
   const plan = buildMintAndFundPlan(input);
   const paymentQuote = quoteSmartAccountDirectMinting(
-    input.terms.publicCeilingXrp + input.executorFee,
+    input.terms.scoringPolicy.ceilingXrpMicros + input.executorFee,
     input.directMintingFeeBips,
     input.directMintingMinimumFeeUBA,
   );

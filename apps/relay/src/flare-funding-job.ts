@@ -4,7 +4,12 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import type { FlareTenderTerms } from "@veilbid/flare-bindings";
+import {
+  assertFlareScoringPolicy,
+  type FlareCredentialRequirement,
+  type FlareScoringPolicy,
+  type FlareTenderTerms,
+} from "@veilbid/flare-bindings";
 
 export interface FlareFundingJob {
   version: 1;
@@ -35,6 +40,18 @@ function exactKeys(
 function bigintString(value: unknown, code: string): bigint {
   if (typeof value !== "string" || !/^[0-9]+$/.test(value)) throw new Error(code);
   return BigInt(value);
+}
+
+function uint16Number(value: unknown, code: string): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > 65_535) {
+    throw new Error(code);
+  }
+  return value;
+}
+
+function boolean(value: unknown, code: string): boolean {
+  if (typeof value !== "boolean") throw new Error(code);
+  return value;
 }
 
 function address(value: unknown, code: string): Address {
@@ -69,28 +86,69 @@ function triple<T>(value: unknown, parse: (item: unknown) => T, code: string): r
   return [parsed[0]!, parsed[1]!, parsed[2]!];
 }
 
+function credentialRequirements(value: unknown): readonly FlareCredentialRequirement[] {
+  if (!Array.isArray(value) || value.length > 4) {
+    throw new Error("INVALID_REQUIRED_CREDENTIALS");
+  }
+  return value.map((item) => {
+    const parsed = object(item, "INVALID_REQUIRED_CREDENTIALS");
+    exactKeys(parsed, ["credentialType", "issuer"], "UNKNOWN_CREDENTIAL_REQUIREMENT_FIELD");
+    return {
+      credentialType: fixedHex(parsed.credentialType, 32, "INVALID_CREDENTIAL_TYPE"),
+      issuer: address(parsed.issuer, "INVALID_CREDENTIAL_ISSUER"),
+    };
+  });
+}
+
+function scoringPolicy(value: unknown): FlareScoringPolicy {
+  const parsed = object(value, "INVALID_FLARE_SCORING_POLICY");
+  exactKeys(parsed, [
+    "schemaVersion",
+    "ceilingXrpMicros",
+    "bidDeadline",
+    "allowXrp",
+    "allowUsd",
+    "ftsoFeedId",
+    "maxDeliveryDays",
+    "minWarrantyDays",
+    "maxWarrantyDays",
+    "priceWeightBps",
+    "deliveryWeightBps",
+    "warrantyWeightBps",
+    "requiredCredentials",
+  ], "UNKNOWN_FLARE_SCORING_POLICY_FIELD");
+  const policy: FlareScoringPolicy = {
+    schemaVersion: uint16Number(parsed.schemaVersion, "INVALID_SCORING_SCHEMA_VERSION"),
+    ceilingXrpMicros: bigintString(parsed.ceilingXrpMicros, "INVALID_PUBLIC_CEILING_XRP"),
+    bidDeadline: bigintString(parsed.bidDeadline, "INVALID_BID_DEADLINE"),
+    allowXrp: boolean(parsed.allowXrp, "INVALID_ALLOW_XRP"),
+    allowUsd: boolean(parsed.allowUsd, "INVALID_ALLOW_USD"),
+    ftsoFeedId: fixedHex(parsed.ftsoFeedId, 21, "INVALID_FTSO_FEED_ID"),
+    maxDeliveryDays: uint16Number(parsed.maxDeliveryDays, "INVALID_MAX_DELIVERY_DAYS"),
+    minWarrantyDays: uint16Number(parsed.minWarrantyDays, "INVALID_MIN_WARRANTY_DAYS"),
+    maxWarrantyDays: uint16Number(parsed.maxWarrantyDays, "INVALID_MAX_WARRANTY_DAYS"),
+    priceWeightBps: uint16Number(parsed.priceWeightBps, "INVALID_PRICE_WEIGHT_BPS"),
+    deliveryWeightBps: uint16Number(parsed.deliveryWeightBps, "INVALID_DELIVERY_WEIGHT_BPS"),
+    warrantyWeightBps: uint16Number(parsed.warrantyWeightBps, "INVALID_WARRANTY_WEIGHT_BPS"),
+    requiredCredentials: credentialRequirements(parsed.requiredCredentials),
+  };
+  assertFlareScoringPolicy(policy);
+  return policy;
+}
+
 function terms(value: unknown): FlareTenderTerms {
   const parsed = object(value, "INVALID_FLARE_FUNDING_TERMS");
   exactKeys(parsed, [
     "metadataHash",
-    "rulesHash",
-    "publicCeilingXrp",
-    "bidDeadline",
+    "scoringPolicy",
     "approvedVendors",
     "extensionId",
     "codeVersion",
     "teeIds",
     "teeKeyFingerprints",
-    "ftsoFeedId",
   ], "UNKNOWN_FLARE_FUNDING_TERM");
-  const publicCeilingXrp = bigintString(parsed.publicCeilingXrp, "INVALID_PUBLIC_CEILING_XRP");
-  const bidDeadline = bigintString(parsed.bidDeadline, "INVALID_BID_DEADLINE");
   const extensionId = bigintString(parsed.extensionId, "INVALID_EXTENSION_ID");
-  if (
-    publicCeilingXrp <= 0n ||
-    bidDeadline <= 0n ||
-    extensionId < 65_536n
-  ) {
+  if (extensionId < 65_536n) {
     throw new Error("INVALID_FLARE_FUNDING_TERMS");
   }
   const teeIds = triple(parsed.teeIds, (item) => address(item, "INVALID_TEE_IDS"), "INVALID_TEE_IDS");
@@ -107,15 +165,12 @@ function terms(value: unknown): FlareTenderTerms {
   }
   return {
     metadataHash: fixedHex(parsed.metadataHash, 32, "INVALID_METADATA_HASH"),
-    rulesHash: fixedHex(parsed.rulesHash, 32, "INVALID_RULES_HASH"),
-    publicCeilingXrp,
-    bidDeadline,
+    scoringPolicy: scoringPolicy(parsed.scoringPolicy),
     approvedVendors: addressArray(parsed.approvedVendors, "INVALID_APPROVED_VENDORS"),
     extensionId,
     codeVersion: fixedHex(parsed.codeVersion, 32, "INVALID_CODE_VERSION"),
     teeIds,
     teeKeyFingerprints,
-    ftsoFeedId: fixedHex(parsed.ftsoFeedId, 21, "INVALID_FTSO_FEED_ID"),
   };
 }
 

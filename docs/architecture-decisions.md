@@ -548,6 +548,32 @@ by the CLI. The minimal local ABIs are drift-tested against the exact
 creation while preventing an executor from becoming a generic arbitrary-call
 relayer or a source of fabricated success evidence.
 
+## ADR-023 — Contract-canonical public scoring policy
+
+**Decision:** `VeilBidFlareMarket.createTender` accepts the complete versioned
+`ScoringPolicy`, validates its ceiling, deadline, quote currencies, service
+bounds, weight sum, credential requirements, and network feed policy, stores
+the tuple, and derives `rulesHash` itself. The former independent client
+`rulesHash` field is removed from the Solidity ABI, Smart Account builder, and
+funding-job schema. Finalized public readers load both the tender and its exact
+policy, and the relay independently derives the hash before it accepts a
+`TenderCreated` event as funding success.
+
+For this Coston2 release, a USD-enabled policy must use the official bytes21
+XRP/USD feed ID
+`0x015852502f55534400000000000000000000000000`. XRP-only policy must use the
+zero feed ID and closing it does not call FTSO. USD-enabled close rejects zero,
+future, stale, or unsupported-decimal snapshots. A shared golden vector fixes
+the policy hash across Solidity, Go, and TypeScript.
+
+**Reason:** The previous ABI could pair an arbitrary caller-controlled hash
+with only a ceiling, deadline, and feed identifier on-chain. That made the
+published procurement rule unverifiable and allowed the client representation
+to diverge from what FCC scored. Canonical storage and derivation make the
+transparent rule a contract fact while keeping every bid value and credential
+private. This is locally tested architecture only until the replacement market
+is deployed and runtime-verified on Coston2.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:

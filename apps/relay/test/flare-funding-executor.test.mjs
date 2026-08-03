@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   assetManagerFAssetsAbi,
   buildMintAndFundPlan,
+  calculateFlareRulesHash,
   memoInstructionsEventsAbi,
   testXrpSourceId,
   xrpPaymentAttestationType,
@@ -21,7 +22,6 @@ const assetManager = "0x4000000000000000000000000000000000000004";
 const controller = "0x5000000000000000000000000000000000000005";
 const fTestXrp = "0x0b6A3645c240605887a5532109323A3E12273dc7";
 const transactionId = `0x${"11".repeat(32)}`;
-const rulesHash = `0x${"33".repeat(32)}`;
 
 const job = {
   version: 1,
@@ -32,9 +32,21 @@ const job = {
   executorFeeUBA: 0n,
   terms: {
     metadataHash: `0x${"22".repeat(32)}`,
-    rulesHash,
-    publicCeilingXrp: 1_000_000n,
-    bidDeadline: 2_000_000_000n,
+    scoringPolicy: {
+      schemaVersion: 1,
+      ceilingXrpMicros: 1_000_000n,
+      bidDeadline: 2_000_000_000n,
+      allowXrp: true,
+      allowUsd: true,
+      ftsoFeedId: "0x015852502f55534400000000000000000000000000",
+      maxDeliveryDays: 30,
+      minWarrantyDays: 12,
+      maxWarrantyDays: 36,
+      priceWeightBps: 6_000,
+      deliveryWeightBps: 2_500,
+      warrantyWeightBps: 1_500,
+      requiredCredentials: [],
+    },
     approvedVendors: ["0x6000000000000000000000000000000000000006"],
     extensionId: 65_922n,
     codeVersion: `0x${"44".repeat(32)}`,
@@ -48,9 +60,9 @@ const job = {
       `0x${"66".repeat(32)}`,
       `0x${"77".repeat(32)}`,
     ],
-    ftsoFeedId: "0x015852502f55534400000000000000000000000000",
   },
 };
+const rulesHash = calculateFlareRulesHash(job.terms.scoringPolicy);
 
 const config = {
   mode: "execute",

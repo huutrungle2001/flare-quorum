@@ -6,7 +6,8 @@ import {
   loadCoston2PublicMarket,
   type Coston2MarketConfig,
   type Coston2PublicReader,
-} from "../src/public-market.ts";
+} from "../dist/public-market.js";
+import { calculateFlareRulesHash, coston2XrpUsdFeedId } from "../dist/smart-account.js";
 
 const market = "0x1000000000000000000000000000000000000001" as Address;
 const buyer = "0x2000000000000000000000000000000000000002" as Address;
@@ -24,13 +25,28 @@ const config: Coston2MarketConfig = {
   deploymentStatus: "planned",
 };
 
-function mockReader() {
+function mockReader(options: { rulesHash?: Hex } = {}) {
   const readBlocks: bigint[] = [];
   const logRanges: { fromBlock: bigint; toBlock: bigint }[] = [];
+  const scoringPolicy = {
+    schemaVersion: 1,
+    ceilingXrpMicros: 1_000_000n,
+    bidDeadline: 1_000n,
+    allowXrp: true,
+    allowUsd: true,
+    ftsoFeedId: coston2XrpUsdFeedId,
+    maxDeliveryDays: 30,
+    minWarrantyDays: 12,
+    maxWarrantyDays: 36,
+    priceWeightBps: 6_000,
+    deliveryWeightBps: 2_500,
+    warrantyWeightBps: 1_500,
+    requiredCredentials: [],
+  } as const;
   const record = {
     buyer,
     metadataHash: hash,
-    rulesHash: hash,
+    rulesHash: options.rulesHash ?? calculateFlareRulesHash(scoringPolicy),
     publicCeilingXrp: 1_000_000n,
     bidDeadline: 1_000n,
     closeBlock: 88n,
@@ -40,7 +56,7 @@ function mockReader() {
     orderedBidRoot: hash,
     extensionId: 65_921n,
     codeVersion: hash,
-    ftsoFeedId: `0x${"12".repeat(21)}` as Hex,
+    ftsoFeedId: coston2XrpUsdFeedId,
     ftsoValue: 250_000n,
     ftsoDecimals: 5,
     ftsoTimestamp: 900n,
@@ -81,6 +97,7 @@ function mockReader() {
     async readContract({ functionName, blockNumber }) {
       readBlocks.push(blockNumber);
       if (functionName === "getTender") return record;
+      if (functionName === "getScoringPolicy") return scoringPolicy;
       return values[functionName];
     },
   };
@@ -96,6 +113,7 @@ test("reads market state and award logs only through the finalized Coston2 block
   assert.deepEqual(logRanges, [{ fromBlock: 80n, toBlock: 88n }]);
   assert.equal(readBlocks.every((block) => block === 88n), true);
   assert.equal(result.tenders[0]?.status, "ComputePending");
+  assert.equal(result.tenders[0]?.scoringPolicy.priceWeightBps, 6_000);
   assert.equal(result.tenders[0]?.winner, null);
 });
 
@@ -118,5 +136,13 @@ test("fails closed while the configured deployment block is not finalized", asyn
   await assert.rejects(
     () => loadCoston2PublicMarket({ ...config, deploymentBlock: 89n }, reader),
     /COSTON2_DEPLOYMENT_NOT_FINALIZED/,
+  );
+});
+
+test("fails closed when finalized tender state and public scoring policy disagree", async () => {
+  const { reader } = mockReader({ rulesHash: zeroHash });
+  await assert.rejects(
+    () => loadCoston2PublicMarket(config, reader),
+    /COSTON2_SCORING_POLICY_HASH_MISMATCH/,
   );
 });

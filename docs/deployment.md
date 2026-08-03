@@ -200,18 +200,36 @@ fields are rejected:
   "executorFeeUBA": "0",
   "terms": {
     "metadataHash": "0x<bytes32>",
-    "rulesHash": "0x<bytes32>",
-    "publicCeilingXrp": "1000000",
-    "bidDeadline": "<unix-seconds>",
+    "scoringPolicy": {
+      "schemaVersion": 1,
+      "ceilingXrpMicros": "1000000",
+      "bidDeadline": "<unix-seconds>",
+      "allowXrp": true,
+      "allowUsd": true,
+      "ftsoFeedId": "0x015852502f55534400000000000000000000000000",
+      "maxDeliveryDays": 30,
+      "minWarrantyDays": 12,
+      "maxWarrantyDays": 36,
+      "priceWeightBps": 6000,
+      "deliveryWeightBps": 2500,
+      "warrantyWeightBps": 1500,
+      "requiredCredentials": []
+    },
     "approvedVendors": ["0x<vendor>"],
     "extensionId": "<registered-id>",
     "codeVersion": "0x<bytes32>",
     "teeIds": ["0x<tee-1>", "0x<tee-2>", "0x<tee-3>"],
-    "teeKeyFingerprints": ["0x<key-1>", "0x<key-2>", "0x<key-3>"],
-    "ftsoFeedId": "0x015852502f55534400000000000000000000000000"
+    "teeKeyFingerprints": ["0x<key-1>", "0x<key-2>", "0x<key-3>"]
   }
 }
 ```
+
+The job never accepts a caller-supplied `rulesHash`. The market validates and
+stores the complete public policy, then derives
+`keccak256(abi.encode(RULES_DOMAIN, scoringPolicy))`; the executor independently
+derives the same hash when proving `TenderCreated`. The 64-bit ceiling and
+deadline remain decimal strings, while bounded `uint16` policy fields are JSON
+integers.
 
 The command emits no raw proof, XRPL source address, credential, provider body,
 or secret. Exit code `2` means `DirectMintingDelayed`; the tender is not funded
