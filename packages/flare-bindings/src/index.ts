@@ -8,6 +8,7 @@ export * from "./fdc-client.js";
 export * from "./fassets.js";
 export * from "./fcc-result.js";
 export * from "./public-market.js";
+export * from "./private-bid.js";
 
 export const coston2ChainId = 114;
 export const veilBidFlareMarketAbi = marketAbiJson as Abi;

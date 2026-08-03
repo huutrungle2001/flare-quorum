@@ -1,10 +1,14 @@
 package protocol
 
 import (
+	"bytes"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/ecies"
 )
 
 func TestBidAndReceiptWireGoldenVectors(t *testing.T) {
@@ -116,6 +120,46 @@ func TestPublicScoringPolicyHashMatchesSolidityAndTypeScript(t *testing.T) {
 	}
 	if hash.Hex() != "0x8969aa4d8ee1fde2fbf813214484c245419fd278b1b791fe05997813315f8cb2" {
 		t.Fatalf("public scoring policy hash drifted: %s", hash)
+	}
+}
+
+func TestPrivateBidCommitmentMatchesTypeScript(t *testing.T) {
+	rules := ScoringRules{
+		SchemaVersion: 1, CeilingXrpMicros: 1_000, BidDeadline: 1_700_000_000,
+		AllowXRP: true, AllowUSD: true,
+		FtsoFeedID:      [21]byte{0x01, 'X', 'R', 'P', '/', 'U', 'S', 'D'},
+		MaxDeliveryDays: 30, MinWarrantyDays: 12, MaxWarrantyDays: 36,
+		PriceWeightBPS: 6_000, DeliveryWeightBPS: 2_500, WarrantyWeightBPS: 1_500,
+	}
+	commitment, err := BidCommitment(BidSubmission{
+		SchemaVersion: 1, ChainID: big.NewInt(114),
+		Market: common.HexToAddress("0x1000000000000000000000000000000000000001"), ExtensionID: big.NewInt(65_537),
+		CodeVersion: common.HexToHash("0x1111111111111111111111111111111111111111111111111111111111111111"),
+		TenderID:    big.NewInt(42), Vendor: common.HexToAddress("0x2000000000000000000000000000000000000002"),
+		SubmissionNonce: big.NewInt(7), Rules: rules, ReceiptExpiry: 1_700_000_000,
+		QuoteCurrency: QuoteXRP, PriceMicros: 400, DeliveryDays: 5, WarrantyDays: 24,
+		Salt: common.HexToHash("0x7777777777777777777777777777777777777777777777777777777777777777"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if commitment.Hex() != "0x982631d2fe15e058d0bac43a2cbfd3c0cb0c77166b499fd6a992e4690702a2dc" {
+		t.Fatalf("TypeScript private bid commitment drifted: %s", commitment.Hex())
+	}
+}
+
+func TestTypeScriptECIESVectorDecryptsWithTeeNodePrimitive(t *testing.T) {
+	privateKey, err := crypto.HexToECDSA(strings.Repeat("44", 32))
+	if err != nil {
+		t.Fatal(err)
+	}
+	ciphertext := common.FromHex("0x044f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa385b6b1b8ead809ca67454d9683fcf2ba03456d6fe2c4abe2b07f0fbdbb2f1c122222222222222222222222222222222d76c006c8f0949a5f57117854f500d53910a263492072ba1db807ddaf0957c1b10d2673c4b90231c8c1301e1784b7f53e0398e964ce685")
+	plaintext, err := ecies.ImportECDSA(privateKey).Decrypt(ciphertext, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(plaintext, []byte("VEILBID_ECIES_VECTOR_V1")) {
+		t.Fatalf("unexpected TypeScript ECIES plaintext: %x", plaintext)
 	}
 }
 

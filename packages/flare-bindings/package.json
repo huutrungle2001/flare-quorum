@@ -20,6 +20,7 @@
     "./manifest": "./generated/manifest.json"
   },
   "dependencies": {
+    "@noble/curves": "1.9.1",
     "viem": "2.47.6"
   },
   "devDependencies": {
