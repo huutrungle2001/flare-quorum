@@ -24,18 +24,20 @@ import (
 )
 
 const (
-	errorActionEnvelope = "INVALID_ACTION_ENVELOPE"
-	errorDecode         = "INVALID_FOUNDATION_REQUEST"
-	errorSchema         = "UNSUPPORTED_SCHEMA_VERSION"
-	errorChain          = "UNSUPPORTED_CHAIN"
-	errorMarket         = "INVALID_MARKET"
-	errorNonce          = "INVALID_REQUEST_NONCE"
-	errorPayloadHash    = "INVALID_PAYLOAD_HASH"
-	errorInternal       = "INTERNAL_ERROR"
-	errorBidDecode      = "INVALID_PRIVATE_BID"
-	errorBidRejected    = "PRIVATE_BID_REJECTED"
-	errorBidConflict    = "PRIVATE_BID_CONFLICT"
-	errorTeeUnavailable = "TEE_CRYPTO_UNAVAILABLE"
+	errorActionEnvelope    = "INVALID_ACTION_ENVELOPE"
+	errorDecode            = "INVALID_FOUNDATION_REQUEST"
+	errorSchema            = "UNSUPPORTED_SCHEMA_VERSION"
+	errorChain             = "UNSUPPORTED_CHAIN"
+	errorMarket            = "INVALID_MARKET"
+	errorNonce             = "INVALID_REQUEST_NONCE"
+	errorPayloadHash       = "INVALID_PAYLOAD_HASH"
+	errorInternal          = "INTERNAL_ERROR"
+	errorBidDecode         = "INVALID_PRIVATE_BID"
+	errorBidRejected       = "PRIVATE_BID_REJECTED"
+	errorBidConflict       = "PRIVATE_BID_CONFLICT"
+	errorTeeUnavailable    = "TEE_CRYPTO_UNAVAILABLE"
+	errorSelectionDecode   = "INVALID_SELECTION_REQUEST"
+	errorSelectionRejected = "SELECTION_REJECTED"
 )
 
 type teeCrypto interface {
@@ -46,6 +48,7 @@ type teeCrypto interface {
 
 type sealedBidStore interface {
 	PutOnce(common.Hash, []byte) (bool, error)
+	Get(common.Hash) ([]byte, error)
 }
 
 type Extension struct {
@@ -106,6 +109,14 @@ func (e *Extension) processAction(action teetypes.Action) (int, []byte) {
 	}
 
 	if dataFixed.OPType != teeutils.ToHash(config.OPTypeVeilBidFoundation) {
+		if dataFixed.OPType == teeutils.ToHash(config.OPTypeVeilBidSelection) && dataFixed.OPCommand == teeutils.ToHash(config.OPCommandSelectV1) {
+			result := e.processSelection(action, dataFixed)
+			body, marshalErr := json.Marshal(result)
+			if marshalErr != nil {
+				return http.StatusInternalServerError, []byte(errorInternal)
+			}
+			return http.StatusOK, body
+		}
 		return http.StatusNotImplemented, []byte("UNSUPPORTED_OPERATION_TYPE")
 	}
 	if dataFixed.OPCommand != teeutils.ToHash(config.OPCommandPingV1) {
@@ -118,6 +129,111 @@ func (e *Extension) processAction(action teetypes.Action) (int, []byte) {
 		return http.StatusInternalServerError, []byte(errorInternal)
 	}
 	return http.StatusOK, body
+}
+
+func (e *Extension) processSelection(action teetypes.Action, dataFixed *instruction.DataFixed) teetypes.ActionResult {
+	if e.tee == nil || e.sealed == nil || e.now == nil {
+		return buildResult(action, dataFixed, nil, 0, errorTeeUnavailable)
+	}
+	var request protocol.SelectionRequest
+	if err := protocol.DecodeSelectionRequest(dataFixed.OriginalMessage, &request); err != nil {
+		return buildResult(action, dataFixed, nil, 0, errorSelectionDecode)
+	}
+	now := uint64(e.now().Unix())
+	if request.SchemaVersion != protocol.SelectionSchemaVersion || request.ChainID == nil || request.ChainID.Cmp(big.NewInt(config.Coston2ChainID)) != 0 || request.Market == (common.Address{}) || request.ExtensionID == nil || request.ExtensionID.Sign() <= 0 || request.CodeVersion == (common.Hash{}) || request.TenderID == nil || request.TenderID.Sign() <= 0 || request.RulesHash == (common.Hash{}) || request.PublicCeilingXrp == nil || !request.PublicCeilingXrp.IsUint64() || request.PublicCeilingXrp.Sign() <= 0 || request.BidDeadline == 0 || request.OrderedBidRoot == (common.Hash{}) || request.ResultNonce == nil || request.ResultNonce.Sign() <= 0 || request.ResultExpiry < now {
+		return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+	}
+	if request.QuorumBitmap&0x07 != request.QuorumBitmap || bitCount(request.QuorumBitmap) < 2 || len(request.BidReferences) > 256 {
+		return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+	}
+	if _, err := e.tee.Identity(context.Background()); err != nil {
+		return buildResult(action, dataFixed, nil, 0, errorTeeUnavailable)
+	}
+
+	references := make([]protocol.BidReference, len(request.BidReferences))
+	for index, reference := range request.BidReferences {
+		if reference.BidID == nil || reference.BidID.Cmp(new(big.Int).SetUint64(uint64(index+1))) != 0 || reference.Vendor == (common.Address{}) || reference.PlaintextCommitment == (common.Hash{}) || reference.SubmissionNonce == nil || reference.SubmissionNonce.Sign() <= 0 || reference.ReceiptBitmap&0x07 != reference.ReceiptBitmap || bitCount(reference.ReceiptBitmap) < 2 || reference.AcceptedBlock == 0 || reference.ReceiptBitmap&request.QuorumBitmap != request.QuorumBitmap {
+			return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+		}
+		references[index] = protocol.BidReference{BidID: reference.BidID, Vendor: reference.Vendor, PlaintextCommitment: reference.PlaintextCommitment, ReceiptBitmap: reference.ReceiptBitmap, AcceptedBlock: reference.AcceptedBlock}
+	}
+	root, err := protocol.RebuildBidRoot(request.TenderID, references)
+	if err != nil || root != request.OrderedBidRoot {
+		return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+	}
+
+	// A zero-bid tender is a valid, public-safe no-award result. There is no
+	// private rules preimage to decrypt in this case; the contract still binds
+	// the result to the public request fields and root.
+	if len(request.BidReferences) == 0 {
+		data, encodeErr := protocol.EncodeSelectionResult(protocol.SelectionResult{SchemaVersion: protocol.SelectionSchemaVersion, ChainID: request.ChainID, Market: request.Market, ExtensionID: request.ExtensionID, CodeVersion: request.CodeVersion, TenderID: request.TenderID, RulesHash: request.RulesHash, OrderedBidRoot: request.OrderedBidRoot, QuorumBitmap: request.QuorumBitmap, FtsoFeedID: request.FtsoFeedID, FtsoValue: request.FtsoValue, FtsoDecimals: request.FtsoDecimals, FtsoTimestamp: request.FtsoTimestamp, CloseBlock: request.CloseBlock, WinnerBidID: new(big.Int), Winner: common.Address{}, WinningAmountXrp: new(big.Int), ResultNonce: request.ResultNonce, Expiry: request.ResultExpiry})
+		if encodeErr != nil {
+			return buildResult(action, dataFixed, nil, 0, errorInternal)
+		}
+		return buildResult(action, dataFixed, data, 1, "")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
+	defer cancel()
+	bids := make([]protocol.PrivateBid, 0, len(request.BidReferences))
+	bindings := make([]protocol.CredentialDomainBinding, 0, len(request.BidReferences))
+	var rules protocol.ScoringRules
+	for index, reference := range request.BidReferences {
+		slot, slotErr := protocol.BidSlotFor(request.ChainID, request.Market, request.ExtensionID, request.TenderID, reference.Vendor)
+		if slotErr != nil {
+			return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+		}
+		ciphertext, getErr := e.sealed.Get(slot)
+		if getErr != nil {
+			return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+		}
+		plaintext, decryptErr := e.tee.Decrypt(ctx, ciphertext)
+		if decryptErr != nil {
+			return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+		}
+		var submission protocol.BidSubmission
+		if decodeErr := protocol.DecodeBidSubmission(plaintext, &submission); decodeErr != nil {
+			return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+		}
+		validated, validateErr := protocol.ValidateStoredSubmission(submission)
+		if validateErr != nil || validated.PlaintextCommitment != reference.PlaintextCommitment || submission.Vendor != reference.Vendor || submission.SubmissionNonce.Cmp(reference.SubmissionNonce) != 0 || validated.RulesHash != request.RulesHash || submission.ChainID.Cmp(request.ChainID) != 0 || submission.Market != request.Market || submission.ExtensionID.Cmp(request.ExtensionID) != 0 || submission.CodeVersion != request.CodeVersion || submission.TenderID.Cmp(request.TenderID) != 0 || submission.Rules.CeilingXrpMicros != request.PublicCeilingXrp.Uint64() || submission.Rules.BidDeadline != request.BidDeadline || submission.Rules.FtsoFeedID != request.FtsoFeedID {
+			return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+		}
+		if index == 0 {
+			rules = submission.Rules
+		}
+		credentials := make([]protocol.Credential, len(submission.Credentials))
+		for credentialIndex, credential := range submission.Credentials {
+			credentials[credentialIndex] = protocol.Credential{CredentialType: credential.CredentialType, Issuer: credential.Issuer, ValidUntil: credential.ValidUntil, Nonce: credential.Nonce, Signature: credential.Signature}
+		}
+		bids = append(bids, protocol.PrivateBid{BidID: reference.BidID, Vendor: submission.Vendor, QuoteCurrency: submission.QuoteCurrency, PriceMicros: submission.PriceMicros, DeliveryDays: submission.DeliveryDays, WarrantyDays: submission.WarrantyDays, Credentials: credentials})
+		bindings = append(bindings, protocol.CredentialDomainBinding{ChainID: submission.ChainID, Market: submission.Market, ExtensionID: submission.ExtensionID, CodeVersion: submission.CodeVersion, TenderID: submission.TenderID, RulesHash: validated.RulesHash, Vendor: submission.Vendor})
+	}
+	winner, found, selectErr := protocol.SelectWinner(rules, bindings, bids, protocol.FtsoSnapshot{Value: request.FtsoValue, Decimals: request.FtsoDecimals}, request.BidDeadline)
+	if selectErr != nil {
+		return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
+	}
+	result := protocol.SelectionResult{SchemaVersion: protocol.SelectionSchemaVersion, ChainID: request.ChainID, Market: request.Market, ExtensionID: request.ExtensionID, CodeVersion: request.CodeVersion, TenderID: request.TenderID, RulesHash: request.RulesHash, OrderedBidRoot: request.OrderedBidRoot, QuorumBitmap: request.QuorumBitmap, FtsoFeedID: request.FtsoFeedID, FtsoValue: request.FtsoValue, FtsoDecimals: request.FtsoDecimals, FtsoTimestamp: request.FtsoTimestamp, CloseBlock: request.CloseBlock, WinnerBidID: new(big.Int), Winner: common.Address{}, WinningAmountXrp: new(big.Int), ResultNonce: request.ResultNonce, Expiry: request.ResultExpiry}
+	if found {
+		result.WinnerBidID = winner.BidID
+		result.Winner = winner.Vendor
+		result.WinningAmountXrp = new(big.Int).SetUint64(winner.WinningAmountXrpMicros)
+	}
+	data, err := protocol.EncodeSelectionResult(result)
+	if err != nil {
+		return buildResult(action, dataFixed, nil, 0, errorInternal)
+	}
+	return buildResult(action, dataFixed, data, 1, "")
+}
+
+func bitCount(value uint8) uint8 {
+	var count uint8
+	for bit := uint8(0); bit < 8; bit++ {
+		if value&(1<<bit) != 0 {
+			count++
+		}
+	}
+	return count
 }
 
 func (e *Extension) processDirectAction(action teetypes.Action) (int, []byte) {

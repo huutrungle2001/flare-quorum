@@ -70,6 +70,7 @@ contract VeilBidFlareMarket {
         int8 ftsoDecimals;
         uint64 ftsoTimestamp;
         uint256 resultNonce;
+        uint64 resultExpiry;
         bytes32 requestId;
         TenderStatus status;
         address[3] teeIds;
@@ -92,6 +93,37 @@ contract VeilBidFlareMarket {
         uint8 receiptBitmap;
         uint64 receiptExpiry;
         uint64 acceptedBlock;
+    }
+
+    struct SelectionBidReference {
+        uint256 bidId;
+        address vendor;
+        uint256 submissionNonce;
+        bytes32 plaintextCommitment;
+        uint8 receiptBitmap;
+        uint64 acceptedBlock;
+    }
+
+    struct SelectionRequest {
+        uint16 schemaVersion;
+        uint256 chainId;
+        address market;
+        uint256 extensionId;
+        bytes32 codeVersion;
+        uint256 tenderId;
+        bytes32 rulesHash;
+        uint256 publicCeilingXrp;
+        uint64 bidDeadline;
+        bytes32 orderedBidRoot;
+        uint8 quorumBitmap;
+        bytes21 ftsoFeedId;
+        uint256 ftsoValue;
+        int8 ftsoDecimals;
+        uint64 ftsoTimestamp;
+        uint64 closeBlock;
+        uint256 resultNonce;
+        uint64 resultExpiry;
+        SelectionBidReference[] bidReferences;
     }
 
     struct SelectionResult {
@@ -201,7 +233,10 @@ contract VeilBidFlareMarket {
     }
 
     function createTender(TenderTerms calldata terms) external nonReentrant returns (uint256 tenderId) {
-        if (terms.metadataHash == bytes32(0) || terms.rulesHash == bytes32(0) || terms.publicCeilingXrp == 0) {
+        if (
+            terms.metadataHash == bytes32(0) || terms.rulesHash == bytes32(0) || terms.publicCeilingXrp == 0
+                || terms.publicCeilingXrp > type(uint64).max
+        ) {
             revert InvalidTender();
         }
         if (terms.bidDeadline <= block.timestamp || terms.bidDeadline > block.timestamp + 30 days) {
@@ -377,27 +412,35 @@ contract VeilBidFlareMarket {
         if (tender.status != TenderStatus.Closed) revert InvalidStatus(TenderStatus.Closed, tender.status);
         tender.resultNonce =
             uint256(keccak256(abi.encode(address(this), tenderId, tender.closeBlock, tender.orderedBidRoot)));
+        tender.resultExpiry = uint64(block.timestamp + 1 hours);
         address[] memory teeIds = _commonTeeIds(tender);
         address[] memory cosigners = new address[](0);
+        SelectionBidReference[] memory references = _selectionBidReferences(tenderId, tender);
         ITeeExtensionRegistry.TeeInstructionParams memory params = ITeeExtensionRegistry.TeeInstructionParams({
             opType: OP_TYPE_SELECTION,
             opCommand: OP_COMMAND_SELECT,
             message: abi.encode(
-                uint16(1),
-                COSTON2_CHAIN_ID,
-                address(this),
-                tender.extensionId,
-                tender.codeVersion,
-                tenderId,
-                tender.rulesHash,
-                tender.orderedBidRoot,
-                tender.commonQuorumBitmap,
-                tender.ftsoFeedId,
-                tender.ftsoValue,
-                tender.ftsoDecimals,
-                tender.ftsoTimestamp,
-                tender.closeBlock,
-                tender.resultNonce
+                SelectionRequest({
+                    schemaVersion: 1,
+                    chainId: COSTON2_CHAIN_ID,
+                    market: address(this),
+                    extensionId: tender.extensionId,
+                    codeVersion: tender.codeVersion,
+                    tenderId: tenderId,
+                    rulesHash: tender.rulesHash,
+                    publicCeilingXrp: tender.publicCeilingXrp,
+                    bidDeadline: tender.bidDeadline,
+                    orderedBidRoot: tender.orderedBidRoot,
+                    quorumBitmap: tender.commonQuorumBitmap,
+                    ftsoFeedId: tender.ftsoFeedId,
+                    ftsoValue: tender.ftsoValue,
+                    ftsoDecimals: tender.ftsoDecimals,
+                    ftsoTimestamp: tender.ftsoTimestamp,
+                    closeBlock: tender.closeBlock,
+                    resultNonce: tender.resultNonce,
+                    resultExpiry: tender.resultExpiry,
+                    bidReferences: references
+                })
             ),
             cosigners: cosigners,
             cosignersThreshold: 0,
@@ -424,7 +467,8 @@ contract VeilBidFlareMarket {
                 || result.orderedBidRoot != tender.orderedBidRoot || result.ftsoFeedId != tender.ftsoFeedId
                 || result.ftsoValue != tender.ftsoValue || result.ftsoDecimals != tender.ftsoDecimals
                 || result.ftsoTimestamp != tender.ftsoTimestamp || result.closeBlock != tender.closeBlock
-                || result.resultNonce != tender.resultNonce || result.expiry < block.timestamp
+                || result.resultNonce != tender.resultNonce || result.expiry != tender.resultExpiry
+                || result.expiry < block.timestamp
         ) revert InvalidResult();
         if (result.quorumBitmap != tender.commonQuorumBitmap || _bitCount(result.quorumBitmap) < RESULT_THRESHOLD) {
             revert InvalidResult();
@@ -531,6 +575,25 @@ contract VeilBidFlareMarket {
             if (tender.teeIds[i] == teeId) return i;
         }
         revert InvalidReceipt();
+    }
+
+    function _selectionBidReferences(uint256 tenderId, Tender storage tender)
+        internal
+        view
+        returns (SelectionBidReference[] memory references)
+    {
+        references = new SelectionBidReference[](tender.bidCount);
+        for (uint256 i = 1; i <= tender.bidCount; ++i) {
+            BidReference storage bid = bidReferences[tenderId][i];
+            references[i - 1] = SelectionBidReference({
+                bidId: i,
+                vendor: bid.vendor,
+                submissionNonce: bid.submissionNonce,
+                plaintextCommitment: bid.plaintextCommitment,
+                receiptBitmap: bid.receiptBitmap,
+                acceptedBlock: bid.acceptedBlock
+            });
+        }
     }
 
     function _commonTeeIds(Tender storage tender) internal view returns (address[] memory ids) {

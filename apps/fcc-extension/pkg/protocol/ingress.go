@@ -30,6 +30,17 @@ type ValidatedSubmission struct {
 }
 
 func ValidateSubmission(submission BidSubmission, now uint64) (ValidatedSubmission, error) {
+	return validateSubmission(submission, now, true)
+}
+
+// ValidateStoredSubmission revalidates a sealed bid after a restart without
+// applying the intake-time clock checks. Credentials remain required through
+// the frozen bid deadline, and every public domain field is still checked.
+func ValidateStoredSubmission(submission BidSubmission) (ValidatedSubmission, error) {
+	return validateSubmission(submission, 0, false)
+}
+
+func validateSubmission(submission BidSubmission, now uint64, enforceIntakeClock bool) (ValidatedSubmission, error) {
 	if submission.SchemaVersion != BidSchemaVersion || submission.ChainID == nil || submission.ChainID.Cmp(big.NewInt(Coston2ChainID)) != 0 {
 		return ValidatedSubmission{}, errors.New("INVALID_BID_NETWORK")
 	}
@@ -42,7 +53,10 @@ func ValidateSubmission(submission BidSubmission, now uint64) (ValidatedSubmissi
 	if err := submission.Rules.Validate(); err != nil {
 		return ValidatedSubmission{}, err
 	}
-	if now >= submission.Rules.BidDeadline || submission.ReceiptExpiry < now || submission.ReceiptExpiry > submission.Rules.BidDeadline {
+	if enforceIntakeClock && (now >= submission.Rules.BidDeadline || submission.ReceiptExpiry < now) {
+		return ValidatedSubmission{}, errors.New("INVALID_BID_EXPIRY")
+	}
+	if submission.ReceiptExpiry > submission.Rules.BidDeadline {
 		return ValidatedSubmission{}, errors.New("INVALID_BID_EXPIRY")
 	}
 	if submission.PriceMicros == 0 || submission.DeliveryDays > submission.Rules.MaxDeliveryDays || submission.WarrantyDays < submission.Rules.MinWarrantyDays {
@@ -91,20 +105,24 @@ func ValidateSubmission(submission BidSubmission, now uint64) (ValidatedSubmissi
 	if err != nil {
 		return ValidatedSubmission{}, errors.New("INVALID_BID_ENCODING")
 	}
-	slotEncoded, err := bidSlotArgs.Pack(
-		BidSlotDomain,
-		submission.ChainID,
-		submission.Market,
-		submission.ExtensionID,
-		submission.TenderID,
-		submission.Vendor,
-	)
+	sealedSlot, err := BidSlotFor(submission.ChainID, submission.Market, submission.ExtensionID, submission.TenderID, submission.Vendor)
 	if err != nil {
 		return ValidatedSubmission{}, errors.New("INVALID_BID_DOMAIN")
 	}
 	return ValidatedSubmission{
 		RulesHash:           rulesHash,
 		PlaintextCommitment: commitment,
-		SealedSlot:          crypto.Keccak256Hash(slotEncoded),
+		SealedSlot:          sealedSlot,
 	}, nil
+}
+
+func BidSlotFor(chainID *big.Int, market common.Address, extensionID, tenderID *big.Int, vendor common.Address) (common.Hash, error) {
+	if chainID == nil || chainID.Sign() <= 0 || market == (common.Address{}) || extensionID == nil || extensionID.Sign() <= 0 || tenderID == nil || tenderID.Sign() <= 0 || vendor == (common.Address{}) {
+		return common.Hash{}, errors.New("INVALID_BID_SLOT_DOMAIN")
+	}
+	slotEncoded, err := bidSlotArgs.Pack(BidSlotDomain, chainID, market, extensionID, tenderID, vendor)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	return crypto.Keccak256Hash(slotEncoded), nil
 }
