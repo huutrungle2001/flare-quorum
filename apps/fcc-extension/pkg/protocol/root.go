@@ -45,8 +45,8 @@ func AppendBidRoot(previous common.Hash, tenderID *big.Int, reference BidReferen
 	if reference.Vendor == (common.Address{}) || reference.PlaintextCommitment == (common.Hash{}) {
 		return common.Hash{}, fmt.Errorf("vendor and commitment must be nonzero")
 	}
-	if reference.ReceiptBitmap&0x07 != reference.ReceiptBitmap || bitCount(reference.ReceiptBitmap) < 2 {
-		return common.Hash{}, fmt.Errorf("receipt bitmap must contain at least two of three machines")
+	if reference.ReceiptBitmap != 0x07 {
+		return common.Hash{}, fmt.Errorf("championship receipt bitmap must contain all three machines")
 	}
 	if reference.AcceptedBlock == 0 {
 		return common.Hash{}, fmt.Errorf("accepted block must be nonzero")
@@ -84,16 +84,6 @@ func RebuildBidRoot(tenderID *big.Int, references []BidReference) (common.Hash, 
 		}
 	}
 	return root, nil
-}
-
-func bitCount(bitmap uint8) uint8 {
-	var count uint8
-	for index := uint8(0); index < 3; index++ {
-		if bitmap&(1<<index) != 0 {
-			count++
-		}
-	}
-	return count
 }
 
 func mustRootABIType(name string) abi.Type {

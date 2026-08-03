@@ -113,7 +113,7 @@ verifiable.
 | Wrong machine key | Verified release data, fingerprint confirmation, tender-fixed key set | Compromised UI or registry discovery can mislead the user |
 | Cross-tender receipt replay | Full receipt domain, vendor nonce, expiry, signer registration | Encoding or verifier defect |
 | One machine acknowledges a different bid | Receipts must preserve a common 2-machine quorum over the same commitment | Two colluding/identically faulty machines |
-| TEE state rollback or omission | Ordered chain root, sequence/checkpoint validation before scoring | Loss of quorum can permanently halt a tender |
+| TEE state rollback or omission | All-three atomic receipt custody, ordered chain root, sequence/checkpoint validation before scoring | Loss of two frozen machines halts selection until recovery or failed-compute refund |
 | Buyer/client supplies favored winner | Market accepts only threshold signatures over its reconstructed result domain | Correlated TEE/code/governance compromise |
 | Split TEE outcomes | Group exact digest and require two distinct common-quorum signers | Liveness failure when no digest reaches threshold |
 | Result replay or rebinding | Tender nonce, expiry, terminal guard, full domain including root and FTSO snapshot | Contract or domain implementation defect |

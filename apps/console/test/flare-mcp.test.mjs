@@ -38,6 +38,7 @@ function service() {
         awardReceipt: market,
         tenderCount: 0n,
         teeCount: 3n,
+        bidReceiptThreshold: 3,
         resultThreshold: 2,
       };
     },

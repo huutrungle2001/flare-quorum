@@ -314,7 +314,7 @@ the championship product and requires Product Plan approval.
 | Official version pinning | IN PROGRESS — core source/toolchain/discovery checks pass; proxy image release and live TEE stack remain |
 | FCC foundation operation | IMPLEMENTED LOCALLY — deterministic `PING_V1` tests pass; live Gate A not run |
 | FCC private ingress | LOCAL IMPLEMENTATION — official direct envelope, loopback decrypt/sign, sealed ciphertext restart/replay tests; no live proxy/TEE proof |
-| Multi-TEE quorum | NOT STARTED |
+| Multi-TEE quorum | LOCAL IMPLEMENTATION — atomic 3-of-3 bid receipts, live identity/code/key rechecks, and 2-of-3 one-outage result path pass; live Gate C/E pending |
 | Flare contracts | LOCAL IMPLEMENTATION — contract-derived/stored public scoring policy, FCC/FTestXRP/conditional-FTSO lifecycle, payout and recovery tests pass; no live deployment |
 | FAssets/FDC/Smart Account journey | LOCAL EXECUTOR COMPLETE — live registry/FDC/direct-mint bindings pass; real XRPL payment, FDC proof, and Gate G execution pending |
 | FTSO scoring | LOCAL CROSS-STACK IMPLEMENTATION — contract policy hash matches Go/TypeScript, XRP/USD conversion and scoring vectors pass; no live FCC/FTSO lifecycle |

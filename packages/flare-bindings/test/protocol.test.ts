@@ -4,10 +4,20 @@ import { rebuildBidRoot, selectionResultDigest } from "../src/protocol.ts";
 
 test("Flare ordered root matches the canonical Go/Solidity vector", () => {
   const root = rebuildBidRoot(42n, [
-    { bidId: 1n, vendor: "0x1000000000000000000000000000000000000001", plaintextCommitment: "0x0000000000000000000000000000000000000000000000000000000000001111", receiptBitmap: 3, acceptedBlock: 33500001n },
+    { bidId: 1n, vendor: "0x1000000000000000000000000000000000000001", plaintextCommitment: "0x0000000000000000000000000000000000000000000000000000000000001111", receiptBitmap: 7, acceptedBlock: 33500001n },
     { bidId: 2n, vendor: "0x2000000000000000000000000000000000000002", plaintextCommitment: "0x0000000000000000000000000000000000000000000000000000000000002222", receiptBitmap: 7, acceptedBlock: 33500009n },
   ]);
-  assert.equal(root, "0xd17b22ee6e48c6ac79cb32c203de07402bfcc9cb79a1f330c043ffa5ed327f77");
+  assert.equal(root, "0xed019a9542e15443dda5329d4988cf864e9189e39200755837488fcba327eb13");
+});
+
+test("rejects a championship root missing any frozen TEE receipt", () => {
+  assert.throws(() => rebuildBidRoot(42n, [{
+    bidId: 1n,
+    vendor: "0x1000000000000000000000000000000000000001",
+    plaintextCommitment: "0x0000000000000000000000000000000000000000000000000000000000001111",
+    receiptBitmap: 3,
+    acceptedBlock: 33_500_001n,
+  }]), /INCOMPLETE_RECEIPT_QUORUM/);
 });
 
 test("Flare result digest binds the full public selection envelope", () => {

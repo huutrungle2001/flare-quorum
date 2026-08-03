@@ -99,6 +99,7 @@ export interface Coston2ProtocolBinding {
   awardReceipt: Address;
   tenderCount: bigint;
   teeCount: bigint;
+  bidReceiptThreshold: number;
   resultThreshold: number;
 }
 
@@ -344,7 +345,17 @@ export async function loadCoston2ProtocolBinding(
 ): Promise<Coston2ProtocolBinding> {
   const reader = suppliedReader ?? createReader(config.rpcUrl);
   const { safeBlock, code } = await readFoundation(config, reader);
-  const [paymentToken, teeManager, ftso, teeExtensionRegistry, awardReceipt, tenderCount, teeCount, resultThreshold] =
+  const [
+    paymentToken,
+    teeManager,
+    ftso,
+    teeExtensionRegistry,
+    awardReceipt,
+    tenderCount,
+    teeCount,
+    bidReceiptThreshold,
+    resultThreshold,
+  ] =
     await Promise.all([
       "paymentToken",
       "teeManager",
@@ -353,6 +364,7 @@ export async function loadCoston2ProtocolBinding(
       "awardReceipt",
       "tenderCount",
       "TEE_COUNT",
+      "BID_RECEIPT_THRESHOLD",
       "RESULT_THRESHOLD",
     ].map((functionName) => reader.readContract({
       address: config.marketAddress,
@@ -360,7 +372,10 @@ export async function loadCoston2ProtocolBinding(
       functionName,
       blockNumber: safeBlock,
     })));
-  if (typeof tenderCount !== "bigint" || typeof teeCount !== "bigint" || typeof resultThreshold !== "number") {
+  if (
+    typeof tenderCount !== "bigint" || typeof teeCount !== "bigint" ||
+    typeof bidReceiptThreshold !== "number" || typeof resultThreshold !== "number"
+  ) {
     throw new Error("COSTON2_PROTOCOL_CONSTANT_MALFORMED");
   }
   return {
@@ -378,6 +393,7 @@ export async function loadCoston2ProtocolBinding(
     awardReceipt: addressResult(awardReceipt, "AWARD_RECEIPT"),
     tenderCount,
     teeCount,
+    bidReceiptThreshold,
     resultThreshold,
   };
 }

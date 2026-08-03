@@ -190,11 +190,10 @@ contract FlareTokenMock is IERC20 {
 
         function testThresholdFccLifecycleConservesFTestXrpEscrow() external {
             uint256 tenderId = market.createTender(_terms());
-            _submitReceipt(tenderId, TEE_KEY_1, teeIds[0]);
-            _submitReceipt(tenderId, TEE_KEY_2, teeIds[1]);
+            _submitReceipts(tenderId);
 
             VeilBidFlareMarket.BidReference memory bid = market.getBidReference(tenderId, 1);
-            if (bid.vendor != vendor || bid.receiptBitmap != 3) revert("receipt quorum mismatch");
+            if (bid.vendor != vendor || bid.receiptBitmap != 7) revert("receipt quorum mismatch");
             bytes32 expectedRoot = keccak256(
                 abi.encode(
                     market.BID_ROOT_DOMAIN(),
@@ -203,7 +202,7 @@ contract FlareTokenMock is IERC20 {
                     uint256(1),
                     vendor,
                     bid.plaintextCommitment,
-                    uint8(3),
+                    uint8(7),
                     bid.acceptedBlock
                 )
             );
@@ -215,7 +214,7 @@ contract FlareTokenMock is IERC20 {
             if (tender.ftsoValue != 250_000 || tender.requestId != registry.nextRequestId()) {
                 revert("close/request binding mismatch");
             }
-            if (registry.selectedTeeCount() != 2) revert("common quorum not targeted");
+            if (registry.selectedTeeCount() != 3) revert("common quorum not targeted");
 
             VeilBidFlareMarket.SelectionResult memory result = _winningResult(tenderId, tender);
             VeilBidFlareMarket.TeeActionProof[] memory proofs = new VeilBidFlareMarket.TeeActionProof[](2);
@@ -242,6 +241,10 @@ contract FlareTokenMock is IERC20 {
             }
         }
 
+        function testMarketRuntimeFitsEip170() external view {
+            if (address(market).code.length > 24_576) revert("market exceeds EIP-170");
+        }
+
         function testOrderedBidRootGoldenVectorMatchesGo() external view {
             bytes32 root = market.EMPTY_BID_ROOT();
             root = keccak256(
@@ -252,7 +255,7 @@ contract FlareTokenMock is IERC20 {
                     uint256(1),
                     0x1000000000000000000000000000000000000001,
                     bytes32(uint256(0x1111)),
-                    uint8(3),
+                    uint8(7),
                     uint64(33_500_001)
                 )
             );
@@ -268,7 +271,7 @@ contract FlareTokenMock is IERC20 {
                     uint64(33_500_009)
                 )
             );
-            if (root != 0xd17b22ee6e48c6ac79cb32c203de07402bfcc9cb79a1f330c043ffa5ed327f77) {
+            if (root != 0xed019a9542e15443dda5329d4988cf864e9189e39200755837488fcba327eb13) {
                 revert("Go/Solidity root drift");
             }
         }
@@ -395,6 +398,13 @@ contract FlareTokenMock is IERC20 {
             market.createTender(terms);
         }
 
+        function testRejectsDuplicateFrozenTeeKeyFingerprint() external {
+            manager.setIdentity(teeIds[2], 0x10001, keccak256("veilbid-fcc-v1"), manager.getPublicKey(teeIds[1]));
+            VeilBidFlareMarket.TenderTerms memory terms = _terms();
+            vm.expectRevert(VeilBidFlareMarket.NotEnoughTeeIdentities.selector);
+            market.createTender(terms);
+        }
+
         function testXrpOnlyTenderDoesNotDependOnFtso() external {
             VeilBidFlareMarket.TenderTerms memory terms = _terms();
             terms.scoringPolicy.allowUsd = false;
@@ -422,8 +432,7 @@ contract FlareTokenMock is IERC20 {
 
         function testRejectsWrongActionResultBinding() external {
             uint256 tenderId = market.createTender(_terms());
-            _submitReceipt(tenderId, TEE_KEY_1, teeIds[0]);
-            _submitReceipt(tenderId, TEE_KEY_2, teeIds[1]);
+            _submitReceipts(tenderId);
             market.closeTender(tenderId);
             market.requestSelection(tenderId);
             VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
@@ -445,6 +454,76 @@ contract FlareTokenMock is IERC20 {
                 VeilBidFlareMarket.TeeActionProof[] memory proofs
             ) = _preparedWinningSelection();
             proofs[1] = _actionProof(result, tender.requestId, TEE_KEY_1);
+            vm.expectRevert(VeilBidFlareMarket.InvalidResult.selector);
+            market.finalizeTender(tenderId, result, proofs);
+        }
+
+        function testRequiresAllThreeMatchingBidReceipts() external {
+            uint256 tenderId = market.createTender(_terms());
+            (VeilBidFlareMarket.BidReceipt[3] memory receipts, bytes[3] memory signatures) = _receiptSet(tenderId);
+            receipts[2] = receipts[1];
+            signatures[2] = signatures[1];
+            vm.prank(vendor);
+            vm.expectRevert(VeilBidFlareMarket.InvalidReceipt.selector);
+            market.submitBidReceipts(tenderId, receipts, signatures);
+            if (market.getTender(tenderId).bidCount != 0) revert("partial receipt set was stored");
+        }
+
+        function testRejectsChangedTeeIdentityAtBidAcceptance() external {
+            uint256 tenderId = market.createTender(_terms());
+            (VeilBidFlareMarket.BidReceipt[3] memory receipts, bytes[3] memory signatures) = _receiptSet(tenderId);
+            manager.setIdentity(
+                teeIds[2],
+                0x10001,
+                keccak256("changed-code"),
+                IFlareTeeManager.PublicKey(keccak256("changed-x"), keccak256("changed-y"))
+            );
+            vm.prank(vendor);
+            vm.expectRevert(VeilBidFlareMarket.NotRegisteredTee.selector);
+            market.submitBidReceipts(tenderId, receipts, signatures);
+        }
+
+        function testSelectionAndFinalizationSurviveOneMachineOutage() external {
+            uint256 tenderId = market.createTender(_terms());
+            _submitReceipts(tenderId);
+            market.closeTender(tenderId);
+            manager.setStatus(teeIds[2], 1);
+            market.requestSelection(tenderId);
+            if (registry.selectedTeeCount() != 2) revert("active two-machine target mismatch");
+            VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
+            VeilBidFlareMarket.SelectionResult memory result = _winningResult(tenderId, tender);
+            VeilBidFlareMarket.TeeActionProof[] memory proofs = new VeilBidFlareMarket.TeeActionProof[](2);
+            proofs[0] = _actionProof(result, tender.requestId, TEE_KEY_1);
+            proofs[1] = _actionProof(result, tender.requestId, TEE_KEY_2);
+            market.finalizeTender(tenderId, result, proofs);
+            if (market.getTender(tenderId).status != VeilBidFlareMarket.TenderStatus.Awarded) {
+                revert("one-machine outage did not settle");
+            }
+        }
+
+        function testSelectionRejectsTwoMachineOutage() external {
+            uint256 tenderId = market.createTender(_terms());
+            _submitReceipts(tenderId);
+            market.closeTender(tenderId);
+            manager.setStatus(teeIds[1], 1);
+            manager.setStatus(teeIds[2], 1);
+            vm.expectRevert(VeilBidFlareMarket.NotEnoughTeeIdentities.selector);
+            market.requestSelection(tenderId);
+        }
+
+        function testRejectsChangedTeeKeyAtFinalization() external {
+            (
+                uint256 tenderId,
+                VeilBidFlareMarket.Tender memory tender,
+                VeilBidFlareMarket.SelectionResult memory result,
+                VeilBidFlareMarket.TeeActionProof[] memory proofs
+            ) = _preparedWinningSelection();
+            manager.setIdentity(
+                teeIds[1],
+                tender.extensionId,
+                tender.codeVersion,
+                IFlareTeeManager.PublicKey(keccak256("rotated-x"), keccak256("rotated-y"))
+            );
             vm.expectRevert(VeilBidFlareMarket.InvalidResult.selector);
             market.finalizeTender(tenderId, result, proofs);
         }
@@ -614,8 +693,7 @@ contract FlareTokenMock is IERC20 {
             )
         {
             tenderId = market.createTender(_terms());
-            _submitReceipt(tenderId, TEE_KEY_1, teeIds[0]);
-            _submitReceipt(tenderId, TEE_KEY_2, teeIds[1]);
+            _submitReceipts(tenderId);
             market.closeTender(tenderId);
             market.requestSelection(tenderId);
             tender = market.getTender(tenderId);
@@ -625,36 +703,46 @@ contract FlareTokenMock is IERC20 {
             proofs[1] = _actionProof(result, tender.requestId, TEE_KEY_2);
         }
 
-        function _submitReceipt(uint256 tenderId, uint256 teeKey, address teeId) private {
-            VeilBidFlareMarket.BidReceipt memory receipt = VeilBidFlareMarket.BidReceipt({
-                schemaVersion: 1,
-                vendor: vendor,
-                submissionNonce: 1,
-                plaintextCommitment: keccak256("opaque-private-bid"),
-                teeId: teeId,
-                expiry: 900
-            });
-            VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
-            bytes32 digest = keccak256(
-                abi.encode(
-                    market.RECEIPT_DOMAIN(),
-                    receipt.schemaVersion,
-                    market.COSTON2_CHAIN_ID(),
-                    address(market),
-                    tender.extensionId,
-                    tender.codeVersion,
-                    tenderId,
-                    tender.rulesHash,
-                    receipt.vendor,
-                    receipt.submissionNonce,
-                    receipt.plaintextCommitment,
-                    receipt.teeId,
-                    receipt.expiry
-                )
-            );
-            bytes memory signature = _signEthDigest(teeKey, digest);
+        function _submitReceipts(uint256 tenderId) private {
+            (VeilBidFlareMarket.BidReceipt[3] memory receipts, bytes[3] memory signatures) = _receiptSet(tenderId);
             vm.prank(vendor);
-            market.submitBidReceipt(tenderId, receipt, signature);
+            market.submitBidReceipts(tenderId, receipts, signatures);
+        }
+
+        function _receiptSet(uint256 tenderId)
+            private
+            returns (VeilBidFlareMarket.BidReceipt[3] memory receipts, bytes[3] memory signatures)
+        {
+            VeilBidFlareMarket.Tender memory tender = market.getTender(tenderId);
+            uint256[3] memory teeKeys = [TEE_KEY_1, TEE_KEY_2, TEE_KEY_3];
+            for (uint256 i; i < 3; ++i) {
+                receipts[i] = VeilBidFlareMarket.BidReceipt({
+                    schemaVersion: 1,
+                    vendor: vendor,
+                    submissionNonce: 1,
+                    plaintextCommitment: keccak256("opaque-private-bid"),
+                    teeId: teeIds[i],
+                    expiry: uint64(block.timestamp + 1 hours)
+                });
+                bytes32 digest = keccak256(
+                    abi.encode(
+                        market.RECEIPT_DOMAIN(),
+                        receipts[i].schemaVersion,
+                        market.COSTON2_CHAIN_ID(),
+                        address(market),
+                        tender.extensionId,
+                        tender.codeVersion,
+                        tenderId,
+                        tender.rulesHash,
+                        receipts[i].vendor,
+                        receipts[i].submissionNonce,
+                        receipts[i].plaintextCommitment,
+                        receipts[i].teeId,
+                        receipts[i].expiry
+                    )
+                );
+                signatures[i] = _signEthDigest(teeKeys[i], digest);
+            }
         }
 
         function _winningResult(uint256 tenderId, VeilBidFlareMarket.Tender memory tender)

@@ -120,20 +120,22 @@ schema versions fail closed.
 
 ## ADR-005 — TEE selection, quorum, and result trust
 
-**Decision:** The championship release uses three registered TEE identities and
-requires two matching result signatures.
+**Decision:** The championship release uses three registered TEE identities,
+requires all three to acknowledge every accepted bid, and requires two matching
+result signatures.
 
 - The market obtains or validates three registered machines for the fixed
   extension/code version before a tender opens.
 - Machine identities and public-key fingerprints are frozen per tender.
-- A bid may enter `Accepted` only if its receipt bitmap preserves a common
-  two-machine quorum across every accepted bid.
-- `commonQuorumBitmap` begins with all selected machines and is intersected with
-  each bid's valid receipt bitmap.
-- Close is permitted only while the bitmap contains at least two machines.
-- Selection instructions target the fixed common quorum.
+- A bid may enter `Accepted` only through one atomic set of three distinct,
+  matching, currently valid machine receipts; its bitmap is exactly `0x07`.
+- `commonQuorumBitmap` therefore remains the frozen three-machine custody set
+  across every accepted bid.
+- Selection instructions target the currently live members of that frozen set
+  and require at least two; one post-intake machine outage is tolerated.
 - Finalization requires two distinct approved machines to sign the exact same
-  result digest.
+  result digest, with status, extension, code hash, and public-key fingerprint
+  revalidated at acceptance, dispatch, and finalization.
 
 One-machine FCC execution is allowed only for Gate A/B development and must be
 labeled `1-of-1 development mode`. It cannot satisfy the championship release
@@ -141,8 +143,11 @@ gate unless the organizer-provided infrastructure makes multiple registered
 machines unavailable, in which case the limitation must be disclosed and the
 submission claim reduced.
 
-**Reason:** Threshold agreement reduces single-machine correctness and
-availability risk without pretending that TEE computation is zero knowledge.
+**Reason:** Threshold agreement reduces single-machine correctness risk, while
+three-machine custody lets either surviving pair reconstruct the same accepted
+bid set after one outage. Requiring all three receipts makes intake depend on
+all three machines; that deliberate availability tradeoff is measured in Gate
+C rather than hidden behind a weaker two-receipt claim.
 
 ## ADR-006 — Key rotation and code upgrades
 
@@ -150,12 +155,11 @@ availability risk without pretending that TEE computation is zero knowledge.
 code version changes after a tender becomes `Open`.
 
 - New versions apply only to new tenders.
-- A machine can be removed before the first accepted bid if the remaining set
-  still meets policy and the buyer republishes the tender binding.
-- After a bid is accepted, recovery can use only machines already inside the
-  frozen common quorum.
-- Losing quorum after close produces an explicit liveness failure; it never
-  enables a buyer-chosen winner or timeout refund.
+- Recovery can use only machines already inside the frozen common quorum.
+- Losing one machine after bid acceptance preserves a valid two-machine result
+  path. Losing two produces an explicit liveness failure and can reach only the
+  documented failed-compute escrow refund after its fixed grace; it never
+  enables a buyer-chosen winner.
 
 Extension governance may approve new versions for future tenders but has no
 winner override, escrow withdrawal, or retroactive tender mutation.
@@ -573,6 +577,29 @@ to diverge from what FCC scored. Canonical storage and derivation make the
 transparent rule a contract fact while keeping every bid value and credential
 private. This is locally tested architecture only until the replacement market
 is deployed and runtime-verified on Coston2.
+
+## ADR-024 — Three-receipt custody with two-machine outage recovery
+
+**Decision:** The earlier incremental `submitBidReceipt` path is replaced by a
+single bounded `submitBidReceipts` call containing exactly three matching
+receipts and signatures. Partial sets never create public pending state and a
+two-receipt bid never enters the ordered root. The contract and FCC extension
+both reject any accepted reference whose receipt bitmap is not `0x07`.
+
+The three frozen identities are revalidated against the live manager at bid
+acceptance. At selection dispatch the contract sends only to currently valid
+members of the frozen set and requires at least two. At finalization it again
+checks production status, extension ID, attested code hash, and frozen public
+key fingerprint for each recovered signer. Local adversarial tests prove that
+one outage still settles, two outages stop dispatch, and code/key drift fails
+closed.
+
+**Reason:** Accepting a bid immediately after the first two receipts made those
+two machines the permanent common quorum and prevented the third receipt from
+being added. An outage of either selected custodian then halted selection, so
+the claimed three-machine topology provided no arbitrary one-machine failover.
+The fixed set restores that property without exposing bids, ciphertext, or
+partial receipt state. Live Gate C evidence remains required.
 
 ## Official reference basis
 

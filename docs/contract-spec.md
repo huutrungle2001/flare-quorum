@@ -132,8 +132,8 @@ not a caller-controlled contract state.
 - `createTender(TenderTerms)` where `TenderTerms` contains the complete public
   `ScoringPolicy`; an FTestXRP approval plus this call is the atomic Smart
   Account batch
-- `submitBidReceipt(tenderId, receipt, signature)` until a matching receipt
-  threshold accepts the vendor's bid
+- `submitBidReceipts(tenderId, receipts[3], signatures[3])`; the atomic set must
+  contain every frozen machine and no partial receipt state is stored
 - `closeTender(tenderId)`
 - `requestSelection(tenderId)`
 - `retrySelection(tenderId)` only after the signed-result window expires; it
@@ -162,7 +162,8 @@ escrow back to the buyer.
 - Scoring weights sum exactly to `10_000`.
 - Numeric scoring bounds and credential issuer/type policy are valid.
 - Extension/code version is approved for new tenders.
-- Three distinct registered machines and key fingerprints are fixed.
+- Three distinct registered machines with three distinct public-key
+  fingerprints are fixed.
 - Threshold is exactly two in championship mode.
 - XRP/USD feed ID is official when USD quotes are enabled.
 - Exact FTestXRP ceiling reaches escrow before `Open`.
@@ -181,11 +182,11 @@ contracts, never the release market.
 3. Caller is approved vendor with no accepted bid.
 4. Submission nonce is exact unused next nonce.
 5. Every receipt reconstructs the canonical `BID_RECEIPT_V1` digest.
-6. Signer is a distinct tender-fixed registered machine for fixed code version.
+6. All three signers are distinct tender-fixed registered machines whose live
+   status, extension, code hash, and public-key fingerprint still match.
 7. Receipts agree on vendor, nonce, rule, and plaintext commitment.
 8. Receipt expiry has not passed.
-9. Valid signer bitmap intersected with current common quorum preserves at least
-   two machines.
+9. Valid signer bitmap is exactly `0x07`; a two-machine set is rejected.
 10. Terminal bid reference is stored and ordered root updated once.
 
 The contract never receives bid plaintext or ciphertext.
@@ -211,7 +212,8 @@ The caller cannot supply the FTSO snapshot.
 `requestSelection`:
 
 - requires `Closed` and no accepted terminal result;
-- targets machines in the frozen common quorum through official FCC contracts;
+- revalidates the frozen machine identities and targets the currently valid
+  subset through official FCC contracts; at least two must remain;
 - sends an ABI-encoded `SelectionRequest` tuple containing the exact public
   tender/root/rules/FTSO/close/result-nonce/expiry binding, the public ceiling
   and bid deadline needed by the extension's deterministic scoring policy, and
@@ -230,8 +232,9 @@ inputs and follow the documented FCC fee/replay policy.
 
 1. Reconstructs the current FCC-compatible domain-separated result digest.
 2. Checks every result field against stored tender state.
-3. Recovers distinct signers and verifies tender-fixed registration, code
-   compatibility, and common-quorum membership.
+3. Recovers distinct signers and revalidates tender-fixed production status,
+   extension, attested code hash, public-key fingerprint, and common-quorum
+   membership.
 4. Requires at least two valid signatures over the exact same digest.
 5. Requires current unused result nonce and nonexpired envelope.
 6. Maps nonzero winner bid ID to the stored vendor and requires equality.

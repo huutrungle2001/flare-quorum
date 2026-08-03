@@ -143,7 +143,7 @@ func (e *Extension) processSelection(action teetypes.Action, dataFixed *instruct
 	if request.SchemaVersion != protocol.SelectionSchemaVersion || request.ChainID == nil || request.ChainID.Cmp(big.NewInt(config.Coston2ChainID)) != 0 || request.Market == (common.Address{}) || request.ExtensionID == nil || request.ExtensionID.Sign() <= 0 || request.CodeVersion == (common.Hash{}) || request.TenderID == nil || request.TenderID.Sign() <= 0 || request.RulesHash == (common.Hash{}) || request.PublicCeilingXrp == nil || !request.PublicCeilingXrp.IsUint64() || request.PublicCeilingXrp.Sign() <= 0 || request.BidDeadline == 0 || request.OrderedBidRoot == (common.Hash{}) || request.ResultNonce == nil || request.ResultNonce.Sign() <= 0 || request.ResultExpiry < now {
 		return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
 	}
-	if request.QuorumBitmap&0x07 != request.QuorumBitmap || bitCount(request.QuorumBitmap) < 2 || len(request.BidReferences) > 256 {
+	if request.QuorumBitmap != 0x07 || len(request.BidReferences) > 256 {
 		return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
 	}
 	if _, err := e.tee.Identity(context.Background()); err != nil {
@@ -152,7 +152,7 @@ func (e *Extension) processSelection(action teetypes.Action, dataFixed *instruct
 
 	references := make([]protocol.BidReference, len(request.BidReferences))
 	for index, reference := range request.BidReferences {
-		if reference.BidID == nil || reference.BidID.Cmp(new(big.Int).SetUint64(uint64(index+1))) != 0 || reference.Vendor == (common.Address{}) || reference.PlaintextCommitment == (common.Hash{}) || reference.SubmissionNonce == nil || reference.SubmissionNonce.Sign() <= 0 || reference.ReceiptBitmap&0x07 != reference.ReceiptBitmap || bitCount(reference.ReceiptBitmap) < 2 || reference.AcceptedBlock == 0 || reference.ReceiptBitmap&request.QuorumBitmap != request.QuorumBitmap {
+		if reference.BidID == nil || reference.BidID.Cmp(new(big.Int).SetUint64(uint64(index+1))) != 0 || reference.Vendor == (common.Address{}) || reference.PlaintextCommitment == (common.Hash{}) || reference.SubmissionNonce == nil || reference.SubmissionNonce.Sign() <= 0 || reference.ReceiptBitmap != 0x07 || reference.AcceptedBlock == 0 {
 			return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
 		}
 		references[index] = protocol.BidReference{BidID: reference.BidID, Vendor: reference.Vendor, PlaintextCommitment: reference.PlaintextCommitment, ReceiptBitmap: reference.ReceiptBitmap, AcceptedBlock: reference.AcceptedBlock}
@@ -224,16 +224,6 @@ func (e *Extension) processSelection(action teetypes.Action, dataFixed *instruct
 		return buildResult(action, dataFixed, nil, 0, errorInternal)
 	}
 	return buildResult(action, dataFixed, data, 1, "")
-}
-
-func bitCount(value uint8) uint8 {
-	var count uint8
-	for bit := uint8(0); bit < 8; bit++ {
-		if value&(1<<bit) != 0 {
-			count++
-		}
-	}
-	return count
 }
 
 func (e *Extension) processDirectAction(action teetypes.Action) (int, []byte) {

@@ -28,7 +28,7 @@ export function appendBidRoot(previous: Hex, tenderId: bigint, reference: FlareB
 export function rebuildBidRoot(tenderId: bigint, references: readonly FlareBidReference[]): Hex {
   return references.reduce((root, reference, index) => {
     if (reference.bidId !== BigInt(index + 1)) throw new Error("NON_CANONICAL_BID_ID");
-    if (reference.receiptBitmap < 3 || (reference.receiptBitmap & 7) !== reference.receiptBitmap) throw new Error("WEAK_RECEIPT_QUORUM");
+    if (reference.receiptBitmap !== 7) throw new Error("INCOMPLETE_RECEIPT_QUORUM");
     return appendBidRoot(root, tenderId, reference);
   }, emptyBidRoot);
 }

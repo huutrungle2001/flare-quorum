@@ -20,6 +20,21 @@ export interface FlarePublicTenderOutput {
   buyer: string;
   metadataHash: string;
   rulesHash: string;
+  scoringPolicy: {
+    schemaVersion: number;
+    ceilingXrpMicros: string;
+    bidDeadline: string;
+    allowXrp: boolean;
+    allowUsd: boolean;
+    ftsoFeedId: string;
+    maxDeliveryDays: number;
+    minWarrantyDays: number;
+    maxWarrantyDays: number;
+    priceWeightBps: number;
+    deliveryWeightBps: number;
+    warrantyWeightBps: number;
+    requiredCredentials: readonly { credentialType: string; issuer: string }[];
+  };
   publicCeilingXrp: string;
   bidDeadline: string;
   closeBlock: string;

@@ -40,6 +40,10 @@ function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
         <div><dt>Accepted bids</dt><dd>{tender.bidCount.toString()} / {tender.approvedVendorCount}</dd></div>
         <div><dt>Buyer / PersonalAccount</dt><dd title={tender.buyer}>{short(tender.buyer)}</dd></div>
         <div><dt>Common TEE quorum</dt><dd>{quorum} / threshold 2</dd></div>
+        <div><dt>Quote currencies</dt><dd>{[tender.scoringPolicy.allowXrp && "XRP", tender.scoringPolicy.allowUsd && "USD"].filter(Boolean).join(" + ")}</dd></div>
+        <div><dt>Scoring weights</dt><dd>{tender.scoringPolicy.priceWeightBps / 100}% price / {tender.scoringPolicy.deliveryWeightBps / 100}% delivery / {tender.scoringPolicy.warrantyWeightBps / 100}% warranty</dd></div>
+        <div><dt>Service bounds</dt><dd>≤ {tender.scoringPolicy.maxDeliveryDays}d delivery / {tender.scoringPolicy.minWarrantyDays}–{tender.scoringPolicy.maxWarrantyDays}d warranty</dd></div>
+        <div><dt>Credential requirements</dt><dd>{tender.scoringPolicy.requiredCredentials.length}</dd></div>
         <div><dt>Extension</dt><dd>{tender.extensionId.toString()}</dd></div>
         <div><dt>Code version</dt><dd title={tender.codeVersion}>{short(tender.codeVersion)}</dd></div>
         <div><dt>Selection attempt</dt><dd>{tender.selectionAttempt || "Not requested"}</dd></div>

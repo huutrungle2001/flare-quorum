@@ -15,6 +15,7 @@ contract VeilBidFlareMarket {
     uint256 public constant MAX_BIDS = 8;
     uint256 public constant MAX_CREDENTIAL_REQUIREMENTS = 4;
     uint256 public constant TEE_COUNT = 3;
+    uint8 public constant BID_RECEIPT_THRESHOLD = 3;
     uint8 public constant RESULT_THRESHOLD = 2;
     uint16 public constant SCORING_WEIGHT_BPS = 10_000;
     uint64 public constant FTSO_MAX_AGE = 300;
@@ -192,9 +193,7 @@ contract VeilBidFlareMarket {
     mapping(uint256 => Tender) private tenders;
     mapping(uint256 => mapping(address => bool)) public isApprovedVendor;
     mapping(uint256 => mapping(address => bool)) public hasSubmittedBid;
-    mapping(uint256 => mapping(address => uint8)) public receiptBitmapByVendor;
     mapping(uint256 => mapping(address => uint256)) public bidIdByVendor;
-    mapping(uint256 => mapping(address => BidReference)) private pendingBidReferences;
     mapping(uint256 => mapping(uint256 => BidReference)) private bidReferences;
     mapping(uint256 => ScoringPolicy) private scoringPolicies;
 
@@ -203,7 +202,6 @@ contract VeilBidFlareMarket {
     error BidDeadlinePassed();
     error InvalidAddress();
     error InvalidCodeVersion();
-    error InvalidDeadline();
     error InvalidFeed();
     error InvalidReceipt();
     error InvalidResult();
@@ -298,7 +296,9 @@ contract VeilBidFlareMarket {
                 revert NotRegisteredTee();
             }
             for (uint256 j; j < i; ++j) {
-                if (terms.teeIds[i] == terms.teeIds[j]) revert NotEnoughTeeIdentities();
+                if (terms.teeIds[i] == terms.teeIds[j] || terms.teeKeyFingerprints[i] == terms.teeKeyFingerprints[j]) {
+                    revert NotEnoughTeeIdentities();
+                }
             }
         }
         uint256 publicCeilingXrp = terms.scoringPolicy.ceilingXrpMicros;
@@ -336,7 +336,7 @@ contract VeilBidFlareMarket {
         emit TenderCreated(tenderId, msg.sender, tender.rulesHash, publicCeilingXrp);
     }
 
-    function submitBidReceipt(uint256 tenderId, BidReceipt calldata receipt, bytes calldata signature)
+    function submitBidReceipts(uint256 tenderId, BidReceipt[3] calldata receipts, bytes[3] calldata signatures)
         external
         nonReentrant
         returns (uint256 bidId)
@@ -344,84 +344,67 @@ contract VeilBidFlareMarket {
         Tender storage tender = _requireTender(tenderId);
         if (tender.status != TenderStatus.Open) revert InvalidStatus(TenderStatus.Open, tender.status);
         if (block.timestamp >= tender.bidDeadline) revert BidDeadlinePassed();
-        if (receipt.vendor != msg.sender || !isApprovedVendor[tenderId][msg.sender]) revert NotApprovedVendor();
+        if (!isApprovedVendor[tenderId][msg.sender]) revert NotApprovedVendor();
         if (hasSubmittedBid[tenderId][msg.sender]) revert AlreadySubmitted();
-        if (
-            receipt.schemaVersion != 1 || receipt.submissionNonce == 0 || receipt.plaintextCommitment == bytes32(0)
-                || receipt.teeId == address(0) || receipt.expiry < block.timestamp
-        ) revert InvalidReceipt();
-        uint8 existing = receiptBitmapByVendor[tenderId][msg.sender];
-        BidReference storage pending = pendingBidReferences[tenderId][msg.sender];
-        if (existing != 0 && pending.receiptExpiry < block.timestamp) {
-            delete pendingBidReferences[tenderId][msg.sender];
-            receiptBitmapByVendor[tenderId][msg.sender] = 0;
-            existing = 0;
-        }
-        uint8 teeIndex = _teeIndex(tender, receipt.teeId);
-        uint8 bit = uint8(2 ** teeIndex);
-        if ((existing & bit) != 0) revert InvalidReceipt();
-        bytes32 digest = keccak256(
-            abi.encode(
-                RECEIPT_DOMAIN,
-                receipt.schemaVersion,
-                COSTON2_CHAIN_ID,
-                address(this),
-                tender.extensionId,
-                tender.codeVersion,
-                tenderId,
-                tender.rulesHash,
-                receipt.vendor,
-                receipt.submissionNonce,
-                receipt.plaintextCommitment,
-                receipt.teeId,
-                receipt.expiry
-            )
-        );
-        if (_recoverEthSigned(digest, signature) != receipt.teeId) revert InvalidReceipt();
-        pending = pendingBidReferences[tenderId][msg.sender];
-        if (existing == 0) {
-            pending.vendor = msg.sender;
-            pending.submissionNonce = receipt.submissionNonce;
-            pending.plaintextCommitment = receipt.plaintextCommitment;
-            pending.receiptExpiry = receipt.expiry;
-        } else if (
-            pending.submissionNonce != receipt.submissionNonce
-                || pending.plaintextCommitment != receipt.plaintextCommitment || pending.receiptExpiry != receipt.expiry
-        ) {
-            revert InvalidReceipt();
-        }
-        receiptBitmapByVendor[tenderId][msg.sender] = existing | bit;
-        if (_bitCount(existing | bit) >= RESULT_THRESHOLD) {
-            uint8 nextCommonQuorum = tender.commonQuorumBitmap & (existing | bit);
-            if (_bitCount(nextCommonQuorum) < RESULT_THRESHOLD) revert InvalidReceipt();
-            bidId = ++tender.bidCount;
-            bidIdByVendor[tenderId][msg.sender] = bidId;
-            hasSubmittedBid[tenderId][msg.sender] = true;
-            uint64 acceptedBlock = uint64(block.number);
-            bidReferences[tenderId][bidId] = BidReference(
-                msg.sender,
-                receipt.submissionNonce,
-                receipt.plaintextCommitment,
-                existing | bit,
-                receipt.expiry,
-                acceptedBlock
-            );
-            delete pendingBidReferences[tenderId][msg.sender];
-            tender.commonQuorumBitmap = nextCommonQuorum;
-            tender.orderedBidRoot = keccak256(
+        BidReceipt calldata first = receipts[0];
+        uint8 receiptBitmap;
+        for (uint8 i; i < BID_RECEIPT_THRESHOLD; ++i) {
+            BidReceipt calldata receipt = receipts[i];
+            if (
+                receipt.schemaVersion != 1 || receipt.vendor != msg.sender || receipt.submissionNonce == 0
+                    || receipt.plaintextCommitment == bytes32(0) || receipt.teeId == address(0)
+                    || receipt.expiry < block.timestamp || receipt.expiry > tender.bidDeadline
+                    || receipt.submissionNonce != first.submissionNonce
+                    || receipt.plaintextCommitment != first.plaintextCommitment || receipt.expiry != first.expiry
+            ) revert InvalidReceipt();
+            uint8 teeIndex = _teeIndex(tender, receipt.teeId);
+            uint8 bit = uint8(2 ** teeIndex);
+            if ((receiptBitmap & bit) != 0) revert InvalidReceipt();
+            if (!_isFrozenTeeIdentity(tender, teeIndex)) revert NotRegisteredTee();
+            bytes32 digest = keccak256(
                 abi.encode(
-                    BID_ROOT_DOMAIN,
-                    tender.orderedBidRoot,
+                    RECEIPT_DOMAIN,
+                    receipt.schemaVersion,
+                    COSTON2_CHAIN_ID,
+                    address(this),
+                    tender.extensionId,
+                    tender.codeVersion,
                     tenderId,
-                    bidId,
-                    msg.sender,
+                    tender.rulesHash,
+                    receipt.vendor,
+                    receipt.submissionNonce,
                     receipt.plaintextCommitment,
-                    existing | bit,
-                    acceptedBlock
+                    receipt.teeId,
+                    receipt.expiry
                 )
             );
-            emit BidReceiptAccepted(tenderId, bidId, msg.sender, existing | bit);
+            if (_recoverEthSigned(digest, signatures[i]) != receipt.teeId) revert InvalidReceipt();
+            receiptBitmap |= bit;
         }
+        if (receiptBitmap != 0x07) revert InvalidReceipt();
+        uint8 nextCommonQuorum = tender.commonQuorumBitmap & receiptBitmap;
+        if (_bitCount(nextCommonQuorum) < RESULT_THRESHOLD) revert InvalidReceipt();
+        bidId = ++tender.bidCount;
+        bidIdByVendor[tenderId][msg.sender] = bidId;
+        hasSubmittedBid[tenderId][msg.sender] = true;
+        uint64 acceptedBlock = uint64(block.number);
+        bidReferences[tenderId][bidId] = BidReference(
+            msg.sender, first.submissionNonce, first.plaintextCommitment, receiptBitmap, first.expiry, acceptedBlock
+        );
+        tender.commonQuorumBitmap = nextCommonQuorum;
+        tender.orderedBidRoot = keccak256(
+            abi.encode(
+                BID_ROOT_DOMAIN,
+                tender.orderedBidRoot,
+                tenderId,
+                bidId,
+                msg.sender,
+                first.plaintextCommitment,
+                receiptBitmap,
+                acceptedBlock
+            )
+        );
+        emit BidReceiptAccepted(tenderId, bidId, msg.sender, receiptBitmap);
     }
 
     function closeTender(uint256 tenderId) external nonReentrant {
@@ -486,7 +469,7 @@ contract VeilBidFlareMarket {
             )
         );
         tender.resultExpiry = uint64(block.timestamp + RESULT_VALIDITY);
-        address[] memory teeIds = _commonTeeIds(tender);
+        address[] memory teeIds = _activeCommonTeeIds(tender);
         address[] memory cosigners = new address[](0);
         SelectionBidReference[] memory references = _selectionBidReferences(tenderId, tender);
         ITeeExtensionRegistry.TeeInstructionParams memory params = ITeeExtensionRegistry.TeeInstructionParams({
@@ -573,8 +556,8 @@ contract VeilBidFlareMarket {
             );
             bytes32 signedPayload = keccak256(abi.encode(TEE_ACTION_RESULT_PREFIX, COSTON2_CHAIN_ID, actionResultHash));
             address signer = _recoverEthSigned(signedPayload, proof.signature);
-            if (teeManager.getTeeMachineStatus(signer) != 2 || teeManager.getExtensionId(signer) != tender.extensionId) revert InvalidResult();
             uint8 index = _teeIndex(tender, signer);
+            if (!_isFrozenTeeIdentity(tender, index)) revert InvalidResult();
             uint8 bit = uint8(2 ** index);
             if ((result.quorumBitmap & bit) == 0 || (seen & bit) != 0) revert InvalidResult();
             seen |= bit;
@@ -748,12 +731,31 @@ contract VeilBidFlareMarket {
         }
     }
 
-    function _commonTeeIds(Tender storage tender) internal view returns (address[] memory ids) {
-        ids = new address[](_bitCount(tender.commonQuorumBitmap));
-        uint256 cursor;
+    function _activeCommonTeeIds(Tender storage tender) internal view returns (address[] memory ids) {
+        address[3] memory active;
+        uint8 count;
         for (uint8 i; i < TEE_COUNT; ++i) {
-            if ((tender.commonQuorumBitmap & uint8(2 ** i)) != 0) ids[cursor++] = tender.teeIds[i];
+            if ((tender.commonQuorumBitmap & uint8(2 ** i)) != 0 && _isFrozenTeeIdentity(tender, i)) {
+                active[count++] = tender.teeIds[i];
+            }
         }
+        if (count < RESULT_THRESHOLD) revert NotEnoughTeeIdentities();
+        ids = new address[](count);
+        for (uint8 i; i < count; ++i) {
+            ids[i] = active[i];
+        }
+    }
+
+    function _isFrozenTeeIdentity(Tender storage tender, uint8 index) internal view returns (bool) {
+        address teeId = tender.teeIds[index];
+        if (teeManager.getTeeMachineStatus(teeId) != 2 || teeManager.getExtensionId(teeId) != tender.extensionId) {
+            return false;
+        }
+        IFlareTeeManager.TeeMachineWithAttestationData memory machine =
+            teeManager.getTeeMachineWithAttestationData(teeId);
+        if (machine.teeId != teeId || machine.codeHash != tender.codeVersion) return false;
+        IFlareTeeManager.PublicKey memory publicKey = teeManager.getPublicKey(teeId);
+        return keccak256(abi.encode(publicKey.x, publicKey.y)) == tender.teeKeyFingerprints[index];
     }
 
     function _recoverEthSigned(bytes32 digest, bytes calldata signature) internal pure returns (address signer) {

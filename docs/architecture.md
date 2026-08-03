@@ -98,15 +98,19 @@ the bid. Public receipts contain commitment/binding only.
 
 ### Common quorum
 
-For every accepted bid, the market computes the valid receipt bitmap and:
+For every accepted championship bid, the market validates one atomic receipt
+set from all three frozen machines:
 
 ```text
-commonQuorumBitmap = commonQuorumBitmap & bidReceiptBitmap
+bidReceiptBitmap = 0b111
+commonQuorumBitmap = 0b111
 ```
 
-Acceptance requires at least two bits after intersection. This guarantees that
-the same two or more machines retain every accepted bid. Close requires the same
-condition.
+Partial two-machine sets never enter contract state or the ordered root. This
+guarantees that any surviving pair retains every accepted bid. Selection
+dispatch filters the frozen set by current status/extension/code/key identity
+and proceeds only with at least two valid machines; finalization revalidates the
+same identity facts for both signers.
 
 ### Ordered root
 

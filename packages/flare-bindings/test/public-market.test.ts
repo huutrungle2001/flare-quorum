@@ -77,6 +77,7 @@ function mockReader(options: { rulesHash?: Hex } = {}) {
     teeExtensionRegistry: manager,
     awardReceipt: receipt,
     TEE_COUNT: 3n,
+    BID_RECEIPT_THRESHOLD: 3,
     RESULT_THRESHOLD: 2,
   };
   const reader: Coston2PublicReader = {
@@ -126,6 +127,7 @@ test("returns public immutable protocol bindings without result or signature mat
   assert.equal(result.teeManager, manager);
   assert.equal(result.teeExtensionRegistry, manager);
   assert.equal(result.teeCount, 3n);
+  assert.equal(result.bidReceiptThreshold, 3);
   assert.equal(result.resultThreshold, 2);
   assert.equal(readBlocks.every((block) => block === 88n), true);
   assert.doesNotMatch(JSON.stringify(result, (_, value) => typeof value === "bigint" ? value.toString() : value), /signature|ciphertext|resultData/i);

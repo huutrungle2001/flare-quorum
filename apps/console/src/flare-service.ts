@@ -41,6 +41,11 @@ function publicTender(tender: Coston2PublicTender): FlarePublicTenderOutput {
     buyer: tender.buyer,
     metadataHash: tender.metadataHash,
     rulesHash: tender.rulesHash,
+    scoringPolicy: {
+      ...tender.scoringPolicy,
+      ceilingXrpMicros: tender.scoringPolicy.ceilingXrpMicros.toString(),
+      bidDeadline: tender.scoringPolicy.bidDeadline.toString(),
+    },
     publicCeilingXrp: tender.publicCeilingXrp.toString(),
     bidDeadline: tender.bidDeadline.toString(),
     closeBlock: tender.closeBlock.toString(),

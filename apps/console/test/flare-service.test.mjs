@@ -18,6 +18,21 @@ const tender = {
   buyer,
   metadataHash: hash,
   rulesHash: hash,
+  scoringPolicy: {
+    schemaVersion: 1,
+    ceilingXrpMicros: 1_000_000n,
+    bidDeadline: 100n,
+    allowXrp: true,
+    allowUsd: true,
+    ftsoFeedId: "0x015852502f55534400000000000000000000000000",
+    maxDeliveryDays: 30,
+    minWarrantyDays: 12,
+    maxWarrantyDays: 36,
+    priceWeightBps: 6_000,
+    deliveryWeightBps: 2_500,
+    warrantyWeightBps: 1_500,
+    requiredCredentials: [],
+  },
   publicCeilingXrp: 1_000_000n,
   bidDeadline: 100n,
   closeBlock: 90n,
@@ -73,6 +88,7 @@ function source() {
         awardReceipt: receipt,
         tenderCount: 1n,
         teeCount: 3n,
+        bidReceiptThreshold: 3,
         resultThreshold: 2,
       };
     },
@@ -85,6 +101,7 @@ test("Flare service returns finalized public FCC and FTSO facts only", async () 
   assert.equal(listed.chainId, 114);
   assert.equal(listed.indexedBlock, "100");
   assert.equal(listed.tenders[0].extensionId, "65921");
+  assert.equal(listed.tenders[0].scoringPolicy.priceWeightBps, 6_000);
   const selection = await service.inspectSelection("1");
   assert.equal(selection.commonQuorumBitmap, 7);
   assert.equal(selection.selectionAttempt, 1);
@@ -98,6 +115,7 @@ test("Flare service exposes immutable protocol bindings as JSON-safe public data
   assert.equal(binding.marketAddress, market);
   assert.equal(binding.teeManager, manager);
   assert.equal(binding.teeCount, "3");
+  assert.equal(binding.bidReceiptThreshold, 3);
   assert.doesNotThrow(() => JSON.stringify(binding));
 });
 
