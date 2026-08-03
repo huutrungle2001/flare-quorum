@@ -142,7 +142,7 @@ verified on-chain.
 - [x] Implement checked fixed-point price, delivery, and warranty penalties.
 - [x] Add deterministic golden vectors shared by Go, Solidity, and TypeScript
   for ordered roots and selection-result digests.
-- [ ] Run invalid, tie, permutation, boundary, overflow, and malformed-schema
+- [x] Run invalid, tie, permutation, boundary, overflow, and malformed-schema
   suites.
 
 Exit: independent deterministic models and real TEEs produce the same winner

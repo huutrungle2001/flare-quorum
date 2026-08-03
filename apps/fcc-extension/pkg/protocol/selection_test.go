@@ -87,3 +87,40 @@ func TestSelectionResultDigestTypeScriptGoldenVector(t *testing.T) {
 		t.Fatalf("TypeScript result vector drift: %s", digest.Hex())
 	}
 }
+
+func TestSelectionWireRejectsTruncatedAndTrailingPayloads(t *testing.T) {
+	request := SelectionRequest{
+		SchemaVersion:    SelectionSchemaVersion,
+		ChainID:          big.NewInt(114),
+		Market:           common.HexToAddress("0x1000000000000000000000000000000000000001"),
+		ExtensionID:      big.NewInt(65537),
+		CodeVersion:      common.HexToHash("0x1111"),
+		TenderID:         big.NewInt(42),
+		RulesHash:        common.HexToHash("0x2222"),
+		PublicCeilingXrp: big.NewInt(1_000),
+		BidDeadline:      1_700_000_000,
+		OrderedBidRoot:   common.HexToHash("0x3333"),
+		QuorumBitmap:     7,
+		FtsoValue:        big.NewInt(0),
+		ResultNonce:      big.NewInt(1),
+		ResultExpiry:     1_700_000_100,
+	}
+	encoded, err := EncodeSelectionRequest(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	malformed := map[string][]byte{
+		"empty":             nil,
+		"truncated":         append([]byte(nil), encoded[:len(encoded)-1]...),
+		"trailing-byte":     append(append([]byte(nil), encoded...), 0),
+		"noncanonical-head": nonCanonicalTupleOffset(encoded),
+	}
+	for name, payload := range malformed {
+		t.Run(name, func(t *testing.T) {
+			var decoded SelectionRequest
+			if err := DecodeSelectionRequest(payload, &decoded); err == nil {
+				t.Fatal("malformed selection payload decoded successfully")
+			}
+		})
+	}
+}

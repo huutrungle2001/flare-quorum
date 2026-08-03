@@ -156,3 +156,40 @@ func TestBidReceiptDigestIgnoresTransportSignatureOnly(t *testing.T) {
 		t.Fatal("receipt expiry was not bound")
 	}
 }
+
+func TestBidWireRejectsTruncatedTrailingAndNonCanonicalPayloads(t *testing.T) {
+	rules, binding, privateBid := scoringFixture(t)
+	submission := BidSubmission{
+		SchemaVersion: BidSchemaVersion, ChainID: binding.ChainID, Market: binding.Market,
+		ExtensionID: binding.ExtensionID, CodeVersion: binding.CodeVersion, TenderID: binding.TenderID,
+		Vendor: binding.Vendor, SubmissionNonce: big.NewInt(7), Rules: rules, ReceiptExpiry: 900,
+		QuoteCurrency: privateBid.QuoteCurrency, PriceMicros: privateBid.PriceMicros,
+		DeliveryDays: privateBid.DeliveryDays, WarrantyDays: privateBid.WarrantyDays,
+		Salt: common.HexToHash("0xabcdef"),
+	}
+	encoded, err := EncodeBidSubmission(submission)
+	if err != nil {
+		t.Fatal(err)
+	}
+	malformed := map[string][]byte{
+		"empty":             nil,
+		"truncated":         append([]byte(nil), encoded[:len(encoded)-1]...),
+		"trailing-byte":     append(append([]byte(nil), encoded...), 0),
+		"noncanonical-head": nonCanonicalTupleOffset(encoded),
+	}
+	for name, payload := range malformed {
+		t.Run(name, func(t *testing.T) {
+			var decoded BidSubmission
+			if err := DecodeBidSubmission(payload, &decoded); err == nil {
+				t.Fatal("malformed bid payload decoded successfully")
+			}
+		})
+	}
+}
+
+func nonCanonicalTupleOffset(encoded []byte) []byte {
+	payload := make([]byte, len(encoded)+32)
+	payload[31] = 64
+	copy(payload[64:], encoded[32:])
+	return payload
+}

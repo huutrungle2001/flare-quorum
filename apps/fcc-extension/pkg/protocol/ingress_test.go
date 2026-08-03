@@ -34,18 +34,19 @@ func TestValidateSubmissionBindsOneCanonicalSealedSlot(t *testing.T) {
 
 func TestValidateSubmissionFailsClosedOnEveryPublicBoundary(t *testing.T) {
 	for name, mutate := range map[string]func(*BidSubmission){
-		"schema":     func(value *BidSubmission) { value.SchemaVersion++ },
-		"chain":      func(value *BidSubmission) { value.ChainID = big.NewInt(1) },
-		"market":     func(value *BidSubmission) { value.Market = common.Address{} },
-		"extension":  func(value *BidSubmission) { value.ExtensionID = big.NewInt(1) },
-		"code":       func(value *BidSubmission) { value.CodeVersion = common.Hash{} },
-		"tender":     func(value *BidSubmission) { value.TenderID = big.NewInt(0) },
-		"vendor":     func(value *BidSubmission) { value.Vendor = common.Address{} },
-		"nonce":      func(value *BidSubmission) { value.SubmissionNonce = big.NewInt(0) },
-		"salt":       func(value *BidSubmission) { value.Salt = common.Hash{} },
-		"expiry":     func(value *BidSubmission) { value.ReceiptExpiry = 1_001 },
-		"currency":   func(value *BidSubmission) { value.QuoteCurrency = 9 },
-		"credential": func(value *BidSubmission) { value.Credentials[0].Signature[0] ^= 1 },
+		"bid schema":     func(value *BidSubmission) { value.SchemaVersion++ },
+		"scoring schema": func(value *BidSubmission) { value.Rules.SchemaVersion++ },
+		"chain":          func(value *BidSubmission) { value.ChainID = big.NewInt(1) },
+		"market":         func(value *BidSubmission) { value.Market = common.Address{} },
+		"extension":      func(value *BidSubmission) { value.ExtensionID = big.NewInt(1) },
+		"code":           func(value *BidSubmission) { value.CodeVersion = common.Hash{} },
+		"tender":         func(value *BidSubmission) { value.TenderID = big.NewInt(0) },
+		"vendor":         func(value *BidSubmission) { value.Vendor = common.Address{} },
+		"nonce":          func(value *BidSubmission) { value.SubmissionNonce = big.NewInt(0) },
+		"salt":           func(value *BidSubmission) { value.Salt = common.Hash{} },
+		"expiry":         func(value *BidSubmission) { value.ReceiptExpiry = 1_001 },
+		"currency":       func(value *BidSubmission) { value.QuoteCurrency = 9 },
+		"credential":     func(value *BidSubmission) { value.Credentials[0].Signature[0] ^= 1 },
 	} {
 		t.Run(name, func(t *testing.T) {
 			candidate := validSubmissionFixture(t)
