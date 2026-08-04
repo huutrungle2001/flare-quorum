@@ -68,6 +68,8 @@
     "flare:foundations:collect": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write",
     "flare:gate:0": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write --require-complete",
     "flare:proxy:config": "node --env-file-if-exists=.env.local tooling/scripts/render-fcc-proxy-config.mjs",
+    "flare:proxy:image:build": "node tooling/scripts/build-fcc-proxy-image.mjs --build --write",
+    "flare:proxy:image:verify": "node tooling/scripts/build-fcc-proxy-image.mjs --write",
     "flare:mcp": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/operator-console build && node --env-file-if-exists=.env.local apps/console/dist/flare-mcp-stdio.js",
     "flare:verify:foundation": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/verify-flare-foundation-sender.mjs",
     "flare:deploy:market": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/deploy-flare-market.mjs",

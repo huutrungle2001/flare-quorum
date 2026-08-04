@@ -97,6 +97,7 @@ export function verifyTeeProxyReleaseRecipe(source, recipe) {
   if (!recipe || typeof source !== "string") return false;
   const sourceDigest = `sha256:${recipe.sourceSha256}`;
   const requiredFragments = [
+    `# syntax=${recipe.dockerfileFrontend}`,
     `FROM --platform=${recipe.platform} ${recipe.builderImage} AS builder`,
     `ADD --checksum=${sourceDigest}`,
     recipe.sourceUrl,
@@ -112,6 +113,7 @@ export function verifyTeeProxyReleaseRecipe(source, recipe) {
     /^[0-9a-f]{64}$/.test(recipe.sourceSha256 ?? "") &&
     isSha256Digest(recipe.builderImage?.split("@")[1]) &&
     isSha256Digest(recipe.runtimeImage?.split("@")[1]) &&
+    isSha256Digest(recipe.dockerfileFrontend?.split("@")[1]) &&
     requiredFragments.every((fragment) => source.includes(fragment))
   );
 }
@@ -312,6 +314,15 @@ export async function inspectFoundations({
   const goCheck = command("go", ["version"]);
   const forgeCheck = command("forge", ["--version"]);
   const dockerCheck = command("docker", ["version", "--format", "{{.Server.Version}}"]);
+  const teeProxyImageCheck = command("docker", [
+    "image",
+    "inspect",
+    "--platform",
+    teeProxyRecipe.platform,
+    teeProxyRecipe.releaseImageTag ?? "",
+    "--format",
+    "{{.Descriptor.digest}}",
+  ]);
   const privateKey = normalizePrivateKey(environment.FLARE_DEPLOYMENT_PRIVATE_KEY);
   const deploymentKeyMatchesDeclaredWallet = privateKey
     ? privateKeyToAccount(privateKey).address === declaredDeployer
@@ -422,6 +433,9 @@ export async function inspectFoundations({
     teeProxyReleaseImageDigestRecorded: isSha256Digest(
       teeProxyRecipe.releaseImageDigest,
     ),
+    teeProxyReleaseImageVerified:
+      dockerCheck.ok && teeProxyImageCheck.ok &&
+      teeProxyImageCheck.output === teeProxyRecipe.releaseImageDigest,
     stableProxyConfigured,
     stableProxyReachable,
     indexerConfigured,
@@ -442,6 +456,11 @@ export async function inspectFoundations({
     blockers,
     assertions.teeProxyReleaseImageDigestRecorded,
     "TEE_PROXY_RELEASE_IMAGE_DIGEST_MISSING",
+  );
+  addBlocker(
+    blockers,
+    assertions.teeProxyReleaseImageVerified,
+    "TEE_PROXY_RELEASE_IMAGE_NOT_VERIFIED",
   );
   addBlocker(blockers, assertions.stableProxyConfigured, "STABLE_PROXY_NOT_CONFIGURED");
   addBlocker(blockers, assertions.stableProxyReachable, "STABLE_PROXY_NOT_REACHABLE");
@@ -510,7 +529,9 @@ export async function inspectFoundations({
         sourceSha256: teeProxyRecipe.sourceSha256,
         builderImage: teeProxyRecipe.builderImage,
         runtimeImage: teeProxyRecipe.runtimeImage,
+        releaseImageTag: teeProxyRecipe.releaseImageTag,
         releaseImageDigest: teeProxyRecipe.releaseImageDigest,
+        releaseBinarySha256: teeProxyRecipe.releaseBinarySha256,
       },
       configuredMachineCount: machineIds.length,
       productionMachineCount,
@@ -519,7 +540,7 @@ export async function inspectFoundations({
     blockers,
     notes: [
       "The official scaffold main branch is reference-only; VeilBid pins the organizer-directed tee-node module and tee-proxy release recipe independently.",
-      "The tee-proxy build inputs are pinned, but Gate 0 remains incomplete until Docker builds the recipe and the immutable release image digest is recorded.",
+      "The tee-proxy build inputs and executable linux/amd64 image digest are pinned and verified against the local Docker content store.",
       "No RPC URL, deployment key, indexer credential, proxy response, or machine secret is recorded.",
       "Simulated TEE mode is the declared Coston2 judging target; it is not hardware-backed confidentiality.",
     ],

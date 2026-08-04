@@ -66,10 +66,12 @@ test("requires an exact checksum-pinned tee-proxy release recipe", () => {
     sourceCommit: "1".repeat(40),
     sourceUrl: "https://example.invalid/proxy.tar.gz",
     sourceSha256: "2".repeat(64),
+    dockerfileFrontend: `frontend@sha256:${"5".repeat(64)}`,
     builderImage: `builder@sha256:${"3".repeat(64)}`,
     runtimeImage: `runtime@sha256:${"4".repeat(64)}`,
   };
   const source = [
+    `# syntax=${recipe.dockerfileFrontend}`,
     `FROM --platform=${recipe.platform} ${recipe.builderImage} AS builder`,
     `ADD --checksum=sha256:${recipe.sourceSha256} ${recipe.sourceUrl} /tmp/source.tar.gz`,
     "RUN go mod verify",

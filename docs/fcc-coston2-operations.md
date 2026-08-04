@@ -45,7 +45,7 @@ resolution, container digests, and a successful availability vote. If the
 scaffold's resolved module is older than the bulletin minimum, the gate remains
 blocked until a tested organizer-supported combination is pinned.
 
-The 2026-08-03 foundation audit found this exact upstream drift:
+The foundation audit found this exact upstream drift:
 
 - official scaffold `f48cafb889441a62e47c083f4be8dd7d3f456f83` and sign
   example `6df972c64d34efe1d4497f0eafe6792d1f0862dd` still pin
@@ -62,8 +62,12 @@ recipe at `apps/fcc-extension/proxy/Dockerfile` downloads the exact official
 source archive, verifies its checksum, and pins both image stages. The canonical
 public pin set and repeatable live checks are in
 `tooling/flare/coston2-foundations.json` and `pnpm flare:foundations:check`.
-Gate 0 still requires a real `linux/amd64` image build and the resulting image
-digest; a pinned recipe alone is not deployment evidence.
+The recipe has now been built twice on `linux/amd64`. The executable OCI
+manifest digest and extracted binary SHA-256 are pinned in the foundation
+manifest and verified by `pnpm flare:proxy:image:verify`; sanitized build
+evidence is stored at `evidence/coston2/gate-0-proxy-image.json`. Provenance
+and SBOM are enabled, but their timestamp-bearing index digest is intentionally
+not substituted for the stable executable platform digest.
 
 ## 3. Fresh registration workflow
 

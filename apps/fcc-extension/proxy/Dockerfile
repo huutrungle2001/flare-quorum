@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
 # This recipe builds the organizer-directed tee-proxy revision from a
 # checksum-pinned official source archive. Keep every value synchronized with
 # tooling/flare/coston2-foundations.json; the Gate 0 verifier checks the exact

@@ -196,16 +196,19 @@
     "teeNodeRuntime": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
     "teeProxyReleaseRecipe": {
       "dockerfile": "apps/fcc-extension/proxy/Dockerfile",
+      "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
       "platform": "linux/amd64",
       "sourceCommit": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
       "sourceUrl": "https://codeload.github.com/flare-foundation/tee-proxy/tar.gz/0c6d016b09948cba9a508ba357e592eb6088fd1c",
       "sourceSha256": "64b74cc37f2e64771244e17ea335d5fc4b5c726b32976b9d548c81c833213984",
       "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
       "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
-      "releaseImageDigest": null
+      "releaseImageTag": "veilbid/tee-proxy:coston2-0c6d016b",
+      "releaseImageDigest": "sha256:59f8abcd380ded3c180e16dd5366118af37488822057ef6c562d9cf07e060ecb",
+      "releaseBinarySha256": "76b83c8e09ae01e3457e8463fc044aca98504ddb0e335456f6f9d0e078258488"
     },
     "redisImage": "redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2",
-    "policy": "VeilBid's tee-proxy recipe pins the official source archive and both image stages. Gate 0 still requires Docker to build the recipe and record the resulting immutable release image digest."
+    "policy": "VeilBid's tee-proxy recipe pins the official source archive and both image stages. The executable linux/amd64 OCI manifest and binary SHA-256 are recorded separately from timestamp-bearing provenance attestations."
   },
   "contracts": {
     "flareContractRegistry": "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019",
