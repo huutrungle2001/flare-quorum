@@ -1,6 +1,5 @@
 import {
   createPublicClient,
-  decodeEventLog,
   getAddress,
   http,
   keccak256,
@@ -9,6 +8,7 @@ import {
   type Hex,
 } from "viem";
 import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { type: "json" };
+import awardReceiptAbiJson from "../generated/abis/VeilBidFlareAwardReceipt.json" with { type: "json" };
 import {
   assertFlareScoringPolicy,
   calculateFlareRulesHash,
@@ -16,8 +16,8 @@ import {
 } from "./smart-account.js";
 
 const marketAbi = marketAbiJson as Abi;
+const awardReceiptAbi = awardReceiptAbiJson as Abi;
 const finalityDepth = 12n;
-const logChunkSize = 2_000n;
 
 const coston2Chain = {
   id: 114,
@@ -158,7 +158,7 @@ interface AwardFact {
   winnerBidId: bigint;
   winner: Address;
   winningAmountXrp: bigint;
-  transactionHash: Hex;
+  transactionHash: Hex | null;
 }
 
 function createReader(rpcUrl: string): Coston2PublicReader {
@@ -187,37 +187,6 @@ function tenderStatus(value: number): Coston2TenderStatus {
   const status = statuses[value];
   if (!status) throw new Error("COSTON2_TENDER_STATUS_INVALID");
   return status;
-}
-
-function decodeAwardFacts(logs: readonly Coston2PublicLog[]): Map<bigint, AwardFact> {
-  const awards = new Map<bigint, AwardFact>();
-  for (const log of logs) {
-    if (log.transactionHash === null) continue;
-    try {
-      const decoded = decodeEventLog({
-        abi: marketAbi,
-        data: log.data,
-        topics: log.topics as [Hex, ...Hex[]],
-        strict: true,
-      });
-      if (decoded.eventName !== "TenderAwarded") continue;
-      const args = decoded.args as unknown as {
-        tenderId: bigint;
-        winnerBidId: bigint;
-        winner: Address;
-        amount: bigint;
-      };
-      awards.set(args.tenderId, {
-        winnerBidId: args.winnerBidId,
-        winner: args.winner,
-        winningAmountXrp: args.amount,
-        transactionHash: log.transactionHash,
-      });
-    } catch {
-      // Unrelated logs are ignored; no result or award is inferred from them.
-    }
-  }
-  return awards;
 }
 
 function mapTender(
@@ -263,62 +232,97 @@ async function readFoundation(
   return { latestBlock, safeBlock, code };
 }
 
+async function readAwardFact(
+  reader: Coston2PublicReader,
+  awardReceipt: Address,
+  tenderId: bigint,
+  record: Coston2TenderRecord,
+  blockNumber: bigint,
+): Promise<AwardFact | undefined> {
+  // A receipt exists only for a successful award. Refunded, open, and pending
+  // tenders must not be interpreted as an award merely because a read failed.
+  if (record.status !== 4) return undefined;
+  const value = await reader.readContract({
+    address: awardReceipt,
+    abi: awardReceiptAbi,
+    functionName: "getAward",
+    args: [tenderId],
+    blockNumber,
+  });
+  if (!value || typeof value !== "object") throw new Error("COSTON2_AWARD_MALFORMED");
+  const award = value as Partial<{
+    winnerBidId: bigint;
+    winner: Address;
+    amount: bigint;
+  }>;
+  if (
+    typeof award.winnerBidId !== "bigint" ||
+    typeof award.winner !== "string" ||
+    typeof award.amount !== "bigint"
+  ) {
+    throw new Error("COSTON2_AWARD_MALFORMED");
+  }
+  return {
+    winnerBidId: award.winnerBidId,
+    winner: addressResult(award.winner, "AWARD_WINNER"),
+    winningAmountXrp: award.amount,
+    // The receipt stores the public proof, not its mint transaction. This is
+    // deliberate: the wallet-free view can inspect the receipt without a
+    // provider-wide event scan.
+    transactionHash: null,
+  };
+}
+
 export async function loadCoston2PublicMarket(
   config: Coston2MarketConfig,
   suppliedReader?: Coston2PublicReader,
 ): Promise<Coston2PublicMarket> {
   const reader = suppliedReader ?? createReader(config.rpcUrl);
   const { latestBlock, safeBlock } = await readFoundation(config, reader);
-  const tenderCount = await reader.readContract({
-    address: config.marketAddress,
-    abi: marketAbi,
-    functionName: "tenderCount",
-    blockNumber: safeBlock,
-  });
-  if (typeof tenderCount !== "bigint") throw new Error("COSTON2_TENDER_COUNT_MALFORMED");
-
-  const logs: Coston2PublicLog[] = [];
-  for (
-    let fromBlock = config.deploymentBlock;
-    fromBlock <= safeBlock;
-    fromBlock += logChunkSize
-  ) {
-    const toBlock = fromBlock + logChunkSize - 1n < safeBlock
-      ? fromBlock + logChunkSize - 1n
-      : safeBlock;
-    logs.push(...await reader.getLogs({
+  const [tenderCount, awardReceiptValue] = await Promise.all([
+    reader.readContract({
       address: config.marketAddress,
-      fromBlock,
-      toBlock,
-    }));
-  }
-
-  const awards = decodeAwardFacts(logs);
-  const tenders: Coston2PublicTender[] = [];
-  for (let tenderId = 1n; tenderId <= tenderCount; tenderId += 1n) {
-    const [record, scoringPolicy] = await Promise.all([
-      reader.readContract({
-        address: config.marketAddress,
-        abi: marketAbi,
-        functionName: "getTender",
-        args: [tenderId],
-        blockNumber: safeBlock,
-      }),
-      reader.readContract({
-        address: config.marketAddress,
-        abi: marketAbi,
-        functionName: "getScoringPolicy",
-        args: [tenderId],
-        blockNumber: safeBlock,
-      }),
-    ]);
-    tenders.push(mapTender(
-      tenderId,
-      record as Coston2TenderRecord,
-      scoringPolicy as FlareScoringPolicy,
-      awards.get(tenderId),
-    ));
-  }
+      abi: marketAbi,
+      functionName: "tenderCount",
+      blockNumber: safeBlock,
+    }),
+    reader.readContract({
+      address: config.marketAddress,
+      abi: marketAbi,
+      functionName: "awardReceipt",
+      blockNumber: safeBlock,
+    }),
+  ]);
+  if (typeof tenderCount !== "bigint") throw new Error("COSTON2_TENDER_COUNT_MALFORMED");
+  const awardReceipt = addressResult(awardReceiptValue, "AWARD_RECEIPT");
+  const tenders = await Promise.all(
+    Array.from({ length: Number(tenderCount) }, (_, index) => BigInt(index + 1)).map(async (tenderId) => {
+      const [record, scoringPolicy] = await Promise.all([
+        reader.readContract({
+          address: config.marketAddress,
+          abi: marketAbi,
+          functionName: "getTender",
+          args: [tenderId],
+          blockNumber: safeBlock,
+        }),
+        reader.readContract({
+          address: config.marketAddress,
+          abi: marketAbi,
+          functionName: "getScoringPolicy",
+          args: [tenderId],
+          blockNumber: safeBlock,
+        }),
+      ]);
+      const typedRecord = record as Coston2TenderRecord;
+      const award = await readAwardFact(reader, awardReceipt, tenderId, typedRecord, safeBlock);
+      return mapTender(
+        tenderId,
+        typedRecord,
+        scoringPolicy as FlareScoringPolicy,
+        award,
+      );
+    }),
+  );
 
   return {
     chainId: 114,

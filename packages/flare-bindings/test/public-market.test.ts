@@ -25,7 +25,7 @@ const config: Coston2MarketConfig = {
   deploymentStatus: "planned",
 };
 
-function mockReader(options: { rulesHash?: Hex } = {}) {
+function mockReader(options: { rulesHash?: Hex; status?: number; award?: unknown } = {}) {
   const readBlocks: bigint[] = [];
   const logRanges: { fromBlock: bigint; toBlock: bigint }[] = [];
   const scoringPolicy = {
@@ -65,7 +65,7 @@ function mockReader(options: { rulesHash?: Hex } = {}) {
     resultNonce: 2n,
     resultExpiry: 1_200n,
     requestId: zeroHash,
-    status: 3,
+    status: options.status ?? 3,
     teeIds: [manager, ftso, receipt],
     teeKeyFingerprints: [hash, hash, hash],
   } as const;
@@ -79,6 +79,7 @@ function mockReader(options: { rulesHash?: Hex } = {}) {
     TEE_COUNT: 3n,
     BID_RECEIPT_THRESHOLD: 3,
     RESULT_THRESHOLD: 2,
+    getAward: options.award,
   };
   const reader: Coston2PublicReader = {
     async getChainId() {
@@ -111,11 +112,24 @@ test("reads market state and award logs only through the finalized Coston2 block
   assert.equal(result.latestBlock, 100n);
   assert.equal(result.finalizedBlock, 88n);
   assert.equal(result.indexedBlock, 88n);
-  assert.deepEqual(logRanges, [{ fromBlock: 80n, toBlock: 88n }]);
+  assert.deepEqual(logRanges, []);
   assert.equal(readBlocks.every((block) => block === 88n), true);
   assert.equal(result.tenders[0]?.status, "ComputePending");
   assert.equal(result.tenders[0]?.scoringPolicy.priceWeightBps, 6_000);
   assert.equal(result.tenders[0]?.winner, null);
+});
+
+test("reads an awarded tender from the public receipt contract", async () => {
+  const { reader } = mockReader({
+    status: 4,
+    award: { winnerBidId: 2n, winner: buyer, amount: 500_000n },
+  });
+  const result = await loadCoston2PublicMarket(config, reader);
+  assert.equal(result.tenders[0]?.status, "Awarded");
+  assert.equal(result.tenders[0]?.winnerBidId, 2n);
+  assert.equal(result.tenders[0]?.winner, buyer);
+  assert.equal(result.tenders[0]?.winningAmountXrp, 500_000n);
+  assert.equal(result.tenders[0]?.awardTransactionHash, null);
 });
 
 test("returns public immutable protocol bindings without result or signature material", async () => {
