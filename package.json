@@ -9,7 +9,8 @@
   },
   "devDependencies": {
     "pnpm": "10.33.0",
-    "viem": "2.47.6"
+    "viem": "2.47.6",
+    "xrpl": "4.3.0"
   },
   "pnpm": {
     "overrides": {
@@ -98,6 +99,8 @@
     "flare:register:market-extension": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-market-extension.mjs",
     "flare:market:lifecycle:preflight": "pnpm --filter @veilbid/flare-bindings build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-market-lifecycle.mjs",
     "flare:market:lifecycle": "pnpm --filter @veilbid/flare-bindings build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-market-lifecycle.mjs --execute",
+    "flare:gate:g:preflight": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-gate-g.mjs",
+    "flare:gate:g": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-gate-g.mjs --execute",
     "flare:relay:health": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js health",
     "flare:relay:dry-run": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js dry-run",
     "flare:relay:once": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js once",
