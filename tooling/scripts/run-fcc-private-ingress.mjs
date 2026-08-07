@@ -20,7 +20,7 @@ import {
   veilBidDirectOpType,
   veilBidDirectSubmitCommand,
 } from "../../packages/flare-bindings/dist/index.js";
-import { calculateFlareRulesHash, coston2XrpUsdFeedId } from "../../packages/flare-bindings/dist/smart-account.js";
+import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
 
 const root = resolve(import.meta.dirname, "../..");
 const evidencePath = resolve(root, "evidence/coston2/gate-b-fcc-ingress.json");
@@ -209,7 +209,7 @@ async function main() {
       bidDeadline,
       allowXrp: true,
       allowUsd: false,
-      ftsoFeedId: coston2XrpUsdFeedId,
+      ftsoFeedId: `0x${"00".repeat(21)}`,
       maxDeliveryDays: 30,
       minWarrantyDays: 12,
       maxWarrantyDays: 36,
