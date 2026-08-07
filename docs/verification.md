@@ -1,9 +1,11 @@
 # VeilBid Flare Championship Verification Plan
 
-> Status: Gate 0 and Gate A are `PASSED`. The Gate-A sender, extension `66007`,
-> governance, code version, three simulated TEE machines, and a domain-bound
-> `PING_V1` result signed by a registered production TEE are live and verified
-> on Coston2. Historical Sepolia/Nox artifacts are pre-hackathon baseline only.
+> Status: Gate 0 and Gate A are `PASSED`. The live Gate-B ingress/replay
+> portion is recorded as `IN_PROGRESS`: extension `66007` accepted three
+> authenticated encrypted bids and rejected a changed ciphertext for an
+> occupied sealed slot across its three production-status simulated TEEs, while
+> same-identity restart recovery remains open. Historical Sepolia/Nox artifacts
+> are pre-hackathon baseline only.
 
 ## 1. Evidence policy
 
@@ -25,7 +27,7 @@ in-memory and save only an allowlisted pass/fail code.
 |---|---|---|---|
 | 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | PASSED — block `33745484`; extension `66007` has three distinct simulated TEE machines in `PRODUCTION` with exact URL/code/platform/key bindings |
 | A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | PASSED — block `33745987`; `PING_V1` binding, TEE signature domain, production signer mapping, wrong-binding rejection, and fresh-process recovery all pass |
-| B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext and survives sealed restart | Commitment/receipt IDs, redaction assertions, restart checkpoint | NOT RUN |
+| B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext and survives sealed restart | Commitment/receipt IDs, redaction assertions, restart checkpoint | IN PROGRESS — live three-machine ingress, receipt binding, idempotent retry, and changed-ciphertext rejection pass; same-identity restart remains open |
 | C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | NOT RUN |
 | D — Private scoring | Real TEEs match shared `SCORING_V1` vectors and select the deterministic eligible winner | Vector hashes, public inputs, result digest, Boolean expectations | NOT RUN |
 | E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | NOT RUN |

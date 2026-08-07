@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "gate": "B",
+  "status": "IN_PROGRESS",
+  "recordedAt": "2026-08-07T15:39:37.090Z",
+  "sourceCommit": "676856ceb540d468054de52f80df714625025e64",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33746423"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "marketBinding": "0xf522b863fb19496D21ac7D0D1d71435C1DDc2EdE",
+    "extensionId": "66007",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "machineIds": [
+      "0x6940f1Da741362E3605B9AD7083de30fFd251334",
+      "0x4bFf0cc88768a04e4137125A84c14EbE63C86312",
+      "0x5ccEA9ac3CD8fBFC8E01522402d46B06cd6C3423"
+    ],
+    "machineCount": 3,
+    "actionIds": [
+      "0x57458907c0fcf4bc31e96f71e8c06ea72747cb04f564123642044df172b14060",
+      "0x2f0b35f1d63438bc06a7696a8fca8af48ce743f442f97ebb2e5c4041e4555840",
+      "0x94906ed55dd463893f2fc42f0c7a4df7bc8e67e1fa7ddb76e989e2cc3e79473b"
+    ],
+    "idempotentRetryActionId": "0x0b0388af7b7b928c6faf70d58390cb471c22a9436412ad35275f8d1f54e29d52",
+    "replayActionId": "0x939d91139dd4244692920d3f7a6ebb3992fc4d1c004e79b7f4b2ef97ceae489f",
+    "plaintextCommitment": "0x673c931e5da662bbf70557414fa71e310a2420c2d9b0b87dcd7a885a6f53397a",
+    "receiptTeeIds": [
+      "0x6940f1Da741362E3605B9AD7083de30fFd251334",
+      "0x4bFf0cc88768a04e4137125A84c14EbE63C86312",
+      "0x5ccEA9ac3CD8fBFC8E01522402d46B06cd6C3423"
+    ],
+    "receiptExpiries": [
+      "1786120473",
+      "1786120473",
+      "1786120473"
+    ],
+    "quoteCurrency": "XRP"
+  },
+  "assertions": {
+    "threeProductionMachinesBound": true,
+    "threeEncryptedSubmissionsAccepted": true,
+    "threeDistinctReceiptSigners": true,
+    "allReceiptsMatchCommitment": true,
+    "allReceiptsBindDomain": true,
+    "allReceiptsSignerChecked": true,
+    "exactCiphertextRetryIdempotent": true,
+    "sealedReplayRejected": true,
+    "ciphertextNotRecorded": true,
+    "plaintextNotRecorded": true,
+    "sealedRestartRecoveryVerified": false
+  },
+  "receiptAssertions": [
+    {
+      "machine": 1,
+      "actionIdMatches": true,
+      "resultStatusSuccess": true,
+      "operationMatches": true,
+      "receiptSchemaMatches": true,
+      "receiptNetworkMatches": true,
+      "receiptMarketMatches": true,
+      "receiptExtensionMatches": true,
+      "receiptCodeVersionMatches": true,
+      "receiptTenderMatches": true,
+      "receiptVendorMatches": true,
+      "receiptNonceMatches": true,
+      "receiptRulesHashMatches": true,
+      "receiptCommitmentMatches": true,
+      "receiptTeeIdMatches": true,
+      "receiptSignerMatches": true,
+      "noPlaintextResult": true
+    },
+    {
+      "machine": 2,
+      "actionIdMatches": true,
+      "resultStatusSuccess": true,
+      "operationMatches": true,
+      "receiptSchemaMatches": true,
+      "receiptNetworkMatches": true,
+      "receiptMarketMatches": true,
+      "receiptExtensionMatches": true,
+      "receiptCodeVersionMatches": true,
+      "receiptTenderMatches": true,
+      "receiptVendorMatches": true,
+      "receiptNonceMatches": true,
+      "receiptRulesHashMatches": true,
+      "receiptCommitmentMatches": true,
+      "receiptTeeIdMatches": true,
+      "receiptSignerMatches": true,
+      "noPlaintextResult": true
+    },
+    {
+      "machine": 3,
+      "actionIdMatches": true,
+      "resultStatusSuccess": true,
+      "operationMatches": true,
+      "receiptSchemaMatches": true,
+      "receiptNetworkMatches": true,
+      "receiptMarketMatches": true,
+      "receiptExtensionMatches": true,
+      "receiptCodeVersionMatches": true,
+      "receiptTenderMatches": true,
+      "receiptVendorMatches": true,
+      "receiptNonceMatches": true,
+      "receiptRulesHashMatches": true,
+      "receiptCommitmentMatches": true,
+      "receiptTeeIdMatches": true,
+      "receiptSignerMatches": true,
+      "noPlaintextResult": true
+    }
+  ],
+  "notes": [
+    "This evidence records live authenticated ciphertext ingress and TEE-signed receipt binding on three Coston2 production-status simulated TEEs.",
+    "A duplicate sealed slot was rejected as PRIVATE_BID_CONFLICT; this is replay protection, not a claim that a Railway process restart was performed.",
+    "A restart proof remains open because restarting simulated TEE services rotates identity and requires re-registration; no service was restarted for this run.",
+    "No plaintext bid, ciphertext, API key, raw signature, or private key is recorded."
+  ]
+}

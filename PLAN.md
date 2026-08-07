@@ -1,9 +1,11 @@
 # VeilBid Flare Championship Execution Plan
 
-> Status: Phase 0, Gate 0, and Gate A pass on Coston2. Three stable Railway FCC
-> origins and three independently registered simulated TEE identities are in
-> `PRODUCTION`; a domain-bound `PING_V1` result has been verified from a
-> registered TEE with fresh-process recovery. Gates B–E remain open.
+> Status: Phase 0, Gate 0, and Gate A pass on Coston2. The live Gate-B
+> ingress/replay portion also passes its public-safe assertions: three stable
+> Railway FCC origins accept encrypted bids and return domain-bound receipts,
+> exact retries are idempotent, and changed ciphertext cannot replace an
+> occupied sealed slot. Same-identity restart recovery remains open under the
+> supported simulated runtime; Gates C–E remain open.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -126,10 +128,12 @@ product code depends on it.
   Keep V1 unregistered and use the tested constant-time V2 replacement for the
   fresh Gate-A registration.
 - [x] Send and verify a domain-correct Coston2 result.
-- [x] Implement private bid ingress through the supported proxy/TEE path (local
-  loopback crypto client and sealed store; live proxy proof remains open).
-- [x] Return and verify one TEE-signed `BidReceipt` in the local extension
-  harness; live registered-TEE verification remains open.
+- [x] Implement private bid ingress through the supported proxy/TEE path and
+  verify live three-machine authenticated ciphertext-only receipts; same-
+  identity restart recovery remains open.
+- [x] Return and verify TEE-signed `BidReceipt` values in the local extension
+  harness and live registered-TEE ingress; body-log and restart evidence remain
+  open.
 - [x] Prove sealed persistence across process restart in the local sealed-store
   tests; live three-machine recovery remains open.
 - [ ] Prove three-machine selection and two matching signatures, or stop and
@@ -321,14 +325,14 @@ the championship product and requires Product Plan approval.
 | Product thesis | DECIDED |
 | Architecture decisions | DECIDED |
 | Documentation transition | COMPLETE |
-| Official version pinning | IN PROGRESS — core source/toolchain/discovery plus pinned proxy and VeilBid extension image checks pass; stable public origin and live TEE stack remain |
+| Official version pinning | PASSED for Gate 0 — core source/toolchain/discovery, pinned proxy/extension images, stable public origins, and live TEE stack are recorded |
 | FCC foundation operation | IMPLEMENTED LOCALLY — deterministic `PING_V1` tests pass; live Gate A not run |
-| FCC private ingress | LOCAL IMPLEMENTATION — official direct envelope, browser/go-ethereum ECIES parity, EIP-712 ciphertext-only gateway authorization, atomic receipt verification, loopback decrypt/sign, and sealed restart/replay tests; no live proxy/TEE proof |
+| FCC private ingress | LIVE PARTIAL — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, and changed-ciphertext rejection pass; supported same-identity restart recovery remains open |
 | Multi-TEE quorum | LOCAL IMPLEMENTATION — atomic 3-of-3 bid receipts, live identity/code/key rechecks, and 2-of-3 one-outage result path pass; live Gate C/E pending |
 | Flare contracts | LOCAL IMPLEMENTATION — contract-derived/stored public scoring policy, FCC/FTestXRP/conditional-FTSO lifecycle, payout and recovery tests pass; no live deployment |
 | FAssets/FDC/Smart Account journey | LOCAL EXECUTOR COMPLETE — live registry/FDC/direct-mint bindings pass; real XRPL payment, FDC proof, and Gate G execution pending |
 | FTSO scoring | LOCAL CROSS-STACK IMPLEMENTATION — contract policy hash matches Go/TypeScript, XRP/USD conversion and scoring vectors pass; no live FCC/FTSO lifecycle |
-| Coston2 deployment/evidence | NOT STARTED |
+| Coston2 deployment/evidence | IN PROGRESS — Gate 0/A and live Gate-B ingress evidence recorded; product lifecycle gates remain open |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported

@@ -1,11 +1,14 @@
 # VeilBid Flare Championship Feasibility Plan
 
-> Status: Gate 0 passed on Coston2 at block `33745484`, and Gate A passed at
-> block `33745987`. The pinned images, indexer, three stable Railway origins,
-> three distinct simulated TEE identities in `PRODUCTION`, and a fresh-process
-> verified domain-bound `PING_V1` result are recorded in public-safe evidence.
-> Full product development remains blocked until Gates B–E pass; Gates F–H
-> are mandatory before the championship judge release.
+> Status: Gate 0 passed on Coston2 at block `33745484`, Gate A passed at block
+> `33745987`, and the live Gate-B ingress/replay portion passed at block
+> `33746423`. The pinned images, indexer, three stable Railway origins, three
+> distinct simulated TEE identities in `PRODUCTION`, a fresh-process verified
+> `PING_V1` result, and three authenticated ciphertext-only bid receipts are
+> recorded in public-safe evidence. Same-identity TEE restart recovery remains
+> open because the supported simulated runtime rotates identity on restart.
+> Gates C–E and the restart portion of B remain open; Gates F–H are mandatory
+> before the championship judge release.
 
 ## 1. Rules
 
@@ -63,6 +66,14 @@ Kill condition: the target contract cannot verify and recover a result from a
 registered FCC identity without trusting an application server.
 
 ## 4. Gate B — private bid ingress and sealed recovery
+
+Live partial result: `evidence/coston2/gate-b-private-ingress.json` records three
+production-status Coston2 simulated TEEs accepting independently encrypted
+XRP bids, binding signed receipts to the same market/tender/vendor/rules
+commitment, an exact-ciphertext idempotent retry, and rejection of a changed
+ciphertext for the occupied sealed slot. It intentionally remains
+`IN_PROGRESS`: a same-identity restart/restore proof is not claimed because the
+supported tee-node runtime generates a new identity after restart.
 
 Prove:
 

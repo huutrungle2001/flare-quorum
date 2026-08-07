@@ -74,9 +74,11 @@ gateway authenticates the vendor request without learning the plaintext. The
 extension calls only tee-node's loopback `/decrypt` and `/sign` endpoints and
 stores the original ECIES bytes in a private persistent volume keyed by a hash
 of chain/market/extension/tender/vendor. Exact ciphertext retry is idempotent;
-a different ciphertext for the same slot fails. This mapping remains local
-evidence until proxy body-log inspection and a real machine restart pass Gate
-B.
+a different ciphertext for the same slot fails. Live evidence now covers
+authenticated ciphertext-only ingress, three signed receipts, exact-retry
+idempotence, and changed-ciphertext slot rejection on the three registered
+Coston2 simulated TEEs. The mapping remains partial until proxy body-log
+inspection and a supported same-identity machine restart pass Gate B.
 
 The local consumer binding now reproduces tee-node's go-ethereum ECIES scheme
 byte-for-byte and verifies a shared Go/TypeScript decryption vector. The relay
@@ -85,7 +87,8 @@ authorization bound to market, tender, vendor, frozen TEE, submission nonce,
 and ciphertext hash. Its request type has no plaintext bid fields. Before
 forwarding it fails closed on closed/expired tenders, missing vendor admission,
 prior submission, signature drift, and TEE identity/key-fingerprint drift.
-This is implementation evidence, not a live Gate B pass.
+This remains implementation evidence for the gateway authorization layer; the
+direct-proxy result is now covered by the partial live Gate-B evidence above.
 
 ## ADR-004 — Canonical bid schema
 

@@ -50,8 +50,9 @@ placeholders are forbidden after that commit.
 - [x] Pin official scaffold and toolchain.
 - [x] Add `apps/fcc-extension`.
 - [x] Add `packages/flare-contracts` feasibility sender/verifier.
-- [ ] Pass Gates 0–B: environment, registered result, private ingress, sealed
-  recovery.
+- [~] Pass Gates 0–B: Gate 0/A and live three-machine private ingress/replay
+  pass; same-identity sealed recovery remains open under the supported
+  simulated tee-node runtime.
 
 ### Milestone 2 — confidential procurement engine
 

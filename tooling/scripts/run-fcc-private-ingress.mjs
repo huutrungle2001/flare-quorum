@@ -23,7 +23,7 @@ import {
 import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
 
 const root = resolve(import.meta.dirname, "../..");
-const evidencePath = resolve(root, "evidence/coston2/gate-b-fcc-ingress.json");
+const evidencePath = resolve(root, "evidence/coston2/gate-b-private-ingress.json");
 const registrationPath = resolve(root, "evidence/coston2/fcc-extension-registration.json");
 const codeVersionPath = resolve(root, "evidence/coston2/fcc-code-version.json");
 const machinesPath = resolve(root, "evidence/coston2/fcc-machines.json");
@@ -322,7 +322,7 @@ async function main() {
     ],
   };
   writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`);
-  console.log(JSON.stringify({ gate: evidence.gate, status: evidence.status, blockNumber: evidence.network.blockNumber, machines: teeMachines.map(({ teeId }) => teeId), receipts: submissions.length, replayRejected, evidence: "evidence/coston2/gate-b-fcc-ingress.json" }, null, 2));
+  console.log(JSON.stringify({ gate: evidence.gate, status: evidence.status, blockNumber: evidence.network.blockNumber, machines: teeMachines.map(({ teeId }) => teeId), receipts: submissions.length, replayRejected, evidence: "evidence/coston2/gate-b-private-ingress.json" }, null, 2));
 }
 
 await main();
