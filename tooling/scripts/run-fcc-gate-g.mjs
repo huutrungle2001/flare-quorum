@@ -136,7 +136,9 @@ async function submitPayment(wallet, amountDrops, memoData) {
       typeof result.hash !== "string" ||
       !/^[A-F0-9]{64}$/i.test(result.hash)
     ) throw new Error("FCC_GATE_G_XRPL_PAYMENT_FAILED");
-    return result.hash.toLowerCase();
+    // XRPL JSON-RPC returns a bare 32-byte hexadecimal transaction hash;
+    // the public funding/FDC job schema represents the same value as bytes32.
+    return `0x${result.hash.toLowerCase()}`;
   } catch (error) {
     const errorName = String(error?.name ?? "unknown").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "unknown";
     lastSafeMarker = `${lastSafeMarker}-${errorName}`;
