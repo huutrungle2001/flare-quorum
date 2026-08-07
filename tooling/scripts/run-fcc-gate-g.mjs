@@ -302,14 +302,26 @@ async function main() {
   }
   const executor = new FlareFundingExecutor(config, fundingChain);
   currentPhase = "fdc-smart-account-execution";
-  let outcome = await executor.execute(job);
+  const executeFunding = async () => {
+    lastSafeMarker = "executor";
+    try {
+      return await executor.execute(job);
+    } catch (error) {
+      const executionCode = error instanceof Error ? error.message : "";
+      if (/^[A-Z0-9_]+$/.test(executionCode)) {
+        throw new Error(`FCC_GATE_G_EXECUTOR_${executionCode}`);
+      }
+      throw new Error("FCC_GATE_G_EXECUTOR_FAILED");
+    }
+  };
+  let outcome = await executeFunding();
   if (outcome.outcome === "delayed") {
     const waitSeconds = outcome.executionAllowedAt > BigInt(Math.floor(Date.now() / 1000))
       ? outcome.executionAllowedAt - BigInt(Math.floor(Date.now() / 1000))
       : 0n;
     if (waitSeconds > 1_800n) throw new Error("FCC_GATE_G_DIRECT_MINT_DELAY_TOO_LONG");
     await new Promise((resolveSleep) => setTimeout(resolveSleep, Number(waitSeconds * 1_000n + 5_000n)));
-    outcome = await executor.execute(job);
+    outcome = await executeFunding();
   }
   if (outcome.outcome !== "executed") throw new Error("FCC_GATE_G_DIRECT_MINT_NOT_EXECUTED");
   currentPhase = "smart-account-settlement-checks";
