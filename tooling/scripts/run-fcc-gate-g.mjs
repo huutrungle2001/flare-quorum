@@ -274,8 +274,7 @@ async function main() {
   const xrplTransactionId = await submitPayment(xrplWallet, quote.paymentAmountUBA, plan.memoData);
   lastSafeMarker = "job-parse";
   let job;
-  try {
-    job = parseFlareFundingJob({
+  const rawJob = {
       version: 1,
       xrplTransactionId,
       personalAccount,
@@ -291,8 +290,12 @@ async function main() {
           bidDeadline: terms.scoringPolicy.bidDeadline.toString(),
         },
       },
-    });
-  } catch {
+    };
+  try {
+    job = parseFlareFundingJob(rawJob);
+  } catch (error) {
+    const parseCode = error instanceof Error ? error.message : "";
+    if (/^[A-Z0-9_]+$/.test(parseCode)) throw new Error(`FCC_GATE_G_JOB_${parseCode}`);
     throw new Error("FCC_GATE_G_JOB_SCHEMA_INVALID");
   }
   const executor = new FlareFundingExecutor(config, fundingChain);
