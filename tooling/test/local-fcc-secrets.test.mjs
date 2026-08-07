@@ -4,7 +4,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-import { ensureLocalFccSecrets } from "../flare/local-fcc-secrets.mjs";
+import {
+  ensureLocalFccSecrets,
+  setLocalEnvironmentValues,
+} from "../flare/local-fcc-secrets.mjs";
 
 test("creates missing FCC runtime secrets without replacing existing values", () => {
   const directory = mkdtempSync(join(tmpdir(), "veilbid-fcc-secrets-"));
@@ -22,6 +25,29 @@ test("creates missing FCC runtime secrets without replacing existing values", ()
     assert.match(source, /^PROXY_PRIVATE_KEY=already-set$/mu);
     assert.match(source, /^FCC_DIRECT_API_KEY=ERERERERERERERERERERERERERERERERERERERERERE$/mu);
     assert.equal(statSync(path).mode & 0o777, 0o600);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("sets public FCC bindings without changing unrelated local values", () => {
+  const directory = mkdtempSync(join(tmpdir(), "veilbid-fcc-public-env-"));
+  const path = join(directory, ".env.local");
+  try {
+    writeFileSync(path, "FCC_EXTENSION_ID=old\nPROXY_PRIVATE_KEY=unchanged\n", { mode: 0o600 });
+    setLocalEnvironmentValues(path, {
+      FCC_EXTENSION_ID: `0x${"00".repeat(29)}010007`,
+      FCC_FOUNDATION_SENDER: "0x1000000000000000000000000000000000000001",
+    });
+    const source = readFileSync(path, "utf8");
+    assert.match(source, /^FCC_EXTENSION_ID=0x0+010007$/mu);
+    assert.match(source, /^FCC_FOUNDATION_SENDER=0x1000000000000000000000000000000000000001$/mu);
+    assert.match(source, /^PROXY_PRIVATE_KEY=unchanged$/mu);
+    assert.equal(statSync(path).mode & 0o777, 0o600);
+    assert.throws(
+      () => setLocalEnvironmentValues(path, { FCC_EXTENSION_ID: "bad\nvalue" }),
+      /LOCAL_ENVIRONMENT_ASSIGNMENT_INVALID/,
+    );
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

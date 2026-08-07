@@ -2,7 +2,7 @@ import { verifyLocalFccStack } from "../flare/local-fcc-stack.mjs";
 
 const expectedOwner = process.env.FCC_INITIAL_OWNER ??
   "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E";
-const expectedExtensionId = process.env.FCC_LOCAL_EXTENSION_ID ??
+const expectedExtensionId = process.env.FCC_EXTENSION_ID ??
   `0x${"0".repeat(59)}10000`;
 
 const result = await verifyLocalFccStack({

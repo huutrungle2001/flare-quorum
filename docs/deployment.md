@@ -63,6 +63,23 @@ It must not be registered. Before the live Gate-A action, deploy
 ID back to the sender. This avoids the scaffold's historical linear scan over
 all public extension IDs while preventing an owner from binding a foreign ID.
 
+The V2 deployment and registration flow is implemented as a resumable local
+journal plus sanitized public evidence. Run its read-only preflight first:
+
+```bash
+pnpm flare:foundation:register:preflight
+```
+
+After the command reports `READY`, commit the exact source and run
+`pnpm flare:foundation:register` from a clean worktree. It deploys V2, registers
+the exact sender, binds the emitted public extension ID, configures the declared
+wallet as machine/project owner, enables the official bytes32 `EVM` key type,
+and verifies runtime logic and every registry/getter binding. Interrupted runs
+resume from `.local/fcc/foundation-registration.state.json`; they must not mint
+a replacement extension merely because a later configuration transaction was
+interrupted. The resulting registration evidence still does not pass Gate A
+until a production machine drives a signed live FCC action.
+
 Record in a committed public dependency manifest:
 
 - official FCC scaffold commit, Go version, Docker image digests, public
