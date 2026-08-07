@@ -177,7 +177,8 @@ for every golden vector without exposing losing fields.
   Foundry; registered live-machine verification remains pending.
 - [x] Implement and unit-test winner payout, buyer remainder, zero-winner
   refund, and receipt.
-- [ ] Add unit, fuzz, invariant, reentrancy, signer, root, nonce, and expiry tests.
+- [x] Add unit, fuzz, reentrancy, signer, root, nonce, and expiry tests.
+- [ ] Add a dedicated stateful invariant harness for multi-tender conservation.
 
 Exit: a two-vendor Coston2 tender settles FTestXRP only through threshold FCC
 selection and conserves the public escrow.
@@ -211,19 +212,25 @@ custodial VeilBid signer.
 ### Phase 5 — product UI and automation
 
 - [x] Add fail-closed Coston2 public-market and XRP funding consumer adapters;
-  the browser route remains on the verified Sepolia baseline until a Flare
-  release manifest and live gates pass.
-- [ ] Replace the Sepolia judge path with verified Coston2 bindings.
+  the browser route is now backed by the verified Coston2 release.
+- [x] Replace the Sepolia judge path with verified Coston2 bindings for `/` and
+  `/flare`; `/room` remains explicitly historical.
 - [ ] Build XRP-native Buyer, EVM Buyer, Vendor, Public, Activity, and Evidence
   workspaces.
-- [ ] Show verified extension, code version, TEE identities/key fingerprints,
-  quorum, rule version, FTSO snapshot, and result digest.
+- [x] Show verified extension, code version, TEE identities/key fingerprints,
+  quorum, rule version, FTSO snapshot, result digest, and sanitized FAssets/FDC/
+  Smart Account bindings in the wallet-free Flare dossier.
 - [ ] Build sealed bid composer with no plaintext persistence.
-- [ ] Build public result/settlement and FXRP redemption journey.
+- [ ] Build the public result/settlement and FXRP redemption journey (the
+  current page exposes FTestXRP settlement and the verified FXRP manager, but
+  redemption interaction is not yet wired).
 - [x] Implement and unit-test stateless close/request/result/finalize relay and
   ciphertext-only vendor ingress; live Coston2 operation remains pending.
-- [ ] Add explicit RPC/FCC/proxy/FDC/FTSO unavailable and recovery states.
-- [ ] Complete responsive, keyboard, reduced-motion, and privacy-copy review.
+- [x] Add explicit RPC/FCC/proxy/FDC/FTSO unavailable and recovery states to the
+  Flare reader, relay, funding, and ingress adapters.
+- [ ] Complete the remaining responsive, keyboard, reduced-motion, privacy-copy,
+  and role-workspace review; the Flare public route's 320px/keyboard smoke now
+  passes.
 
 Exit: every core role can complete its journey and judges can verify a finalized
 tender without a wallet.
@@ -246,15 +253,18 @@ confidential bid or settlement boundary:
 
 ### Phase 6 — security and release evidence
 
-- [ ] Publish exact source/runtime mapping and Coston2 release manifest.
-- [ ] Verify extension image/code hash, governance, machines, and key policy.
+- [x] Publish exact source/runtime mapping and the verified Coston2 release
+  manifest.
+- [x] Verify extension image/code hash, governance, machines, and key policy.
 - [ ] Run two-vendor and three-vendor lifecycles.
 - [ ] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
   wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay drills.
 - [ ] Record gas, latency, bid-ingress, close-to-result, and recovery benchmarks.
-- [ ] Run current/full-history secret and privacy-output scans.
-- [ ] Generate Flare bindings and reject all drift.
-- [ ] Deploy web/relay and record desktop/mobile/keyboard smoke evidence.
+- [x] Run current/full-history secret and privacy-output scans.
+- [x] Generate Flare bindings and reject all drift.
+- [x] Deploy the v2 web judge and record desktop/mobile/keyboard smoke evidence;
+  the separate Coston2 write-relay deployment remains gated on its dedicated
+  finalizer environment.
 
 Exit: canonical manifest, bindings, source, runtime, extension, UI, and evidence
 all agree and contain no confidential material.
@@ -272,7 +282,7 @@ Exit: the submission contains real user evidence, not only technical claims.
 
 ### Phase 8 — judge package
 
-- [ ] Live Coston2 app and wallet-free finalized tender.
+- [x] Live Coston2 app and wallet-free finalized tender.
 - [ ] Four-minute video following the single flagship journey.
 - [ ] Architecture diagram and 60-second privacy/trust explanation.
 - [ ] Before/after work ledger with commits and evidence.
