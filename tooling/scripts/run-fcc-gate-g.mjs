@@ -365,11 +365,14 @@ async function main() {
   }
   if (outcome.outcome !== "executed") throw new Error("FCC_GATE_G_DIRECT_MINT_NOT_EXECUTED");
   currentPhase = "smart-account-settlement-checks";
+  lastSafeMarker = "settlement-read-tender";
   const tender = await publicClient.readContract({ address: market, abi: veilBidFlareMarketAbi, functionName: "getTender", args: [outcome.tenderId] });
+  lastSafeMarker = "settlement-read-balance";
   const ftestXrpBalance = await publicClient.readContract({ address: network.fTestXrp, abi: [{ type: "function", name: "balanceOf", stateMutability: "view", inputs: [{ name: "owner", type: "address" }], outputs: [{ name: "", type: "uint256" }] }], functionName: "balanceOf", args: [market] });
   const tenderBuyer = getAddress(field(tender, "buyer", 0));
   const ceiling = field(tender, "publicCeilingXrp", 3);
   const escrowIncrease = ftestXrpBalance - ftestXrpBalanceBefore;
+  lastSafeMarker = "settlement-assertions";
   if (
     !isAddressEqual(tenderBuyer, personalAccount) ||
     ceiling !== terms.scoringPolicy.ceilingXrpMicros ||
@@ -378,6 +381,7 @@ async function main() {
     throw new Error("FCC_GATE_G_TENDER_ESCROW_INVALID");
   }
   const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+  lastSafeMarker = "evidence-build";
   const evidence = {
     schemaVersion: 1,
     gate: "G",
@@ -444,6 +448,7 @@ async function main() {
     ],
   };
   mkdirSync(resolve(root, "evidence/coston2"), { recursive: true });
+  lastSafeMarker = "evidence-write";
   writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
   mkdirSync(resolve(root, ".local/fcc"), { recursive: true, mode: 0o700 });
   writeFileSync(statePath, `${JSON.stringify({ status: "PASSED", tenderId: outcome.tenderId.toString(), directMintingTransactionHash: outcome.directMintingTransactionHash }, null, 2)}\n`, { mode: 0o600, flag: "wx" });
@@ -454,7 +459,13 @@ try {
   await main();
 } catch (error) {
   const rawCode = error instanceof Error ? error.message : "";
-  const code = /^FCC_GATE_G_[A-Z0-9_]+$/.test(rawCode) ? rawCode : "FCC_GATE_G_OPERATION_FAILED";
+  const code = /^FCC_GATE_G_[A-Z0-9_]+$/.test(rawCode)
+    ? rawCode
+    : error instanceof TypeError
+      ? "FCC_GATE_G_INTERNAL_TYPE_ERROR"
+      : error instanceof RangeError
+        ? "FCC_GATE_G_INTERNAL_RANGE_ERROR"
+        : "FCC_GATE_G_OPERATION_FAILED";
   console.error(JSON.stringify({ gate: "G", status: "FAILED", phase: currentPhase, code, diagnostic: lastSafeMarker }));
   process.exitCode = 1;
 }
