@@ -16,8 +16,11 @@ import type { FlareSelectionResult } from "./protocol.js";
 
 export const teeActionResultPrefix = stringToHex("TEE_ACTION_RESULT", { size: 32 });
 export const proxyActionResultPrefix = stringToHex("PROXY_ACTION_RESULT", { size: 32 });
+export const veilBidFoundationOpType = stringToHex("VEILBID_FOUNDATION", { size: 32 });
+export const veilBidFoundationPingV1OpCommand = stringToHex("PING_V1", { size: 32 });
 export const veilBidSelectionOpType = stringToHex("VEILBID_SELECTION", { size: 32 });
 export const veilBidSelectV1OpCommand = stringToHex("SELECT_V1", { size: 32 });
+export const veilBidFoundationDomain = keccak256(stringToHex("VEILBID_FCC_FOUNDATION_V1"));
 
 const bytes32Pattern = /^0x[0-9a-fA-F]{64}$/;
 const bytes21Pattern = /^0x[0-9a-fA-F]{42}$/;
@@ -49,6 +52,18 @@ const selectionResultParameter = [{
   ],
 }] as const;
 
+const foundationResultParameter = [{
+  type: "tuple",
+  components: [
+    { name: "schemaVersion", type: "uint16" },
+    { name: "chainId", type: "uint256" },
+    { name: "market", type: "address" },
+    { name: "requestNonce", type: "bytes32" },
+    { name: "payloadHash", type: "bytes32" },
+    { name: "bindingHash", type: "bytes32" },
+  ],
+}] as const;
+
 export type FccSubmissionTag = "submit" | "threshold" | "end";
 
 export interface FccActionResult {
@@ -75,6 +90,34 @@ export interface VerifiedSelectionAction {
   teeId: Address;
   actionResultHash: Hex;
   signingDigest: Hex;
+}
+
+export interface FoundationRequest {
+  schemaVersion: number;
+  chainId: bigint;
+  market: Address;
+  requestNonce: Hex;
+  payloadHash: Hex;
+}
+
+export interface FoundationResponse extends FoundationRequest {
+  bindingHash: Hex;
+}
+
+export interface VerifiedFoundationAction {
+  response: FccActionResponse;
+  result: FoundationResponse;
+  teeId: Address;
+  actionResultHash: Hex;
+  signingDigest: Hex;
+}
+
+export interface VerifyFoundationActionOptions {
+  actionId: Hex;
+  chainId: bigint;
+  allowedTeeIds: readonly Address[];
+  expectedVersion?: string;
+  expectedRequest?: FoundationRequest;
 }
 
 export interface VerifySelectionActionOptions {
@@ -173,6 +216,98 @@ export function decodeSelectionResult(data: Hex): FlareSelectionResult {
     throw new Error("INVALID_FCC_SELECTION_DATA");
   }
   return decoded;
+}
+
+export function foundationBindingHash(request: FoundationRequest): Hex {
+  return keccak256(encodeAbiParameters(
+    [
+      { type: "bytes32" }, { type: "bytes32" }, { type: "bytes32" },
+      { type: "uint16" }, { type: "uint256" }, { type: "address" },
+      { type: "bytes32" }, { type: "bytes32" },
+    ],
+    [
+      veilBidFoundationDomain,
+      veilBidFoundationOpType,
+      veilBidFoundationPingV1OpCommand,
+      request.schemaVersion,
+      request.chainId,
+      request.market,
+      request.requestNonce,
+      request.payloadHash,
+    ],
+  ));
+}
+
+export function decodeFoundationResponse(data: Hex): FoundationResponse {
+  if (!bytesPattern.test(data) || data === "0x") throw new Error("INVALID_FCC_FOUNDATION_DATA");
+  let decoded: FoundationResponse;
+  try {
+    [decoded] = decodeAbiParameters(foundationResultParameter, data);
+  } catch {
+    throw new Error("INVALID_FCC_FOUNDATION_DATA");
+  }
+  const canonical = encodeAbiParameters(foundationResultParameter, [decoded]);
+  if (canonical.toLowerCase() !== data.toLowerCase()) throw new Error("NON_CANONICAL_FCC_FOUNDATION_DATA");
+  if (
+    decoded.schemaVersion !== 1
+    || decoded.chainId !== 114n
+    || !bytes32Pattern.test(decoded.requestNonce)
+    || decoded.requestNonce === `0x${"0".repeat(64)}`
+    || !bytes32Pattern.test(decoded.payloadHash)
+    || decoded.payloadHash === `0x${"0".repeat(64)}`
+    || !bytes32Pattern.test(decoded.bindingHash)
+  ) throw new Error("INVALID_FCC_FOUNDATION_DATA");
+  return {
+    schemaVersion: decoded.schemaVersion,
+    chainId: decoded.chainId,
+    market: getAddress(decoded.market),
+    requestNonce: decoded.requestNonce.toLowerCase() as Hex,
+    payloadHash: decoded.payloadHash.toLowerCase() as Hex,
+    bindingHash: decoded.bindingHash.toLowerCase() as Hex,
+  };
+}
+
+export async function verifyFoundationActionResponse(
+  value: unknown,
+  options: VerifyFoundationActionOptions,
+): Promise<VerifiedFoundationAction> {
+  const response = parseFccActionResponse(value);
+  const action = response.result;
+  if (action.id !== options.actionId.toLowerCase()) throw new Error("FCC_ACTION_ID_MISMATCH");
+  if (action.submissionTag !== "submit" && action.submissionTag !== "threshold") {
+    throw new Error("FCC_FOUNDATION_NOT_FINAL");
+  }
+  if (action.status !== 1) throw new Error("FCC_FOUNDATION_FAILED");
+  if (action.opType !== veilBidFoundationOpType || action.opCommand !== veilBidFoundationPingV1OpCommand) {
+    throw new Error("FCC_FOUNDATION_OPERATION_MISMATCH");
+  }
+  if (options.expectedVersion !== undefined && action.version !== options.expectedVersion) {
+    throw new Error("FCC_EXTENSION_VERSION_MISMATCH");
+  }
+  const actionResultHash = fccActionResultHash(action);
+  const signingDigest = fccSigningDigest(teeActionResultPrefix, options.chainId, actionResultHash);
+  const teeId = getAddress(await recoverAddress({
+    hash: hashMessage({ raw: signingDigest }),
+    signature: response.signature,
+  }));
+  if (!options.allowedTeeIds.some((allowed) => isAddressEqual(allowed, teeId))) {
+    throw new Error("FCC_TEE_NOT_REGISTERED");
+  }
+  const result = decodeFoundationResponse(action.data);
+  if (options.expectedRequest !== undefined) {
+    const expected = options.expectedRequest;
+    if (
+      result.schemaVersion !== expected.schemaVersion
+      || result.chainId !== expected.chainId
+      || !isAddressEqual(result.market, expected.market)
+      || result.requestNonce !== expected.requestNonce.toLowerCase()
+      || result.payloadHash !== expected.payloadHash.toLowerCase()
+    ) throw new Error("FCC_FOUNDATION_REQUEST_MISMATCH");
+    if (result.bindingHash !== foundationBindingHash(expected)) {
+      throw new Error("FCC_FOUNDATION_BINDING_MISMATCH");
+    }
+  }
+  return { response, result, teeId, actionResultHash, signingDigest };
 }
 
 /**

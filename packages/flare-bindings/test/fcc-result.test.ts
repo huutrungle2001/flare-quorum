@@ -5,10 +5,14 @@ import { privateKeyToAccount } from "viem/accounts";
 import {
   fccActionResultHash,
   fccSigningDigest,
+  foundationBindingHash,
   parseFccActionResponse,
   teeActionResultPrefix,
+  veilBidFoundationOpType,
+  veilBidFoundationPingV1OpCommand,
   veilBidSelectionOpType,
   veilBidSelectV1OpCommand,
+  verifyFoundationActionResponse,
   verifySelectionActionResponse,
 } from "../src/fcc-result.ts";
 
@@ -60,6 +64,57 @@ test("uses Solidity bytes32 operation identifiers instead of hashes", () => {
   assert.equal(
     veilBidSelectV1OpCommand,
     "0x53454c4543545f56310000000000000000000000000000000000000000000000",
+  );
+});
+
+const foundationRequest = {
+  schemaVersion: 1,
+  chainId: 114n,
+  market: "0x1000000000000000000000000000000000000001" as const,
+  requestNonce: `0x${"22".repeat(32)}` as const,
+  payloadHash: `0x${"33".repeat(32)}` as const,
+};
+
+test("verifies a domain-bound foundation action and rejects a changed request", async () => {
+  const data = encodeAbiParameters([{
+    type: "tuple",
+    components: [
+      { name: "schemaVersion", type: "uint16" }, { name: "chainId", type: "uint256" },
+      { name: "market", type: "address" }, { name: "requestNonce", type: "bytes32" },
+      { name: "payloadHash", type: "bytes32" }, { name: "bindingHash", type: "bytes32" },
+    ],
+  }], [{ ...foundationRequest, bindingHash: foundationBindingHash(foundationRequest) }]);
+  const result = {
+    id: `0x${"44".repeat(32)}` as const,
+    submissionTag: "submit" as const,
+    status: 1,
+    log: "ok",
+    opType: veilBidFoundationOpType,
+    opCommand: veilBidFoundationPingV1OpCommand,
+    additionalResultStatus: "0x" as const,
+    version: "v0.2.2",
+    data,
+  };
+  const digest = fccSigningDigest(teeActionResultPrefix, 114n, fccActionResultHash(result));
+  const signature = await account.sign({ hash: hashMessage({ raw: digest }) });
+  const response = { result, signature, proxySignature: signature };
+  const verified = await verifyFoundationActionResponse(response, {
+    actionId: result.id,
+    chainId: 114n,
+    allowedTeeIds: [account.address],
+    expectedVersion: "v0.2.2",
+    expectedRequest: foundationRequest,
+  });
+  assert.equal(verified.teeId, account.address);
+  assert.equal(verified.result.bindingHash, foundationBindingHash(foundationRequest));
+  await assert.rejects(
+    verifyFoundationActionResponse(response, {
+      actionId: result.id,
+      chainId: 114n,
+      allowedTeeIds: [account.address],
+      expectedRequest: { ...foundationRequest, payloadHash: `0x${"55".repeat(32)}` },
+    }),
+    /FCC_FOUNDATION_REQUEST_MISMATCH/,
   );
 });
 
