@@ -21,7 +21,10 @@ import type {
   FlareFundingNetwork,
   FlareFundingTenderFact,
 } from "./flare-funding-chain.js";
-import type { FlareFundingJob } from "./flare-funding-job.js";
+import type {
+  FlareFundingCheckpoint,
+  FlareFundingJob,
+} from "./flare-funding-job.js";
 import { waitForXrplFinality, type XrplFinality } from "./xrpl-finality.js";
 
 const tenderCreatedEventAbi = [{
@@ -63,7 +66,9 @@ export type FlareFundingExecution =
       directMintingTransactionHash: Hex;
       directMintingBlock: bigint;
       userOperationCommitment: Hex;
+      paymentAmountUBA: bigint;
       executionAllowedAt: bigint;
+      checkpoint: FlareFundingCheckpoint;
     }
   | {
       outcome: "executed";
@@ -187,7 +192,10 @@ export class FlareFundingExecutor {
     throw new Error("FDC_PROOF_TIMEOUT");
   }
 
-  async execute(job: FlareFundingJob): Promise<FlareFundingExecution> {
+  private assertWritable(): asserts this is this & {
+    chain: FlareFundingChain & { executorAddress: Address };
+    config: FlareFundingConfig & { verifierApiKey: string };
+  } {
     if (
       this.config.mode !== "execute" ||
       this.chain.executorAddress === null ||
@@ -195,6 +203,146 @@ export class FlareFundingExecutor {
     ) {
       throw new Error("FLARE_FUNDING_WRITE_DISABLED");
     }
+  }
+
+  private async finishMint(input: {
+    network: FlareFundingNetwork;
+    job: FlareFundingJob;
+    plan: ReturnType<typeof buildMintAndFundPlan>;
+    requiredMintedAmountUBA: bigint;
+    xrplFinality: XrplFinality;
+    fdcRequestTransactionHash: Hex;
+    fdcVotingRound: bigint;
+    fdcAbiEncodedRequest: Hex;
+    paymentAmountUBA: bigint;
+    tenderCountBefore: bigint | null;
+    mintReceipt: Awaited<ReturnType<FlareFundingChain["executeDirectMinting"]>>;
+  }): Promise<FlareFundingExecution> {
+    const {
+      network,
+      job,
+      plan,
+      requiredMintedAmountUBA,
+      xrplFinality,
+      fdcRequestTransactionHash,
+      fdcVotingRound,
+      fdcAbiEncodedRequest,
+      paymentAmountUBA,
+      tenderCountBefore,
+      mintReceipt,
+    } = input;
+    if (mintReceipt.status !== "success") throw new Error("DIRECT_MINTING_REVERTED");
+    const executor = this.chain.executorAddress;
+    if (executor === null) throw new Error("FLARE_FUNDING_WRITE_DISABLED");
+    this.stage("inspect-direct-mint");
+    const mintOutcome = inspectDirectMintingReceipt({
+      logs: mintReceipt.logs,
+      assetManager: network.contracts.assetManager,
+      masterAccountController: network.contracts.masterAccountController,
+      transactionId: job.xrplTransactionId,
+      executor,
+      memoData: plan.memoData,
+      personalAccount: job.personalAccount,
+      nonce: job.nonce,
+    });
+    const common = {
+      xrplTransactionId: job.xrplTransactionId,
+      xrplFinality,
+      fdcRequestTransactionHash,
+      fdcVotingRound,
+      directMintingTransactionHash: mintReceipt.transactionHash,
+      directMintingBlock: mintReceipt.blockNumber,
+      userOperationCommitment: plan.userOperationCommitment,
+      paymentAmountUBA,
+    } as const;
+    if (mintOutcome.status === "delayed") {
+      const checkpoint: FlareFundingCheckpoint = {
+        version: 1,
+        kind: "flare-xrp-funding",
+        job,
+        xrplFinality,
+        fdcRequestTransactionHash,
+        fdcVotingRound,
+        fdcAbiEncodedRequest,
+        directMintingTransactionHash: mintReceipt.transactionHash,
+        directMintingBlock: mintReceipt.blockNumber,
+        userOperationCommitment: plan.userOperationCommitment,
+        paymentAmountUBA,
+        executionAllowedAt: mintOutcome.executionAllowedAt,
+      };
+      return {
+        outcome: "delayed",
+        ...common,
+        executionAllowedAt: mintOutcome.executionAllowedAt,
+        checkpoint,
+      };
+    }
+    if (mintOutcome.mintedAmountUBA < requiredMintedAmountUBA) {
+      throw new Error("DIRECT_MINTING_UNDERFUNDED");
+    }
+    this.stage("prove-tender-created");
+    let tender = parseEventLogs({
+      abi: tenderCreatedEventAbi,
+      eventName: "TenderCreated",
+      logs: [...mintReceipt.logs],
+      strict: true,
+    }).find((event) =>
+      event.address.toLowerCase() === this.config.marketAddress.toLowerCase() &&
+      event.args.buyer.toLowerCase() === job.personalAccount.toLowerCase() &&
+      event.args.rulesHash.toLowerCase() === calculateFlareRulesHash(job.terms.scoringPolicy).toLowerCase() &&
+      event.args.ceiling === job.terms.scoringPolicy.ceilingXrpMicros
+    ) as TenderCreatedFact | undefined;
+    // Some Coston2 RPC responses can briefly omit deeply nested logs even
+    // though the state transition is committed. Re-read only the bounded
+    // set of tenders created after our preflight count and require the exact
+    // buyer/rules/ceiling tuple before accepting the funding result.
+    if (
+      !tender && tenderCountBefore !== null && this.chain.getMarketTender &&
+      this.chain.getMarketTenderCount
+    ) {
+      let tenderCountAfter = tenderCountBefore;
+      for (let attempt = 0; attempt < 6 && tenderCountAfter <= tenderCountBefore; attempt += 1) {
+        tenderCountAfter = await this.chain.getMarketTenderCount(this.config.marketAddress);
+        if (tenderCountAfter > tenderCountBefore) break;
+        if (attempt < 5) await this.sleep(1_000);
+      }
+      const createdCount = tenderCountAfter - tenderCountBefore;
+      if (createdCount > 0n && createdCount <= MAX_TENDER_STATE_FALLBACK_SCAN) {
+        for (let id = tenderCountBefore + 1n; id <= tenderCountAfter; id += 1n) {
+          const state: FlareFundingTenderFact = await this.chain.getMarketTender(
+            this.config.marketAddress,
+            id,
+          );
+          if (
+            state.buyer.toLowerCase() === job.personalAccount.toLowerCase() &&
+            state.rulesHash.toLowerCase() === calculateFlareRulesHash(job.terms.scoringPolicy).toLowerCase() &&
+            state.publicCeilingXrp === job.terms.scoringPolicy.ceilingXrpMicros
+          ) {
+            tender = { args: {
+              tenderId: id,
+              buyer: state.buyer,
+              rulesHash: state.rulesHash,
+              ceiling: state.publicCeilingXrp,
+            } };
+            break;
+          }
+        }
+      }
+    }
+    if (!tender) throw new Error("TENDER_CREATION_NOT_PROVEN");
+    return {
+      outcome: "executed",
+      ...common,
+      personalAccount: mintOutcome.personalAccount,
+      nonce: mintOutcome.nonce,
+      tenderId: tender.args.tenderId,
+      mintedAmountUBA: mintOutcome.mintedAmountUBA,
+      mintingFeeUBA: mintOutcome.mintingFeeUBA,
+    };
+  }
+
+  async execute(job: FlareFundingJob): Promise<FlareFundingExecution> {
+    this.assertWritable();
     this.stage("inspect-network");
     const network = await this.chain.inspectNetwork();
     this.stage("read-initial-nonce");
@@ -302,95 +450,137 @@ export class FlareFundingExecutor {
       plan.userOperationData,
       totalCallValue,
     );
-    if (mintReceipt.status !== "success") throw new Error("DIRECT_MINTING_REVERTED");
-    this.stage("inspect-direct-mint");
-    const mintOutcome = inspectDirectMintingReceipt({
-      logs: mintReceipt.logs,
-      assetManager: network.contracts.assetManager,
-      masterAccountController: network.contracts.masterAccountController,
-      transactionId: job.xrplTransactionId,
-      executor: this.chain.executorAddress,
-      memoData: plan.memoData,
-      personalAccount: job.personalAccount,
-      nonce: job.nonce,
-    });
-    const common = {
-      xrplTransactionId: job.xrplTransactionId,
+    return this.finishMint({
+      network,
+      job,
+      plan,
+      requiredMintedAmountUBA,
       xrplFinality,
       fdcRequestTransactionHash: requestReceipt.transactionHash,
       fdcVotingRound: votingRoundId,
-      directMintingTransactionHash: mintReceipt.transactionHash,
-      directMintingBlock: mintReceipt.blockNumber,
-      userOperationCommitment: plan.userOperationCommitment,
-    } as const;
-    if (mintOutcome.status === "delayed") {
+      fdcAbiEncodedRequest: prepared.abiEncodedRequest,
+      paymentAmountUBA: quote.paymentAmountUBA,
+      tenderCountBefore,
+      mintReceipt,
+    });
+  }
+
+  /**
+   * Resume a delayed direct mint from its public checkpoint. This path never
+   * submits another XRPL payment or FDC request and never changes the nonce.
+   */
+  async resume(checkpoint: FlareFundingCheckpoint): Promise<FlareFundingExecution> {
+    this.assertWritable();
+    const job = checkpoint.job;
+    this.stage("resume-inspect-network");
+    const network = await this.chain.inspectNetwork();
+    this.stage("resume-build-user-operation");
+    const plan = buildMintAndFundPlan({
+      personalAccount: job.personalAccount,
+      nonce: job.nonce,
+      fTestXrp: network.fTestXrp,
+      market: this.config.marketAddress,
+      terms: job.terms,
+      walletId: job.walletId,
+      executorFee: job.executorFeeUBA,
+    });
+    if (plan.userOperationCommitment.toLowerCase() !== checkpoint.userOperationCommitment.toLowerCase()) {
+      throw new Error("FUNDING_CHECKPOINT_HASH_MISMATCH");
+    }
+    const requiredMintedAmountUBA =
+      job.terms.scoringPolicy.ceilingXrpMicros + job.executorFeeUBA;
+    const quote = quoteSmartAccountDirectMinting(
+      requiredMintedAmountUBA,
+      network.directMintingFeeBips,
+      network.directMintingMinimumFeeUBA,
+    );
+    if (quote.paymentAmountUBA !== checkpoint.paymentAmountUBA) {
+      throw new Error("FUNDING_CHECKPOINT_QUOTE_MISMATCH");
+    }
+    this.stage("resume-xrpl-finality");
+    const xrplFinality = await waitForXrplFinality({
+      rpcUrl: this.config.xrplRpcUrl,
+      transactionId: job.xrplTransactionId,
+      minimumConfirmations: this.config.xrplConfirmations,
+      attempts: this.config.pollAttempts,
+      pollIntervalMs: this.config.pollIntervalMs,
+      fetchImplementation: this.options.fetchImplementation,
+      sleep: this.options.sleep,
+    });
+    this.stage("resume-read-current-nonce");
+    const currentNonce = await this.chain.getSmartAccountNonce(
+      network.contracts.masterAccountController,
+      job.personalAccount,
+    );
+    if (currentNonce !== job.nonce) throw new Error("STALE_SMART_ACCOUNT_NONCE");
+    const currentTimestamp = await this.chain.getBlockTimestamp(network.blockNumber);
+    if (currentTimestamp < checkpoint.executionAllowedAt) {
+      const refreshedCheckpoint: FlareFundingCheckpoint = {
+        ...checkpoint,
+        xrplFinality,
+      };
       return {
         outcome: "delayed",
-        ...common,
-        executionAllowedAt: mintOutcome.executionAllowedAt,
+        xrplTransactionId: job.xrplTransactionId,
+        xrplFinality,
+        fdcRequestTransactionHash: checkpoint.fdcRequestTransactionHash,
+        fdcVotingRound: checkpoint.fdcVotingRound,
+        directMintingTransactionHash: checkpoint.directMintingTransactionHash,
+        directMintingBlock: checkpoint.directMintingBlock,
+        userOperationCommitment: checkpoint.userOperationCommitment,
+        paymentAmountUBA: checkpoint.paymentAmountUBA,
+        executionAllowedAt: checkpoint.executionAllowedAt,
+        checkpoint: refreshedCheckpoint,
       };
     }
-    if (mintOutcome.mintedAmountUBA < requiredMintedAmountUBA) {
-      throw new Error("DIRECT_MINTING_UNDERFUNDED");
+    this.stage("resume-fdc-finalization");
+    await this.waitForFdcFinalization(network, checkpoint.fdcVotingRound);
+    this.stage("resume-fdc-proof");
+    const proof = await this.retrieveProof(
+      checkpoint.fdcVotingRound,
+      checkpoint.fdcAbiEncodedRequest,
+    );
+    this.stage("resume-fdc-proof-verification");
+    assertXrpPaymentProof(proof, {
+      attestationType: xrpPaymentAttestationType,
+      sourceId: testXrpSourceId,
+      transactionId: job.xrplTransactionId,
+      proofOwner: this.chain.executorAddress,
+      memoData: plan.memoData,
+      votingRound: checkpoint.fdcVotingRound,
+      minimumReceivedAmount: checkpoint.paymentAmountUBA,
+    });
+    this.stage("resume-derive-personal-account");
+    const derivedPersonalAccount = await this.chain.getPersonalAccount(
+      network.contracts.masterAccountController,
+      proof.data.responseBody.sourceAddress,
+    );
+    if (derivedPersonalAccount !== job.personalAccount) {
+      throw new Error("XRPL_OWNER_PERSONAL_ACCOUNT_MISMATCH");
     }
-    this.stage("prove-tender-created");
-    let tender = parseEventLogs({
-      abi: tenderCreatedEventAbi,
-      eventName: "TenderCreated",
-      logs: [...mintReceipt.logs],
-      strict: true,
-    }).find((event) =>
-      event.address.toLowerCase() === this.config.marketAddress.toLowerCase() &&
-      event.args.buyer.toLowerCase() === job.personalAccount.toLowerCase() &&
-      event.args.rulesHash.toLowerCase() === calculateFlareRulesHash(job.terms.scoringPolicy).toLowerCase() &&
-      event.args.ceiling === job.terms.scoringPolicy.ceilingXrpMicros
-    ) as TenderCreatedFact | undefined;
-    // Some Coston2 RPC responses can briefly omit deeply nested logs even
-    // though the state transition is committed. Re-read only the bounded
-    // set of tenders created after our preflight count and require the exact
-    // buyer/rules/ceiling tuple before accepting the funding result.
-    if (
-      !tender && tenderCountBefore !== null && this.chain.getMarketTender &&
-      this.chain.getMarketTenderCount
-    ) {
-      let tenderCountAfter = tenderCountBefore;
-      for (let attempt = 0; attempt < 6 && tenderCountAfter <= tenderCountBefore; attempt += 1) {
-        tenderCountAfter = await this.chain.getMarketTenderCount(this.config.marketAddress);
-        if (tenderCountAfter > tenderCountBefore) break;
-        if (attempt < 5) await this.sleep(1_000);
-      }
-      const createdCount = tenderCountAfter - tenderCountBefore;
-      if (createdCount > 0n && createdCount <= MAX_TENDER_STATE_FALLBACK_SCAN) {
-        for (let id = tenderCountBefore + 1n; id <= tenderCountAfter; id += 1n) {
-          const state: FlareFundingTenderFact = await this.chain.getMarketTender(
-            this.config.marketAddress,
-            id,
-          );
-          if (
-            state.buyer.toLowerCase() === job.personalAccount.toLowerCase() &&
-            state.rulesHash.toLowerCase() === calculateFlareRulesHash(job.terms.scoringPolicy).toLowerCase() &&
-            state.publicCeilingXrp === job.terms.scoringPolicy.ceilingXrpMicros
-          ) {
-            tender = { args: {
-              tenderId: id,
-              buyer: state.buyer,
-              rulesHash: state.rulesHash,
-              ceiling: state.publicCeilingXrp,
-            } };
-            break;
-          }
-        }
-      }
-    }
-    if (!tender) throw new Error("TENDER_CREATION_NOT_PROVEN");
-    return {
-      outcome: "executed",
-      ...common,
-      personalAccount: mintOutcome.personalAccount,
-      nonce: mintOutcome.nonce,
-      tenderId: tender.args.tenderId,
-      mintedAmountUBA: mintOutcome.mintedAmountUBA,
-      mintingFeeUBA: mintOutcome.mintingFeeUBA,
-    };
+    const tenderCountBefore = this.chain.getMarketTenderCount
+      ? await this.chain.getMarketTenderCount(this.config.marketAddress)
+      : null;
+    const totalCallValue = plan.calls.reduce((sum, call) => sum + call.value, 0n);
+    this.stage("resume-direct-mint");
+    const mintReceipt = await this.chain.executeDirectMinting(
+      network.contracts.assetManager,
+      proof,
+      plan.userOperationData,
+      totalCallValue,
+    );
+    return this.finishMint({
+      network,
+      job,
+      plan,
+      requiredMintedAmountUBA,
+      xrplFinality,
+      fdcRequestTransactionHash: checkpoint.fdcRequestTransactionHash,
+      fdcVotingRound: checkpoint.fdcVotingRound,
+      fdcAbiEncodedRequest: checkpoint.fdcAbiEncodedRequest,
+      paymentAmountUBA: checkpoint.paymentAmountUBA,
+      tenderCountBefore,
+      mintReceipt,
+    });
   }
 }

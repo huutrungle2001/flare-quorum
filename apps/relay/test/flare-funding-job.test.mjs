@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseFlareFundingJob } from "../dist/flare-funding-job.js";
+import {
+  parseFlareFundingCheckpoint,
+  parseFlareFundingJob,
+} from "../dist/flare-funding-job.js";
 
 function fixture() {
   return {
@@ -65,4 +68,61 @@ test("rejects unknown fields, JSON numbers for large integers, and duplicate TEE
   const invalidPolicy = fixture();
   invalidPolicy.terms.scoringPolicy.priceWeightBps = 5999;
   assert.throws(() => parseFlareFundingJob(invalidPolicy), /INVALID_FLARE_SCORING_POLICY/);
+});
+
+test("parses a delayed checkpoint and binds it to the original public job", () => {
+  const checkpoint = {
+    version: 1,
+    kind: "flare-xrp-funding",
+    job: fixture(),
+    xrplFinality: {
+      transactionId: `0x${"11".repeat(32)}`,
+      transactionLedgerIndex: 100,
+      validatedLedgerIndex: 102,
+      confirmations: 3,
+    },
+    fdcRequestTransactionHash: `0x${"aa".repeat(32)}`,
+    fdcVotingRound: "55",
+    fdcAbiEncodedRequest: "0x1234",
+    directMintingTransactionHash: `0x${"bb".repeat(32)}`,
+    directMintingBlock: "200",
+    userOperationCommitment: `0x${"cc".repeat(32)}`,
+    paymentAmountUBA: "1100025",
+    executionAllowedAt: "300",
+  };
+  const parsed = parseFlareFundingCheckpoint(checkpoint);
+  assert.equal(parsed.fdcVotingRound, 55n);
+  assert.equal(parsed.paymentAmountUBA, 1_100_025n);
+  assert.equal(parsed.job.nonce, 7n);
+  assert.equal(parsed.xrplFinality.confirmations, 3);
+});
+
+test("rejects checkpoint transaction drift and private-shaped fields", () => {
+  const checkpoint = {
+    version: 1,
+    kind: "flare-xrp-funding",
+    job: fixture(),
+    xrplFinality: {
+      transactionId: `0x${"22".repeat(32)}`,
+      transactionLedgerIndex: 100,
+      validatedLedgerIndex: 102,
+      confirmations: 3,
+    },
+    fdcRequestTransactionHash: `0x${"aa".repeat(32)}`,
+    fdcVotingRound: "55",
+    fdcAbiEncodedRequest: "0x1234",
+    directMintingTransactionHash: `0x${"bb".repeat(32)}`,
+    directMintingBlock: "200",
+    userOperationCommitment: `0x${"cc".repeat(32)}`,
+    paymentAmountUBA: "1100025",
+    executionAllowedAt: "300",
+  };
+  assert.throws(
+    () => parseFlareFundingCheckpoint(checkpoint),
+    /XRPL_CHECKPOINT_TRANSACTION_MISMATCH/,
+  );
+  assert.throws(
+    () => parseFlareFundingCheckpoint({ ...checkpoint, privateKey: "never" }),
+    /UNKNOWN_FLARE_FUNDING_CHECKPOINT_FIELD/,
+  );
 });

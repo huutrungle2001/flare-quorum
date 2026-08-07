@@ -80,6 +80,11 @@ pnpm flare:relay:dry-run
 pnpm flare:relay:once
 pnpm flare:relay:poll
 
+# XRP-native Smart Account funding (server-side, disposable executor only)
+pnpm flare:funding:health
+pnpm flare:funding:execute < funding-job.json
+pnpm flare:funding:resume < delayed-checkpoint.json
+
 # Ciphertext-only FCC ingress server
 pnpm flare:ingress
 ```

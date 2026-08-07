@@ -167,6 +167,21 @@ function successLogs(memoData) {
   return [minted, executed, tender];
 }
 
+function delayedLogs(executionAllowedAt) {
+  return [log(
+    encodeEventTopics({
+      abi: assetManagerFAssetsAbi,
+      eventName: "DirectMintingDelayed",
+    }),
+    encodeAbiParameters(
+      [{ type: "bytes32" }, { type: "uint256" }, { type: "uint256" }],
+      [transactionId, 1_000_000n, executionAllowedAt],
+    ),
+    assetManager,
+    0,
+  )];
+}
+
 test("executes one real-shape XRPL → FDC → FAssets → Smart Account funding lifecycle", async () => {
   const plan = buildMintAndFundPlan({
     personalAccount,
@@ -277,5 +292,110 @@ test("executes one real-shape XRPL → FDC → FAssets → Smart Account funding
   assert.deepEqual(chainCalls, [
     ["request", "0x1234", 10n],
     ["mint", plan.userOperationData, 0n],
+  ]);
+});
+
+test("emits a public checkpoint and resumes without a second FDC request or nonce", async () => {
+  const plan = buildMintAndFundPlan({
+    personalAccount,
+    nonce: 7n,
+    fTestXrp,
+    market,
+    terms: job.terms,
+    walletId: 0,
+    executorFee: 0n,
+  });
+  const response = {
+    attestationType: xrpPaymentAttestationType,
+    sourceId: testXrpSourceId,
+    votingRound: 1n,
+    lowestUsedTimestamp: 1_000n,
+    requestBody: { transactionId, proofOwner: executorAddress },
+    responseBody: {
+      blockNumber: 100n,
+      blockTimestamp: 1_100n,
+      sourceAddress: "rSource",
+      sourceAddressHash: `0x${"cc".repeat(32)}`,
+      receivingAddressHash: `0x${"dd".repeat(32)}`,
+      intendedReceivingAddressHash: `0x${"00".repeat(32)}`,
+      spentAmount: 1_100_000n,
+      intendedSpentAmount: 1_100_000n,
+      receivedAmount: 1_100_000n,
+      intendedReceivedAmount: 1_100_000n,
+      hasMemoData: true,
+      firstMemoData: plan.memoData,
+      hasDestinationTag: false,
+      destinationTag: 0n,
+      status: 0,
+    },
+  };
+  const responseHex = encodeAbiParameters([xrpPaymentResponseParameter], [response]);
+  const calls = [];
+  const fetchImplementation = async (_url, init) => {
+    const body = JSON.parse(init.body);
+    calls.push(body.method ?? new URL(String(_url)).pathname);
+    if (body.method === "tx") return Response.json({ result: { validated: true, ledger_index: 100 } });
+    if (body.method === "ledger") return Response.json({ result: { ledger_index: 102 } });
+    if (String(_url).includes("prepareRequest")) {
+      return Response.json({ status: "VALID", abiEncodedRequest: "0x1234" });
+    }
+    return Response.json({ response_hex: responseHex, proof: [`0x${"ee".repeat(32)}`] });
+  };
+  let currentTimestamp = 1_120n;
+  let mintAttempt = 0;
+  const chainCalls = [];
+  const chain = {
+    executorAddress,
+    inspectNetwork: async () => network,
+    getSmartAccountNonce: async () => 7n,
+    getPersonalAccount: async (_controller, xrplOwner) => {
+      assert.equal(xrplOwner, "rSource");
+      return personalAccount;
+    },
+    getRequestFee: async () => 10n,
+    submitAttestationRequest: async (_hub, request, fee) => {
+      chainCalls.push(["request", request, fee]);
+      return {
+        transactionHash: `0x${"f1".repeat(32)}`,
+        blockNumber: 50n,
+        status: "success",
+        logs: [],
+      };
+    },
+    getBlockTimestamp: async () => currentTimestamp,
+    getFdcTiming: async () => ({
+      firstVotingRoundStartTimestamp: 1_000n,
+      votingEpochDurationSeconds: 90n,
+    }),
+    getFdcProtocolId: async () => 200n,
+    isFdcFinalized: async () => true,
+    executeDirectMinting: async (_assetManager, _proof, data, value) => {
+      mintAttempt += 1;
+      chainCalls.push(["mint", data, value]);
+      return {
+        transactionHash: `0x${(mintAttempt === 1 ? "f2" : "f3").repeat(32)}`,
+        blockNumber: mintAttempt === 1 ? 200n : 201n,
+        status: "success",
+        logs: mintAttempt === 1 ? delayedLogs(2_000n) : successLogs(plan.memoData),
+      };
+    },
+  };
+  const executor = new FlareFundingExecutor(config, chain, {
+    fetchImplementation,
+    sleep: async () => {},
+  });
+  const delayed = await executor.execute(job);
+  assert.equal(delayed.outcome, "delayed");
+  assert.equal(delayed.checkpoint.fdcVotingRound, 1n);
+  assert.equal(delayed.checkpoint.paymentAmountUBA, 1_100_000n);
+  currentTimestamp = 2_001n;
+  const resumed = await executor.resume(delayed.checkpoint);
+  assert.equal(resumed.outcome, "executed");
+  assert.equal(resumed.tenderId, 9n);
+  assert.deepEqual(chainCalls.map(([kind]) => kind), ["request", "mint", "mint"]);
+  assert.deepEqual(calls, [
+    "tx", "ledger", "/verifier/xrp/XRPPayment/prepareRequest",
+    "/api/v1/fdc/proof-by-request-round-raw", "tx", "ledger",
+    "/api/v1/fdc/proof-by-request-round-raw",
   ]);
 });

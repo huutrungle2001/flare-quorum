@@ -570,7 +570,9 @@ checkpoint. It then:
 
 `DirectMintingDelayed` is a distinct non-success outcome. Verifier/DA/API
 credentials, raw proofs, source addresses, and provider errors are not emitted
-by the CLI. The minimal local ABIs are drift-tested against the exact
+by the CLI. The delayed result includes a public-safe checkpoint that can be
+resumed without a second XRPL payment, FDC request, or nonce; resume rejects
+quote, domain, user-operation, and nonce drift before writing. The minimal local ABIs are drift-tested against the exact
 `@flarenetwork/flare-wagmi-periphery-package@3.6.0` package.
 
 **Reason:** This makes FDC, FAssets, and Smart Accounts essential to tender

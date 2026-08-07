@@ -7,15 +7,18 @@ import {
 } from "./flare-funding-config.js";
 import { LiveFlareFundingChain } from "./flare-funding-chain.js";
 import { FlareFundingExecutor } from "./flare-funding-executor.js";
-import { parseFlareFundingJob } from "./flare-funding-job.js";
+import {
+  parseFlareFundingCheckpoint,
+  parseFlareFundingJob,
+} from "./flare-funding-job.js";
 
 function json(value: unknown): string {
   return JSON.stringify(value, (_key, item: unknown) =>
     typeof item === "bigint" ? item.toString() : item);
 }
 
-function mode(value: string | undefined): FlareFundingMode {
-  if (value === "health" || value === "execute") return value;
+function mode(value: string | undefined): FlareFundingMode | "resume" {
+  if (value === "health" || value === "execute" || value === "resume") return value;
   throw new FlareFundingConfigError("invalid-flare-funding-mode");
 }
 
@@ -41,7 +44,10 @@ function errorCode(error: unknown): string {
 
 async function main(): Promise<void> {
   const selectedMode = mode(process.argv[2]);
-  const config = loadFlareFundingConfig(selectedMode, process.env);
+  const config = loadFlareFundingConfig(
+    selectedMode === "resume" ? "execute" : selectedMode,
+    process.env,
+  );
   const executor = new FlareFundingExecutor(
     config,
     new LiveFlareFundingChain(config),
@@ -50,7 +56,9 @@ async function main(): Promise<void> {
     process.stdout.write(`${json(await executor.health())}\n`);
     return;
   }
-  const outcome = await executor.execute(parseFlareFundingJob(input()));
+  const outcome = selectedMode === "resume"
+    ? await executor.resume(parseFlareFundingCheckpoint(input()))
+    : await executor.execute(parseFlareFundingJob(input()));
   process.stdout.write(`${json(outcome)}\n`);
   if (outcome.outcome === "delayed") process.exitCode = 2;
 }

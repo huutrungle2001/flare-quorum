@@ -4,7 +4,8 @@
 > market, FCC extension/quorum, FTestXRP settlement, Gate G XRP-native funding
 > evidence, hosted ingress, public/EVM role surfaces, the structured Buyer
 > Brief, and an official amount-based redemption request are implemented. XRP
-> browser funding/recovery and user validation remain open.
+> The server-side XRP funding checkpoint/resume path is implemented; browser
+> native funding/recovery and user validation remain open.
 
 ## 1. Product identity
 
@@ -85,6 +86,8 @@ Secondary:
 - XRP/USD FTSO close snapshot for currency normalization.
 - Winner payout and buyer remainder/refund in FTestXRP.
 - Guided official redemption from FXRP/FTestXRP flow to XRP where supported.
+- Public-safe delayed-mint checkpoint/resume that reuses the same XRPL payment
+  and Smart Account nonce without accepting quote or domain drift.
 
 ### Product and evidence
 
@@ -188,7 +191,7 @@ All formerly open choices are accepted in
 | Result authenticity | Two distinct registered tender-fixed machines sign the same full-domain digest |
 | FTSO | Supported fresh XRP/USD snapshot is fixed at close and bound to scoring/result |
 | Escrow | Official FTestXRP award plus remainder/refund conserves ceiling exactly once |
-| Recovery | Close/request/results resume after browser, relay, proxy, or one-machine outage |
+| Recovery | Close/request/results resume after browser, relay, proxy, or one-machine outage; XRP funding resumes from a public-safe delayed-mint checkpoint |
 | UX | Complete XRP Buyer, Vendor, Public, Activity, Evidence, and redemption journeys |
 | Deployment | Runtime/source/registry/extension/code/machine/binding facts agree |
 | Privacy | Secret and output scans find no forbidden bid, ciphertext, key, or credential material |

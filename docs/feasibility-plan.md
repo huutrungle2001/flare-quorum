@@ -213,6 +213,10 @@ Prove on XRPL testnet and Coston2:
 7. Reject wrong sender, nonce, operation bytes/hash, executor, payment, and
    duplicate transaction ID.
 8. Exercise delayed mint and stuck-mint recovery without duplicate custody.
+   The server-side executor now emits and resumes a public-safe checkpoint;
+   relay tests prove no second FDC request, XRPL payment, or nonce. A live
+   rate-limited Coston2 delay has not been forced and remains release-hardening
+   evidence rather than a claimed live pass.
 
 Kill condition: VeilBid needs a custodial signer or the XRP payment/mint/tender
 actions cannot be cryptographically and atomically bound.

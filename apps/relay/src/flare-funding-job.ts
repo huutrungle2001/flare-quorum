@@ -10,6 +10,7 @@ import {
   type FlareScoringPolicy,
   type FlareTenderTerms,
 } from "@veilbid/flare-bindings";
+import type { XrplFinality } from "./xrpl-finality.js";
 
 export interface FlareFundingJob {
   version: 1;
@@ -19,6 +20,28 @@ export interface FlareFundingJob {
   walletId: number;
   executorFeeUBA: bigint;
   terms: FlareTenderTerms;
+}
+
+/**
+ * Public-safe checkpoint emitted when AssetManager delays a direct mint.
+ *
+ * It deliberately contains no FDC proof, API credential, wallet secret, or
+ * bid material. Resuming reuses the same XRPL payment, nonce, memo-bound
+ * user operation, and finalized FDC request.
+ */
+export interface FlareFundingCheckpoint {
+  version: 1;
+  kind: "flare-xrp-funding";
+  job: FlareFundingJob;
+  xrplFinality: XrplFinality;
+  fdcRequestTransactionHash: Hex;
+  fdcVotingRound: bigint;
+  fdcAbiEncodedRequest: Hex;
+  directMintingTransactionHash: Hex;
+  directMintingBlock: bigint;
+  userOperationCommitment: Hex;
+  paymentAmountUBA: bigint;
+  executionAllowedAt: bigint;
 }
 
 function object(value: unknown, code: string): Record<string, unknown> {
@@ -67,6 +90,24 @@ function fixedHex(value: unknown, bytes: number, code: string): Hex {
     throw new Error(code);
   }
   return value.toLowerCase() as Hex;
+}
+
+function boundedHex(value: unknown, maximumBytes: number, code: string): Hex {
+  if (
+    typeof value !== "string" ||
+    !/^0x(?:[0-9a-fA-F]{2})+$/.test(value) ||
+    (value.length - 2) / 2 > maximumBytes
+  ) {
+    throw new Error(code);
+  }
+  return value.toLowerCase() as Hex;
+}
+
+function positiveInteger(value: unknown, code: string): number {
+  if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1) {
+    throw new Error(code);
+  }
+  return value;
 }
 
 function addressArray(value: unknown, code: string): readonly Address[] {
@@ -211,5 +252,81 @@ export function parseFlareFundingJob(value: unknown): FlareFundingJob {
     walletId: parsed.walletId,
     executorFeeUBA,
     terms: terms(parsed.terms),
+  };
+}
+
+/** Parse a delayed funding checkpoint without accepting unknown fields. */
+export function parseFlareFundingCheckpoint(value: unknown): FlareFundingCheckpoint {
+  const parsed = object(value, "INVALID_FLARE_FUNDING_CHECKPOINT");
+  exactKeys(parsed, [
+    "version",
+    "kind",
+    "job",
+    "xrplFinality",
+    "fdcRequestTransactionHash",
+    "fdcVotingRound",
+    "fdcAbiEncodedRequest",
+    "directMintingTransactionHash",
+    "directMintingBlock",
+    "userOperationCommitment",
+    "paymentAmountUBA",
+    "executionAllowedAt",
+  ], "UNKNOWN_FLARE_FUNDING_CHECKPOINT_FIELD");
+  if (parsed.version !== 1 || parsed.kind !== "flare-xrp-funding") {
+    throw new Error("UNSUPPORTED_FLARE_FUNDING_CHECKPOINT_VERSION");
+  }
+  const finality = object(parsed.xrplFinality, "INVALID_XRPL_FINALITY_CHECKPOINT");
+  exactKeys(finality, [
+    "transactionId",
+    "transactionLedgerIndex",
+    "validatedLedgerIndex",
+    "confirmations",
+  ], "UNKNOWN_XRPL_FINALITY_CHECKPOINT_FIELD");
+  const transactionId = fixedHex(finality.transactionId, 32, "INVALID_XRPL_TRANSACTION_ID");
+  const transactionLedgerIndex = positiveInteger(finality.transactionLedgerIndex, "INVALID_XRPL_FINALITY_CHECKPOINT");
+  const validatedLedgerIndex = positiveInteger(finality.validatedLedgerIndex, "INVALID_XRPL_FINALITY_CHECKPOINT");
+  const confirmations = positiveInteger(finality.confirmations, "INVALID_XRPL_FINALITY_CHECKPOINT");
+  if (validatedLedgerIndex < transactionLedgerIndex) {
+    throw new Error("INVALID_XRPL_FINALITY_CHECKPOINT");
+  }
+  const job = parseFlareFundingJob(parsed.job);
+  if (job.xrplTransactionId.toLowerCase() !== transactionId.toLowerCase()) {
+    throw new Error("XRPL_CHECKPOINT_TRANSACTION_MISMATCH");
+  }
+  const userOperationCommitment = fixedHex(
+    parsed.userOperationCommitment,
+    32,
+    "INVALID_USER_OPERATION_COMMITMENT",
+  );
+  return {
+    version: 1,
+    kind: "flare-xrp-funding",
+    job,
+    xrplFinality: {
+      transactionId,
+      transactionLedgerIndex,
+      validatedLedgerIndex,
+      confirmations,
+    },
+    fdcRequestTransactionHash: fixedHex(
+      parsed.fdcRequestTransactionHash,
+      32,
+      "INVALID_FDC_REQUEST_TRANSACTION_HASH",
+    ),
+    fdcVotingRound: bigintString(parsed.fdcVotingRound, "INVALID_FDC_VOTING_ROUND"),
+    fdcAbiEncodedRequest: boundedHex(
+      parsed.fdcAbiEncodedRequest,
+      64 * 1024,
+      "INVALID_FDC_REQUEST",
+    ),
+    directMintingTransactionHash: fixedHex(
+      parsed.directMintingTransactionHash,
+      32,
+      "INVALID_DIRECT_MINTING_TRANSACTION_HASH",
+    ),
+    directMintingBlock: bigintString(parsed.directMintingBlock, "INVALID_DIRECT_MINTING_BLOCK"),
+    userOperationCommitment,
+    paymentAmountUBA: bigintString(parsed.paymentAmountUBA, "INVALID_PAYMENT_AMOUNT_UBA"),
+    executionAllowedAt: bigintString(parsed.executionAllowedAt, "INVALID_EXECUTION_ALLOWED_AT"),
   };
 }

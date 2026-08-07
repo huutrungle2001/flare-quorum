@@ -209,8 +209,10 @@ requested escrow and memo executor fee, and binds every registry read to
 Coston2. A successful transaction is still not a successful funding result
 unless the AssetManager, MasterAccountController, and market emit the expected
 mint, user-operation, and tender events. A rate-limited mint is reported as
-`delayed` and must be resumed with the same XRPL payment; it never becomes a
-sample or optimistic success state.
+`delayed` with a public-safe checkpoint. `flare:funding:resume` rechecks the
+same payment, FDC request/round, quote, nonce, and user-operation commitment
+before retrying the direct mint; no second XRPL payment is accepted and it
+never becomes a sample or optimistic success state.
 
 The PersonalAccount is the on-chain buyer. VeilBid has no XRPL key or custodial
 signer. Direct EVM funding remains a recovery and developer path.
@@ -241,7 +243,8 @@ selected TEE boundary.
 - Quorum loss: explicit liveness failure; after the fixed 24-hour grace the
   buyer may recover escrow with no award and no success claim.
 - FTSO unavailable/stale: USD-enabled close pauses; no manual price.
-- FDC/Smart Account failure: use documented stuck-mint recovery; no app custody.
+- FDC/Smart Account failure: use the documented public-safe delayed-mint
+  checkpoint/resume; no app custody and no duplicate XRPL payment.
 - Competing finalizer: canonical reread and benign-race classification only.
 
 ## 11. Administration

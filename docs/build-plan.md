@@ -56,37 +56,42 @@ placeholders are forbidden after that commit.
 
 ### Milestone 2 — confidential procurement engine
 
-- [ ] Freeze cross-language schemas and golden vectors.
-- [ ] Implement bid receipts, common quorum, and ordered root.
-- [ ] Implement credential validation and `SCORING_V1`.
-- [ ] Implement three-machine selection and two-signature result threshold.
+- [x] Freeze cross-language schemas and golden vectors.
+- [x] Implement bid receipts, common quorum, and ordered root.
+- [x] Implement credential validation and `SCORING_V1`.
+- [x] Implement three-machine selection and two-signature result threshold.
 - [x] Pass Gates C–E with the live three-bid, common-quorum, private-scoring,
   and two-signature finalization evidence.
 
 ### Milestone 3 — Flare economic path
 
-- [ ] Implement production `VeilBidFlareMarket` and receipt.
-- [ ] Integrate FTestXRP escrow and FAssets exit.
-- [ ] Integrate XRP/USD FTSO snapshot and conversion.
+- [x] Implement production `VeilBidFlareMarket` and receipt.
+- [x] Integrate FTestXRP escrow and FAssets exit.
+- [x] Integrate XRP/USD FTSO snapshot and conversion.
 - [x] Implement and live-verify the Smart Account `0xFE` plus FDC direct
   mint-and-fund executor.
 - [x] Pass Gates F–G in the live Coston2 lifecycle.
 
 ### Milestone 4 — generated consumers
 
-- [ ] Add `packages/flare-bindings` and drift checks.
-- [ ] Migrate web judge path to Coston2.
-- [ ] Implement private vendor ingress and receipt UX.
-- [ ] Implement XRP-native and EVM buyer paths.
-- [ ] Implement Activity recovery and public Evidence workspace.
-- [ ] Migrate relay and console to Flare bindings.
+- [x] Add `packages/flare-bindings` and drift checks.
+- [x] Migrate web judge path to Coston2.
+- [x] Implement private vendor ingress and receipt UX.
+- [x] Implement XRP-native executor and EVM buyer paths; delayed XRP minting
+  now has public-safe checkpoint/resume, while browser XRPL signing remains
+  intentionally outside the app.
+- [x] Implement Activity recovery and public Evidence workspace.
+- [x] Migrate relay and console to Flare bindings.
 
 ### Milestone 5 — verification and production presentation
 
-- [ ] Deploy and verify canonical Coston2 contracts/extension/machine policy.
-- [ ] Run full live/adversarial/recovery suites.
-- [ ] Publish sanitized evidence and performance benchmarks.
-- [ ] Deploy web and relay; verify desktop/mobile/keyboard behavior.
+- [x] Deploy and verify canonical Coston2 contracts/extension/machine policy.
+- [~] Run full live/adversarial/recovery suites; core live lifecycles and one-
+  endpoint recovery pass, while same-identity restart and complete fault drills
+  remain open.
+- [~] Publish sanitized evidence and performance benchmarks; release evidence is
+  current, benchmark collection remains open.
+- [x] Deploy web and relay; verify desktop/mobile/keyboard behavior.
 - [ ] Complete user research, vendor tests, and pilot outreach.
 - [ ] Pass Gate H.
 

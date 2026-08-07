@@ -339,7 +339,11 @@ does not fall back to `FLARE_DEPLOYMENT_PRIVATE_KEY` or
 bytecode, finalized-market, FTestXRP, fee, and direct-mint-address checks without
 writing. After Gate G prerequisites exist, pipe one public-safe version-1 job
 to `pnpm flare:funding:execute`; decimal integer fields are strings and unknown
-fields are rejected:
+fields are rejected. If AssetManager returns `DirectMintingDelayed`, preserve
+the JSON result as a checkpoint and run `pnpm flare:funding:resume` after its
+`executionAllowedAt` time. Resume reuses the original FDC request and nonce;
+it never sends a second XRPL payment and fails closed on quote, domain, or
+user-operation drift:
 
 ```json
 {
@@ -384,7 +388,10 @@ integers.
 
 The command emits no raw proof, XRPL source address, credential, provider body,
 or secret. Exit code `2` means `DirectMintingDelayed`; the tender is not funded
-and the same XRPL payment must be resumed after `executionAllowedAt`.
+and the same XRPL payment must be resumed after `executionAllowedAt`. The
+checkpoint contains only public identifiers, the public-safe job, FDC request
+bytes/round, payment amount, and direct-mint transaction checkpoint; it never
+contains the FDC proof, verifier credentials, wallet keys, or bid payload.
 
 The market deployment command is `pnpm flare:deploy:market`. It is intentionally
 non-runnable before every Gate 0–E evidence file has status `PASS`, all recorded

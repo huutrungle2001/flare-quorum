@@ -3,9 +3,10 @@
 > Status: verified Coston2 experience. The checked-in `/` and `/flare` routes
 > provide the fail-closed wallet-free evidence view and dedicated public
 > Activity/Evidence ledger, and explicit Coston2 EVM Buyer/Vendor role routes
-> are live. The XRP-native funding protocol and
-> executor have live Gate G evidence; its browser composer remains a separate
-> recovery/UI hardening item. `/room` remains the historical Sepolia baseline.
+> are live. The XRP-native funding protocol and executor have live Gate G
+> evidence plus a public-safe delayed-mint checkpoint/resume path; browser
+> XRPL signing remains a separate recovery/UI hardening item. `/room` remains
+> the historical Sepolia baseline.
 
 ## 1. What the product will do
 
@@ -72,7 +73,11 @@ success. The Sepolia app remains a pre-hackathon baseline.
    `XRPPayment` proof, and calls `executeDirectMintingWithData`.
 4. Accept the funding result only when the direct-mint, user-operation, and
    `TenderCreated` events prove one atomic Coston2 tender. Delayed minting is a
-   public pending checkpoint, never a success fallback.
+   public pending checkpoint, never a success fallback. Save the JSON result
+   and resume it later with `pnpm flare:funding:resume < checkpoint.json`; the
+   resume command reuses the same XRPL payment, FDC request, memo-bound nonce,
+   and user operation. It never sends a second payment or silently changes the
+   public terms.
 5. Monitor the public tender and continue through FCC selection and settlement
    in the same wallet-free evidence view.
 
@@ -148,11 +153,14 @@ Every workflow labels data as one of:
 - **Private ingress unavailable:** show unavailable and retain no payload.
 - **Stale/unavailable FTSO:** a USD-enabled tender cannot close with a manual
   replacement price.
-- **FDC/Smart Account delayed:** keep the XRPL and user-op checkpoints; do not
-  send another payment with the same nonce or mark the tender funded. The
-  executor reports the public `executionAllowedAt`; resume the same payment and
-  operation only after that time. Success requires the mint, user-operation,
-  and tender-created events in one Coston2 receipt.
+- **FDC/Smart Account delayed:** keep the executor's public-safe JSON result;
+  do not send another payment with the same nonce or mark the tender funded.
+  The result contains `executionAllowedAt` and a checkpoint without FDC proof,
+  secrets, or bid data. Run `pnpm flare:funding:resume < checkpoint.json` only
+  after that time. The resume path rechecks XRPL finality, nonce, payment
+  amount, FDC round/request, and the canonical user-operation commitment;
+  success still requires the mint, user-operation, and tender-created events in
+  one Coston2 receipt. A changed nonce, quote, domain, or hash fails closed.
 - **Split or expired TEE results:** request the same frozen computation again;
   the caller cannot choose among digests.
 - **RPC/indexer/relay unavailable:** recover from canonical chain state with
