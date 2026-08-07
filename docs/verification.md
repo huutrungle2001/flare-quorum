@@ -62,7 +62,7 @@ wallet/executor secrets are never persisted.
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | NOT RUN |
 | Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | NOT RUN |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json` |
-| Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | NOT RUN |
+| Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PARTIAL — 320px/keyboard/focus/reduced-motion/labels pass in `evidence/coston2/web-keyboard-accessibility.json`; recovery interaction remains |
 | Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | IN PROGRESS — repository/history/evidence scan passes; hosted runtime log review remains |
 | New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | IN PROGRESS |
 | User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN |
@@ -88,6 +88,7 @@ evidence/coston2/three-vendor-recovery.release.json
 evidence/coston2/web-desktop-mobile-keyboard.release.json
 evidence/coston2/production-smoke.release.json
 evidence/coston2/web-production-smoke.json
+evidence/coston2/web-keyboard-accessibility.json
 evidence/coston2/user-validation.release.json
 evidence/coston2/new-work-ledger.release.json
 ```
