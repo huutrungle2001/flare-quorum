@@ -50,6 +50,18 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
     },
   });
   try {
+    const health = await fetch(`${app.baseUrl}/health`, {
+      headers: { Origin: "https://app.example" },
+    });
+    assert.equal(health.status, 200);
+    assert.equal(health.headers.get("access-control-allow-origin"), "https://app.example");
+    assert.deepEqual(await health.json(), {
+      status: "ok",
+      service: "veilbid-flare-ingress",
+      chainId: 114,
+      schemaVersion: 1,
+    });
+
     const keys = await fetch(`${app.baseUrl}/flare/ingress/tenders/7/machines`, {
       headers: { Origin: "https://app.example" },
     });

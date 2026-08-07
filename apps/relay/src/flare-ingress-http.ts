@@ -11,6 +11,7 @@ const machineRoute = /^\/flare\/ingress\/tenders\/([1-9][0-9]*)\/machines$/;
 const rateLimitWindowMs = 60_000;
 const rateLimitRequests = 120;
 const maximumRateLimitEntries = 10_000;
+const healthRoute = "/health";
 
 interface PublicIngressGateway {
   machineKeys(tenderId: bigint): ReturnType<FlareBidIngressGateway["machineKeys"]>;
@@ -134,11 +135,14 @@ export function createFlareIngressHandler(
     try {
       const path = requestPath(request);
       const machineMatch = machineRoute.exec(path);
-      const knownRoute = machineMatch !== null || path === "/flare/ingress/bids";
+      const knownRoute = machineMatch !== null || path === "/flare/ingress/bids" || path === healthRoute;
       if (request.method === "OPTIONS" && knownRoute) {
         if (origin !== webOrigin) throw new HttpIngressError(403, "ORIGIN_NOT_ALLOWED");
         response.statusCode = 204;
-        response.setHeader("Access-Control-Allow-Methods", machineMatch ? "GET, OPTIONS" : "POST, OPTIONS");
+        response.setHeader(
+          "Access-Control-Allow-Methods",
+          machineMatch || path === healthRoute ? "GET, OPTIONS" : "POST, OPTIONS",
+        );
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setHeader("Access-Control-Max-Age", "600");
         response.end();
@@ -158,6 +162,15 @@ export function createFlareIngressHandler(
             fingerprint,
             publicKey,
           })),
+        });
+        return;
+      }
+      if (request.method === "GET" && path === healthRoute) {
+        json(response, 200, {
+          status: "ok",
+          service: "veilbid-flare-ingress",
+          chainId: 114,
+          schemaVersion: 1,
         });
         return;
       }
