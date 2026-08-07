@@ -102,6 +102,33 @@ function receipt(value: {
   };
 }
 
+function directMintFailureCode(error: unknown): string {
+  const candidates = [
+    error,
+    error instanceof Error ? error.cause : undefined,
+  ];
+  for (const candidate of candidates) {
+    if (candidate === null || typeof candidate !== "object") continue;
+    const record = candidate as Record<string, unknown>;
+    for (const key of ["data", "cause", "details"]) {
+      const value = record[key];
+      if (typeof value === "string") {
+        const selector = value.match(/^0x([0-9a-fA-F]{8})/);
+        if (selector) return `DIRECT_MINT_REVERT_${selector[1].toUpperCase()}`;
+      }
+    }
+    const shortMessage = record.shortMessage;
+    if (typeof shortMessage === "string") {
+      const normalized = shortMessage.toLowerCase();
+      if (normalized.includes("insufficient funds")) return "DIRECT_MINT_INSUFFICIENT_FUNDS";
+      if (normalized.includes("nonce")) return "DIRECT_MINT_NONCE_ERROR";
+      if (normalized.includes("gas")) return "DIRECT_MINT_GAS_ERROR";
+      if (normalized.includes("revert")) return "DIRECT_MINT_REVERT";
+    }
+  }
+  return "DIRECT_MINT_SIMULATION_ERROR";
+}
+
 export class LiveFlareFundingChain implements FlareFundingChain {
   readonly config: FlareFundingConfig;
   readonly publicClient;
@@ -389,22 +416,31 @@ export class LiveFlareFundingChain implements FlareFundingChain {
     value: bigint,
   ): Promise<FundingTransactionReceipt> {
     const writer = this.requireWriter();
-    await this.publicClient.simulateContract({
-      account: writer.account,
-      address: assetManager,
-      abi: assetManagerFAssetsAbi,
-      functionName: "executeDirectMintingWithData",
-      args: [proof, userOperationData],
-      value,
-    });
-    const hash = await writer.walletClient.writeContract({
-      account: writer.account,
-      address: assetManager,
-      abi: assetManagerFAssetsAbi,
-      functionName: "executeDirectMintingWithData",
-      args: [proof, userOperationData],
-      value,
-    });
+    try {
+      await this.publicClient.simulateContract({
+        account: writer.account,
+        address: assetManager,
+        abi: assetManagerFAssetsAbi,
+        functionName: "executeDirectMintingWithData",
+        args: [proof, userOperationData],
+        value,
+      });
+    } catch (error) {
+      throw new Error(directMintFailureCode(error));
+    }
+    let hash: Hex;
+    try {
+      hash = await writer.walletClient.writeContract({
+        account: writer.account,
+        address: assetManager,
+        abi: assetManagerFAssetsAbi,
+        functionName: "executeDirectMintingWithData",
+        args: [proof, userOperationData],
+        value,
+      });
+    } catch (error) {
+      throw new Error(directMintFailureCode(error));
+    }
     return receipt(await this.publicClient.waitForTransactionReceipt({ hash }));
   }
 }
