@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-ciphertext-ingress-production",
-  "recordedAt": "2026-08-07T21:22:17.811Z",
+  "recordedAt": "2026-08-07T21:31:07.009Z",
   "publicIdentifiers": {
-    "sourceCommit": "0e59652a96ba8eb74f6adf9ec89e11054defaa55",
+    "sourceCommit": "53fcb1a12edcfcf394098aba18e5205626746d57",
     "provider": "railway",
     "project": "veilbid-flare-fcc",
     "service": "veilbid-flare-ingress",
