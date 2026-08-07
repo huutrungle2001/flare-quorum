@@ -1,6 +1,6 @@
 import { formatUnits } from "viem";
 import { useSearchParams } from "react-router";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { coston2FlarePublicRelease } from "@veilbid/flare-bindings";
 import type { FlareMarketState } from "../public-market/useFlareMarket";
 import { useFlareMarket } from "../public-market/useFlareMarket";
@@ -241,6 +241,23 @@ function FlareRoleBar({
   );
 }
 
+function FlareRoleWorkspace({
+  activeRole,
+  onRoleChange,
+  children,
+}: {
+  activeRole: FlareRole;
+  onRoleChange: (role: FlareRole) => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="tender-layout flare-tender-layout">
+      <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
+      {children}
+    </div>
+  );
+}
+
 export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState; onRetry: () => void }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const tenders = state.data?.tenders ?? [];
@@ -293,18 +310,16 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   };
   if (activeRole === "evidence") {
     return (
-      <>
-        <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange}>
         <FlareEvidenceWorkspace state={state} onRetry={() => void refresh()} />
-      </>
+      </FlareRoleWorkspace>
     );
   }
   if ((role === "vendor" || role === "buyer") && wallet && state.status === "ready" && state.data) {
     return (
-      <>
-        <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange}>
         {role === "buyer" ? <FlareBuyerWorkspace wallet={wallet} onRefresh={() => void refresh()} /> : <FlareVendorWorkspace wallet={wallet} tenders={state.data.tenders} onRefresh={() => void refresh()} />}
-      </>
+      </FlareRoleWorkspace>
     );
   }
   return <FlareExplorerView state={state} onRetry={() => void refresh()} />;
