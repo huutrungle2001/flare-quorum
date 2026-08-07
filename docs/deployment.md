@@ -30,16 +30,21 @@ Collect sanitized evidence with `pnpm flare:foundations:collect`. The stricter
 `pnpm flare:gate:0` command fails until every external registration prerequisite
 also passes; an `IN_PROGRESS` evidence file is not a release gate pass.
 
-Build and verify the checksum-pinned `linux/amd64` tee-proxy separately:
+Build and verify the checksum-pinned `linux/amd64` VeilBid extension and
+tee-proxy separately:
 
 ```bash
+pnpm flare:extension:image:build
+pnpm flare:extension:image:verify
 pnpm flare:proxy:image:build
 pnpm flare:proxy:image:verify
 ```
 
-The verifier checks the executable platform manifest digest, extracted binary
-SHA-256, ELF architecture, non-root runtime user, read-only executable mode,
-and entrypoint. It records no runtime configuration or credential.
+Both verifiers check the executable platform manifest digest, extracted binary
+SHA-256, ELF architecture, and read-only executable mode. The extension check
+also requires its safe production-attestation default, persistent sealed-store
+volume, and exact launch policy; the proxy check requires its non-root user and
+entrypoint. Neither records runtime configuration or credentials.
 
 The deployed-but-unregistered Gate-A V1 sender is independently reproducible
 with:

@@ -69,6 +69,14 @@ evidence is stored at `evidence/coston2/gate-0-proxy-image.json`. Provenance
 and SBOM are enabled, but their timestamp-bearing index digest is intentionally
 not substituted for the stable executable platform digest.
 
+The VeilBid extension recipe at `apps/fcc-extension/Dockerfile` is pinned by
+the same policy. `pnpm flare:extension:image:verify` checks the executable
+platform digest, extracted binary, `MODE=0` default, persistent sealed-store
+volume, exact launch-policy environment allowlist, and absence of embedded
+runtime secret variables. Its sanitized record is
+`evidence/coston2/gate-0-extension-image.json`. A Coston2 simulation must still
+opt into `MODE=1` explicitly and must never be described as hardware-backed.
+
 ## 3. Fresh registration workflow
 
 Because the redeploy may have cleared prior registrations:
@@ -174,5 +182,5 @@ The current partial live record is
 `evidence/coston2/gate-0-foundations.json`. It is explicitly
 `IN_PROGRESS`: source hashes, toolchains, manager interface, registry discovery,
 FTestXRP binding, XRP/USD feed, indexer configuration, and tee-proxy build-input
-pinning pass. Docker/image build, stable proxy reachability, and three production
-machines remain blockers.
+pinning pass. Docker plus both pinned image builds now pass. Stable proxy
+reachability and three production machines remain blockers.

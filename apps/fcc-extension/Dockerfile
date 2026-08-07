@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
 FROM golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa AS builder
 
 ARG SOURCE_DATE_EPOCH=0
@@ -18,7 +18,7 @@ RUN if [ "${SOURCE_DATE_EPOCH}" -gt 0 ] 2>/dev/null; then find /app -exec touch 
 FROM gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838
 
 WORKDIR /app
-COPY --chmod=755 --chown=0:0 --from=builder /app/extension-tee /app/extension-tee
+COPY --chmod=555 --chown=0:0 --from=builder /app/extension-tee /app/extension-tee
 
 # Production attestation is the safe image default. Local simulation must opt in with MODE=1.
 ENV MODE=0 CONFIG_PORT=5501 SIGN_PORT=7701 EXTENSION_PORT=7702 SEALED_STORE_DIR=/var/lib/veilbid/sealed

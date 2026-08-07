@@ -6,6 +6,7 @@ import {
   isStableProxyUrl,
   normalizePrivateKey,
   parseVersion,
+  verifyFccExtensionReleaseRecipe,
   verifyTeeProxyReleaseRecipe,
   verifyPinnedSources,
   versionAtLeast,
@@ -83,6 +84,34 @@ test("requires an exact checksum-pinned tee-proxy release recipe", () => {
   assert.equal(verifyTeeProxyReleaseRecipe(source, recipe), true);
   assert.equal(
     verifyTeeProxyReleaseRecipe(source.replace("go mod verify", "go mod download"), recipe),
+    false,
+  );
+});
+
+test("requires exact pinned inputs and safe defaults for the FCC extension image", () => {
+  const recipe = {
+    context: "apps/fcc-extension",
+    platform: "linux/amd64",
+    version: "0.2.0",
+    dockerfileFrontend: `frontend@sha256:${"5".repeat(64)}`,
+    builderImage: `builder@sha256:${"3".repeat(64)}`,
+    runtimeImage: `runtime@sha256:${"4".repeat(64)}`,
+  };
+  const source = [
+    `# syntax=${recipe.dockerfileFrontend}`,
+    `FROM ${recipe.builderImage} AS builder`,
+    "RUN go mod download && go mod verify",
+    'RUN GOFLAGS="-buildvcs=false" go build -trimpath',
+    `FROM ${recipe.runtimeImage}`,
+    "COPY --chmod=555 --chown=0:0 --from=builder /app/extension-tee /app/extension-tee",
+    "ENV MODE=0 SEALED_STORE_DIR=/var/lib/veilbid/sealed",
+    "USER 0:0",
+    'VOLUME ["/var/lib/veilbid/sealed"]',
+    'CMD ["/app/extension-tee"]',
+  ].join("\n");
+  assert.equal(verifyFccExtensionReleaseRecipe(source, recipe), true);
+  assert.equal(
+    verifyFccExtensionReleaseRecipe(source.replace("ENV MODE=0", "ENV MODE=1"), recipe),
     false,
   );
 });

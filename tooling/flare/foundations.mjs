@@ -118,6 +118,32 @@ export function verifyTeeProxyReleaseRecipe(source, recipe) {
   );
 }
 
+export function verifyFccExtensionReleaseRecipe(source, recipe) {
+  if (!recipe || typeof source !== "string") return false;
+  const requiredFragments = [
+    `# syntax=${recipe.dockerfileFrontend}`,
+    `FROM ${recipe.builderImage} AS builder`,
+    `FROM ${recipe.runtimeImage}`,
+    "go mod download && go mod verify",
+    'GOFLAGS="-buildvcs=false"',
+    "go build -trimpath",
+    "COPY --chmod=555 --chown=0:0 --from=builder /app/extension-tee /app/extension-tee",
+    "ENV MODE=0",
+    "SEALED_STORE_DIR=/var/lib/veilbid/sealed",
+    "USER 0:0",
+    'VOLUME ["/var/lib/veilbid/sealed"]',
+    'CMD ["/app/extension-tee"]',
+  ];
+  return (
+    recipe.context === "apps/fcc-extension" &&
+    /^\d+\.\d+\.\d+$/.test(recipe.version ?? "") &&
+    isSha256Digest(recipe.builderImage?.split("@")[1]) &&
+    isSha256Digest(recipe.runtimeImage?.split("@")[1]) &&
+    isSha256Digest(recipe.dockerfileFrontend?.split("@")[1]) &&
+    requiredFragments.every((fragment) => source.includes(fragment))
+  );
+}
+
 export function normalizePrivateKey(value) {
   const trimmed = value?.trim();
   if (!trimmed) return null;
@@ -158,6 +184,15 @@ export async function inspectFoundations({
   fetchImplementation = fetch,
 }) {
   const manifest = readFoundationManifest(repositoryRoot);
+  const fccExtensionRecipe = manifest.docker.fccExtensionReleaseRecipe;
+  const fccExtensionDockerfile = readFileSync(
+    resolve(repositoryRoot, fccExtensionRecipe.dockerfile),
+    "utf8",
+  );
+  const fccExtensionBuildInputsPinned = verifyFccExtensionReleaseRecipe(
+    fccExtensionDockerfile,
+    fccExtensionRecipe,
+  );
   const teeProxyRecipe = manifest.docker.teeProxyReleaseRecipe;
   const teeProxyDockerfile = readFileSync(
     resolve(repositoryRoot, teeProxyRecipe.dockerfile),
@@ -314,6 +349,15 @@ export async function inspectFoundations({
   const goCheck = command("go", ["version"]);
   const forgeCheck = command("forge", ["--version"]);
   const dockerCheck = command("docker", ["version", "--format", "{{.Server.Version}}"]);
+  const fccExtensionImageCheck = command("docker", [
+    "image",
+    "inspect",
+    "--platform",
+    fccExtensionRecipe.platform,
+    fccExtensionRecipe.releaseImageTag ?? "",
+    "--format",
+    "{{.Descriptor.digest}}",
+  ]);
   const teeProxyImageCheck = command("docker", [
     "image",
     "inspect",
@@ -429,6 +473,13 @@ export async function inspectFoundations({
       BigInt(block.timestamp) >= BigInt(feedTimestamp) &&
       BigInt(block.timestamp) - BigInt(feedTimestamp) <= 300n,
     dockerDaemonAvailable: dockerCheck.ok,
+    fccExtensionBuildInputsPinned,
+    fccExtensionReleaseImageDigestRecorded: isSha256Digest(
+      fccExtensionRecipe.releaseImageDigest,
+    ),
+    fccExtensionReleaseImageVerified:
+      dockerCheck.ok && fccExtensionImageCheck.ok &&
+      fccExtensionImageCheck.output === fccExtensionRecipe.releaseImageDigest,
     teeProxyBuildInputsPinned,
     teeProxyReleaseImageDigestRecorded: isSha256Digest(
       teeProxyRecipe.releaseImageDigest,
@@ -447,6 +498,21 @@ export async function inspectFoundations({
   const blockers = [];
   addBlocker(blockers, assertions.deploymentKeyMatchesDeclaredWallet, "DEPLOYMENT_KEY_NOT_READY");
   addBlocker(blockers, assertions.dockerDaemonAvailable, "DOCKER_DAEMON_UNAVAILABLE");
+  addBlocker(
+    blockers,
+    assertions.fccExtensionBuildInputsPinned,
+    "FCC_EXTENSION_BUILD_INPUTS_UNPINNED",
+  );
+  addBlocker(
+    blockers,
+    assertions.fccExtensionReleaseImageDigestRecorded,
+    "FCC_EXTENSION_RELEASE_IMAGE_DIGEST_MISSING",
+  );
+  addBlocker(
+    blockers,
+    assertions.fccExtensionReleaseImageVerified,
+    "FCC_EXTENSION_RELEASE_IMAGE_NOT_VERIFIED",
+  );
   addBlocker(
     blockers,
     assertions.teeProxyBuildInputsPinned,
@@ -522,6 +588,17 @@ export async function inspectFoundations({
         ]),
       ),
       sourceChecks,
+      fccExtensionReleaseRecipe: {
+        dockerfile: fccExtensionRecipe.dockerfile,
+        context: fccExtensionRecipe.context,
+        platform: fccExtensionRecipe.platform,
+        version: fccExtensionRecipe.version,
+        builderImage: fccExtensionRecipe.builderImage,
+        runtimeImage: fccExtensionRecipe.runtimeImage,
+        releaseImageTag: fccExtensionRecipe.releaseImageTag,
+        releaseImageDigest: fccExtensionRecipe.releaseImageDigest,
+        releaseBinarySha256: fccExtensionRecipe.releaseBinarySha256,
+      },
       teeProxyReleaseRecipe: {
         dockerfile: teeProxyRecipe.dockerfile,
         platform: teeProxyRecipe.platform,
@@ -540,6 +617,7 @@ export async function inspectFoundations({
     blockers,
     notes: [
       "The official scaffold main branch is reference-only; VeilBid pins the organizer-directed tee-node module and tee-proxy release recipe independently.",
+      "The VeilBid extension build inputs and executable linux/amd64 image digest are pinned and locally verifiable without recording runtime secrets.",
       "The tee-proxy build inputs and executable linux/amd64 image digest are pinned and verified against the local Docker content store.",
       "No RPC URL, deployment key, indexer credential, proxy response, or machine secret is recorded.",
       "Simulated TEE mode is the declared Coston2 judging target; it is not hardware-backed confidentiality.",

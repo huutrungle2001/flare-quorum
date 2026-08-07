@@ -32,3 +32,15 @@ ownership must come from `INITIAL_OWNER` or `FLARE_DEPLOYMENT_PRIVATE_KEY`; no
 development key is embedded in source or the image. Production deployment must
 mount a persistent private volume at `SEALED_STORE_DIR`; an ephemeral container
 filesystem cannot satisfy restart recovery.
+
+Build and verify the pinned release image from the repository root:
+
+```bash
+pnpm flare:extension:image:build
+pnpm flare:extension:image:verify
+```
+
+The verifier compares the local executable OCI manifest and extracted binary
+with `tooling/flare/coston2-foundations.json`. It also rejects an image that
+defaults to simulation, lacks the sealed-store volume, changes the launch
+policy, or embeds a runtime secret variable.

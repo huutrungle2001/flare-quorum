@@ -69,6 +69,7 @@ receipt can change that status.
 
 ```text
 evidence/coston2/gate-0-foundations.json
+evidence/coston2/gate-0-extension-image.json
 evidence/coston2/gate-0-proxy-image.json
 evidence/coston2/gate-a-fcc-result.json
 evidence/coston2/foundations.release.json

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "gate": "0-extension-image",
+  "status": "PASSED",
+  "recordedAt": "2026-08-04T06:22:12.400Z",
+  "sourceCommit": "147bc351adf8391c4dc21a05ce5b70906ea3209a",
+  "extensionVersion": "0.2.0",
+  "buildPolicy": {
+    "dockerfile": "apps/fcc-extension/Dockerfile",
+    "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
+    "context": "apps/fcc-extension",
+    "platform": "linux/amd64",
+    "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
+    "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
+    "provenance": "mode=max",
+    "sbom": true
+  },
+  "publicIdentifiers": {
+    "imageTag": "veilbid/fcc-extension:coston2-v0.2.0",
+    "imageDigest": "sha256:930b6481838ae84965429d504af78dc8ebd62fa7e390d1647a3c2bf8f7951496",
+    "imageMediaType": "application/vnd.oci.image.manifest.v1+json",
+    "platform": "linux/amd64",
+    "runtimeUser": "0:0",
+    "command": [
+      "/app/extension-tee"
+    ],
+    "binarySha256": "841e5cf25de1c8b28e0f403983428ce24ef3b0319b0bf4cb9200c893538eff59",
+    "binaryBytes": 11124884,
+    "binaryMode": "555",
+    "defaultMode": "0",
+    "sealedStore": "/var/lib/veilbid/sealed"
+  },
+  "assertions": {
+    "releaseDigestMatches": true,
+    "platformMatches": true,
+    "runtimeUserMatches": true,
+    "commandMatches": true,
+    "productionAttestationIsDefault": true,
+    "sealedStoreIsPersistent": true,
+    "launchPolicyIsExact": true,
+    "noEmbeddedRuntimeSecrets": true,
+    "binaryDigestMatches": true,
+    "binaryIsElf64Amd64": true,
+    "binaryIsExecutableReadOnly": true
+  },
+  "notes": [
+    "The recorded digest is the executable linux/amd64 OCI manifest, not the timestamp-bearing provenance index.",
+    "MODE=0 remains the image default. Any simulated Coston2 run must explicitly set MODE=1 and be labeled simulated.",
+    "No deployment key, proxy key, direct API key, indexer credential, TEE identity, or bid data is copied into the image or evidence."
+  ]
+}
