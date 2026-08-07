@@ -353,7 +353,12 @@ export class FlareFundingExecutor {
       !tender && tenderCountBefore !== null && this.chain.getMarketTender &&
       this.chain.getMarketTenderCount
     ) {
-      const tenderCountAfter = await this.chain.getMarketTenderCount(this.config.marketAddress);
+      let tenderCountAfter = tenderCountBefore;
+      for (let attempt = 0; attempt < 6 && tenderCountAfter <= tenderCountBefore; attempt += 1) {
+        tenderCountAfter = await this.chain.getMarketTenderCount(this.config.marketAddress);
+        if (tenderCountAfter > tenderCountBefore) break;
+        if (attempt < 5) await this.sleep(1_000);
+      }
       const createdCount = tenderCountAfter - tenderCountBefore;
       if (createdCount > 0n && createdCount <= MAX_TENDER_STATE_FALLBACK_SCAN) {
         for (let id = tenderCountBefore + 1n; id <= tenderCountAfter; id += 1n) {
