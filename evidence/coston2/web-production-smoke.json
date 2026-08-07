@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-frontend-smoke",
+  "recordedAt": "2026-08-07T20:04:59.153Z",
+  "publicIdentifiers": {
+    "sourceCommit": "b65c37cd2ba7d643795ad4e5ade8f6090d70c144",
+    "provider": "vercel",
+    "project": "veilbid-flare",
+    "canonicalUrl": "https://veilbid-flare.vercel.app",
+    "network": "flare-coston2",
+    "chainId": 114,
+    "deploymentKind": "release",
+    "deploymentVerified": true,
+    "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
+    "awardReceipt": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5"
+  },
+  "routeStatuses": {
+    "/": 200,
+    "/flare": 200,
+    "/room": 200,
+    "/docs": 200
+  },
+  "visualChecks": {
+    "desktop": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "d90ec7c10fecea9e3c75850496c048de0e0ddfcc5b43c12666b105838ca7270a"
+    },
+    "mobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "68b711606e963c475d15342ed7fdae2fa3fccfa79696173c0e0937ae72d085ce"
+    },
+    "docsMobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "ed1fb3b2700d0af85a0c2689ab4d969011ebff870be1bf6a119b8a84ddaa9d45"
+    }
+  },
+  "assertions": {
+    "allRoutesReturned200": true,
+    "canonicalMarketBundled": true,
+    "coston2NetworkRendered": true,
+    "verifiedReleaseRendered": true,
+    "walletFreeTenderListLoaded": true,
+    "awardedTenderVisible": true,
+    "privacyBoundaryVisible": true,
+    "noPublicStateFailureRendered": true,
+    "mobileTenderNavigationActive": true,
+    "docsRouteRendered": true,
+    "desktopScreenshotCaptured": true,
+    "mobileScreenshotCaptured": true,
+    "docsMobileScreenshotCaptured": true
+  },
+  "blockers": [],
+  "notes": [
+    "The deployed v2 Vercel project loaded the verified Coston2 public market without a wallet.",
+    "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
+    "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed."
+  ]
+}
