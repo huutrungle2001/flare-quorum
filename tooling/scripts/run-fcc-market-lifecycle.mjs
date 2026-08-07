@@ -164,7 +164,7 @@ async function readMachineInfo(url, expectedExtension, expectedCodeHash) {
   return publicMachineInfo(await response.json(), expectedExtension, expectedCodeHash);
 }
 
-async function readActionResult(url, actionId, submissionTag, attempts = 72) {
+async function readActionResult(url, actionId, submissionTag, attempts = 120) {
   let lastStatus = 0;
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const resultUrl = new URL(`${url}/action/result/${actionId}`);
@@ -351,7 +351,9 @@ async function main() {
   const awardReceipt = getAddress(candidate.contracts.VeilBidFlareAwardReceipt?.address ?? candidate.contracts.VeilBidFlareAwardReceipt ?? "0x0000000000000000000000000000000000000000");
   const extensionId = BigInt(registration.publicIdentifiers.extensionId);
   const codeHash = codeVersionEvidence.publicIdentifiers.codeHash;
-  const version = codeVersionEvidence.publicIdentifiers.version;
+  // The release evidence stores the registry version with a leading `v`,
+  // while tee-node action envelopes expose the semver without that prefix.
+  const version = String(codeVersionEvidence.publicIdentifiers.version).replace(/^v/, "");
   const urls = publicUrls();
   const keys = apiKeys();
   const machineIds = machinesEvidence.publicIdentifiers.machines.map(({ teeId }) => getAddress(teeId));
