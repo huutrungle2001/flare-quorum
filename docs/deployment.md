@@ -199,7 +199,21 @@ the same three origins in `FCC_PROXY_CONTROL_URLS`; the registration client then
 uses the remote HTTPS control endpoint instead of assuming a local process.
 `pnpm flare:machines:preflight` compares every public `/info` response with its
 control endpoint, rejects credential-bearing/path/quick-tunnel URLs, and prints
-only TEE IDs and public-key fingerprints. When it reports `READY`, run:
+only TEE IDs and public-key fingerprints. Before machine registration, bind the
+exact governance signer set reported by all three machines to the extension:
+
+```bash
+pnpm flare:governance:preflight
+pnpm flare:governance:set
+```
+
+The setter defaults to the declared extension owner with threshold one, matching
+the pinned scaffold/runtime default. An explicit `GOVERNANCE_SIGNERS` and
+`GOVERNANCE_THRESHOLD` pair is accepted only when all three `/info` envelopes
+report its exact official `keccak256(abi.encode(address[], uint256))` hash. It
+refuses to overwrite a different nonzero on-chain policy, keeps the deployment
+key process-local, and records only public governance identifiers. When both
+governance and machine preflights report ready, run:
 
 ```bash
 pnpm flare:machines:register

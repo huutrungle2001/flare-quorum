@@ -90,10 +90,12 @@ Because the redeploy may have cleared prior registrations:
 3. call `setExtensionIdExplicit(EXTENSION_ID)` as the deployment owner and
    require the live registry to map that ID back to the V2 sender;
 4. start the current TEE/proxy stack against Coston2;
-5. run `post-build`;
-6. ensure registration invokes `register-tee -command rRap`;
-7. verify the capital `R` generated a fresh attestation challenge;
-8. save the new extension/machine identifiers only after on-chain confirmation.
+5. require all machine `/info` envelopes to report the same intended governance
+   hash, then register that exact signer set and threshold on-chain;
+6. run `post-build` or the equivalent pinned registration commands;
+7. ensure registration invokes `register-tee -command rRap`;
+8. verify the capital `R` generated a fresh attestation challenge;
+9. save the new extension/machine identifiers only after on-chain confirmation.
 
 Reusing a historical extension ID, machine record, challenge, or address is a
 failure. Re-running `pre-build --force` casually is also forbidden because it
@@ -106,6 +108,13 @@ Steps 1–3 are now evidenced by
 `evidence/coston2/fcc-code-version.json`. The three local machines share that
 binding and image but have distinct identities; they remain local-only until
 three stable public origins pass `pnpm flare:machines:preflight`.
+
+VeilBid performs the missing governance step explicitly with
+`pnpm flare:governance:preflight` followed by `pnpm flare:governance:set`. The
+preflight derives the official plain-governance hash, compares it with all
+three public machines and the current extension owner/policy, and refuses an
+unexpected nonzero on-chain policy. This ordering prevents the manager's
+`InvalidGovernanceHash` registration revert without weakening machine binding.
 
 The deployed V1 sender at `0x44A322A45e8D796d890271209D59d529501113B9`
 remains public evidence of manager/constructor compatibility only. It is
