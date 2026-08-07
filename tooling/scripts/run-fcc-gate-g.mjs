@@ -90,8 +90,30 @@ async function faucet(destination) {
 
 async function submitPayment(wallet, amountDrops, memoData) {
   const client = new Client(xrplWebsocketUrl);
+  let stage = "connect";
   try {
     await client.connect();
+    stage = "await-faucet-funding";
+    let funded = false;
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      try {
+        const accountInfo = await client.request({
+          command: "account_info",
+          account: wallet.address,
+          ledger_index: "validated",
+        });
+        const balance = BigInt(accountInfo.result.account_data.Balance);
+        if (balance >= amountDrops + 10_000n) {
+          funded = true;
+          break;
+        }
+      } catch {
+        // The faucet transaction may not be in a validated ledger yet.
+      }
+      await new Promise((resolveSleep) => setTimeout(resolveSleep, 3_000));
+    }
+    if (!funded) throw new Error("FCC_GATE_G_XRPL_FAUCET_NOT_SETTLED");
+    stage = "autofill";
     const prepared = await client.autofill({
       TransactionType: "Payment",
       Account: wallet.address,
@@ -99,6 +121,7 @@ async function submitPayment(wallet, amountDrops, memoData) {
       Amount: amountDrops.toString(),
       Memos: [{ Memo: { MemoData: memoData.slice(2).toUpperCase() } }],
     });
+    stage = "submit";
     const signed = wallet.sign(prepared);
     const submitted = await client.submitAndWait(signed.tx_blob);
     const result = submitted?.result;
@@ -111,7 +134,11 @@ async function submitPayment(wallet, amountDrops, memoData) {
     return result.hash.toLowerCase();
   } catch (error) {
     if (error instanceof Error && /^FCC_GATE_G_/.test(error.message)) throw error;
-    throw new Error("FCC_GATE_G_XRPL_PAYMENT_FAILED");
+    const message = String(error?.message ?? "");
+    if (/tecUNFUNDED|insufficient|unfunded/i.test(message)) {
+      throw new Error("FCC_GATE_G_XRPL_PAYMENT_UNFUNDED");
+    }
+    throw new Error(`FCC_GATE_G_XRPL_PAYMENT_${stage.toUpperCase()}`);
   } finally {
     await client.disconnect().catch(() => undefined);
   }
