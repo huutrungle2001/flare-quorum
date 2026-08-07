@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-web-role-workspaces",
+  "recordedAt": "2026-08-07T21:32:57.732Z",
+  "publicIdentifiers": {
+    "sourceCommit": "0e59652a96ba8eb74f6adf9ec89e11054defaa55",
+    "provider": "vercel",
+    "project": "veilbid-flare",
+    "canonicalUrl": "https://veilbid-flare.vercel.app",
+    "routes": ["/?role=buyer", "/?role=vendor"],
+    "network": "flare-coston2",
+    "chainId": 114,
+    "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05"
+  },
+  "assertions": {
+    "buyerRoleRendersOnCoston2": true,
+    "vendorRoleRendersOnCoston2": true,
+    "buyerRequiresExplicitWallet": true,
+    "vendorRequiresExplicitWallet": true,
+    "vendorShowsNoEip1193ProviderState": true,
+    "noFlareStateFallbackRendered": true,
+    "roleRoutesDoNotExposeCredentials": true,
+    "roleRoutesDoNotPersistBidMaterial": true
+  },
+  "blockers": [],
+  "notes": [
+    "Headless browser smoke opened both production role routes without a wallet; each displayed the explicit Coston2 wallet gate rather than attempting silent authorization.",
+    "This is a role/access smoke, not a claim that a wallet write was performed. The vendor write path remains fail-closed until a user explicitly connects a Coston2 wallet."
+  ]
+}
