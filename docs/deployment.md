@@ -257,6 +257,11 @@ then be recorded in `FLARE_FCC_PROXY_URLS` in matching machine order.
   `VITE_FLARE_DEPLOYMENT_STATUS` are supplied from the sanitized release
   manifest. `VITE_*` must never carry a private RPC, proxy credential, wallet
   key, or indexer secret.
+- The wallet-free Flare reader pins every contract read to the finalized
+  Coston2 block. It reads tender/scoring state and the immutable award-receipt
+  contract directly; it does not scan historical `eth_getLogs` ranges (the
+  public Coston2 RPC caps those ranges at 30 blocks). This keeps the judge page
+  responsive while preserving the no-plaintext/no-ciphertext boundary.
 
 ## 4. Feasibility deployment order
 

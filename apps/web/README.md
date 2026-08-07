@@ -4,17 +4,17 @@
 > its public `VITE_*` configuration is supplied. The `/room` route remains the
 > explicitly historical Sepolia/Nox baseline.
 
-VeilBid's browser product. It includes the wallet-free Public explorer, EOA and
-Safe Buyer flows, Private Bids views for submission/ownership/granted access,
-and Activity settlement recovery. The public route rebuilds tender dossiers
-through the latest confirmed Ethereum Sepolia block and labels records that
-remain inside the 12-block finality window.
+VeilBid's browser product. It includes the wallet-free Flare Coston2 explorer,
+the historical EOA/Safe Buyer flows, Private Bids views for
+submission/ownership/granted access, and Activity settlement recovery. The
+default `/` and `/flare` routes read finalized Coston2 contract state; `/room`
+remains the explicitly historical Sepolia/Nox baseline.
 
 It intentionally:
 
-- reads the generated, verified `sepolia.release` address snapshot;
-- starts at the recorded market deployment block and paginates bounded log
-  ranges;
+- reads the verified Coston2 market and award-receipt bindings;
+- pins public reads to the finalized block and does not scan historical log
+  ranges on the Flare judge path;
 - waits 12 blocks before indexing events;
 - shows explicit loading, empty, and RPC-failure states;
 - never inserts mock tenders after a read failure; and
@@ -27,6 +27,7 @@ pnpm --filter @veilbid/tender-room dev
 pnpm --filter @veilbid/tender-room test
 pnpm --filter @veilbid/tender-room build
 pnpm test:production https://veilbid-three.vercel.app
+pnpm test:flare:production https://veilbid-flare.vercel.app
 ```
 
 `VITE_SEPOLIA_RPC_URL` may override the public read-only RPC. Buyer, Vendor,
