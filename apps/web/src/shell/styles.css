@@ -991,6 +991,18 @@ main {
   padding: 8px 12px;
 }
 
+.intro-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.intro-actions .secondary-button {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .explorer-grid {
   align-items: start;
   display: grid;

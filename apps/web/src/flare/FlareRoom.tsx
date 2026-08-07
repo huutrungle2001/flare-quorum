@@ -255,9 +255,11 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
         <div className="intro-copy">
           <p>Wallet-free evidence view for the Flare release. FCC, FTSO, FAssets and Smart Account facts are read only from configured Coston2 contracts.</p>
           <span className="deployment-label">{state.data?.deploymentStatus === "verified" ? "VERIFIED COSTON2 RELEASE" : "PLANNED / NOT YET VERIFIED"}</span>
-          <a className="secondary-button" href="?role=buyer">OPEN BUYER WORKSPACE →</a>
-          <a className="secondary-button" href="?role=vendor">OPEN VENDOR WORKSPACE →</a>
-          <a className="secondary-button" href="?role=evidence">OPEN ACTIVITY LEDGER →</a>
+          <div className="intro-actions" role="group" aria-label="Open Flare workspaces">
+            <a className="secondary-button" href="?role=buyer">OPEN BUYER WORKSPACE →</a>
+            <a className="secondary-button" href="?role=vendor">OPEN VENDOR WORKSPACE →</a>
+            <a className="secondary-button" href="?role=evidence">OPEN ACTIVITY LEDGER →</a>
+          </div>
         </div>
       </section>
       <ProtocolFacts />

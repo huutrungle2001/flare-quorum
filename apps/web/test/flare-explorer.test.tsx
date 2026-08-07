@@ -106,6 +106,19 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("≤ 30d delivery / 12–36d warranty")).toBeInTheDocument();
   });
 
+  it("keeps the public workspace actions stacked and individually reachable", () => {
+    render(<MemoryRouter><FlareExplorerView state={{
+      status: "ready",
+      error: null,
+      data: { chainId: 114, tenders: [], indexedBlock: 100n, finalizedBlock: 100n, latestBlock: 112n, deploymentStatus: "verified" },
+    }} onRetry={() => undefined} /></MemoryRouter>);
+    const actions = screen.getByRole("group", { name: "Open Flare workspaces" });
+    expect(actions.querySelectorAll("a.secondary-button")).toHaveLength(3);
+    expect(screen.getByRole("link", { name: "OPEN BUYER WORKSPACE →" })).toHaveAttribute("href", "?role=buyer");
+    expect(screen.getByRole("link", { name: "OPEN VENDOR WORKSPACE →" })).toHaveAttribute("href", "?role=vendor");
+    expect(screen.getByRole("link", { name: "OPEN ACTIVITY LEDGER →" })).toHaveAttribute("href", "?role=evidence");
+  });
+
   it("renders the dedicated public activity ledger without exposing bid data", () => {
     render(<MemoryRouter><FlareEvidenceWorkspace state={{
       status: "ready",
