@@ -1,11 +1,13 @@
 # VeilBid Flare Championship Execution Plan
 
-> Status: Phase 0, Gate 0, and Gate A pass on Coston2. The live Gate-B
-> ingress/replay portion also passes its public-safe assertions: three stable
-> Railway FCC origins accept encrypted bids and return domain-bound receipts,
-> exact retries are idempotent, and changed ciphertext cannot replace an
-> occupied sealed slot. Same-identity restart recovery remains open under the
-> supported simulated runtime; Gates C–E remain open.
+> Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
+> lifecycle, and Gate G pass on Coston2. Three stable Railway FCC origins accept encrypted bids and
+> return domain-bound receipts; a three-bid, two-signature lifecycle proves
+> common quorum, private scoring, threshold finalization, FTSO binding, and
+> exact FTestXRP settlement. The XRP-native run also proves an XRPL `0xFE`
+> payment, FDC proof, Smart Account direct mint, and atomic tender funding.
+> Same-identity restart recovery remains open under the supported simulated
+> runtime; Gate H and release hardening remain open.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -112,7 +114,7 @@ All open design questions are resolved in
 - [x] Pin Go, Foundry, Solidity, Node, pnpm, viem, and Flare periphery versions.
 - [x] Record official Coston2 registry, FCC, FAssets, FTSO, and Smart Account
   discovery paths without hardcoding undocumented addresses.
-- [ ] Obtain disposable Coston2, XRPL testnet, and executor identities.
+- [x] Obtain disposable Coston2, XRPL testnet, and executor identities.
 
 Exit: every external dependency is reachable or recorded as a blocker before
 product code depends on it.
@@ -136,8 +138,8 @@ product code depends on it.
   open.
 - [x] Prove sealed persistence across process restart in the local sealed-store
   tests; live three-machine recovery remains open.
-- [ ] Prove three-machine selection and two matching signatures, or stop and
-  document the exact infrastructure limitation.
+- [x] Prove three-machine selection and two matching signatures in the live
+  Coston2 lifecycle; same-identity restart recovery remains a Gate-B limitation.
 
 Exit: private data never crosses the public path and a registered TEE result is
 verified on-chain.
@@ -165,7 +167,8 @@ for every golden vector without exposing losing fields.
 
 - [x] Implement the local `VeilBidFlareMarket` lifecycle and exact FTestXRP
   escrow model; live Coston2 proof remains required by the phase exit.
-- [ ] Resolve FTestXRP/AssetManager through supported Flare tooling.
+- [x] Resolve FTestXRP/AssetManager through supported Flare tooling and verify
+  the live FTestXRP escrow path.
 - [x] Implement contract-canonical public scoring policy plus conditional FTSO
   XRP/USD snapshot, official feed, freshness, decimals, and bounds locally.
 - [x] Implement asynchronous close/request/result/finalize recovery locally.
@@ -180,9 +183,9 @@ selection and conserves the public escrow.
 
 ### Phase 4 — XRP-native buyer journey
 
-- [ ] Derive the user's PersonalAccount and current nonce.
-- [ ] Build the approval + create/fund `PackedUserOperation`.
-- [ ] Commit the user-op hash in an XRPL testnet `0xFE` payment memo.
+- [x] Derive the user's PersonalAccount and current nonce.
+- [x] Build the approval + create/fund `PackedUserOperation`.
+- [x] Commit the user-op hash in an XRPL testnet `0xFE` payment memo.
 - [x] Freeze the official Smart Account `0xFE` packed-user-operation builder and
   recovery `0xE0` memo encoder in the Flare bindings (local vectors only; no
   XRPL payment or FDC proof has been claimed).
@@ -193,9 +196,10 @@ selection and conserves the public escrow.
   finality, registry discovery, live FDC fee/request/round/finalization, DA raw
   proof decoding, fee-aware amount validation, PersonalAccount/nonce checks,
   exact approve/create batch, delayed-mint classification, and three-event
-  success proof (local production-shaped tests only; Gate G remains unrun).
-- [ ] Obtain the FDC `XRPPayment` proof.
-- [ ] Execute `executeDirectMintingWithData` atomically.
+  success proof (live Gate G evidence is recorded; delayed/stuck recovery UX
+  remains open).
+- [x] Obtain and verify the FDC `XRPPayment` proof.
+- [x] Execute `executeDirectMintingWithData` atomically.
 - [ ] Handle delayed mint, duplicate nonce, hash mismatch, and stuck-mint
   recovery UX.
 - [ ] Add direct EVM funding as a recovery/developer path, not the flagship demo.
@@ -222,6 +226,22 @@ custodial VeilBid signer.
 
 Exit: every core role can complete its journey and judges can verify a finalized
 tender without a wallet.
+
+### Deferred after the core lifecycle — Buyer Brief clarity pass
+
+This is intentionally scheduled after the live protocol gates and before the
+judge-package UX pass. It improves buyer comprehension without changing the
+confidential bid or settlement boundary:
+
+- [ ] Add a structured Buyer Brief with title, category, public goal,
+  acceptance criteria, delivery deadline, budget/asset, vendor eligibility,
+  scoring weights, and optional vendor questions.
+- [ ] Show a clear public/private map: brief and rules are public; bids,
+  private answers, credentials, and losing commercial terms remain inside FCC.
+- [ ] Commit the immutable `rulesHash` on-chain and explain it in the buyer and
+  evidence views so a buyer cannot silently change the rules after bidding.
+- [ ] Add judge-facing copy and examples that explain the procurement story in
+  one screen without weakening the fail-closed privacy claims.
 
 ### Phase 6 — security and release evidence
 
@@ -326,13 +346,13 @@ the championship product and requires Product Plan approval.
 | Architecture decisions | DECIDED |
 | Documentation transition | COMPLETE |
 | Official version pinning | PASSED for Gate 0 — core source/toolchain/discovery, pinned proxy/extension images, stable public origins, and live TEE stack are recorded |
-| FCC foundation operation | IMPLEMENTED LOCALLY — deterministic `PING_V1` tests pass; live Gate A not run |
+| FCC foundation operation | LIVE PASSED — deterministic `PING_V1` result verified on Coston2 with registered signer/domain |
 | FCC private ingress | LIVE PARTIAL — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, and changed-ciphertext rejection pass; supported same-identity restart recovery remains open |
-| Multi-TEE quorum | LOCAL IMPLEMENTATION — atomic 3-of-3 bid receipts, live identity/code/key rechecks, and 2-of-3 one-outage result path pass; live Gate C/E pending |
-| Flare contracts | LOCAL IMPLEMENTATION — contract-derived/stored public scoring policy, FCC/FTestXRP/conditional-FTSO lifecycle, payout and recovery tests pass; no live deployment |
-| FAssets/FDC/Smart Account journey | LOCAL EXECUTOR COMPLETE — live registry/FDC/direct-mint bindings pass; real XRPL payment, FDC proof, and Gate G execution pending |
-| FTSO scoring | LOCAL CROSS-STACK IMPLEMENTATION — contract policy hash matches Go/TypeScript, XRP/USD conversion and scoring vectors pass; no live FCC/FTSO lifecycle |
-| Coston2 deployment/evidence | IN PROGRESS — Gate 0/A and live Gate-B ingress evidence recorded; product lifecycle gates remain open |
+| Multi-TEE quorum | LIVE PASSED for one three-bid lifecycle — atomic 3-of-3 receipts, common root, two matching frozen-TEE signatures, and one-machine resilience assertions recorded; same-identity restart remains open |
+| Flare contracts | LIVE CANDIDATE PASSED — Coston2 market, FTestXRP escrow, FTSO snapshot, award receipt, and recovery wiring are exercised; canonical release verification remains open |
+| FAssets/FDC/Smart Account journey | LIVE PASSED Gate G — disposable XRPL payment, FDC proof, Smart Account direct mint, and atomic tender funding are recorded in `gate-g-smart-account.json` |
+| FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
+| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G evidence recorded; Gate-B restart, release consistency, adversarial suites, UI, and Gate H remain open |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported

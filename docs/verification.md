@@ -1,11 +1,9 @@
 # VeilBid Flare Championship Verification Plan
 
-> Status: Gate 0 and Gate A are `PASSED`. The live Gate-B ingress/replay
-> portion is recorded as `IN_PROGRESS`: extension `66007` accepted three
-> authenticated encrypted bids and rejected a changed ciphertext for an
-> occupied sealed slot across its three production-status simulated TEEs, while
-> same-identity restart recovery remains open. Historical Sepolia/Nox artifacts
-> are pre-hackathon baseline only.
+> Status: Gates 0–A, the live Gate-B ingress/replay portion, Gates C–F, and Gate
+> G are recorded on Coston2. Gate B remains `IN_PROGRESS` because the supported
+> simulated runtime rotates identity on restart; Gate H and release checks are
+> not yet run. Historical Sepolia/Nox artifacts are pre-hackathon baseline only.
 
 ## 1. Evidence policy
 
@@ -28,21 +26,22 @@ in-memory and save only an allowlisted pass/fail code.
 | 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | PASSED — block `33745484`; extension `66007` has three distinct simulated TEE machines in `PRODUCTION` with exact URL/code/platform/key bindings |
 | A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | PASSED — block `33745987`; `PING_V1` binding, TEE signature domain, production signer mapping, wrong-binding rejection, and fresh-process recovery all pass |
 | B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext and survives sealed restart | Commitment/receipt IDs, redaction assertions, restart checkpoint | IN PROGRESS — live three-machine ingress, receipt binding, idempotent retry, and changed-ciphertext rejection pass; same-identity restart remains open |
-| C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | NOT RUN |
-| D — Private scoring | Real TEEs match shared `SCORING_V1` vectors and select the deterministic eligible winner | Vector hashes, public inputs, result digest, Boolean expectations | NOT RUN |
-| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | NOT RUN |
-| F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP | Feed snapshot, discovered asset IDs, balance conservation | NOT RUN |
-| G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | NOT RUN |
+| C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | PASSED (core quorum) — live three-bid lifecycle; surviving-pair outage drill remains open |
+| D — Private scoring | Real TEEs match shared `SCORING_V1` vectors and select the deterministic eligible winner | Vector hashes, public inputs, result digest, Boolean expectations | PASSED — live FCC selection bound to XRP/USD terms and the common root |
+| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED (core threshold) — two frozen machines signed and finalized one exact digest; retry/outage drill remains open |
+| F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP | Feed snapshot, discovered asset IDs, balance conservation | PASSED — live FTSO snapshot and conserved FTestXRP award |
+| G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | PASSED — live evidence in `gate-g-smart-account.json` |
 | H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | NOT RUN |
 
 No later gate converts an earlier failure into success. Private ingress, FCC
 selection, FTestXRP conservation, and the XRP-native flagship path are product
 stop conditions defined in [`PLAN.md`](../PLAN.md).
 
-Gate G now has a locally tested production-shaped executor and ABI drift suite,
-but remains `NOT RUN`: only a real XRPL testnet payment, Coston2 FDC request and
+Gate G is now live-passed: a real XRPL testnet payment, Coston2 FDC request and
 proof, AssetManager direct mint, Smart Account execution, and market tender
-receipt can change that status.
+receipt are recorded in `evidence/coston2/gate-g-smart-account.json`. The
+evidence contains only public identifiers and assertion booleans; disposable
+wallet/executor secrets are never persisted.
 
 ## 3. Mandatory release matrix
 

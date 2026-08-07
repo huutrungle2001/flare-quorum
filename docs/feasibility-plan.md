@@ -1,14 +1,14 @@
 # VeilBid Flare Championship Feasibility Plan
 
 > Status: Gate 0 passed on Coston2 at block `33745484`, Gate A passed at block
-> `33745987`, and the live Gate-B ingress/replay portion passed at block
-> `33746423`. The pinned images, indexer, three stable Railway origins, three
-> distinct simulated TEE identities in `PRODUCTION`, a fresh-process verified
-> `PING_V1` result, and three authenticated ciphertext-only bid receipts are
-> recorded in public-safe evidence. Same-identity TEE restart recovery remains
-> open because the supported simulated runtime rotates identity on restart.
-> Gates C–E and the restart portion of B remain open; Gates F–H are mandatory
-> before the championship judge release.
+> `33745987`, live Gate-B ingress/replay passed at block `33746423`, Gates C–F
+> passed in the three-bid lifecycle at block `33748772`, and Gate G passed at
+> block `33752891`. The pinned images, indexer, three stable Railway origins,
+> three distinct simulated TEE identities in `PRODUCTION`, private receipts,
+> FTSO-bound scoring, exact FTestXRP settlement, and the XRPL/FDC/Smart Account
+> funding path are recorded in public-safe evidence. Same-identity TEE restart
+> recovery remains open because the supported simulated runtime rotates identity
+> on restart. Gate H and release hardening remain mandatory.
 
 ## 1. Rules
 
@@ -93,6 +93,11 @@ plaintext in an application database.
 
 ## 5. Gate C — common multi-TEE bid quorum
 
+Live core pass: `evidence/coston2/gate-c-e-f-live-lifecycle.json` records three
+distinct production machines accepting the same three encrypted bids, a common
+three-machine receipt quorum, and the ordered root for tender `11`. The
+surviving-pair outage drill remains part of release hardening.
+
 Prove with three registered machines:
 
 - each bid receives three mutually consistent receipts from the three frozen
@@ -113,6 +118,10 @@ sets.
 
 ## 6. Gate D — deterministic private scoring
 
+Live pass: the same evidence records the real FCC selection over XRP/USD
+multi-criteria terms, with the winning result bound to the frozen rules and
+ordered root. Losing inputs remain private.
+
 Implement `SCORING_V1` and prove:
 
 - required credential signatures gate eligibility;
@@ -131,6 +140,11 @@ Kill condition: implementations disagree, client/buyer must calculate winner,
 or private scoring requires subjective/AI branching.
 
 ## 7. Gate E — threshold result and recovery
+
+Live core pass: two distinct frozen TEE identities signed the exact same result
+digest and the market finalized the result on Coston2. The evidence includes
+the request and finalization transactions and the public binding assertions;
+retry/outage recovery drills remain part of release hardening.
 
 Prove:
 
@@ -154,6 +168,10 @@ presented as a successful FCC selection.
 
 ## 8. Gate F — FTSO and exact FTestXRP settlement
 
+Live pass: the official XRP/USD FTSO snapshot was captured at close and the
+market paid the winner from the exact FTestXRP escrow, minting the award receipt
+without recording private bid fields.
+
 Prove:
 
 - official FTestXRP/AssetManager and XRP/USD feed are resolved through supported
@@ -172,6 +190,10 @@ Kill condition: a generic test token or manually supplied price is required for
 the final lifecycle.
 
 ## 9. Gate G — XRP-native Smart Account funding
+
+Live pass: `evidence/coston2/gate-g-smart-account.json` records a disposable
+XRPL testnet `0xFE` payment, FDC `XRPPayment` proof, direct mint execution,
+PersonalAccount derivation/nonce binding, and atomic tender funding on Coston2.
 
 Prove on XRPL testnet and Coston2:
 
@@ -221,4 +243,5 @@ evidence/coston2/gate-h-product.json
 ```
 
 Until an artifact passes its schema and live assertions, its capability remains
-`NOT RUN` in `docs/verification.md` and `PLAN.md`.
+`NOT RUN` in `docs/verification.md` and `PLAN.md`. Gate B is intentionally still
+`IN PROGRESS` because live same-identity restart recovery is not claimed.

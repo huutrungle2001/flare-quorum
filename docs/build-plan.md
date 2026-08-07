@@ -1,9 +1,9 @@
 # VeilBid Flare Championship Build Plan
 
-> Status: Phase 0, Gate 0, and Gate A pass with three registered Coston2 FCC
-> machines and a verified domain-bound `PING_V1` result. Product scope and
-> architecture are decided; private ingress and the complete Coston2 VeilBid
-> lifecycle have not passed yet.
+> Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
+> lifecycle, and Gate G pass with three registered Coston2 FCC machines and a verified XRP-native
+> lifecycle. Same-identity simulated-TEE restart, release hardening, product
+> UX, and Gate H remain open.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.
@@ -60,16 +60,17 @@ placeholders are forbidden after that commit.
 - [ ] Implement bid receipts, common quorum, and ordered root.
 - [ ] Implement credential validation and `SCORING_V1`.
 - [ ] Implement three-machine selection and two-signature result threshold.
-- [ ] Pass Gates C–E.
+- [x] Pass Gates C–E with the live three-bid, common-quorum, private-scoring,
+  and two-signature finalization evidence.
 
 ### Milestone 3 — Flare economic path
 
 - [ ] Implement production `VeilBidFlareMarket` and receipt.
 - [ ] Integrate FTestXRP escrow and FAssets exit.
 - [ ] Integrate XRP/USD FTSO snapshot and conversion.
-- [x] Implement and locally verify the Smart Account `0xFE` plus FDC direct
-  mint-and-fund executor; live Gate G execution remains required.
-- [ ] Pass Gates F–G.
+- [x] Implement and live-verify the Smart Account `0xFE` plus FDC direct
+  mint-and-fund executor.
+- [x] Pass Gates F–G in the live Coston2 lifecycle.
 
 ### Milestone 4 — generated consumers
 
