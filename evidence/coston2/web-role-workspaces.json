@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-web-role-workspaces",
-  "recordedAt": "2026-08-07T21:32:57.732Z",
+  "recordedAt": "2026-08-07T21:51:00.064Z",
   "publicIdentifiers": {
-    "sourceCommit": "0e59652a96ba8eb74f6adf9ec89e11054defaa55",
+    "sourceCommit": "941977b1f14738d68ccded9851f437f5de9c7006",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
-    "routes": ["/?role=buyer", "/?role=vendor"],
+    "routes": ["/?role=buyer", "/?role=vendor", "/?role=evidence"],
     "network": "flare-coston2",
     "chainId": 114,
     "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05"
@@ -15,6 +15,8 @@
   "assertions": {
     "buyerRoleRendersOnCoston2": true,
     "vendorRoleRendersOnCoston2": true,
+    "publicEvidenceRoleRendersOnCoston2": true,
+    "publicEvidenceRoleRequiresNoWallet": true,
     "buyerRequiresExplicitWallet": true,
     "vendorRequiresExplicitWallet": true,
     "vendorShowsNoEip1193ProviderState": true,

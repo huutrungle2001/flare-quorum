@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-07T21:42:31.125Z",
+  "recordedAt": "2026-08-07T21:51:00.064Z",
   "publicIdentifiers": {
-    "sourceCommit": "0f2076772eaad8fe6a18f12869d6a8add3d0efa9",
+    "sourceCommit": "941977b1f14738d68ccded9851f437f5de9c7006",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -17,6 +17,7 @@
   "routeStatuses": {
     "/": 200,
     "/flare": 200,
+    "/?role=evidence": 200,
     "/room": 200,
     "/docs": 200
   },
@@ -26,14 +27,21 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "191f1defe3c04ba926521d19331389e5aced73560eecd8207caad21fdb7fae91"
+      "sha256": "e30f4bbb72e44ed94e97d264b131c9c567ae08dca141aec7730032f30668f8f2"
     },
     "mobile": {
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sha256": "6cef8759f7c174497b1bd0e2a45751df00737cff94103888b36ad8ebc3ceb0a0"
+      "sha256": "87fe34e93d39e7875664b963ffaee29db93f74335dcf1e624ce3f6df278da662"
+    },
+    "evidence": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "001d4f2570c10f34e91f5a3e6c9179a636e7cb2639ba45cdab3ebaff6614dadf"
     },
     "docsMobile": {
       "viewport": {
@@ -51,6 +59,8 @@
     "walletFreeTenderListLoaded": true,
     "awardedTenderVisible": true,
     "privacyBoundaryVisible": true,
+    "publicEvidenceLedgerRendered": true,
+    "publicEvidenceNoWalletGate": true,
     "noPublicStateFailureRendered": true,
     "mobileTenderNavigationActive": true,
     "docsRouteRendered": true,
@@ -61,6 +71,7 @@
   "blockers": [],
   "notes": [
     "The deployed v2 Vercel project loaded the verified Coston2 public market without a wallet.",
+    "The dedicated Activity/Evidence route reread the same finalized market snapshot without a wallet or bid payload.",
     "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
     "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed."
   ]
