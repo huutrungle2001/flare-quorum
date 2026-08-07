@@ -7,7 +7,8 @@
 > exact FTestXRP settlement. The XRP-native run also proves an XRPL `0xFE`
 > payment, FDC proof, Smart Account direct mint, and atomic tender funding.
 > Same-identity restart recovery remains open under the supported simulated
-> runtime; Gate H and release hardening remain open.
+> runtime; the verified release and wallet-free Coston2 judge smoke are live,
+> while role/accessibility/user-validation hardening remains open.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -25,8 +26,8 @@ The supplied competition requirements are preserved in
 
 **One-line pitch:** XRP treasuries fund procurement from XRPL, vendors submit
 private multi-criteria offers, a quorum of Flare TEEs selects the best eligible
-offer under a public deterministic rule, and the winner receives FXRP with a
-publicly verifiable award.
+offer under a public deterministic rule, and the winner receives FTestXRP on
+Coston2 with a publicly verifiable award.
 
 **Primary users:**
 
@@ -349,10 +350,10 @@ the championship product and requires Product Plan approval.
 | FCC foundation operation | LIVE PASSED — deterministic `PING_V1` result verified on Coston2 with registered signer/domain |
 | FCC private ingress | LIVE PARTIAL — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, and changed-ciphertext rejection pass; supported same-identity restart recovery remains open |
 | Multi-TEE quorum | LIVE PASSED for one three-bid lifecycle — atomic 3-of-3 receipts, common root, two matching frozen-TEE signatures, and one-machine resilience assertions recorded; same-identity restart remains open |
-| Flare contracts | LIVE CANDIDATE PASSED — Coston2 market, FTestXRP escrow, FTSO snapshot, award receipt, and recovery wiring are exercised; canonical release verification remains open |
+| Flare contracts | LIVE VERIFIED — Coston2 market, FTestXRP escrow, FTSO snapshot, award receipt, and recovery wiring agree with the verified release manifest |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G — disposable XRPL payment, FDC proof, Smart Account direct mint, and atomic tender funding are recorded in `gate-g-smart-account.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
-| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G evidence recorded; Gate-B restart, release consistency, adversarial suites, UI, and Gate H remain open |
+| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; the wallet-free judge smoke passes; Gate-B restart, adversarial suites, accessibility, and Gate H user validation remain open |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported

@@ -1,9 +1,10 @@
 # VeilBid Flare Championship Verification Plan
 
 > Status: Gates 0–A, the live Gate-B ingress/replay portion, Gates C–F, and Gate
-> G are recorded on Coston2. Gate B remains `IN_PROGRESS` because the supported
-> simulated runtime rotates identity on restart; Gate H and release checks are
-> not yet run. Historical Sepolia/Nox artifacts are pre-hackathon baseline only.
+> G are recorded on Coston2. The canonical release is verified and the wallet-free
+> Coston2 judge smoke is live; Gate B restart hardening and the remaining Gate H
+> role/accessibility/user-validation work remain open. Historical Sepolia/Nox
+> artifacts are pre-hackathon baseline only.
 
 ## 1. Evidence policy
 
@@ -31,7 +32,7 @@ in-memory and save only an allowlisted pass/fail code.
 | E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED (core threshold) — two frozen machines signed and finalized one exact digest; retry/outage drill remains open |
 | F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP | Feed snapshot, discovered asset IDs, balance conservation | PASSED — live FTSO snapshot and conserved FTestXRP award |
 | G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | PASSED — live evidence in `gate-g-smart-account.json` |
-| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | NOT RUN |
+| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — wallet-free Coston2 judge path passes live smoke; role journeys, accessibility, and user validation remain |
 
 No later gate converts an earlier failure into success. Private ingress, FCC
 selection, FTestXRP conservation, and the XRP-native flagship path are product
@@ -47,7 +48,7 @@ wallet/executor secrets are never persisted.
 
 | Area | Passing condition | Status |
 |---|---|---|
-| Deployment truth | Source, runtime, constructor, manifest, registry wiring, extension image, machines, and bindings agree | NOT RUN |
+| Deployment truth | Source, runtime, constructor, manifest, registry wiring, extension image, machines, and bindings agree | PASSED — `evidence/coston2/deployment-consistency.json` and verified release manifest |
 | Bid privacy | No plaintext/ciphertext in chain, logs, analytics, evidence, or durable browser/proxy state | NOT RUN |
 | Receipt binding | Wrong chain/market/extension/code/tender/vendor/rules/nonce/commitment/expiry fails | NOT RUN |
 | Quorum continuity | Every accepted bid preserves a common 2-of-3 machine set; weaker receipt sets fail | NOT RUN |
@@ -60,9 +61,9 @@ wallet/executor secrets are never persisted.
 | FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | NOT RUN |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | NOT RUN |
 | Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | NOT RUN |
-| Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | NOT RUN |
+| Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json` |
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | NOT RUN |
-| Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | NOT RUN |
+| Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | IN PROGRESS — repository/history/evidence scan passes; hosted runtime log review remains |
 | New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | IN PROGRESS |
 | User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN |
 
@@ -86,6 +87,7 @@ evidence/coston2/two-vendor-lifecycle.release.json
 evidence/coston2/three-vendor-recovery.release.json
 evidence/coston2/web-desktop-mobile-keyboard.release.json
 evidence/coston2/production-smoke.release.json
+evidence/coston2/web-production-smoke.json
 evidence/coston2/user-validation.release.json
 evidence/coston2/new-work-ledger.release.json
 ```
