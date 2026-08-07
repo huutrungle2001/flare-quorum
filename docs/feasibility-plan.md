@@ -1,11 +1,10 @@
 # VeilBid Flare Championship Feasibility Plan
 
-> Status: Gate 0 is in progress. Core source, toolchain, registry, contract,
-> asset, FDC/direct-mint, feed, and deterministic FCC foundation checks pass;
-> indexer configuration and tee-proxy build-input pinning are present, while
-> Docker/image build, stable proxy, and registration requirements remain open.
-> Full product development is blocked until Gates 0–E pass. Gates F–H are
-> mandatory before the championship judge release.
+> Status: Gate 0 passed on Coston2 at block `33745484`. The pinned images,
+> indexer, three stable Railway origins, and three distinct simulated TEE
+> identities in `PRODUCTION` are recorded in public-safe evidence. Gate A is in
+> progress. Full product development remains blocked until Gates A–E pass;
+> Gates F–H are mandatory before the championship judge release.
 
 ## 1. Rules
 

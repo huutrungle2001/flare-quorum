@@ -1,8 +1,8 @@
 # VeilBid Flare Championship Build Plan
 
-> Status: Phase 0 feasibility is in progress. Product scope and architecture are
-> decided; live foundation evidence exists, but FCC registration infrastructure
-> and the Coston2 VeilBid lifecycle have not passed.
+> Status: Phase 0 and Gate 0 pass with three registered Coston2 FCC machines.
+> Product scope and architecture are decided; the registered Gate-A action and
+> complete Coston2 VeilBid lifecycle have not passed yet.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.
@@ -46,9 +46,9 @@ placeholders are forbidden after that commit.
 
 ### Milestone 1 — FCC foundation
 
-- [ ] Pin official scaffold and toolchain.
-- [ ] Add `apps/fcc-extension`.
-- [ ] Add `packages/flare-contracts` feasibility sender/verifier.
+- [x] Pin official scaffold and toolchain.
+- [x] Add `apps/fcc-extension`.
+- [x] Add `packages/flare-contracts` feasibility sender/verifier.
 - [ ] Pass Gates 0–B: environment, registered result, private ingress, sealed
   recovery.
 

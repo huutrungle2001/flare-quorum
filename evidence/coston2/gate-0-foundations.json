@@ -1,21 +1,22 @@
 {
   "schemaVersion": 1,
   "gate": "0",
-  "status": "IN_PROGRESS",
-  "recordedAt": "2026-08-07T12:38:53.346Z",
-  "sourceCommit": "fee5b1eb1b4796aedf1cbb3e061cc32ef5b26cb8",
+  "status": "PASSED",
+  "recordedAt": "2026-08-07T15:15:23.194Z",
+  "sourceCommit": "5d596c7b4b37146c6f08514df4d395e0a6d1dd65",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "blockNumber": "33740406",
-    "blockTimestamp": 1786106341
+    "blockNumber": "33745484",
+    "blockTimestamp": 1786115733
   },
   "publicIdentifiers": {
     "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
-    "deployerGasBalanceWei": "1297797730223339180602",
+    "deployerGasBalanceWei": "1294150797308339180602",
     "contracts": {
       "flareContractRegistry": "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019",
       "flareTeeManager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+      "fccFdc2Hub": "0x04dd3Ba33aC798d400bEc42A26F82f9812A421dc",
       "ftsoV2": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
       "fdcVerification": "0x906507E0B64bcD494Db73bd0459d1C667e14B933",
       "fdcHub": "0x48aC463d7975828989331F4De43341627b9c5f1D",
@@ -30,6 +31,7 @@
     "contractCodeSizes": {
       "flareContractRegistry": 3197,
       "flareTeeManager": 184,
+      "fccFdc2Hub": 130,
       "ftsoV2": 170,
       "fdcVerification": 170,
       "fdcHub": 10065,
@@ -41,12 +43,12 @@
       "fTestXRP": 177,
       "masterAccountController": 250
     },
-    "nextPublicExtensionId": "66005",
+    "nextPublicExtensionId": "66010",
     "xrpUsdFeed": {
       "id": "0x015852502f55534400000000000000000000000000",
-      "value": "1035425",
+      "value": "1027229",
       "decimals": 6,
-      "timestamp": 1786106341
+      "timestamp": 1786115733
     },
     "fTestXRP": {
       "address": "0x0b6A3645c240605887a5532109323A3E12273dc7",
@@ -84,6 +86,10 @@
     "sourceChecks": [
       {
         "id": "fcc-coston2-addresses",
+        "matches": true
+      },
+      {
+        "id": "fcc-scaffold-source-archive",
         "matches": true
       },
       {
@@ -164,12 +170,12 @@
       "dockerfile": "apps/fcc-extension/Dockerfile",
       "context": "apps/fcc-extension",
       "platform": "linux/amd64",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
       "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
-      "releaseImageTag": "veilbid/fcc-extension:coston2-v0.2.1",
-      "releaseImageDigest": "sha256:713323d25a153c4c228dff94071dd2fd5080d00e7f9fc7a727551670af69ebd5",
-      "releaseBinarySha256": "dc3c69e9f2e14fc8221fc2c4aa7f061eccaf0b779762ef1c4593a4001b87118d"
+      "releaseImageTag": "veilbid/fcc-extension:coston2-v0.2.2",
+      "releaseImageDigest": "sha256:f5ca282313917ce6f5f5a8167b1c10b61d17751d3a4c18f74da40984eba2d1f1",
+      "releaseBinarySha256": "e2e3c35ed485ccae883793f4ac3f14a0047481c211adcde45e177aec3e21b5af"
     },
     "teeProxyReleaseRecipe": {
       "dockerfile": "apps/fcc-extension/proxy/Dockerfile",
@@ -182,8 +188,21 @@
       "releaseImageDigest": "sha256:59f8abcd380ded3c180e16dd5366118af37488822057ef6c562d9cf07e060ecb",
       "releaseBinarySha256": "76b83c8e09ae01e3457e8463fc044aca98504ddb0e335456f6f9d0e078258488"
     },
-    "configuredMachineCount": 0,
-    "productionMachineCount": 0
+    "teeRegistrationReleaseRecipe": {
+      "dockerfile": "apps/fcc-extension/registration/Dockerfile",
+      "platform": "linux/amd64",
+      "sourceCommit": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
+      "sourceSha256": "ff2c61c5054ebb6636539db0417e41565d6c8afd24368f8b54578c32503290d4",
+      "teeNodeModuleVersion": "0.0.23",
+      "goFlareCommonModuleVersion": "v1.2.2-0.20260727094511-09a10067e6a4",
+      "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
+      "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
+      "releaseImageTag": "veilbid/fcc-register-tee:coston2-f48cafb",
+      "releaseImageDigest": "sha256:95cd528b5bef931d216ad0fc92b14b6315f5345c337fddcd74eb062f7258febf",
+      "releaseBinarySha256": "d88d6816fb132275cd60a5e13bb181ee96db2811d3f78a309b842fb382b2a012"
+    },
+    "configuredMachineCount": 3,
+    "productionMachineCount": 3
   },
   "assertions": {
     "chainIdMatches": true,
@@ -210,20 +229,20 @@
     "teeProxyBuildInputsPinned": true,
     "teeProxyReleaseImageDigestRecorded": true,
     "teeProxyReleaseImageVerified": true,
-    "stableProxyConfigured": false,
-    "stableProxyReachable": false,
+    "teeRegistrationBuildInputsPinned": true,
+    "teeRegistrationReleaseImageDigestRecorded": true,
+    "teeRegistrationReleaseImageVerified": true,
+    "stableProxyConfigured": true,
+    "stableProxyReachable": true,
     "indexerConfigured": true,
-    "threeProductionMachinesRegistered": false
+    "threeProductionMachinesRegistered": true
   },
-  "blockers": [
-    "STABLE_PROXY_NOT_CONFIGURED",
-    "STABLE_PROXY_NOT_REACHABLE",
-    "THREE_PRODUCTION_MACHINES_NOT_VERIFIED"
-  ],
+  "blockers": [],
   "notes": [
     "The official scaffold main branch is reference-only; VeilBid pins the organizer-directed tee-node module and tee-proxy release recipe independently.",
     "The VeilBid extension build inputs and executable linux/amd64 image digest are pinned and locally verifiable without recording runtime secrets.",
     "The tee-proxy build inputs and executable linux/amd64 image digest are pinned and verified against the local Docker content store.",
+    "The official register-tee operator is checksum-pinned, aligned to the selected FCC wire/ABI modules, and verified as a separate non-root image.",
     "No RPC URL, deployment key, indexer credential, proxy response, or machine secret is recorded.",
     "Simulated TEE mode is the declared Coston2 judging target; it is not hardware-backed confidentiality."
   ]

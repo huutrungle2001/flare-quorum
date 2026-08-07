@@ -1,8 +1,9 @@
 # VeilBid Flare Championship Execution Plan
 
-> Status: Phase 0 audit is implemented and pushed; FCC/TEE registration and
-> external infrastructure gates remain open. Phase 1 foundation code is local
-> and tested, but no Coston2 result is claimed until live evidence exists.
+> Status: Phase 0 and Gate 0 pass with three stable Railway FCC origins and
+> three independently registered simulated TEE identities in `PRODUCTION` on
+> Coston2. Phase 1 foundation code is local and tested; Gate A remains open
+> until a live registered FCC action result is verified end to end.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -99,13 +100,13 @@ All open design questions are resolved in
 - [x] Align `tee-node v0.0.23` with the exact version resolved by the pinned
   proxy and record the upstream identity-restart limitation without persisting
   a raw TEE private key.
-- [ ] Apply [`docs/fcc-coston2-operations.md`](docs/fcc-coston2-operations.md):
+- [x] Apply [`docs/fcc-coston2-operations.md`](docs/fcc-coston2-operations.md):
   resolve live `FlareTeeManager`, enforce the organizer minimum TEE/proxy
   revisions, use a fresh extension ID and `rRap`, and reach machine status `2`.
 - [x] Obtain and locally configure current read-only Coston2 indexer
   credentials without committing or printing them.
-- [ ] Configure three named Cloudflare Tunnel or reserved ngrok origins;
-  quick-tunnel URLs are forbidden for registration.
+- [x] Configure three persistent Railway HTTPS origins with independent FCC
+  machine identities; quick-tunnel URLs remain forbidden for registration.
 - [x] Pin Go, Foundry, Solidity, Node, pnpm, viem, and Flare periphery versions.
 - [x] Record official Coston2 registry, FCC, FAssets, FTSO, and Smart Account
   discovery paths without hardcoding undocumented addresses.
