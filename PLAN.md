@@ -312,7 +312,9 @@ all agree and contain no confidential material.
 - [ ] Record problems, decisions, and changes without inventing traction.
 - [x] Publish [`docs/integration-guide.md`](docs/integration-guide.md) for
   procurement/treasury teams and infrastructure partners.
-- [ ] Prepare Telegram/community updates and request Flare technical feedback.
+- [~] Prepare [`submission/flare/COMMUNITY-UPDATE.md`](submission/flare/COMMUNITY-UPDATE.md)
+  and [`submission/flare/VALIDATION-PLAN.md`](submission/flare/VALIDATION-PLAN.md);
+  sending the draft and collecting organizer/user feedback remain external.
 
 Exit: the submission contains real user evidence, not only technical claims.
 

@@ -14,6 +14,8 @@ Ethereum Sepolia/Nox release and must not be used as evidence for this package.
 | Vendor workspace | [Coston2 Vendor](https://veilbid-flare.vercel.app/?role=vendor) |
 | Technical docs | [Flare docs](https://veilbid-flare.vercel.app/docs#flare-coston2) |
 | Integration guide | [`docs/integration-guide.md`](../../docs/integration-guide.md) |
+| Validation protocol | [`VALIDATION-PLAN.md`](VALIDATION-PLAN.md) |
+| Community draft | [`COMMUNITY-UPDATE.md`](COMMUNITY-UPDATE.md) |
 | Source | [github.com/huutrungle2001/veilbid-flare](https://github.com/huutrungle2001/veilbid-flare) |
 | Hosted ingress health | [Railway `/health`](https://veilbid-flare-ingress-production.up.railway.app/health) |
 
