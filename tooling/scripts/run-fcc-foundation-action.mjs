@@ -14,6 +14,8 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import {
   foundationBindingHash,
+  veilBidFoundationOpType,
+  veilBidFoundationPingV1OpCommand,
   verifyFoundationActionResponse,
 } from "../../packages/flare-bindings/dist/fcc-result.js";
 import { normalizePrivateKey } from "../flare/foundations.mjs";
@@ -121,7 +123,9 @@ async function main() {
   const manager = getAddress(registration.publicIdentifiers.manager);
   const sender = getAddress(registration.publicIdentifiers.foundationSender);
   const extensionId = BigInt(registration.publicIdentifiers.extensionId);
-  const expectedVersion = codeVersion.publicIdentifiers.version;
+  // The release manifest uses the display form `v0.2.2`, while tee-node's
+  // ActionResponse carries the wire form `0.2.2`.
+  const expectedVersion = String(codeVersion.publicIdentifiers.version).replace(/^v/, "");
   const machineByTeeId = new Map(
     machinesEvidence.publicIdentifiers.machines.map((machine) => [machine.teeId.toLowerCase(), machine]),
   );
@@ -183,7 +187,7 @@ async function main() {
   const assertions = {
     dispatchTransactionSucceeded: receipt.status === "success",
     instructionBoundToExtension: instruction.extensionId === extensionId,
-    instructionOperationMatches: sameHex(instruction.opCommand, "0x50494e475f563100000000000000000000000000000000000000000000000000") && sameHex(instruction.opType, "0x5645494c4249445f464f554e444154494f4e0000000000000000000000000000"),
+    instructionOperationMatches: sameHex(instruction.opCommand, veilBidFoundationPingV1OpCommand) && sameHex(instruction.opType, veilBidFoundationOpType),
     resultRetrieved: fetched.verified.response.result.id.toLowerCase() === actionId.toLowerCase(),
     resultStatusSuccess: fetched.verified.response.result.status === 1,
     resultBindingMatches: fetched.verified.result.bindingHash === expectedBindingHash,
