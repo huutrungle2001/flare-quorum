@@ -388,6 +388,9 @@ test("emits a public checkpoint and resumes without a second FDC request or nonc
   assert.equal(delayed.outcome, "delayed");
   assert.equal(delayed.checkpoint.fdcVotingRound, 1n);
   assert.equal(delayed.checkpoint.paymentAmountUBA, 1_100_000n);
+  const stillDelayed = await executor.resume(delayed.checkpoint);
+  assert.equal(stillDelayed.outcome, "delayed");
+  assert.equal(mintAttempt, 1);
   currentTimestamp = 2_001n;
   const resumed = await executor.resume(delayed.checkpoint);
   assert.equal(resumed.outcome, "executed");
@@ -395,7 +398,7 @@ test("emits a public checkpoint and resumes without a second FDC request or nonc
   assert.deepEqual(chainCalls.map(([kind]) => kind), ["request", "mint", "mint"]);
   assert.deepEqual(calls, [
     "tx", "ledger", "/verifier/xrp/XRPPayment/prepareRequest",
-    "/api/v1/fdc/proof-by-request-round-raw", "tx", "ledger",
+    "/api/v1/fdc/proof-by-request-round-raw", "tx", "ledger", "tx", "ledger",
     "/api/v1/fdc/proof-by-request-round-raw",
   ]);
 });
