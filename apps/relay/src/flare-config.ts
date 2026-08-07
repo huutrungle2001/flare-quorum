@@ -1,6 +1,6 @@
 import { getAddress, isAddress, type Address, type Hex } from "viem";
 
-export type FlareRelayMode = "health" | "dry-run" | "once" | "poll";
+export type FlareRelayMode = "health" | "health-server" | "dry-run" | "once" | "poll";
 
 export interface FlareRelayConfig {
   mode: FlareRelayMode;

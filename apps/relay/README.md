@@ -68,6 +68,7 @@ node --env-file-if-exists=.env.local apps/relay/dist/cli.js poll
 
 # Coston2/FCC lifecycle
 pnpm flare:relay:health
+pnpm flare:relay:health-server
 pnpm flare:relay:dry-run
 pnpm flare:relay:once
 pnpm flare:relay:poll
@@ -89,6 +90,10 @@ FLARE_FCC_EXTENSION_VERSION
 FLARE_FCC_INSTRUCTION_FEE_WEI
 FLARE_ACTION_BUDGET                     # 1 by default, maximum 100
 
+# Hosted health server (read-only mode; no signer or proxy credentials)
+FLARE_HEALTH_HOST                        # 127.0.0.1 by default
+FLARE_HEALTH_PORT                        # PORT fallback, 8787 by default
+
 # Additional server-only ingress configuration
 FLARE_TEE_MANAGER                       # verified market constructor binding
 FLARE_FCC_DIRECT_API_KEYS               # three comma-separated values; never VITE_*
@@ -101,18 +106,24 @@ FLARE_INGRESS_PORT                      # 8788 by default; PORT is fallback
 disabled while the release status is `planned`; local tests do not override
 this production gate.
 
+`health-server` keeps a read-only Coston2 process alive for a hosted health
+check. It serves `/live` for process liveness and `/health` for chain/market
+readiness without requiring a finalizer key or exposing FCC credentials. A
+settlement deployment must use `poll` only after the dedicated signer, three
+FCC proxies, extension version, and instruction fee are configured.
+
 `dry-run` and `health` require only `SEPOLIA_RPC_URL`. `once` and `poll`
 require a dedicated gas-funded `FINALIZER_PRIVATE_KEY`. Runtime consumers use
 the verified canonical release manifest. The
 `VEILBID_ALLOW_UNVERIFIED_DEPLOYMENT` escape exists only for historical test
 manifests and must remain false for release operation.
 
-Polling exposes chain readiness at `GET /health` and process liveness at
-`GET /live` on `127.0.0.1:8787` by default. Hosted deployments set
-`FINALIZER_HEALTH_HOST=0.0.0.0` and supply `PORT`. The canonical Railway
-service is linked to the repository's `main` branch, reads `railway.json`, and
-publishes health at
-`https://veilbid-relay-production.up.railway.app/health`. Each cycle rebuilds
+Polling exposes chain readiness through the hosted health server at `GET
+/health` and process liveness at `GET /live` on `127.0.0.1:8787` by default.
+Hosted deployments set `FLARE_HEALTH_HOST=0.0.0.0` and supply `PORT`. The v2
+Flare service must be separate from any historical Sepolia relay and should
+publish its own Railway domain after its Coston2 environment is configured.
+Each cycle rebuilds
 the finalized public index in bounded RPC ranges; it keeps no database or
 confidential checkpoint. A zero winner ID follows the same `finalizeTender`
 call and produces the contract's full-refund outcome.

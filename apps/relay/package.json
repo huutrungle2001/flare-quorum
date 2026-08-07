@@ -10,6 +10,7 @@
     "health": "node dist/cli.js health",
     "flare-dry-run": "node dist/flare-cli.js dry-run",
     "flare-health": "node dist/flare-cli.js health",
+    "flare-health-server": "node dist/flare-cli.js health-server",
     "flare-funding-health": "node dist/flare-funding-cli.js health",
     "flare-funding-execute": "node dist/flare-funding-cli.js execute",
     "flare-ingress": "node dist/flare-ingress-cli.js",

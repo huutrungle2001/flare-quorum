@@ -23,6 +23,12 @@ test("Flare relay reads explicit Coston2 config without Sepolia fallback", () =>
   assert.equal(config.actionBudget, 1);
 });
 
+test("hosted Flare health-server mode remains read-only", () => {
+  const config = loadFlareRelayConfig("health-server", baseEnv);
+  assert.equal(config.mode, "health-server");
+  assert.equal(config.signerPrivateKey, null);
+});
+
 test("Flare relay fails closed when market or deployment metadata is missing", () => {
   assert.throws(
     () => loadFlareRelayConfig("health", { COSTON2_RPC_URL: baseEnv.COSTON2_RPC_URL }),

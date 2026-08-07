@@ -5,6 +5,7 @@ export * from "./flare-funding-chain.js";
 export * from "./flare-funding-executor.js";
 export * from "./flare-funding-job.js";
 export * from "./flare-live.js";
+export * from "./flare-health-server.js";
 export * from "./flare-lifecycle.js";
 export * from "./flare-results.js";
 export * from "./flare-ingress.js";

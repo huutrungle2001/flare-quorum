@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { loadFlareRelayConfig, FlareRelayConfigError, type FlareRelayMode } from "./flare-config.js";
 import { FlareLiveRelay } from "./flare-live.js";
+import { flareHealthHost, flareHealthPort, startFlareHealthServer } from "./flare-health-server.js";
 import { FccSelectionPendingError, FlareLifecycleRelay } from "./flare-lifecycle.js";
 
 function safeJson(value: unknown): string {
@@ -8,7 +9,7 @@ function safeJson(value: unknown): string {
 }
 
 function mode(value: string | undefined): FlareRelayMode {
-  if (value === "health" || value === "dry-run" || value === "once" || value === "poll") return value;
+  if (value === "health" || value === "health-server" || value === "dry-run" || value === "once" || value === "poll") return value;
   throw new Error("invalid-flare-relay-mode");
 }
 
@@ -57,6 +58,13 @@ async function main(): Promise<void> {
     const health = await new FlareLiveRelay(config).health();
     process.stdout.write(`${safeJson(health)}\n`);
     if (health.status === "unavailable") process.exitCode = 1;
+    return;
+  }
+  if (selectedMode === "health-server") {
+    const relay = new FlareLiveRelay(config);
+    await startFlareHealthServer(relay, flareHealthHost(process.env), flareHealthPort(process.env));
+    process.stdout.write(`${safeJson({ status: "listening", host: flareHealthHost(process.env), port: flareHealthPort(process.env) })}\n`);
+    await new Promise(() => undefined);
     return;
   }
   const relay = new FlareLifecycleRelay(config);

@@ -105,6 +105,7 @@
     "flare:gate:g:preflight": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-gate-g.mjs",
     "flare:gate:g": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-gate-g.mjs --execute",
     "flare:relay:health": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js health",
+    "flare:relay:health-server": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js health-server",
     "flare:relay:dry-run": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js dry-run",
     "flare:relay:once": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js once",
     "flare:relay:poll": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js poll",

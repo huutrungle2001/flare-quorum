@@ -17,10 +17,12 @@ Implemented and locally verified:
   the winner, payout, rules hash, ordered root, and exact selection-result
   digest. Refunds never mint a receipt.
 
-These contracts are not a verified Coston2 release yet. The test suite uses
-local protocol mocks and deterministic Foundry keys only. Deployment addresses
-must not be published until the live extension, manager wiring, runtime
-bytecode, constructor arguments, and end-to-end evidence pass.
+The Coston2 release is now verified in
+`deployments/coston2.release.json`. The test suite still uses local protocol
+mocks and deterministic Foundry keys for fast feedback; live extension,
+manager-wiring, runtime-bytecode, constructor, and end-to-end checks are kept
+in sanitized `evidence/coston2/` records and must be rerun for any new
+deployment.
 
 Never register the V1 foundation sender. A fresh Gate-A run deploys V2,
 registers that exact address, and calls `setExtensionIdExplicit` with the ID
@@ -43,5 +45,8 @@ chain, low gas balance, missing protocol bytecode, or an existing deployment
 artifact. It verifies constructor calldata, masks only compiler-declared
 immutable slots for a full runtime-logic comparison, then checks every
 immutable getter plus the separately deployed award-receipt binding. It writes
-a sanitized `verified:false` Coston2 candidate manifest and deployment evidence;
-promotion remains blocked until live Gates F–H pass.
+a sanitized `verified:false` Coston2 candidate manifest and deployment
+evidence. `pnpm flare:release:promote` promotes only after the live
+release-consistency, FCC, FTestXRP, FTSO, and Smart Account evidence passes;
+the canonical manifest is now `verified:true`, with Gate H product hardening
+tracked separately.

@@ -428,6 +428,13 @@ The championship release provides:
 - explicit unavailable/recovery states when RPC, proxy, FCC, FDC, FTSO,
   FAssets, or indexer dependencies fail.
 
+The current v2 judge deployment is the separate Vercel project
+`veilbid-flare.vercel.app`; it is not the historical `veilbid-three` project.
+The Flare relay includes a read-only `health-server` mode (`/live` and
+`/health`) that needs no signer. Settlement polling must be deployed only as a
+separate Coston2 service after a dedicated finalizer key and the three verified
+FCC proxy URLs are configured; it must never reuse a Sepolia service or key.
+
 The browser deployment gets no wallet, relay signer, TEE secret, proxy database,
 XRPL secret, or infrastructure credential.
 
