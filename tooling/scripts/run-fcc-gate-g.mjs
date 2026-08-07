@@ -33,6 +33,7 @@ const statePath = resolve(root, ".local/fcc/gate-g-smart-account.state.json");
 const publicVerifierApiKey = "00000000-0000-0000-0000-000000000000";
 const xrplWebsocketUrl = process.env.XRPL_TESTNET_WS_URL?.trim() || "wss://s.altnet.rippletest.net:51233";
 const xrplFaucetUrl = process.env.XRPL_TESTNET_FAUCET_URL?.trim() || "https://faucet.altnet.rippletest.net/accounts";
+const xrplConnectTimeoutMs = Number(process.env.XRPL_CONNECT_TIMEOUT_MS || 30_000);
 const chain = {
   id: 114,
   name: "Coston2",
@@ -101,12 +102,19 @@ async function faucet(destination) {
   return body.transactionHash.toUpperCase();
 }
 
+async function connectWithTimeout(client) {
+  await Promise.race([
+    client.connect(),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("FCC_GATE_G_XRPL_CONNECT_TIMEOUT")), xrplConnectTimeoutMs)),
+  ]);
+}
+
 async function submitPayment(wallet, amountDrops, memoData) {
   const client = new Client(xrplWebsocketUrl);
   let stage = "connect";
   lastSafeMarker = "xrpl-connect";
   try {
-    await client.connect();
+    await connectWithTimeout(client);
     stage = "await-faucet-funding";
     lastSafeMarker = "xrpl-await-faucet-funding";
     let funded = false;
