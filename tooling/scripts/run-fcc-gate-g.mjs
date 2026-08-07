@@ -256,7 +256,7 @@ async function main() {
   });
   const personalAccount = await fundingChain.getPersonalAccount(network.contracts.masterAccountController, xrplWallet.address);
   const nonce = await fundingChain.getSmartAccountNonce(network.contracts.masterAccountController, personalAccount);
-  const executorFeeUBA = 1_000n;
+  const executorFeeUBA = network.directMintingExecutorFeeUBA;
   const plan = buildMintAndFundPlan({
     personalAccount,
     nonce,
@@ -373,6 +373,7 @@ async function main() {
       rulesHash: field(tender, "rulesHash", 2),
       mintedAmountUBA: outcome.mintedAmountUBA,
       mintingFeeUBA: outcome.mintingFeeUBA,
+      executorFeeUBA,
       xrplTransactionLedgerIndex: outcome.xrplFinality.transactionLedgerIndex,
       xrplValidatedLedgerIndex: outcome.xrplFinality.validatedLedgerIndex,
       xrplConfirmations: outcome.xrplFinality.confirmations,

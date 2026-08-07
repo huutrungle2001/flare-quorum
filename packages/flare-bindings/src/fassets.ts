@@ -106,6 +106,13 @@ export const assetManagerFAssetsAbi = [
   },
   {
     type: "function",
+    name: "getDirectMintingExecutorFeeUBA",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
     name: "executeDirectMintingWithData",
     stateMutability: "payable",
     inputs: [xrpPaymentProofParameter, { name: "_data", type: "bytes" }],

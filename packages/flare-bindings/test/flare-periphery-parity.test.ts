@@ -68,6 +68,7 @@ test("minimal FDC/FAssets ABIs match pinned Flare periphery 3.6.0", () => {
   assertParity(assetManagerFAssetsAbi, iDirectMintingAbi, "function", "directMintingPaymentAddress");
   assertParity(assetManagerFAssetsAbi, iDirectMintingSettingsAbi, "function", "getDirectMintingFeeBIPS");
   assertParity(assetManagerFAssetsAbi, iDirectMintingSettingsAbi, "function", "getDirectMintingMinimumFeeUBA");
+  assertParity(assetManagerFAssetsAbi, iDirectMintingSettingsAbi, "function", "getDirectMintingExecutorFeeUBA");
   assertParity(assetManagerFAssetsAbi, iDirectMintingAbi, "function", "executeDirectMintingWithData");
   assertParity(assetManagerFAssetsAbi, iDirectMintingAbi, "event", "DirectMintingDelayed");
   assertParity(assetManagerFAssetsAbi, iDirectMintingAbi, "event", "DirectMintingExecutedToSmartAccount");

@@ -51,6 +51,7 @@ export interface FlareFundingNetwork {
   directMintingPaymentAddress: string;
   directMintingFeeBips: bigint;
   directMintingMinimumFeeUBA: bigint;
+  directMintingExecutorFeeUBA: bigint;
   marketRuntimeCodeHash: Hex;
 }
 
@@ -184,6 +185,7 @@ export class LiveFlareFundingChain implements FlareFundingChain {
       directMintingPaymentAddress,
       feeBips,
       minimumFee,
+      executorFee,
       marketPaymentToken,
       marketTeeCount,
       marketResultThreshold,
@@ -217,6 +219,12 @@ export class LiveFlareFundingChain implements FlareFundingChain {
           address: contracts.assetManager,
           abi: assetManagerFAssetsAbi,
           functionName: "getDirectMintingMinimumFeeUBA",
+          blockNumber: finalizedBlock,
+        }),
+        this.publicClient.readContract({
+          address: contracts.assetManager,
+          abi: assetManagerFAssetsAbi,
+          functionName: "getDirectMintingExecutorFeeUBA",
           blockNumber: finalizedBlock,
         }),
         this.publicClient.readContract({
@@ -259,6 +267,7 @@ export class LiveFlareFundingChain implements FlareFundingChain {
       directMintingPaymentAddress,
       directMintingFeeBips: feeBips,
       directMintingMinimumFeeUBA: minimumFee,
+      directMintingExecutorFeeUBA: executorFee,
       marketRuntimeCodeHash: keccak256(codes[1]!),
     };
   }
