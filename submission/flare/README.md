@@ -10,6 +10,7 @@ Ethereum Sepolia/Nox release and must not be used as evidence for this package.
 | --- | --- |
 | Live app | [veilbid-flare.vercel.app](https://veilbid-flare.vercel.app) |
 | Four-minute demo | [`veilbid-flare-demo.mp4`](veilbid-flare-demo.mp4) |
+| Demo evidence | [`judge-demo-video.release.json`](../../evidence/coston2/judge-demo-video.release.json) |
 | Public evidence ledger | [Coston2 Activity/Evidence view](https://veilbid-flare.vercel.app/?role=evidence) |
 | Buyer workspace | [Coston2 Buyer](https://veilbid-flare.vercel.app/?role=buyer) |
 | Vendor workspace | [Coston2 Vendor](https://veilbid-flare.vercel.app/?role=vendor) |
