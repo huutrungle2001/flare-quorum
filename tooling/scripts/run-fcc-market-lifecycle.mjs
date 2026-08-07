@@ -119,6 +119,27 @@ function assertFreshFtso(feed, blockTimestamp) {
   }
 }
 
+async function readFreshFtso(client, ftso, attempts = 15) {
+  let lastTimestamp = 0n;
+  let lastBlockTimestamp = 0n;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const [block, feed] = await Promise.all([
+      client.getBlock({ blockTag: "latest" }),
+      client.readContract({ address: ftso, abi: ftsoAbi, functionName: "getFeedById", args: [xrpUsdFeedId] }),
+    ]);
+    const timestamp = field(feed, "timestamp", 2);
+    lastTimestamp = timestamp;
+    lastBlockTimestamp = block.timestamp;
+    if (timestamp > block.timestamp && timestamp - block.timestamp <= 15n) {
+      await sleep(2_000);
+      continue;
+    }
+    assertFreshFtso(feed, block.timestamp);
+    return { block, feed };
+  }
+  throw new Error(`FCC_MARKET_FTSO_CLOCK_SKEW_${lastTimestamp}_${lastBlockTimestamp}`);
+}
+
 function publicMachineInfo(value, expectedExtension, expectedCodeHash) {
   const machine = value?.machineData;
   const publicKey = machine?.publicKey;
@@ -336,9 +357,7 @@ async function main() {
   if (!execute) {
     const client = createPublicClient({ chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
     const machines = await readTeeSet({ client, manager, urls, extensionId, codeHash });
-    const latest = await client.getBlock({ blockTag: "latest" });
-    const feed = await client.readContract({ address: ftso, abi: ftsoAbi, functionName: "getFeedById", args: [xrpUsdFeedId] });
-    assertFreshFtso(feed, latest.timestamp);
+    const { feed } = await readFreshFtso(client, ftso);
     const balance = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [account.address] });
     console.log(safeJson({
       status: "READY",
@@ -362,10 +381,8 @@ async function main() {
   const buyerWallet = createWalletClient({ account, chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
   currentPhase = "machine-preflight";
   const machines = await readTeeSet({ client, manager, urls, extensionId, codeHash });
-  const block = await client.getBlock({ blockTag: "latest" });
+  const { block, feed } = await readFreshFtso(client, ftso);
   const now = block.timestamp;
-  const feed = await client.readContract({ address: ftso, abi: ftsoAbi, functionName: "getFeedById", args: [xrpUsdFeedId] });
-  assertFreshFtso(feed, now);
   const bidDeadline = now + 1_800n;
   const ceiling = 1_000_000n;
   const rules = {
