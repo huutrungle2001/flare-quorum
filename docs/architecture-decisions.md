@@ -1,7 +1,9 @@
 # VeilBid Flare Architecture Decision Record
 
-> Status: Accepted target decisions. Implementation evidence is still pending.
-> These decisions replace the open alternatives in the initial transition plan.
+> Status: Accepted decisions with live Coston2 implementation/evidence for the
+> FCC, ingress, market, and XRP-native funding path. Restart/recovery, final
+> UX, and validation gaps remain explicitly tracked below. These decisions
+> replace the open alternatives in the initial transition plan.
 
 ## ADR-001 — Product shape
 

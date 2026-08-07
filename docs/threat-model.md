@@ -1,8 +1,9 @@
 # VeilBid Flare Championship Threat Model
 
-> Status: accepted security model with local implementation and adversarial
-> tests in progress; live Coston2 review/evidence has not started. Historical
-> Sepolia/Nox evidence does not establish the security of this architecture.
+> Status: accepted security model with live Coston2 FCC, ingress, market, and
+> XRP-native evidence recorded. Adversarial/restart hardening and runtime-log
+> review remain in progress; historical Sepolia/Nox evidence does not establish
+> the security of this architecture.
 
 ## 1. Security objectives
 

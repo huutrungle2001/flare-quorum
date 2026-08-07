@@ -1,8 +1,8 @@
 # VeilBid Flare Championship Architecture
 
-> Status: Accepted target architecture; no canonical Coston2 deployment exists
-> yet. Detailed rationale is in
-> [`architecture-decisions.md`](architecture-decisions.md).
+> Status: Accepted architecture implemented by the verified Coston2 release;
+> live restart/recovery and final UI hardening remain open. Detailed rationale
+> is in [`architecture-decisions.md`](architecture-decisions.md).
 
 ## 1. Goals
 

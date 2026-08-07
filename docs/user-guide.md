@@ -1,9 +1,10 @@
 # VeilBid Flare Championship User Guide
 
-> Status: target Coston2 experience. The checked-in `/flare` route now provides
-> a fail-closed wallet-free Coston2 evidence view, while buyer/vendor writes
-> remain disabled until the Flare gates and verified release pass. `/room`
-> remains the historical Sepolia baseline.
+> Status: verified Coston2 experience. The checked-in `/` and `/flare` routes
+> provide the fail-closed wallet-free evidence view, and explicit Coston2 EVM
+> Buyer/Vendor role routes are live. The XRP-native funding protocol and
+> executor have live Gate G evidence; its browser composer remains a separate
+> recovery/UI hardening item. `/room` remains the historical Sepolia baseline.
 
 ## 1. What the product will do
 
@@ -35,8 +36,9 @@ The wallet-free judge path must let a reviewer:
 7. Compare the page with sanitized release evidence without seeing a bid or
    encrypted payload.
 
-Until this live path exists, all Flare screens remain labeled planned or
-unverified and the Sepolia app remains a pre-hackathon baseline.
+The public path is live and release-labeled. Any missing dependency keeps its
+own operation unavailable; the UI never substitutes Sepolia data or mock
+success. The Sepolia app remains a pre-hackathon baseline.
 
 ## 3. Network and safety
 
@@ -50,25 +52,23 @@ unverified and the Sepolia app remains a pre-hackathon baseline.
 - Account, network, market, tender, extension, code, rules, or machine-key
   changes clear all session-only bid input and invalidate an unsent payload.
 
-## 4. XRP treasury buyer flow
+## 4. XRP treasury buyer flow (executor-backed flagship)
 
-1. Select `XRP TREASURY` and derive the deterministic Flare PersonalAccount and
-   its current nonce.
-2. Define public tender metadata, FTestXRP ceiling, deadline, approved vendors,
-   allowed XRP/USD quote currencies, credential policy, and fixed
-   price/delivery/warranty weights.
-3. Review the extension, code version, three TEE identities/key fingerprints,
-   result threshold, FTSO feed, and which fields become public.
-4. Let the app build one `PackedUserOperation` containing FTestXRP approval plus
-   atomic tender creation/funding.
-5. Commit that operation hash in the supported XRPL `0xFE` payment memo.
-6. Wait for the FDC `XRPPayment` proof and Smart Account
-   `executeDirectMintingWithData` transaction.
-7. Confirm that FXRP was minted and the exact ceiling reached the market in the
-   same successful execution before the tender becomes `Open`.
-8. Monitor public receipt participation and quorum health without seeing bids.
-9. After finalization, confirm winner payout, buyer remainder, receipt, and the
-   full public audit trail.
+1. Derive the deterministic Flare PersonalAccount and read its current nonce
+   from the supported Smart Account controller.
+2. Build a public-safe `FlareFundingJob` containing the tender terms, exact
+   FTestXRP ceiling, approved vendors, three frozen TEE identities, and the
+   XRPL transaction ID. The checked-in adapter builds the `PackedUserOperation`
+   and 42-byte `0xFE` memo; it does not request an XRPL secret.
+3. Send the XRP testnet payment with that memo from the buyer's own XRPL
+   wallet, then run the dedicated `flare:funding:execute` executor with local
+   credentials. The executor waits for XRPL finality, requests the official FDC
+   `XRPPayment` proof, and calls `executeDirectMintingWithData`.
+4. Accept the funding result only when the direct-mint, user-operation, and
+   `TenderCreated` events prove one atomic Coston2 tender. Delayed minting is a
+   public pending checkpoint, never a success fallback.
+5. Monitor the public tender and continue through FCC selection and settlement
+   in the same wallet-free evidence view.
 
 The app never asks for the buyer's XRPL secret and never holds an autonomous
 buyer signer. Direct EVM funding is a clearly labeled recovery/developer route.
@@ -78,8 +78,10 @@ buyer signer. Direct EVM funding is a clearly labeled recovery/developer route.
 1. Connect the approved Coston2 address and open an `Open` tender.
 2. Verify market, buyer, deadline, ceiling, rules, extension/code, three machine
    fingerprints, common threshold, and official release status.
-3. Enter quote currency, price, delivery days, warranty days, and supported
-   signed credentials in the current browser session.
+3. In the current browser role route, enter an XRP quote, delivery days, and
+   warranty days. Credential-gated tenders are rejected by this composer until
+   an explicit issuer-credential UX is added; the underlying protocol still
+   validates credential requirements inside FCC.
 4. Review the canonical commitment locally; the random salt prevents practical
    enumeration of low-range values.
 5. Encrypt separately to each selected TEE key and send through the authenticated

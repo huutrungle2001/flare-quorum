@@ -3,8 +3,9 @@
 > Status: The local Flare market slice implements canonical public scoring
 > policy, receipt quorum, conditional close-time FTSO, canonical FCC
 > action-result verification, and public-token escrow conservation. Private
-> ingress and Smart Account/FDC execution are implemented and tested locally;
-> live FCC deployment and end-to-end Coston2 verification remain pending.
+> ingress, live FCC deployment, and Smart Account/FDC execution are now
+> recorded on Coston2; restart/recovery and release-hardening limitations remain
+> explicit.
 
 ## 1. Core types
 

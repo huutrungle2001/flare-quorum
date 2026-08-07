@@ -1,7 +1,9 @@
 # VeilBid Flare Championship Product Plan
 
-> Status: Product and architecture direction approved; implementation and live
-> Coston2 verification have not started.
+> Status: Product and architecture direction approved; the verified Coston2
+> market, FCC extension/quorum, FTestXRP settlement, Gate G XRP-native funding
+> evidence, hosted ingress, and public/EVM role surfaces are implemented. XRP
+> browser funding/recovery, redemption UX, and user validation remain open.
 
 ## 1. Product identity
 
