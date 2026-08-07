@@ -302,6 +302,7 @@ export class LiveFlareBidIngressChain implements FlareBidIngressChain {
       status: tender.status,
       chainTimestamp: block.timestamp,
       bidDeadline: tender.bidDeadline,
+      rulesHash: tender.rulesHash,
       extensionId: tender.extensionId,
       codeVersion: tender.codeVersion,
       teeIds: tender.teeIds,

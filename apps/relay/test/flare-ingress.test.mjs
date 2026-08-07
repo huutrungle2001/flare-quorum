@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  bidReceiptDigest,
+  decodeBidReceipt,
   flareBidIngressTypedData,
   teeIdentityFromPublicKey,
   teePublicKeyFingerprint,
 } from "@veilbid/flare-bindings";
 import { privateKeyToAccount } from "viem/accounts";
+import { encodeAbiParameters } from "viem";
 import {
   FlareBidIngressGateway,
   parseFlareBidIngressRequest,
@@ -29,6 +32,24 @@ function teeKey(byte) {
 const machines = [teeKey("11"), teeKey("22"), teeKey("44")];
 const teeIds = machines.map(({ publicKey }) => teeIdentityFromPublicKey(publicKey));
 const fingerprints = machines.map(({ publicKey }) => teePublicKeyFingerprint(publicKey));
+const receiptParameter = {
+  type: "tuple",
+  components: [
+    { name: "schemaVersion", type: "uint16" },
+    { name: "chainId", type: "uint256" },
+    { name: "market", type: "address" },
+    { name: "extensionId", type: "uint256" },
+    { name: "codeVersion", type: "bytes32" },
+    { name: "tenderId", type: "uint256" },
+    { name: "vendor", type: "address" },
+    { name: "submissionNonce", type: "uint256" },
+    { name: "rulesHash", type: "bytes32" },
+    { name: "plaintextCommitment", type: "bytes32" },
+    { name: "teeId", type: "address" },
+    { name: "expiry", type: "uint64" },
+    { name: "signature", type: "bytes" },
+  ],
+};
 
 function tender(overrides = {}) {
   return {
@@ -36,6 +57,7 @@ function tender(overrides = {}) {
     status: "Open",
     chainTimestamp: 1_000n,
     bidDeadline: 2_000n,
+    rulesHash: `0x${"22".repeat(32)}`,
     extensionId: 65_537n,
     codeVersion: `0x${"33".repeat(32)}`,
     teeIds,
@@ -141,4 +163,68 @@ test("gateway fails closed on replay, wrong signature, state, and plaintext-shap
       /BID_INGRESS_NOT_AVAILABLE/,
     );
   }
+});
+
+test("gateway result route returns only a fully domain-bound TEE receipt", async () => {
+  const receiptSigner = privateKeyToAccount(`0x${"66".repeat(32)}`);
+  const resultTender = tender({ teeIds: [receiptSigner.address, teeIds[1], teeIds[2]] });
+  const mismatchedTender = tender({ teeIds: [receiptSigner.address, teeIds[1], teeIds[2]], rulesHash: `0x${"55".repeat(32)}` });
+  const unsigned = {
+    schemaVersion: 1,
+    chainId: 114n,
+    market,
+    extensionId: 65_537n,
+    codeVersion: `0x${"33".repeat(32)}`,
+    tenderId: 7n,
+    rulesHash: `0x${"22".repeat(32)}`,
+    vendor: vendor.address,
+    submissionNonce: 9n,
+    plaintextCommitment: `0x${"44".repeat(32)}`,
+    teeId: receiptSigner.address,
+    expiry: 1_200n,
+    signature: "0x",
+  };
+  const receipt = {
+    ...unsigned,
+    signature: await receiptSigner.signMessage({ message: { raw: bidReceiptDigest(unsigned) } }),
+  };
+  const data = encodeAbiParameters([receiptParameter], [receipt]);
+  const gateway = new FlareBidIngressGateway(
+    { async inspect() { return resultTender; } },
+    {
+      async submit() { throw new Error("not called"); },
+      async result() {
+        return {
+          actionId: `0x${"99".repeat(32)}`,
+          status: 1,
+          submissionTag: "submit",
+          opType: "0x5645494c4249445f424944000000000000000000000000000000000000000000",
+          opCommand: "0x5355424d49545f56310000000000000000000000000000000000000000000000",
+          data,
+        };
+      },
+    },
+  );
+  const accepted = await gateway.result(7n, 0, `0x${"99".repeat(32)}`);
+  assert.equal(accepted.teeId, receiptSigner.address);
+  assert.deepEqual(decodeBidReceipt(accepted.data), receipt);
+  await assert.rejects(
+    new FlareBidIngressGateway(
+      { async inspect() { return mismatchedTender; } },
+      {
+        async submit() { throw new Error("not called"); },
+        async result() {
+          return {
+            actionId: `0x${"99".repeat(32)}`,
+            status: 1,
+            submissionTag: "submit",
+            opType: "0x5645494c4249445f424944000000000000000000000000000000000000000000",
+            opCommand: "0x5355424d49545f56310000000000000000000000000000000000000000000000",
+            data,
+          };
+        },
+      },
+    ).result(7n, 0, `0x${"99".repeat(32)}`),
+    /FCC_PROXY_ACTION_MISMATCH/,
+  );
 });

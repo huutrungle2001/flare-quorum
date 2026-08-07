@@ -43,6 +43,7 @@ export interface FlareBidIngressTender {
   status: "FundingPending" | "Open" | "Closed" | "ComputePending" | "Awarded" | "Refunded" | "Cancelled";
   chainTimestamp: bigint;
   bidDeadline: bigint;
+  rulesHash: Hex;
   extensionId: bigint;
   codeVersion: Hex;
   teeIds: readonly [Address, Address, Address];
@@ -200,7 +201,14 @@ export class FlareBidIngressGateway {
     if (!isAddressEqual(receipt.teeId, expectedTeeId) || !isAddressEqual(signer, expectedTeeId)) {
       throw new Error("FCC_TEE_IDENTITY_MISMATCH");
     }
-    if (receipt.chainId !== 114n || receipt.tenderId !== tenderId) {
+    if (
+      receipt.chainId !== 114n || receipt.tenderId !== tenderId ||
+      !isAddressEqual(receipt.market, tender.market) ||
+      receipt.extensionId !== tender.extensionId ||
+      receipt.codeVersion.toLowerCase() !== tender.codeVersion.toLowerCase() ||
+      receipt.rulesHash.toLowerCase() !== tender.rulesHash.toLowerCase() ||
+      receipt.expiry <= 0n || receipt.expiry > tender.bidDeadline
+    ) {
       throw new Error("FCC_PROXY_ACTION_MISMATCH");
     }
     return {
