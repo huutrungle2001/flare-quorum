@@ -64,6 +64,7 @@
     "publish:sources:release": "pnpm --filter @veilbid/auction-house publish:sources:release",
     "test:preflight": "node --env-file-if-exists=.env.local tooling/scripts/preflight.mjs",
     "evidence:validate": "node tooling/scripts/validate-evidence.mjs",
+    "flare:judge:check": "node tooling/scripts/validate-flare-judge-package.mjs",
     "verify:deployment": "pnpm --filter @veilbid/auction-house verify:deployment:release",
     "verify:deployment:release": "pnpm --filter @veilbid/auction-house verify:deployment:release",
     "verify:deployment:test": "pnpm --filter @veilbid/auction-house verify:deployment:test",

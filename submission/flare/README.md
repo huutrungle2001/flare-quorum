@@ -136,6 +136,7 @@ pnpm test
 pnpm lint
 pnpm build
 pnpm evidence:validate
+pnpm flare:judge:check
 pnpm test:flare:production
 pnpm test:flare:accessibility
 ```
@@ -156,4 +157,3 @@ Still open and deliberately not overstated: same-identity simulated-TEE
 restart recovery, browser-native XRP funding/recovery UI, interactive FXRP
 redemption, adversarial/recovery breadth beyond the recorded drill, structured
 buyer/vendor interviews, pilot evidence, and the final video recording.
-
