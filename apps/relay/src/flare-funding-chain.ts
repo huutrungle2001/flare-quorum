@@ -103,29 +103,44 @@ function receipt(value: {
 }
 
 function directMintFailureCode(error: unknown): string {
-  const candidates = [
-    error,
-    error instanceof Error ? error.cause : undefined,
+  const strings: string[] = [];
+  const visit = (value: unknown, depth: number): void => {
+    if (depth > 4 || value === null || value === undefined) return;
+    if (typeof value === "string") {
+      strings.push(value);
+      const selector = value.match(/(?:^|[^0-9a-fA-F])0x([0-9a-fA-F]{8})(?:[^0-9a-fA-F]|$)/);
+      if (selector) strings.push(`selector:${selector[1]}`);
+      return;
+    }
+    if (typeof value !== "object") return;
+    const record = value as Record<string, unknown>;
+    for (const key of ["data", "cause", "error", "originalError", "details", "shortMessage", "message"]) {
+      visit(record[key], depth + 1);
+    }
+  };
+  visit(error, 0);
+  const normalized = strings.join(" ").toLowerCase();
+  const known = [
+    "invalidsender",
+    "invalidnonce",
+    "wrongexecutor",
+    "custominstructionhashmismatch",
+    "invalidmemodata",
+    "invalidinstructionid",
+    "callfailed",
+    "transactionalreadyprocessed",
+    "transactionattestationfailed",
+    "invalidproof",
+    "directmintingpaymenttoosmallforfee",
   ];
-  for (const candidate of candidates) {
-    if (candidate === null || typeof candidate !== "object") continue;
-    const record = candidate as Record<string, unknown>;
-    for (const key of ["data", "cause", "details"]) {
-      const value = record[key];
-      if (typeof value === "string") {
-        const selector = value.match(/^0x([0-9a-fA-F]{8})/);
-        if (selector) return `DIRECT_MINT_REVERT_${selector[1].toUpperCase()}`;
-      }
-    }
-    const shortMessage = record.shortMessage;
-    if (typeof shortMessage === "string") {
-      const normalized = shortMessage.toLowerCase();
-      if (normalized.includes("insufficient funds")) return "DIRECT_MINT_INSUFFICIENT_FUNDS";
-      if (normalized.includes("nonce")) return "DIRECT_MINT_NONCE_ERROR";
-      if (normalized.includes("gas")) return "DIRECT_MINT_GAS_ERROR";
-      if (normalized.includes("revert")) return "DIRECT_MINT_REVERT";
-    }
-  }
+  const knownError = known.find((name) => normalized.includes(name));
+  if (knownError) return `DIRECT_MINT_${knownError.toUpperCase()}`;
+  const selectorMarker = strings.find((value) => value.startsWith("selector:"));
+  if (selectorMarker) return `DIRECT_MINT_REVERT_${selectorMarker.slice("selector:".length).toUpperCase()}`;
+  if (normalized.includes("insufficient funds")) return "DIRECT_MINT_INSUFFICIENT_FUNDS";
+  if (normalized.includes("nonce")) return "DIRECT_MINT_NONCE_ERROR";
+  if (normalized.includes("gas")) return "DIRECT_MINT_GAS_ERROR";
+  if (normalized.includes("revert")) return "DIRECT_MINT_REVERT";
   return "DIRECT_MINT_SIMULATION_ERROR";
 }
 
