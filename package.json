@@ -81,6 +81,8 @@
     "flare:proxy:image:verify": "node tooling/scripts/build-fcc-proxy-image.mjs --write",
     "flare:registration:image:build": "node tooling/scripts/build-fcc-registration-image.mjs --build --write",
     "flare:registration:image:verify": "node tooling/scripts/build-fcc-registration-image.mjs --write",
+    "flare:machines:preflight": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs",
+    "flare:machines:register": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs --execute",
     "flare:mcp": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/operator-console build && node --env-file-if-exists=.env.local apps/console/dist/flare-mcp-stdio.js",
     "flare:verify:foundation": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/verify-flare-foundation-sender.mjs",
     "flare:deploy:market": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/deploy-flare-market.mjs",

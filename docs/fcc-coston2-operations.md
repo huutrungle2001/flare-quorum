@@ -1,10 +1,12 @@
 # FCC Coston2 Operational Baseline
 
-> Status: Phase 0 pre-deployment checks are in progress, derived from the
+> Status: Phase 0 machine-registration checks are in progress, derived from the
 > project-owner-supplied
 > [FCC redeploy message](original/fcc-coston2-redeploy-message.md) and current
 > official FCC sources. The live manager and core protocol discovery checks
-> pass; no VeilBid extension or TEE is registered yet.
+> pass. VeilBid extension `66007`, its foundation sender, and simulated code
+> version `v0.2.2` are registered on Coston2; no VeilBid TEE machine has reached
+> `PRODUCTION` yet.
 
 ## 1. Authority and drift rule
 
@@ -96,6 +98,14 @@ Because the redeploy may have cleared prior registrations:
 Reusing a historical extension ID, machine record, challenge, or address is a
 failure. Re-running `pre-build --force` casually is also forbidden because it
 can detach a machine from the expected extension.
+
+Steps 1–3 are now evidenced by
+`evidence/coston2/fcc-extension-registration.json`: sender
+`0xf522b863fb19496D21ac7D0D1d71435C1DDc2EdE` is explicitly bound to extension
+`66007`. The allowed `v0.2.2` code/platform record is in
+`evidence/coston2/fcc-code-version.json`. The three local machines share that
+binding and image but have distinct identities; they remain local-only until
+three stable public origins pass `pnpm flare:machines:preflight`.
 
 The deployed V1 sender at `0x44A322A45e8D796d890271209D59d529501113B9`
 remains public evidence of manager/constructor compatibility only. It is
@@ -203,6 +213,6 @@ the championship quorum requirement.
 The current partial live record is
 `evidence/coston2/gate-0-foundations.json`. It is explicitly
 `IN_PROGRESS`: source hashes, toolchains, manager interface, registry discovery,
-FTestXRP binding, XRP/USD feed, indexer configuration, and tee-proxy build-input
-pinning pass. Docker plus both pinned image builds now pass. Stable proxy
+FTestXRP binding, XRP/USD feed, indexer configuration, extension registration,
+code-version allowlisting, and all three pinned FCC images pass. Stable proxy
 reachability and three production machines remain blockers.

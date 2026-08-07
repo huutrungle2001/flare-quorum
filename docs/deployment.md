@@ -192,6 +192,22 @@ and runs as a non-root distroless image. Runtime invocation supplies the
 deployment key without storing it in the image and must use `-command rRap`
 plus one state file and stable public HTTPS URL per machine.
 
+Configure exactly three comma-separated stable origins in
+`FLARE_FCC_PROXY_URLS`, with each origin tunneling to its matching loopback port
+in order. `pnpm flare:machines:preflight` compares every public `/info` response
+with its local machine, rejects credential-bearing/path/quick-tunnel URLs, and
+prints only TEE IDs and public-key fingerprints. When it reports `READY`, run:
+
+```bash
+pnpm flare:machines:register
+```
+
+The runner extracts and re-hashes the verified registration binary, invokes
+`rRap` sequentially with a TEE-ID-specific resume file, and verifies status,
+extension, URL, code/platform, and public key from one Coston2 block before it
+writes public evidence. The deployment key remains process-local and is never
+placed in an argument, image, state file, output, or evidence.
+
 - Use disposable Coston2/XRPL testnet identities and C2FLR for gas.
 - Keep deployer, executor, XRPL, TEE, proxy, indexer, Redis, and tunnel secrets
   in ignored local configuration or secret storage.

@@ -78,7 +78,9 @@ export function isStableProxyUrl(value, forbiddenSuffix) {
       url.hostname.length > 0 &&
       !url.hostname.endsWith(forbiddenSuffix) &&
       url.hostname !== "localhost" &&
-      url.hostname !== "127.0.0.1"
+      url.hostname !== "127.0.0.1" &&
+      !url.username && !url.password &&
+      url.pathname === "/" && !url.search && !url.hash
     );
   } catch {
     return false;
@@ -442,21 +444,25 @@ export async function inspectFoundations({
     ? privateKeyToAccount(privateKey).address === declaredDeployer
     : false;
 
-  const stableProxyUrl = environment[
+  const stableProxyUrls = String(environment[
     manifest.externalRequirements.stableProxyEnvironmentVariable
-  ];
-  const stableProxyConfigured = isStableProxyUrl(
-    stableProxyUrl,
-    manifest.externalRequirements.forbiddenProxyHostnameSuffix,
-  );
+  ] ?? "").split(",").map((value) => value.trim()).filter(Boolean);
+  const stableProxyConfigured =
+    stableProxyUrls.length === manifest.externalRequirements.requiredMachineCount &&
+    new Set(stableProxyUrls).size === manifest.externalRequirements.requiredMachineCount &&
+    stableProxyUrls.every((url) => isStableProxyUrl(
+      url,
+      manifest.externalRequirements.forbiddenProxyHostnameSuffix,
+    ));
   let stableProxyReachable = false;
   if (stableProxyConfigured) {
     try {
-      const response = await fetchImplementation(
-        `${stableProxyUrl.replace(/\/$/, "")}/info`,
-        { headers: { accept: "application/json" } },
-      );
-      stableProxyReachable = response.ok;
+      const responses = await Promise.all(stableProxyUrls.map((url) =>
+        fetchImplementation(`${url.replace(/\/$/, "")}/info`, {
+          headers: { accept: "application/json" },
+        })
+      ));
+      stableProxyReachable = responses.every((response) => response.ok);
     } catch {
       stableProxyReachable = false;
     }

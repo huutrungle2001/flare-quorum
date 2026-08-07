@@ -23,7 +23,7 @@ in-memory and save only an allowlisted pass/fail code.
 
 | Gate | Required live outcome | Minimum evidence | Status |
 |---|---|---|---|
-| 0 — Foundations | Official access, live FCC manager, current indexer, stable proxy URL, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | IN PROGRESS — core live discovery passes; registration stack remains blocked |
+| 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | IN PROGRESS — extension `66007`, code version, and three local machines pass; stable HTTPS origins and production registration remain |
 | A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | IN PROGRESS — sender deployed and runtime verified; extension/result pending |
 | B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext and survives sealed restart | Commitment/receipt IDs, redaction assertions, restart checkpoint | NOT RUN |
 | C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | NOT RUN |

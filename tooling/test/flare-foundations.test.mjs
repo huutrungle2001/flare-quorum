@@ -32,6 +32,17 @@ test("accepts only stable HTTPS proxy origins", () => {
     false,
   );
   assert.equal(isStableProxyUrl("http://localhost:6674", "trycloudflare.com"), false);
+  assert.equal(
+    isStableProxyUrl(
+      ["https://user", "secret@fcc.veilbid.example"].join(":"),
+      "trycloudflare.com",
+    ),
+    false,
+  );
+  assert.equal(
+    isStableProxyUrl("https://fcc.veilbid.example/private", "trycloudflare.com"),
+    false,
+  );
   assert.equal(isStableProxyUrl("not-a-url", "trycloudflare.com"), false);
 });
 

@@ -84,7 +84,7 @@ All open design questions are resolved in
 
 ### Phase 0 — external access and pinned foundations
 
-- [ ] Confirm organizer-supported FCC environment, indexer access, proxy
+- [x] Confirm organizer-supported FCC environment, indexer access, proxy
   requirements, and whether at least three registered TEE machines are
   available for one extension.
 - [x] Confirm real confidential hardware versus simulated TEE judge policy.
@@ -102,8 +102,10 @@ All open design questions are resolved in
 - [ ] Apply [`docs/fcc-coston2-operations.md`](docs/fcc-coston2-operations.md):
   resolve live `FlareTeeManager`, enforce the organizer minimum TEE/proxy
   revisions, use a fresh extension ID and `rRap`, and reach machine status `2`.
-- [ ] Obtain current indexer credentials and a named Cloudflare Tunnel or
-  reserved ngrok domain; quick-tunnel URLs are forbidden for registration.
+- [x] Obtain and locally configure current read-only Coston2 indexer
+  credentials without committing or printing them.
+- [ ] Configure three named Cloudflare Tunnel or reserved ngrok origins;
+  quick-tunnel URLs are forbidden for registration.
 - [x] Pin Go, Foundry, Solidity, Node, pnpm, viem, and Flare periphery versions.
 - [x] Record official Coston2 registry, FCC, FAssets, FTSO, and Smart Account
   discovery paths without hardcoding undocumented addresses.
