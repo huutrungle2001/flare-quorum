@@ -17,8 +17,11 @@ When the hosted ingress origin is configured, `/?role=vendor` opens the
 Coston2 browser composer: each bid is encrypted separately to the three
 tender-frozen TEE keys, authorized with EIP-712, receipt-checked, and submitted
 as one atomic receipt set. `/?role=buyer` is the direct EVM funding/recovery
-path; the XRP-native Smart Account journey remains a separate server-side
-executor until its delayed-mint recovery UI is complete.
+path. An awarded vendor can use the same Coston2 role to approve the exact
+FTestXRP amount and submit an official `redeemAmount` request to AssetManagerFXRP;
+the later agent payment remains protocol-governed. The XRP-native Smart Account
+journey remains a separate server-side executor until its delayed-mint recovery
+UI is complete.
 
 It intentionally:
 

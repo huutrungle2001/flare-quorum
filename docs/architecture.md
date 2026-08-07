@@ -257,7 +257,8 @@ escrow, or bypass settlement verification.
   redemption journeys.
 - **Relay:** public close/request/result aggregation/finalize only.
 - **Console:** isolated read-only Coston2 contract/FCC/FTSO inspection at one
-  finalized checkpoint; FAssets/FDC inspection remains pending its live gate.
+  finalized checkpoint; FAssets redemption is exposed through the awarded
+  vendor browser path and public FDC/FAssets facts remain read-only.
 - **FCC extension:** private ingress, sealed state, deterministic scoring, and
   minimum signed result.
 

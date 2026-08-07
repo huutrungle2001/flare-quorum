@@ -189,6 +189,9 @@ Prove:
 - reentrancy and token failure cannot settle partially or twice;
 - winner can follow the supported FAssets redemption path without VeilBid
   receiving an XRPL secret.
+- the awarded vendor can submit an amount-based `redeemAmount` request through
+  the verified AssetManager, with the request event and agent payout obligation
+  recorded without claiming that the underlying XRP payment is instant.
 
 Kill condition: a generic test token or manually supplied price is required for
 the final lifecycle.

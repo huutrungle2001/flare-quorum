@@ -232,9 +232,10 @@ custodial VeilBid signer.
   three authenticated ingress requests, three signed receipt checks, and an
   atomic on-chain receipt submission; browser storage and public payloads never
   receive plaintext or ciphertext.
-- [ ] Build the public result/settlement and FXRP redemption journey (the
-  current page exposes FTestXRP settlement and the verified FXRP manager, but
-  redemption interaction is not yet wired).
+- [x] Build the public result/settlement and FXRP redemption journey: the
+  awarded vendor can approve the exact FTestXRP amount and submit the official
+  `redeemAmount` request to AssetManagerFXRP; live Coston2 evidence is recorded
+  in `evidence/coston2/fassets-redemption.release.json`.
 - [x] Implement and unit-test stateless close/request/result/finalize relay and
   ciphertext-only vendor ingress; the hosted v2 ingress health and result API
   are live on Railway, while write-settlement relay operation remains gated on a
@@ -388,7 +389,7 @@ the championship product and requires Product Plan approval.
 | FCC private ingress | LIVE PARTIAL — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, and changed-ciphertext rejection pass; supported same-identity restart recovery remains open |
 | Multi-TEE quorum | LIVE PASSED for one three-bid lifecycle — atomic 3-of-3 receipts, common root, two matching frozen-TEE signatures, and one-machine resilience assertions recorded; same-identity restart remains open |
 | Flare contracts | LIVE VERIFIED — Coston2 market, FTestXRP escrow, FTSO snapshot, award receipt, and recovery wiring agree with the verified release manifest |
-| FAssets/FDC/Smart Account journey | LIVE PASSED Gate G — disposable XRPL payment, FDC proof, Smart Account direct mint, and atomic tender funding are recorded in `gate-g-smart-account.json` |
+| FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, and an official amount-based FTestXRP redemption request are recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
 | Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke and hosted ciphertext-ingress health pass; Gate-B restart, adversarial suites, final UI-role hardening, and Gate H user validation remain open |
 | User research/traction | NOT STARTED |

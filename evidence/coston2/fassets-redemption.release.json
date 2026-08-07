@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "gate": "F-REDEMPTION",
+  "status": "PASSED",
+  "recordedAt": "2026-08-07T22:15:06Z",
+  "sourceCommit": "1086412f6a51043d17f250f10f7b9aa7e41770ed",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33757003"
+  },
+  "publicIdentifiers": {
+    "assetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
+    "fAsset": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+    "redeemer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "paymentAddress": "rXPAEkUGWD7pyjgSTrjqB1njTdrKLauTx",
+    "amountUBA": "5000000",
+    "minimumRedeemAmountUBA": "5000000",
+    "feeUBA": "25000",
+    "requestId": "44024130",
+    "approvalTransaction": "0xf62267aec82688a507f2865e6dc3e21da2322c2f6cc0a606b811273d7770eb3a",
+    "redemptionTransaction": "0x17285fd2e0301f4c70bb7a7fa5e5f6c6ad9f043ac7064801ae663b88b8778573"
+  },
+  "assertions": {
+    "officialAssetManagerMatchesRelease": true,
+    "fAssetMatchesOfficialFTestXrp": true,
+    "approvalEqualsRequestedAmount": true,
+    "redemptionTransactionSucceeded": true,
+    "redemptionRequestedEventMatchesRedeemer": true,
+    "requestAmountMeetsProtocolMinimum": true,
+    "xrpPayoutAddressIsPublicOnly": true,
+    "noCustodialXrplSecretRecorded": true,
+    "testnetOnly": true
+  },
+  "blockers": [],
+  "notes": [
+    "This is a live Coston2 amount-based FAssets redemption request. The request records an agent payout obligation; it is not represented as an instant XRP payout.",
+    "Only public addresses, hashes, amounts, request identifiers, and assertion booleans are recorded. No XRPL secret, private key, bid data, or proof body is included."
+  ]
+}

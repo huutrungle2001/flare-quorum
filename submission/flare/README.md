@@ -33,9 +33,9 @@ proxy credential is requested by the browser.
 - **Primary:** Confidential Compute Apps.
 - **Interoperable Asset Products:** a credible secondary fit only where the
   judge follows the recorded XRPL → FDC `XRPPayment` → Smart Account direct
-  mint → FTestXRP tender journey. FXRP/native-XRP redemption remains an
-  official FAssets follow-on step and is not claimed as a VeilBid-managed
-  redemption transaction.
+  mint → FTestXRP tender journey, then the winning Coston2 wallet can submit an
+  official amount-based FAssets redemption request. The agent's later XRPL
+  payment remains protocol-governed; VeilBid never holds an XRPL secret.
 
 FCC is essential: the winner is computed from sealed bid state inside the
   registered extension, not supplied by the browser, buyer, or relay. FTSO is
@@ -69,6 +69,12 @@ FCC is essential: the winner is computed from sealed bid state inside the
 | FCC manager | [`0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE`](https://coston2-explorer.flare.network/address/0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE) |
 | Extension | `66011` · `v0.2.2` · code hash `0x194844cf…10fdc2` |
 | Verified release manifest | [`packages/flare-contracts/deployments/coston2.release.json`](../../packages/flare-contracts/deployments/coston2.release.json) |
+
+The live amount-based FAssets redemption request is recorded in
+[`fassets-redemption.release.json`](../../evidence/coston2/fassets-redemption.release.json)
+with the approval and `RedemptionRequested` transaction hashes. It proves the
+request boundary and public agent obligation, not an instant underlying XRP
+payment.
 
 ### Featured recovery lifecycle
 
@@ -107,7 +113,7 @@ flowchart LR
   S --> Q[2-of-3 matching result signatures]
   Q --> M
   M --> A[Public winner + FTestXRP\naward receipt / refund]
-  A -.-> X[Official FAssets redemption\nVeilBid never holds XRPL secret]
+  A -.-> X[Official FAssets redemption request\nVeilBid never holds XRPL secret]
 ```
 
 ## Four-minute demo storyboard
@@ -123,7 +129,7 @@ flagship story; it does not imply that a recording has already been made.
 | `1:30–2:10` | Show a sealed bid submission as three separate encrypted ingress requests and receipt quorum. | Hosted ingress health, three frozen TEE identities, atomic receipt submission |
 | `2:10–2:55` | Follow close, FTSO snapshot, FCC scoring, two matching result signatures, and finalization. | Tender `21` transactions and recovery evidence |
 | `2:55–3:25` | Open the award receipt and explain public winner/amount versus private losing bids. | Coston2 explorer and receipt contract |
-| `3:25–3:50` | Show the XRPL/FDC/Smart Account evidence and official FAssets redemption boundary. | Gate G evidence; no custody or private-key claim |
+| `3:25–3:50` | Show the XRPL/FDC/Smart Account evidence and the live amount-based FAssets redemption request boundary. | Gate G + `fassets-redemption.release.json`; no custody or instant-payout claim |
 | `3:50–4:00` | State limitations: simulated TEE, testnet, unaudited, restart recovery and user validation remain open. | Honest threat-model boundary |
 
 ## Reproduction and validation
@@ -154,6 +160,7 @@ Account funding, hosted ingress health/result API, public Evidence workspace,
 and Vercel smoke/accessibility evidence.
 
 Still open and deliberately not overstated: same-identity simulated-TEE
-restart recovery, browser-native XRP funding/recovery UI, interactive FXRP
-redemption, adversarial/recovery breadth beyond the recorded drill, structured
-buyer/vendor interviews, pilot evidence, and the final video recording.
+restart recovery, browser-native XRP funding/recovery UI, adversarial/recovery
+breadth beyond the recorded drill, structured buyer/vendor interviews, pilot
+evidence, and the final video recording. The redemption request is live; the
+underlying agent payout remains an external FAssets protocol obligation.

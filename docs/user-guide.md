@@ -97,7 +97,9 @@ buyer signer. Direct EVM funding is a clearly labeled recovery/developer route.
 7. Confirm that the chain shows only vendor participation, commitment, receipt
    bitmap, and updated common quorum/root.
 8. Clear the local draft. If selected, receive the public FTestXRP amount and
-   optionally follow the official FAssets redemption path to XRP.
+   open the Vendor workspace with the winning wallet to approve the exact amount
+   and submit an official FAssets redemption request to an XRPL address. The
+   request creates an agent payout obligation; it is not an instant XRP payout.
 
 The submission fails rather than weakening privacy if private ingress, a valid
 receipt set, or a common 2-machine quorum is unavailable.

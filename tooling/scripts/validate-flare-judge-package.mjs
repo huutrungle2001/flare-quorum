@@ -12,6 +12,8 @@ const requiredText = [
   "https://veilbid-flare.vercel.app",
   "https://github.com/huutrungle2001/veilbid-flare",
   "evidence/coston2/three-vendor-recovery.release.json",
+  "evidence/coston2/fassets-redemption.release.json",
+  "RedemptionRequested",
   "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
   "extension `66011`",
   "Confidential Compute Apps",
