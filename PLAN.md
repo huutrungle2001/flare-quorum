@@ -96,6 +96,9 @@ All open design questions are resolved in
 - [x] Pin and build the VeilBid FCC extension image, keep production
   attestation as its safe default, and verify its binary, sealed-store volume,
   launch policy, and absence of embedded runtime secrets.
+- [x] Align `tee-node v0.0.23` with the exact version resolved by the pinned
+  proxy and record the upstream identity-restart limitation without persisting
+  a raw TEE private key.
 - [ ] Apply [`docs/fcc-coston2-operations.md`](docs/fcc-coston2-operations.md):
   resolve live `FlareTeeManager`, enforce the organizer minimum TEE/proxy
   revisions, use a fresh extension ID and `rRap`, and reach machine status `2`.

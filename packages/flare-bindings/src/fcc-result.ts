@@ -16,8 +16,8 @@ import type { FlareSelectionResult } from "./protocol.js";
 
 export const teeActionResultPrefix = stringToHex("TEE_ACTION_RESULT", { size: 32 });
 export const proxyActionResultPrefix = stringToHex("PROXY_ACTION_RESULT", { size: 32 });
-export const veilBidSelectionOpType = keccak256(stringToHex("VEILBID_SELECTION"));
-export const veilBidSelectV1OpCommand = keccak256(stringToHex("SELECT_V1"));
+export const veilBidSelectionOpType = stringToHex("VEILBID_SELECTION", { size: 32 });
+export const veilBidSelectV1OpCommand = stringToHex("SELECT_V1", { size: 32 });
 
 const bytes32Pattern = /^0x[0-9a-fA-F]{64}$/;
 const bytes21Pattern = /^0x[0-9a-fA-F]{42}$/;

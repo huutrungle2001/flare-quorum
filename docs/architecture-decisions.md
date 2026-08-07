@@ -409,9 +409,13 @@ audit found their `main` branches still pinning `tee-node` `v0.0.21` and
 baseline.
 
 VeilBid pins the exact scaffold/example commits for provenance, but selects and
-tests the organizer-directed `develop` runtime line: `tee-node` `v0.0.24` at
-`adc67a29eb7162f6f1b5dabcbca320009480695e` and `tee-proxy` at
-`0c6d016b09948cba9a508ba357e592eb6088fd1c`. The VeilBid proxy recipe pins the
+tests one wire-compatible runtime pair: `tee-node` `v0.0.23` at
+`9090eccbae1111742bd83ef0601485d9503b4a13` and `tee-proxy` at
+`0c6d016b09948cba9a508ba357e592eb6088fd1c`, whose own module graph resolves
+the same `tee-node` version. This supersedes the briefly tested independent
+`v0.0.24` extension pin after 2026-08-05 Flare maintainer guidance confirmed
+that node/proxy wire formats must be aligned rather than upgraded separately.
+The VeilBid proxy recipe pins the
 official source archive by checksum and both build stages by digest. Gate 0 also
 requires the recipe to be built and the resulting immutable release image
 digest recorded; reproducible inputs alone are not deployment evidence. If
@@ -445,6 +449,13 @@ allowlisted error codes and never echo their bytes. The operation is a Phase 1
 compatibility probe, not a bid path or a live FCC claim; private ingress and
 selection remain gated by the real proxy, indexer, registration, and Coston2
 verification evidence.
+
+Every custom FCC operation identifier uses Solidity's `bytes32("text")`
+representation: UTF-8 bytes followed by zero bytes to length 32. Go uses
+`op.Type.Hash`/`teeutils.ToHash`, and TypeScript uses `stringToHex` with
+`size: 32`. These identifiers are never `keccak256` hashes. Cross-language
+literal vectors cover selection so a client cannot reject a valid live result
+while still passing self-generated fixtures.
 
 **Reason:** The scaffold's mutable greeting example was unsuitable for a
 multi-machine result quorum and its error logs could grow into a privacy leak.
@@ -609,6 +620,34 @@ being added. An outage of either selected custodian then halted selection, so
 the claimed three-machine topology provided no arbitrary one-machine failover.
 The fixed set restores that property without exposing bids, ciphertext, or
 partial receipt state. Live Gate C evidence remains required.
+
+## ADR-025 — TEE identity restart boundary
+
+**Decision:** Do not export, log, inject, or host-persist a raw TEE identity
+private key. The pinned official `tee-node v0.0.23` initializes an identity key
+in memory and its public extension server starts from `ZeroState`; neither that
+release nor the inspected `v0.0.25` release exposes a supported identity-key
+restore path. Consequently, restarting the `extension-tee` process creates a
+new machine identity and invalidates the old registration.
+
+Until Flare publishes a supported sealed identity/state restore mechanism,
+VeilBid treats a machine restart as loss of that frozen machine, not as
+same-machine recovery. The championship topology uses three independent
+long-lived machines, stores the same accepted bid set on all three, and allows
+the two surviving registered identities to produce the exact same selection.
+A replacement identity may be registered only for new tenders; it cannot be
+substituted into a tender that already froze its machine set.
+
+The existing file-backed sealed-store test proves extension state persistence
+only. It is not live TEE restart evidence because the regenerated node identity
+cannot decrypt ciphertext addressed to the former key. Gate B restart evidence
+therefore remains open. A raw Docker secret, host file, embedded key, or
+deployment-wallet-derived identity is not an acceptable workaround.
+
+**Reason:** Silent identity rotation explains production machines that remain
+registered but no longer answer for the running container. Preserving two
+survivors is compatible with the threshold design and safer than weakening the
+TEE trust boundary to manufacture same-identity restart evidence.
 
 ## Official reference basis
 

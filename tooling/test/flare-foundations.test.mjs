@@ -7,6 +7,7 @@ import {
   normalizePrivateKey,
   parseVersion,
   verifyFccExtensionReleaseRecipe,
+  verifyFccRuntimeAlignment,
   verifyTeeProxyReleaseRecipe,
   verifyPinnedSources,
   versionAtLeast,
@@ -112,6 +113,25 @@ test("requires exact pinned inputs and safe defaults for the FCC extension image
   assert.equal(verifyFccExtensionReleaseRecipe(source, recipe), true);
   assert.equal(
     verifyFccExtensionReleaseRecipe(source.replace("ENV MODE=0", "ENV MODE=1"), recipe),
+    false,
+  );
+});
+
+test("requires the extension and proxy to resolve the same tee-node wire version", () => {
+  const goMod = "module example\nrequire github.com/flare-foundation/tee-node v0.0.23\n";
+  const teeNode = { tag: "v0.0.23", minimumOrganizerVersion: "0.0.22" };
+  const teeProxy = { teeNodeModuleVersion: "0.0.23" };
+  assert.equal(verifyFccRuntimeAlignment(goMod, teeNode, teeProxy), true);
+  assert.equal(
+    verifyFccRuntimeAlignment(
+      goMod.replace("v0.0.23", "v0.0.24"),
+      teeNode,
+      teeProxy,
+    ),
+    false,
+  );
+  assert.equal(
+    verifyFccRuntimeAlignment(goMod, teeNode, { teeNodeModuleVersion: "0.0.24" }),
     false,
   );
 });

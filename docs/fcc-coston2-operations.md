@@ -50,14 +50,15 @@ The foundation audit found this exact upstream drift:
 - official scaffold `f48cafb889441a62e47c083f4be8dd7d3f456f83` and sign
   example `6df972c64d34efe1d4497f0eafe6792d1f0862dd` still pin
   `tee-node` `v0.0.21` and `tee-proxy` `v0.0.18`;
-- selected `tee-node` `develop` commit
-  `adc67a29eb7162f6f1b5dabcbca320009480695e` is tagged `v0.0.24`;
+- selected `tee-node` commit
+  `9090eccbae1111742bd83ef0601485d9503b4a13` is tagged `v0.0.23`;
 - selected `tee-proxy` `develop` commit
   `0c6d016b09948cba9a508ba357e592eb6088fd1c` resolves `tee-node`
   `v0.0.23` and Go `1.25.8`.
 
 The scaffold is therefore a reference, not a build-ready dependency snapshot.
-VeilBid upgrades and tests the node/proxy pins independently. The proxy release
+VeilBid tests one wire-compatible node/proxy pair rather than combining their
+independent latest tags. The proxy release
 recipe at `apps/fcc-extension/proxy/Dockerfile` downloads the exact official
 source archive, verifies its checksum, and pins both image stages. The canonical
 public pin set and repeatable live checks are in
@@ -159,7 +160,28 @@ GCP dependency; it does not justify claims of hardware-backed confidentiality.
 The final submission must distinguish simulated execution from real
 confidential hardware.
 
-## 7. Gate 0 pass record
+## 7. Restart and identity semantics
+
+The pinned official runtime generates the TEE identity key during process
+initialization and starts extension mode from `ZeroState`. Its public API does
+not provide a supported identity restore path. Restarting `extension-tee`
+therefore creates a new TEE ID even if the VeilBid sealed-bid volume survives.
+
+Operational rules:
+
+- never restart or recreate all three championship machines together;
+- monitor the live `/info` identity and fail closed on any on-chain mismatch;
+- treat one rotated identity as an unavailable member while the two surviving
+  frozen identities remain usable for selection;
+- re-run the supported `rRap` flow only for a replacement used by new tenders;
+- never persist a raw identity key in `.env`, a Docker secret, or a host file;
+- do not mark Gate B restart recovery passed until Flare supplies a supported
+  sealed identity/state restore mechanism and live evidence verifies it.
+
+The file-backed sealed-store test is still useful for handler state, but it is
+not proof that the whole TEE machine can restart under the same identity.
+
+## 8. Gate 0 pass record
 
 Gate 0 cannot pass without all of:
 

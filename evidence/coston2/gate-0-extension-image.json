@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "gate": "0-extension-image",
   "status": "PASSED",
-  "recordedAt": "2026-08-04T06:22:12.400Z",
-  "sourceCommit": "147bc351adf8391c4dc21a05ce5b70906ea3209a",
-  "extensionVersion": "0.2.0",
+  "recordedAt": "2026-08-07T12:38:38.076Z",
+  "sourceCommit": "fee5b1eb1b4796aedf1cbb3e061cc32ef5b26cb8",
+  "extensionVersion": "0.2.1",
   "buildPolicy": {
     "dockerfile": "apps/fcc-extension/Dockerfile",
     "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
@@ -12,19 +12,22 @@
     "platform": "linux/amd64",
     "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
     "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
+    "teeNodeVersion": "v0.0.23",
+    "teeProxySourceCommit": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
+    "teeProxyTeeNodeVersion": "v0.0.23",
     "provenance": "mode=max",
     "sbom": true
   },
   "publicIdentifiers": {
-    "imageTag": "veilbid/fcc-extension:coston2-v0.2.0",
-    "imageDigest": "sha256:930b6481838ae84965429d504af78dc8ebd62fa7e390d1647a3c2bf8f7951496",
+    "imageTag": "veilbid/fcc-extension:coston2-v0.2.1",
+    "imageDigest": "sha256:713323d25a153c4c228dff94071dd2fd5080d00e7f9fc7a727551670af69ebd5",
     "imageMediaType": "application/vnd.oci.image.manifest.v1+json",
     "platform": "linux/amd64",
     "runtimeUser": "0:0",
     "command": [
       "/app/extension-tee"
     ],
-    "binarySha256": "841e5cf25de1c8b28e0f403983428ce24ef3b0319b0bf4cb9200c893538eff59",
+    "binarySha256": "dc3c69e9f2e14fc8221fc2c4aa7f061eccaf0b779762ef1c4593a4001b87118d",
     "binaryBytes": 11124884,
     "binaryMode": "555",
     "defaultMode": "0",

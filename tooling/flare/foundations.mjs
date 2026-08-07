@@ -144,6 +144,23 @@ export function verifyFccExtensionReleaseRecipe(source, recipe) {
   );
 }
 
+export function verifyFccRuntimeAlignment(extensionGoMod, teeNode, teeProxy) {
+  if (
+    typeof extensionGoMod !== "string" || !teeNode || !teeProxy ||
+    typeof teeNode.tag !== "string" ||
+    typeof teeProxy.teeNodeModuleVersion !== "string"
+  ) return false;
+  const selectedVersion = teeNode.tag.replace(/^v/, "");
+  const moduleMatch = extensionGoMod.match(
+    /^\s*(?:require\s+)?github\.com\/flare-foundation\/tee-node\s+v([^\s]+)\s*$/mu,
+  );
+  return (
+    moduleMatch?.[1] === selectedVersion &&
+    teeProxy.teeNodeModuleVersion === selectedVersion &&
+    versionAtLeast(selectedVersion, teeNode.minimumOrganizerVersion)
+  );
+}
+
 export function normalizePrivateKey(value) {
   const trimmed = value?.trim();
   if (!trimmed) return null;
@@ -192,6 +209,15 @@ export async function inspectFoundations({
   const fccExtensionBuildInputsPinned = verifyFccExtensionReleaseRecipe(
     fccExtensionDockerfile,
     fccExtensionRecipe,
+  );
+  const fccExtensionGoMod = readFileSync(
+    resolve(repositoryRoot, "apps/fcc-extension/go.mod"),
+    "utf8",
+  );
+  const fccRuntimeVersionsAligned = verifyFccRuntimeAlignment(
+    fccExtensionGoMod,
+    manifest.upstreams.teeNode,
+    manifest.upstreams.teeProxy,
   );
   const teeProxyRecipe = manifest.docker.teeProxyReleaseRecipe;
   const teeProxyDockerfile = readFileSync(
@@ -473,6 +499,7 @@ export async function inspectFoundations({
       BigInt(block.timestamp) >= BigInt(feedTimestamp) &&
       BigInt(block.timestamp) - BigInt(feedTimestamp) <= 300n,
     dockerDaemonAvailable: dockerCheck.ok,
+    fccRuntimeVersionsAligned,
     fccExtensionBuildInputsPinned,
     fccExtensionReleaseImageDigestRecorded: isSha256Digest(
       fccExtensionRecipe.releaseImageDigest,
@@ -498,6 +525,11 @@ export async function inspectFoundations({
   const blockers = [];
   addBlocker(blockers, assertions.deploymentKeyMatchesDeclaredWallet, "DEPLOYMENT_KEY_NOT_READY");
   addBlocker(blockers, assertions.dockerDaemonAvailable, "DOCKER_DAEMON_UNAVAILABLE");
+  addBlocker(
+    blockers,
+    assertions.fccRuntimeVersionsAligned,
+    "FCC_NODE_PROXY_WIRE_VERSION_MISMATCH",
+  );
   addBlocker(
     blockers,
     assertions.fccExtensionBuildInputsPinned,
@@ -588,6 +620,11 @@ export async function inspectFoundations({
         ]),
       ),
       sourceChecks,
+      fccRuntimeCompatibility: {
+        extensionTeeNodeVersion: manifest.upstreams.teeNode.tag,
+        teeProxySourceCommit: manifest.upstreams.teeProxy.commit,
+        teeProxyTeeNodeVersion: `v${manifest.upstreams.teeProxy.teeNodeModuleVersion}`,
+      },
       fccExtensionReleaseRecipe: {
         dockerfile: fccExtensionRecipe.dockerfile,
         context: fccExtensionRecipe.context,

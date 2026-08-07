@@ -21,6 +21,7 @@ const requiredFoundationAssertions = [
   "goVersionPinned",
   "foundryVersionPinned",
   "teeNodeMinimumSatisfied",
+  "fccRuntimeVersionsAligned",
   "fccExtensionBuildInputsPinned",
   "fccExtensionReleaseImageDigestRecorded",
   "fccExtensionReleaseImageVerified",

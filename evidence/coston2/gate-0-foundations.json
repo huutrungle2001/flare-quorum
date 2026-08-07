@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "gate": "0",
   "status": "IN_PROGRESS",
-  "recordedAt": "2026-08-04T06:22:42.896Z",
-  "sourceCommit": "147bc351adf8391c4dc21a05ce5b70906ea3209a",
+  "recordedAt": "2026-08-07T12:38:53.346Z",
+  "sourceCommit": "fee5b1eb1b4796aedf1cbb3e061cc32ef5b26cb8",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "blockNumber": "33606212",
-    "blockTimestamp": 1785824570
+    "blockNumber": "33740406",
+    "blockTimestamp": 1786106341
   },
   "publicIdentifiers": {
     "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
@@ -41,12 +41,12 @@
       "fTestXRP": 177,
       "masterAccountController": 250
     },
-    "nextPublicExtensionId": "65930",
+    "nextPublicExtensionId": "66005",
     "xrpUsdFeed": {
       "id": "0x015852502f55534400000000000000000000000000",
-      "value": "1075859",
+      "value": "1035425",
       "decimals": 6,
-      "timestamp": 1785824570
+      "timestamp": 1786106341
     },
     "fTestXRP": {
       "address": "0x0b6A3645c240605887a5532109323A3E12273dc7",
@@ -72,7 +72,7 @@
       "fccScaffold": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
       "fccSignExample": "6df972c64d34efe1d4497f0eafe6792d1f0862dd",
       "goFlareCommon": "09a10067e6a4",
-      "teeNode": "adc67a29eb7162f6f1b5dabcbca320009480695e",
+      "teeNode": "9090eccbae1111742bd83ef0601485d9503b4a13",
       "teeProxy": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
       "flareSmartContracts": "b69873e1e1a0785e2450d811f35c7927a625716b",
       "flareFoundryPeriphery": "ca264d6a31ddfb53d1bef7cb7bd1942aa89d323a",
@@ -127,6 +127,14 @@
         "matches": true
       },
       {
+        "id": "tee-node-identity-initialization",
+        "matches": true
+      },
+      {
+        "id": "tee-node-extension-server-initialization",
+        "matches": true
+      },
+      {
         "id": "coston2-contract-registry",
         "matches": true
       },
@@ -147,16 +155,21 @@
         "matches": true
       }
     ],
+    "fccRuntimeCompatibility": {
+      "extensionTeeNodeVersion": "v0.0.23",
+      "teeProxySourceCommit": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
+      "teeProxyTeeNodeVersion": "v0.0.23"
+    },
     "fccExtensionReleaseRecipe": {
       "dockerfile": "apps/fcc-extension/Dockerfile",
       "context": "apps/fcc-extension",
       "platform": "linux/amd64",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
       "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
-      "releaseImageTag": "veilbid/fcc-extension:coston2-v0.2.0",
-      "releaseImageDigest": "sha256:930b6481838ae84965429d504af78dc8ebd62fa7e390d1647a3c2bf8f7951496",
-      "releaseBinarySha256": "841e5cf25de1c8b28e0f403983428ce24ef3b0319b0bf4cb9200c893538eff59"
+      "releaseImageTag": "veilbid/fcc-extension:coston2-v0.2.1",
+      "releaseImageDigest": "sha256:713323d25a153c4c228dff94071dd2fd5080d00e7f9fc7a727551670af69ebd5",
+      "releaseBinarySha256": "dc3c69e9f2e14fc8221fc2c4aa7f061eccaf0b779762ef1c4593a4001b87118d"
     },
     "teeProxyReleaseRecipe": {
       "dockerfile": "apps/fcc-extension/proxy/Dockerfile",
@@ -190,6 +203,7 @@
     "fAssetsDirectMintingBindingsLive": true,
     "xrpUsdFeedIsLive": true,
     "dockerDaemonAvailable": true,
+    "fccRuntimeVersionsAligned": true,
     "fccExtensionBuildInputsPinned": true,
     "fccExtensionReleaseImageDigestRecorded": true,
     "fccExtensionReleaseImageVerified": true,

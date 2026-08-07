@@ -52,6 +52,17 @@ const selection = {
   expiry: 2_000n,
 } as const;
 
+test("uses Solidity bytes32 operation identifiers instead of hashes", () => {
+  assert.equal(
+    veilBidSelectionOpType,
+    "0x5645494c4249445f53454c454354494f4e000000000000000000000000000000",
+  );
+  assert.equal(
+    veilBidSelectV1OpCommand,
+    "0x53454c4543545f56310000000000000000000000000000000000000000000000",
+  );
+});
+
 async function responseFixture() {
   const data = encodeAbiParameters(selectionResultParameter, [selection]);
   const result = {
