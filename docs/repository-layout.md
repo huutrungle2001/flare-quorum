@@ -24,6 +24,7 @@ VeilBid/
 │   └── schemas/
 ├── tooling/scripts/
 ├── docs/
+├── submission/flare/          # current Flare judge package; parent pack is historical
 ├── AGENTS.md
 ├── DESIGNS.md
 ├── PLAN.md                   # championship execution authority
@@ -161,6 +162,7 @@ Rules:
 | Execution sequence and phase status | `PLAN.md` |
 | Supplied competition/FCC source messages | `docs/original/` |
 | Competition checklist/judging mapping | `docs/hackathon-brief.md` |
+| Current Flare judge package | `submission/flare/` |
 | Current FCC registration/proxy preflight | `docs/fcc-coston2-operations.md` |
 
 ## 5. Root orchestration
