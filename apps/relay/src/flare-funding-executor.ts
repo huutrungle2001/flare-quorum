@@ -83,6 +83,7 @@ export type FlareFundingExecution =
 export interface FlareFundingExecutorOptions {
   fetchImplementation?: typeof fetch;
   sleep?: (milliseconds: number) => Promise<void>;
+  onStage?: (stage: string) => void;
 }
 
 export class FlareFundingExecutor {
@@ -104,6 +105,10 @@ export class FlareFundingExecutor {
     return this.options.sleep
       ? this.options.sleep(milliseconds)
       : new Promise((resolve) => setTimeout(resolve, milliseconds));
+  }
+
+  private stage(name: string): void {
+    this.options.onStage?.(name);
   }
 
   async health(): Promise<FlareFundingHealth> {
@@ -178,12 +183,15 @@ export class FlareFundingExecutor {
     ) {
       throw new Error("FLARE_FUNDING_WRITE_DISABLED");
     }
+    this.stage("inspect-network");
     const network = await this.chain.inspectNetwork();
+    this.stage("read-initial-nonce");
     const initialNonce = await this.chain.getSmartAccountNonce(
       network.contracts.masterAccountController,
       job.personalAccount,
     );
     if (initialNonce !== job.nonce) throw new Error("STALE_SMART_ACCOUNT_NONCE");
+    this.stage("build-user-operation");
     const plan = buildMintAndFundPlan({
       personalAccount: job.personalAccount,
       nonce: job.nonce,
@@ -200,6 +208,7 @@ export class FlareFundingExecutor {
       network.directMintingFeeBips,
       network.directMintingMinimumFeeUBA,
     );
+    this.stage("xrpl-finality");
     const xrplFinality = await waitForXrplFinality({
       rpcUrl: this.config.xrplRpcUrl,
       transactionId: job.xrplTransactionId,
@@ -209,22 +218,26 @@ export class FlareFundingExecutor {
       fetchImplementation: this.options.fetchImplementation,
       sleep: this.options.sleep,
     });
+    this.stage("fdc-prepare-request");
     const prepared = await prepareXrpPaymentRequest({
       verifierBaseUrl: this.config.verifierBaseUrl,
       apiKey: this.config.verifierApiKey,
       transactionId: job.xrplTransactionId,
       proofOwner: this.chain.executorAddress,
     }, { fetchImplementation: this.options.fetchImplementation });
+    this.stage("fdc-request-fee");
     const requestFee = await this.chain.getRequestFee(
       network.contracts.fdcHub,
       prepared.abiEncodedRequest,
     );
+    this.stage("fdc-submit-request");
     const requestReceipt = await this.chain.submitAttestationRequest(
       network.contracts.fdcHub,
       prepared.abiEncodedRequest,
       requestFee,
     );
     if (requestReceipt.status !== "success") throw new Error("FDC_REQUEST_REVERTED");
+    this.stage("fdc-round-calculation");
     const [requestBlockTimestamp, timing] = await Promise.all([
       this.chain.getBlockTimestamp(requestReceipt.blockNumber),
       this.chain.getFdcTiming(network.contracts.flareSystemsManager),
@@ -234,11 +247,14 @@ export class FlareFundingExecutor {
       timing.firstVotingRoundStartTimestamp,
       timing.votingEpochDurationSeconds,
     );
+    this.stage("fdc-finalization");
     await this.waitForFdcFinalization(network, votingRoundId);
+    this.stage("fdc-proof");
     const proof = await this.retrieveProof(
       votingRoundId,
       prepared.abiEncodedRequest,
     );
+    this.stage("fdc-proof-verification");
     assertXrpPaymentProof(proof, {
       attestationType: xrpPaymentAttestationType,
       sourceId: testXrpSourceId,
@@ -248,6 +264,7 @@ export class FlareFundingExecutor {
       votingRound: votingRoundId,
       minimumReceivedAmount: quote.paymentAmountUBA,
     });
+    this.stage("derive-personal-account");
     const derivedPersonalAccount = await this.chain.getPersonalAccount(
       network.contracts.masterAccountController,
       proof.data.responseBody.sourceAddress,
@@ -255,12 +272,14 @@ export class FlareFundingExecutor {
     if (derivedPersonalAccount !== job.personalAccount) {
       throw new Error("XRPL_OWNER_PERSONAL_ACCOUNT_MISMATCH");
     }
+    this.stage("read-current-nonce");
     const currentNonce = await this.chain.getSmartAccountNonce(
       network.contracts.masterAccountController,
       job.personalAccount,
     );
     if (currentNonce !== job.nonce) throw new Error("STALE_SMART_ACCOUNT_NONCE");
     const totalCallValue = plan.calls.reduce((sum, call) => sum + call.value, 0n);
+    this.stage("direct-mint");
     const mintReceipt = await this.chain.executeDirectMinting(
       network.contracts.assetManager,
       proof,
@@ -268,6 +287,7 @@ export class FlareFundingExecutor {
       totalCallValue,
     );
     if (mintReceipt.status !== "success") throw new Error("DIRECT_MINTING_REVERTED");
+    this.stage("inspect-direct-mint");
     const mintOutcome = inspectDirectMintingReceipt({
       logs: mintReceipt.logs,
       assetManager: network.contracts.assetManager,
@@ -297,6 +317,7 @@ export class FlareFundingExecutor {
     if (mintOutcome.mintedAmountUBA < requiredMintedAmountUBA) {
       throw new Error("DIRECT_MINTING_UNDERFUNDED");
     }
+    this.stage("prove-tender-created");
     const tender = parseEventLogs({
       abi: tenderCreatedEventAbi,
       eventName: "TenderCreated",

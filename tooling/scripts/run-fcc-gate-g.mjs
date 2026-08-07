@@ -301,7 +301,11 @@ async function main() {
     if (/^[A-Z0-9_]+$/.test(parseCode)) throw new Error(`FCC_GATE_G_JOB_${parseCode}`);
     throw new Error("FCC_GATE_G_JOB_SCHEMA_INVALID");
   }
-  const executor = new FlareFundingExecutor(config, fundingChain);
+  const executor = new FlareFundingExecutor(config, fundingChain, {
+    onStage: (stage) => {
+      lastSafeMarker = `executor-${stage}`;
+    },
+  });
   currentPhase = "fdc-smart-account-execution";
   const executeFunding = async () => {
     lastSafeMarker = "executor";
