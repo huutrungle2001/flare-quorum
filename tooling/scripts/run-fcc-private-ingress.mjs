@@ -115,7 +115,9 @@ async function sendDirect(url, apiKey, ciphertext) {
 async function readResult(url, actionId, attempts = 36) {
   let lastStatus = 0;
   for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const response = await fetch(`${url.replace(/\/+$/, "")}/action/result/${actionId}`, {
+    const resultUrl = new URL(`${url.replace(/\/+$/, "")}/action/result/${actionId}`);
+    resultUrl.searchParams.set("submissionTag", "submit");
+    const response = await fetch(resultUrl, {
       headers: { accept: "application/json" },
       redirect: "error",
       signal: AbortSignal.timeout(12_000),
@@ -193,6 +195,11 @@ async function main() {
   }
 
   const now = BigInt(Math.floor(Date.now() / 1000));
+  // Use a fresh synthetic tender namespace for every live probe.  The TEE's
+  // sealed store intentionally allows only one ciphertext per
+  // (chain, market, extension, tender, vendor) slot, so a rerun must not
+  // collide with an earlier evidence attempt.
+  const tenderId = BigInt(Date.now());
   const bidDeadline = now + 3_600n;
   const submission = {
     schemaVersion: 1,
@@ -200,7 +207,7 @@ async function main() {
     market,
     extensionId,
     codeVersion: codeHash,
-    tenderId: 1n,
+    tenderId,
     vendor: "0x2000000000000000000000000000000000000002",
     submissionNonce: BigInt(Date.now()),
     rules: {
@@ -246,7 +253,23 @@ async function main() {
     submissions.push({ index, actionId, verified });
   }
 
-  const replayActionId = await sendDirect(proxyUrls[0], apiKeys[0], ciphertexts[0]);
+  // An exact transport retry is intentionally idempotent: it returns the
+  // same receipt rather than minting a second sealed slot.  A re-encrypted
+  // payload for the same canonical slot must be rejected, which prevents a
+  // caller from replacing a bid after the first ciphertext was accepted.
+  const idempotentRetryActionId = await sendDirect(proxyUrls[0], apiKeys[0], ciphertexts[0]);
+  const idempotentRetryValue = await readResult(proxyUrls[0], idempotentRetryActionId);
+  const idempotentRetry = await verifyReceipt(idempotentRetryValue, {
+    actionId: idempotentRetryActionId,
+    submission,
+    commitment,
+    rulesHash,
+  }, teeMachines[0].teeId);
+  const conflictCiphertext = await encryptPrivateBidForTee(
+    Uint8Array.from(Buffer.from(plaintext.slice(2), "hex")),
+    teeMachines[0].publicKey,
+  );
+  const replayActionId = await sendDirect(proxyUrls[0], apiKeys[0], conflictCiphertext);
   const replayValue = await readResult(proxyUrls[0], replayActionId);
   const replayResponse = parseFccActionResponse(replayValue);
   const replayRejected = replayResponse.result.status === 0 && replayResponse.result.log === "error: PRIVATE_BID_CONFLICT" && replayResponse.result.data === "0x";
@@ -260,6 +283,7 @@ async function main() {
     allReceiptsMatchCommitment: submissions.every(({ verified }) => sameHex(verified.receipt.plaintextCommitment, commitment)),
     allReceiptsBindDomain: submissions.every(({ verified }) => verified.assertions.receiptMarketMatches && verified.assertions.receiptTenderMatches && verified.assertions.receiptVendorMatches),
     allReceiptsSignerChecked: submissions.every(({ verified }) => verified.assertions.receiptSignerMatches),
+    exactCiphertextRetryIdempotent: idempotentRetry.response.result.status === 1 && idempotentRetry.assertions.receiptCommitmentMatches,
     sealedReplayRejected: replayRejected,
     ciphertextNotRecorded: true,
     plaintextNotRecorded: true,
@@ -281,6 +305,7 @@ async function main() {
       machineIds: teeMachines.map(({ teeId }) => teeId),
       machineCount: teeMachines.length,
       actionIds: submissions.map(({ actionId }) => actionId),
+      idempotentRetryActionId,
       replayActionId,
       plaintextCommitment: commitment,
       receiptTeeIds: submissions.map(({ verified }) => verified.receipt.teeId),
