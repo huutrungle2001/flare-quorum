@@ -80,6 +80,12 @@ a replacement extension merely because a later configuration transaction was
 interrupted. The resulting registration evidence still does not pass Gate A
 until a production machine drives a signed live FCC action.
 
+Re-verify the committed public evidence independently with
+`pnpm flare:foundation:registration:verify`. This command uses no signer and
+checks the deployment/registration receipts, constructor input, masked runtime
+logic, current registry mappings, explicit sender binding, owner allowlists,
+and EVM key type directly against Coston2.
+
 Record in a committed public dependency manifest:
 
 - official FCC scaffold commit, Go version, Docker image digests, public

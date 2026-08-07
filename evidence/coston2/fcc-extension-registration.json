@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "gate": "FCC_EXTENSION_REGISTRATION",
+  "status": "REGISTERED_BOUND_CONFIGURATION_READY",
+  "recordedAt": "2026-08-07T13:07:45.097Z",
+  "sourceCommit": "48c4753ea960fc5f079b8028038922fc63e1e736",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "foundationSender": "0xf522b863fb19496D21ac7D0D1d71435C1DDc2EdE",
+    "extensionId": "66007",
+    "extensionIdHex": "0x00000000000000000000000000000000000000000000000000000000000101d7",
+    "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "deploymentTransaction": "0xb6d942a48fdf148cbc48756375fc7e77691085e2bc7f837142801af465af097d",
+    "deploymentBlock": "33741384",
+    "registrationTransaction": "0x85f24ee46242e63c78b61318f1331cccb7113c4b52ed135fe65b2f81a315685f",
+    "registrationBlock": "33741390",
+    "bindingTransaction": "0x694c0b343c93df973103db78304cfbca04bad178ebeeed08a632b6c8f0862b92",
+    "runtimeHash": "0x01e4f779c137779ff6cb10350100b84b972fa408fb433bb3012ed25d9b9b43d8",
+    "maskedRuntimeHash": "0x1cf2f325d025f9f0aa02c39c76478231a12a41cd697774002ffed021f8022b02",
+    "artifactMaskedRuntimeHash": "0x1cf2f325d025f9f0aa02c39c76478231a12a41cd697774002ffed021f8022b02",
+    "machineOwnerTransaction": "0x57761d8f80a4edc09be2b7f6b18fcb0f4d1c17894b2c5b70b22133fb1229d174",
+    "walletProjectOwnerTransaction": "0x881ce2e0fde065294055b86fda9cedabe5dc7c019d86602cd5e9aea6d35288d5",
+    "keyTypeTransaction": "0xeb60e60d2fe05e7f08cad139363e212c31f61f32dd47b4794442c46e47eace63"
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "deployerMatchesDeclaredWallet": true,
+    "deploymentSucceeded": true,
+    "registrationSucceeded": true,
+    "extensionIdIsPublic": true,
+    "registrationOwnerMatches": true,
+    "registrationSenderMatches": true,
+    "registrationStateVerifierIsZero": true,
+    "runtimeSizeMatches": true,
+    "runtimeLogicMatchesArtifact": true,
+    "senderChainMatches": true,
+    "senderVersionMatches": true,
+    "senderOwnerMatches": true,
+    "senderRegistryMatches": true,
+    "senderMachineRegistryMatches": true,
+    "senderExtensionBindingMatches": true,
+    "machineOwnerAllowed": true,
+    "walletProjectOwnerAllowed": true,
+    "evmKeyTypeSupported": true
+  },
+  "blockers": [
+    "CODE_VERSION_NOT_ALLOWED",
+    "THREE_PRODUCTION_MACHINES_NOT_REGISTERED",
+    "LIVE_FCC_FOUNDATION_ACTION_NOT_VERIFIED"
+  ],
+  "notes": [
+    "This evidence proves only deployment, extension registration, explicit ID binding, owner allowlists, and EVM key-type configuration.",
+    "It does not claim a production TEE, FCC action result, Gate A pass, or bounty completion.",
+    "No RPC URL, private key, wallet signature, proxy credential, attestation body, or bid data is recorded."
+  ]
+}
