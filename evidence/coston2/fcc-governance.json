@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "gate": "FCC_GOVERNANCE",
+  "status": "PASSED",
+  "recordedAt": "2026-08-07T14:48:29.637Z",
+  "sourceCommit": "3997a4da5e56401f65a3e3344ecdb98354a8452b",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33744574"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "66007",
+    "governanceHash": "0xa3ff9bd94c8e0f9512e1e3ecc81caa16c94946e366974182da86dba03a5f9832",
+    "signers": [
+      "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E"
+    ],
+    "threshold": "1",
+    "transactionHash": "0x20f37e8eeb899311e863ec698bddb6c7c8e8697346a35b916509b85effb27e08",
+    "machineIds": [
+      "0x6940f1Da741362E3605B9AD7083de30fFd251334",
+      "0x4bFf0cc88768a04e4137125A84c14EbE63C86312",
+      "0x5ccEA9ac3CD8fBFC8E01522402d46B06cd6C3423"
+    ]
+  },
+  "assertions": {
+    "extensionOwnerMatchesSigner": true,
+    "threeMachineGovernanceHashesPresent": true,
+    "machineGovernanceHashesMatchDesired": true,
+    "onchainGovernanceCanBeInitialized": true,
+    "existingGovernanceDetailsMatch": true,
+    "latestHashMatches": true,
+    "signerOrderMatches": true,
+    "thresholdMatches": true,
+    "plainGovernanceHasNoSafe": true,
+    "governanceHashIsValid": true,
+    "allGovernanceSignersRecognized": true,
+    "transactionSucceeded": true
+  },
+  "blockers": [
+    "THREE_PRODUCTION_MACHINES_NOT_REGISTERED",
+    "LIVE_FCC_FOUNDATION_ACTION_NOT_VERIFIED"
+  ],
+  "notes": [
+    "Plain one-signer governance matches the governance hash independently reported by all three simulated Railway TEE machines.",
+    "This record does not claim machine production status, a live FCC action result, hardware attestation, or a completed Gate 0/Gate A.",
+    "No private key, proxy key, indexer credential, raw signature, attestation, TEE public key, or bid payload is recorded."
+  ]
+}
