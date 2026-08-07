@@ -85,6 +85,13 @@ export const assetManagerFAssetsAbi = [
   },
   {
     type: "function",
+    name: "minimumRedeemAmountUBA",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
     name: "directMintingPaymentAddress",
     stateMutability: "view",
     inputs: [],
@@ -119,6 +126,17 @@ export const assetManagerFAssetsAbi = [
     outputs: [],
   },
   {
+    type: "function",
+    name: "redeemAmount",
+    stateMutability: "payable",
+    inputs: [
+      { name: "_amountUBA", type: "uint256" },
+      { name: "_redeemerUnderlyingAddressString", type: "string" },
+      { name: "_executor", type: "address" },
+    ],
+    outputs: [{ name: "_redeemedAmountUBA", type: "uint256" }],
+  },
+  {
     type: "event",
     name: "DirectMintingDelayed",
     anonymous: false,
@@ -139,6 +157,25 @@ export const assetManagerFAssetsAbi = [
       { name: "mintedAmountUBA", type: "uint256", indexed: false },
       { name: "mintingFeeUBA", type: "uint256", indexed: false },
       { name: "memoData", type: "bytes", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "RedemptionRequested",
+    anonymous: false,
+    inputs: [
+      { name: "agentVault", type: "address", indexed: true },
+      { name: "redeemer", type: "address", indexed: true },
+      { name: "requestId", type: "uint256", indexed: true },
+      { name: "paymentAddress", type: "string", indexed: false },
+      { name: "valueUBA", type: "uint256", indexed: false },
+      { name: "feeUBA", type: "uint256", indexed: false },
+      { name: "firstUnderlyingBlock", type: "uint256", indexed: false },
+      { name: "lastUnderlyingBlock", type: "uint256", indexed: false },
+      { name: "lastUnderlyingTimestamp", type: "uint256", indexed: false },
+      { name: "paymentReference", type: "bytes32", indexed: false },
+      { name: "executor", type: "address", indexed: false },
+      { name: "executorFeeNatWei", type: "uint256", indexed: false },
     ],
   },
 ] as const;

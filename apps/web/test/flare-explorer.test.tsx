@@ -2,6 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { FlareEvidenceWorkspace, FlareExplorerView } from "../src/flare/FlareRoom";
+import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
 import { PrimaryNavigation } from "../src/shell/PrimaryNavigation";
 import type { WalletController } from "../src/wallet/WalletPanel";
 
@@ -121,5 +122,13 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("Threshold result pending")).toBeInTheDocument();
     expect(screen.getByText(/Only public commitments, finalized checkpoints/)).toBeInTheDocument();
     expect(screen.queryByText(/plaintext bid|ciphertext/i)).toBeNull();
+  });
+
+  it("keeps FXRP redemption behind the winning wallet and never asks for an XRPL secret", () => {
+    render(<FlareRedemptionPanel wallet={wallet} tenders={[publicTender]} />);
+    expect(screen.getByRole("heading", { name: "Request XRP redemption" })).toBeInTheDocument();
+    expect(screen.getByText(/Connect the winning Coston2 wallet/)).toBeInTheDocument();
+    expect(screen.getByText(/never asks for an XRPL secret/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /APPROVE & REQUEST XRP REDEMPTION/i })).toBeNull();
   });
 });

@@ -5,6 +5,7 @@ import { useToasts } from "../shell/ToastProvider";
 import { parseUnits } from "viem";
 import { useMemo, useState } from "react";
 import { submitFlareBid } from "./flareBidIngress";
+import { FlareRedemptionPanel } from "./FlareRedemptionPanel";
 
 const stageLabels = {
   keys: "Checking the frozen TEE keys…",
@@ -156,7 +157,7 @@ export function FlareVendorWorkspace({
           )}
         </section>
       )}
+      <FlareRedemptionPanel wallet={wallet} tenders={tenders} />
     </main>
   );
 }
-

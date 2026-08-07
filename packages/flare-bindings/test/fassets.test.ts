@@ -129,3 +129,12 @@ test("reports a rate-limited mint as delayed, never executed", () => {
     executionAllowedAt: 2_000n,
   });
 });
+
+test("exposes the official amount-based redemption surface", () => {
+  const redeem = assetManagerFAssetsAbi.find((item) => item.type === "function" && item.name === "redeemAmount");
+  const minimum = assetManagerFAssetsAbi.find((item) => item.type === "function" && item.name === "minimumRedeemAmountUBA");
+  const requested = assetManagerFAssetsAbi.find((item) => item.type === "event" && item.name === "RedemptionRequested");
+  assert.deepEqual(redeem && "inputs" in redeem ? redeem.inputs.map((input) => input.type) : [], ["uint256", "string", "address"]);
+  assert.equal(minimum?.type, "function");
+  assert.equal(requested?.type, "event");
+});
