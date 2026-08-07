@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-frontend-keyboard-accessibility",
+  "recordedAt": "2026-08-07T20:09:27.531Z",
+  "publicIdentifiers": {
+    "sourceCommit": "786fe2ef47247e283c8e58aee1477e11c5ebd3ce",
+    "provider": "vercel",
+    "project": "veilbid-flare",
+    "canonicalUrl": "https://veilbid-flare.vercel.app",
+    "network": "flare-coston2",
+    "chainId": 114,
+    "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05"
+  },
+  "measurements": {
+    "desktopInteractiveCount": 22,
+    "mobileViewportWidth": 320,
+    "focusSequence": [
+      {
+        "tag": "A",
+        "text": "SKIP TO CONTENT",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "A",
+        "text": "VEILBID",
+        "ariaLabel": "VeilBid home",
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "A",
+        "text": "TENDERS",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "A",
+        "text": "DOCS",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
+        "text": "↻",
+        "ariaLabel": "Refresh Coston2 state",
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
+        "text": "TENDER / 1Flare confidential procurement1 FTestXRPPublic ceiling0/1TEE receiptsC",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
+        "text": "TENDER / 2Flare confidential procurement1 FTestXRPPublic ceiling0/1TEE receiptsC",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
+        "text": "TENDER / 3Flare confidential procurement1 FTestXRPPublic ceiling0/1TEE receiptsC",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      }
+    ]
+  },
+  "assertions": {
+    "skipLinkAndPrimaryNavigation": true,
+    "activeCoston2TenderNavigation": true,
+    "allInteractiveControlsNamed": true,
+    "keyboardFocusVisitedControls": true,
+    "keyboardFocusIndicatorPresent": true,
+    "desktopNoHorizontalOverflow": true,
+    "mobile320NoHorizontalOverflow": true,
+    "mobileTenderVisible": true,
+    "reducedMotionStylesPresent": true,
+    "noUnexpectedErrorAlert": true
+  },
+  "blockers": [],
+  "notes": [
+    "The live Flare route was exercised with keyboard input and a 320px viewport.",
+    "The smoke records labels, layout assertions, and public route state only; it does not connect a wallet or access confidential data."
+  ]
+}
