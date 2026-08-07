@@ -244,9 +244,11 @@ custodial VeilBid signer.
   dedicated finalizer environment.
 - [x] Add explicit RPC/FCC/proxy/FDC/FTSO unavailable and recovery states to the
   Flare reader, relay, funding, and ingress adapters.
-- [ ] Complete the remaining responsive, keyboard, reduced-motion, privacy-copy,
-  and role-workspace review; the Flare public route's 320px/keyboard smoke now
-  passes.
+- [x] Complete the responsive, keyboard, reduced-motion, privacy-copy, and
+  role-workspace review; production desktop/mobile smoke and the 320px keyboard
+  evidence pass in `evidence/coston2/web-production-smoke.json` and
+  `evidence/coston2/web-keyboard-accessibility.json`. Browser-native XRP
+  signing remains explicitly outside the app custody boundary.
 
 Exit: every core role can complete its journey and judges can verify a finalized
 tender without a wallet.
