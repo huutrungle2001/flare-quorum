@@ -48,6 +48,9 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
       calls.push({ kind: "submit", value });
       return { actionId: `0x${"66".repeat(32)}`, teeId, expiresAt: 1_200n };
     },
+    async result() {
+      return { actionId: `0x${"66".repeat(32)}`, teeId, data: `0x${"77".repeat(32)}`, expiresAt: 1_200n };
+    },
   });
   try {
     const health = await fetch(`${app.baseUrl}/health`, {
@@ -85,6 +88,19 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
       expiresAt: "1200",
     });
     assert.equal(calls[1].value.ciphertext, ciphertext);
+
+    const result = await fetch(`${app.baseUrl}/flare/ingress/tenders/7/machines/2/results/0x${"66".repeat(32)}`, {
+      headers: { Origin: "https://app.example" },
+    });
+    assert.equal(result.status, 200);
+    assert.deepEqual(await result.json(), {
+      schemaVersion: 1,
+      status: "ready",
+      actionId: `0x${"66".repeat(32)}`,
+      teeId,
+      data: `0x${"77".repeat(32)}`,
+      expiresAt: "1200",
+    });
   } finally {
     await app.close();
   }
@@ -94,6 +110,7 @@ test("HTTP ingress rejects plaintext-shaped fields, oversized input, and foreign
   const gateway = {
     async machineKeys() { throw new Error("not called"); },
     async submit() { throw new Error("not called"); },
+    async result() { throw new Error("not called"); },
   };
   const app = await fixture(gateway);
   try {
@@ -128,6 +145,7 @@ test("HTTP ingress sanitizes unexpected downstream errors", async () => {
   const app = await fixture({
     async machineKeys() { throw new Error("sensitive upstream detail"); },
     async submit() { throw new Error("not called"); },
+    async result() { throw new Error("not called"); },
   });
   try {
     const response = await fetch(`${app.baseUrl}/flare/ingress/tenders/7/machines`);
@@ -148,6 +166,7 @@ test("HTTP ingress applies a bounded per-peer request rate", async () => {
       return [];
     },
     async submit() { throw new Error("not called"); },
+    async result() { throw new Error("not called"); },
   });
   try {
     for (let index = 0; index < 120; index += 1) {

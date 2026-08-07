@@ -44,8 +44,15 @@ three authenticated FCC `/direct` endpoints. `GET
 encryption keys after rereading one Coston2 block and matching the market's
 immutable manager, production status, extension ID, code hash, registered
 proxy URL, TEE identity, and frozen key fingerprint. `POST
-/flare/ingress/bids` accepts only the strict EIP-712-authorized ciphertext
+POST `/flare/ingress/bids` accepts only the strict EIP-712-authorized ciphertext
 envelope and returns only the public action ID, target TEE ID, and expiry.
+`GET /flare/ingress/tenders/:tenderId/machines/:machineIndex/results/:actionId`
+polls one action and returns only a verified, TEE-signed bid receipt payload;
+pending proxy results remain HTTP 202. `GET /health` is a public readiness
+response containing only the service name, schema version, and chain ID. The
+hosted v2 judge ingress is
+`https://veilbid-flare-ingress-production.up.railway.app`; its browser origin
+allowlist is the separate v2 Vercel deployment.
 
 The server authenticates the vendor before doing admission RPC reads, bounds
 request and proxy-response bodies, rate limits the socket peer, uses exact
@@ -101,6 +108,9 @@ FLARE_INGRESS_WEB_ORIGIN                # exact HTTPS web origin
 FLARE_INGRESS_HOST                      # loopback by default
 FLARE_INGRESS_PORT                      # 8788 by default; PORT is fallback
 ```
+
+The browser receives only the public `VITE_FLARE_INGRESS_URL` origin. It never
+receives the direct proxy API keys, indexer credentials, or any TEE secret.
 
 `health` and `dry-run` remain read-only. `once` and `poll` are intentionally
 disabled while the release status is `planned`; local tests do not override

@@ -430,6 +430,13 @@ The championship release provides:
 
 The current v2 judge deployment is the separate Vercel project
 `veilbid-flare.vercel.app`; it is not the historical `veilbid-three` project.
+The ciphertext-only vendor ingress is the separate Railway v2 service at
+`https://veilbid-flare-ingress-production.up.railway.app`. Its `/health` route
+is public and returns only `{status, service, chainId, schemaVersion}`; browser
+builds receive this origin through `VITE_FLARE_INGRESS_URL`, while all direct
+proxy keys remain server-only. The service does not persist bid bodies or
+proxy envelopes. A successful ingress action is not by itself a settlement;
+the receipt quorum still must be submitted to the frozen Coston2 market.
 The Flare relay includes a read-only `health-server` mode (`/live` and
 `/health`) that needs no signer. Settlement polling must be deployed only as a
 separate Coston2 service after a dedicated finalizer key and the three verified

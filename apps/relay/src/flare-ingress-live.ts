@@ -1,6 +1,9 @@
 import {
+  parseFccActionResponse,
   teeIdentityFromPublicKey,
   teePublicKeyFingerprint,
+  veilBidDirectOpType,
+  veilBidDirectSubmitCommand,
   veilBidFlareMarketAbi,
   type FlareTeePublicKey,
 } from "@veilbid/flare-bindings";
@@ -420,5 +423,57 @@ export class LiveFlareBidIngressProxy implements FlareBidIngressProxy {
       throw new Error("FCC_PROXY_RESPONSE_INVALID");
     }
     return { actionId: verifyProxyAction(parsed, instruction) };
+  }
+
+  async result(
+    machineIndex: number,
+    actionId: Hex,
+  ): Promise<{ actionId: Hex; status: number; submissionTag: string; opType: Hex; opCommand: Hex; data: Hex }> {
+    if (!Number.isInteger(machineIndex) || machineIndex < 0 || machineIndex >= 3) {
+      throw new Error("FCC_PROXY_MACHINE_INDEX_INVALID");
+    }
+    if (!/^0x[0-9a-fA-F]{64}$/.test(actionId)) throw new Error("FCC_PROXY_ACTION_INVALID");
+    const resultUrl = new URL(`${this.#urls[machineIndex]}/action/result/${actionId}`);
+    resultUrl.searchParams.set("submissionTag", "submit");
+    let response: Response;
+    try {
+      response = await this.#fetch(resultUrl, {
+        method: "GET",
+        headers: { accept: "application/json", "X-API-Key": this.#apiKeys[machineIndex] },
+        cache: "no-store",
+        credentials: "omit",
+        redirect: "manual",
+        referrerPolicy: "no-referrer",
+        signal: AbortSignal.timeout(12_000),
+      });
+    } catch {
+      throw new Error("FCC_PROXY_UNAVAILABLE");
+    }
+    if (response.status === 404 || response.status === 202) throw new Error("FCC_PROXY_RESULT_PENDING");
+    if (!response.ok) throw new Error("FCC_PROXY_REJECTED");
+    if (response.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() !== "application/json") {
+      throw new Error("FCC_PROXY_RESPONSE_INVALID");
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(await boundedBody(response));
+    } catch (error) {
+      if (error instanceof Error && error.message === "FCC_PROXY_RESPONSE_INVALID") throw error;
+      throw new Error("FCC_PROXY_RESPONSE_INVALID");
+    }
+    const action = parseFccActionResponse(parsed).result;
+    if (
+      action.id.toLowerCase() !== actionId.toLowerCase() || action.submissionTag !== "submit" ||
+      action.opType.toLowerCase() !== veilBidDirectOpType.toLowerCase() ||
+      action.opCommand.toLowerCase() !== veilBidDirectSubmitCommand.toLowerCase()
+    ) throw new Error("FCC_PROXY_ACTION_MISMATCH");
+    return {
+      actionId: action.id,
+      status: action.status,
+      submissionTag: action.submissionTag,
+      opType: action.opType,
+      opCommand: action.opCommand,
+      data: action.data,
+    };
   }
 }

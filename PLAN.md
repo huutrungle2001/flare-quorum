@@ -2,7 +2,8 @@
 
 > Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
 > lifecycle, and Gate G pass on Coston2. Three stable Railway FCC origins accept encrypted bids and
-> return domain-bound receipts; a three-bid, two-signature lifecycle proves
+> return domain-bound receipts; the v2 Railway ingress now fronts that path for
+> browser ciphertext, while a three-bid, two-signature lifecycle proves
 > common quorum, private scoring, threshold finalization, FTSO binding, and
 > exact FTestXRP settlement. The XRP-native run also proves an XRPL `0xFE`
 > payment, FDC proof, Smart Account direct mint, and atomic tender funding.
@@ -216,17 +217,23 @@ custodial VeilBid signer.
   the browser route is now backed by the verified Coston2 release.
 - [x] Replace the Sepolia judge path with verified Coston2 bindings for `/` and
   `/flare`; `/room` remains explicitly historical.
-- [ ] Build XRP-native Buyer, EVM Buyer, Vendor, Public, Activity, and Evidence
-  workspaces.
+- [~] Build role workspaces: the wallet-free Public dossier and EVM Buyer/Vendor
+  Coston2 paths are implemented; XRP-native Buyer, Activity, and dedicated
+  Evidence workspaces remain open.
 - [x] Show verified extension, code version, TEE identities/key fingerprints,
   quorum, rule version, FTSO snapshot, result digest, and sanitized FAssets/FDC/
   Smart Account bindings in the wallet-free Flare dossier.
-- [ ] Build sealed bid composer with no plaintext persistence.
+- [x] Build the Coston2 sealed bid composer with browser-only ECIES encryption,
+  three authenticated ingress requests, three signed receipt checks, and an
+  atomic on-chain receipt submission; browser storage and public payloads never
+  receive plaintext or ciphertext.
 - [ ] Build the public result/settlement and FXRP redemption journey (the
   current page exposes FTestXRP settlement and the verified FXRP manager, but
   redemption interaction is not yet wired).
 - [x] Implement and unit-test stateless close/request/result/finalize relay and
-  ciphertext-only vendor ingress; live Coston2 operation remains pending.
+  ciphertext-only vendor ingress; the hosted v2 ingress health and result API
+  are live on Railway, while write-settlement relay operation remains gated on a
+  dedicated finalizer environment.
 - [x] Add explicit RPC/FCC/proxy/FDC/FTSO unavailable and recovery states to the
   Flare reader, relay, funding, and ingress adapters.
 - [ ] Complete the remaining responsive, keyboard, reduced-motion, privacy-copy,
@@ -271,7 +278,8 @@ confidential bid or settlement boundary:
 - [x] Generate Flare bindings and reject all drift.
 - [x] Deploy the v2 web judge and record desktop/mobile/keyboard smoke evidence;
   the separate Coston2 write-relay deployment remains gated on its dedicated
-  finalizer environment.
+  finalizer environment, and the browser ingress is a separate hosted Railway
+  service with server-only FCC credentials.
 
 Exit: canonical manifest, bindings, source, runtime, extension, UI, and evidence
 all agree and contain no confidential material.
@@ -370,7 +378,7 @@ the championship product and requires Product Plan approval.
 | Flare contracts | LIVE VERIFIED — Coston2 market, FTestXRP escrow, FTSO snapshot, award receipt, and recovery wiring agree with the verified release manifest |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G — disposable XRPL payment, FDC proof, Smart Account direct mint, and atomic tender funding are recorded in `gate-g-smart-account.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
-| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; the wallet-free judge smoke passes; Gate-B restart, adversarial suites, accessibility, and Gate H user validation remain open |
+| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke and hosted ciphertext-ingress health pass; Gate-B restart, adversarial suites, final UI-role hardening, and Gate H user validation remain open |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported

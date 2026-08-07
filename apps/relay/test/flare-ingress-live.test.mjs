@@ -148,6 +148,24 @@ function actionResponse(instruction, overrides = {}) {
   };
 }
 
+function resultResponse(instruction, data = `0x${"77".repeat(32)}`) {
+  return {
+    result: {
+      id: `0x${"99".repeat(32)}`,
+      submissionTag: "submit",
+      status: 1,
+      log: "ok",
+      opType: instruction.opType,
+      opCommand: instruction.opCommand,
+      additionalResultStatus: "0x",
+      version: "veilbid-coston2",
+      data,
+    },
+    signature: `0x${"00".repeat(65)}`,
+    proxySignature: `0x${"00".repeat(65)}`,
+  };
+}
+
 test("live proxy authenticates /direct and returns only the bound action id", async () => {
   const instruction = directBidInstruction(`0x${"aa".repeat(114)}`);
   const observed = [];
@@ -169,6 +187,33 @@ test("live proxy authenticates /direct and returns only the bound action id", as
   assert.equal(JSON.stringify(result).includes(instruction.message), false);
 });
 
+test("live proxy reads only a parsed bid result and keeps the request ciphertext out", async () => {
+  const instruction = directBidInstruction(`0x${"aa".repeat(114)}`);
+  const observed = [];
+  const proxy = new LiveFlareBidIngressProxy({
+    proxyUrls,
+    directApiKeys: ["test-only-key-one", "test-only-key-two", "test-only-key-three"],
+  }, async (url, init) => {
+    observed.push({ url: url.toString(), init });
+    return new Response(JSON.stringify(resultResponse(instruction)), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  });
+  const result = await proxy.result(1, `0x${"99".repeat(32)}`);
+  assert.deepEqual(result, {
+    actionId: `0x${"99".repeat(32)}`,
+    status: 1,
+    submissionTag: "submit",
+    opType: instruction.opType,
+    opCommand: instruction.opCommand,
+    data: `0x${"77".repeat(32)}`,
+  });
+  assert.equal(observed[0].url, "https://tee-2.example/action/result/0x9999999999999999999999999999999999999999999999999999999999999999?submissionTag=submit");
+  assert.equal(observed[0].init.headers["X-API-Key"], "test-only-key-two");
+  assert.equal(JSON.stringify(result).includes(instruction.message), false);
+});
+
 test("live proxy rejects unbound, malformed, and failed responses without returning their body", async () => {
   const instruction = directBidInstruction(`0x${"aa".repeat(114)}`);
   for (const [response, code] of [
@@ -187,4 +232,15 @@ test("live proxy rejects unbound, malformed, and failed responses without return
     }, async () => response);
     await assert.rejects(proxy.submit(0, instruction), new RegExp(code));
   }
+});
+
+test("live proxy reports a pending result without exposing upstream response text", async () => {
+  const proxy = new LiveFlareBidIngressProxy({
+    proxyUrls,
+    directApiKeys: ["test-only-key-one", "test-only-key-two", "test-only-key-three"],
+  }, async () => new Response("pending-sensitive-body", { status: 404 }));
+  await assert.rejects(
+    proxy.result(0, `0x${"99".repeat(32)}`),
+    /FCC_PROXY_RESULT_PENDING/,
+  );
 });

@@ -17,6 +17,11 @@
       "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
       "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
       "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40"
+    ],
+    "teeKeyFingerprints": [
+      "0xe2595ee89e3afc5f005be802fd3c204b11cd47ea7521d5beffea1b4e5419d28",
+      "0xbd09962a41d295b6f2e230fb0c05e52c19348b8c30370fc936d26cbd8e2882ba",
+      "0xfe95fb421110f8af54a739c7874c3fcb0a988dbc6264723ee3f89dd56266bb40"
     ]
   },
   "protocols": {

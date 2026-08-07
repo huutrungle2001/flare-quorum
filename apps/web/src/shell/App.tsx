@@ -876,6 +876,7 @@ function TenderRoomApp({ wallet }: { wallet: WalletController }) {
 export function App() {
   const location = useLocation();
   const wallet = useWallet();
+  const flareWallet = useWallet("coston2");
   const flareReleaseEnabled = isFlareReleaseEnabled();
   const legacyRoomLink =
     new URLSearchParams(location.search).has("role") ||
@@ -884,9 +885,9 @@ export function App() {
     location.pathname === "/docs" ? (
       <DocsPage />
     ) : location.pathname === "/flare" ? (
-      <FlareRoom />
+      <FlareRoom wallet={flareWallet} />
     ) : location.pathname === "/" && flareReleaseEnabled ? (
-      <FlareRoom />
+      <FlareRoom wallet={flareWallet} />
     ) : location.pathname === "/room" || legacyRoomLink ? (
       <TenderRoomApp wallet={wallet} />
     ) : (

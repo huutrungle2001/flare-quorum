@@ -29,6 +29,7 @@ export interface Coston2FlarePublicRelease {
     version: string;
     resultThreshold: number;
     teeIds: readonly Address[];
+    teeKeyFingerprints: readonly Hex[];
   };
   protocols: {
     fTestXRP: Address;

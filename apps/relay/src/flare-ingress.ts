@@ -1,8 +1,12 @@
 import {
+  decodeBidReceipt,
   directBidInstruction,
   flareBidIngressTypedData,
+  recoverBidReceiptSigner,
   teeIdentityFromPublicKey,
   teePublicKeyFingerprint,
+  veilBidDirectOpType,
+  veilBidDirectSubmitCommand,
   type FlareTeePublicKey,
 } from "@veilbid/flare-bindings";
 import {
@@ -57,6 +61,10 @@ export interface FlareBidIngressProxy {
     machineIndex: number,
     instruction: ReturnType<typeof directBidInstruction>,
   ): Promise<{ actionId: Hex }>;
+  result(
+    machineIndex: number,
+    actionId: Hex,
+  ): Promise<{ actionId: Hex; status: number; submissionTag: string; opType: Hex; opCommand: Hex; data: Hex }>;
 }
 
 export interface FlareBidIngressAccepted {
@@ -166,5 +174,40 @@ export class FlareBidIngressGateway {
     const accepted = await this.proxy.submit(machineIndex, directBidInstruction(request.ciphertext));
     if (!/^0x[0-9a-fA-F]{64}$/.test(accepted.actionId)) throw new Error("FCC_PROXY_ACTION_INVALID");
     return { actionId: accepted.actionId, teeId: request.teeId, expiresAt: request.expiresAt };
+  }
+
+  async result(tenderId: bigint, machineIndex: number, actionId: Hex): Promise<{
+    actionId: Hex;
+    teeId: Address;
+    data: Hex;
+    expiresAt: bigint;
+  }> {
+    if (!Number.isInteger(machineIndex) || machineIndex < 0 || machineIndex >= 3) {
+      throw new Error("FCC_PROXY_MACHINE_INDEX_INVALID");
+    }
+    if (!/^0x[0-9a-fA-F]{64}$/.test(actionId)) throw new Error("FCC_PROXY_ACTION_INVALID");
+    const tender = await this.chain.inspect(tenderId);
+    const expectedTeeId = tender.teeIds[machineIndex];
+    const result = await this.proxy.result(machineIndex, actionId);
+    if (
+      result.actionId.toLowerCase() !== actionId.toLowerCase() ||
+      result.status !== 1 || result.submissionTag !== "submit" ||
+      result.opType.toLowerCase() !== veilBidDirectOpType.toLowerCase() ||
+      result.opCommand.toLowerCase() !== veilBidDirectSubmitCommand.toLowerCase()
+    ) throw new Error("FCC_PROXY_ACTION_MISMATCH");
+    const receipt = decodeBidReceipt(result.data);
+    const signer = await recoverBidReceiptSigner(receipt);
+    if (!isAddressEqual(receipt.teeId, expectedTeeId) || !isAddressEqual(signer, expectedTeeId)) {
+      throw new Error("FCC_TEE_IDENTITY_MISMATCH");
+    }
+    if (receipt.chainId !== 114n || receipt.tenderId !== tenderId) {
+      throw new Error("FCC_PROXY_ACTION_MISMATCH");
+    }
+    return {
+      actionId,
+      teeId: expectedTeeId,
+      data: result.data,
+      expiresAt: receipt.expiry,
+    };
   }
 }

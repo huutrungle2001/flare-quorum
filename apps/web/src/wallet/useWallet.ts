@@ -24,6 +24,23 @@ export type WalletStatus =
   | "wrong-chain"
   | "error";
 
+export type WalletNetwork = "sepolia" | "coston2";
+
+const coston2 = {
+  id: 114,
+  name: "Coston2",
+  nativeCurrency: { name: "Coston2 Flare", symbol: "C2FLR", decimals: 18 },
+  rpcUrls: { default: { http: ["https://coston2-api.flare.network/ext/C/rpc"] } },
+} as const;
+
+const networkConfig: Record<WalletNetwork, {
+  chain: typeof sepolia | typeof coston2;
+  label: string;
+}> = {
+  sepolia: { chain: sepolia, label: "Ethereum Sepolia" },
+  coston2: { chain: coston2, label: "Flare Coston2" },
+};
+
 export interface WalletState {
   status: WalletStatus;
   providers: readonly WalletProviderDetail[];
@@ -76,8 +93,10 @@ function connectedState(
   selectedProvider: WalletProviderDetail,
   account: Address,
   chainId: number,
+  network: WalletNetwork,
 ): WalletState {
-  const correctChain = chainId === sepolia.id;
+  const config = networkConfig[network];
+  const correctChain = chainId === config.chain.id;
   return {
     ...current,
     status: correctChain ? "connected" : "wrong-chain",
@@ -87,7 +106,7 @@ function connectedState(
     walletClient: correctChain
       ? createWalletClient({
           account,
-          chain: sepolia,
+          chain: config.chain,
           transport: custom(selectedProvider.provider),
         })
       : null,
@@ -95,7 +114,8 @@ function connectedState(
   };
 }
 
-export function useWallet() {
+export function useWallet(network: WalletNetwork = "sepolia") {
+  const config = networkConfig[network];
   const toasts = useToasts();
   const [state, setState] = useState<WalletState>(initialState);
   const reconnectAttempted = useRef(new Set<string>());
@@ -137,25 +157,25 @@ export function useWallet() {
       detectedChainId = chainId;
       localStorage.setItem(selectedProviderStorageKey, detail.info.rdns);
 
-      if (chainId !== sepolia.id) {
+      if (chainId !== config.chain.id) {
         toasts.update(
           toastId,
-          `${detail.info.name} authorized. Confirm the switch to Ethereum Sepolia…`,
+          `${detail.info.name} authorized. Confirm the switch to ${config.label}…`,
         );
         await detail.provider.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: numberToHex(sepolia.id) }],
+          params: [{ chainId: numberToHex(config.chain.id) }],
         });
         detectedChainId = await currentChain(detail.provider);
-        if (detectedChainId !== sepolia.id) {
-          throw new Error("Wallet did not switch to Ethereum Sepolia");
+        if (detectedChainId !== config.chain.id) {
+          throw new Error(`Wallet did not switch to ${config.label}`);
         }
       }
 
       setState((current) =>
-        connectedState(current, detail, account, sepolia.id),
+        connectedState(current, detail, account, config.chain.id, network),
       );
-      toasts.succeed(toastId, `${detail.info.name} connected on Sepolia.`);
+      toasts.succeed(toastId, `${detail.info.name} connected on ${config.label}.`);
     } catch {
       if (authorizedAccount && detectedChainId !== null) {
         setState((current) => ({
@@ -164,19 +184,20 @@ export function useWallet() {
             detail,
             authorizedAccount as Address,
             detectedChainId as number,
+            network,
           ),
-          error: "Confirm the switch to Ethereum Sepolia to enable signing.",
+          error: `Confirm the switch to ${config.label} to enable signing.`,
         }));
         toasts.fail(
           toastId,
-          "Wallet connected, but the Sepolia switch was rejected or unavailable.",
+          `Wallet connected, but the ${config.label} switch was rejected or unavailable.`,
         );
       } else {
         toasts.fail(toastId, "Wallet connection was rejected or unavailable.");
         clearSession("error", "Wallet connection was rejected or unavailable.");
       }
     }
-  }, [clearSession, toasts]);
+  }, [clearSession, config.chain.id, config.label, network, toasts]);
 
   const switchToSepolia = useCallback(async () => {
     const detail = state.selectedProvider;
@@ -193,7 +214,7 @@ export function useWallet() {
       const account = await accounts(detail.provider, false);
       if (!account) throw new Error("Wallet has no connected account");
       setState((current) =>
-        connectedState(current, detail, account, sepolia.id),
+        connectedState(current, detail, account, sepolia.id, "sepolia"),
       );
       toasts.succeed(toastId, "Wallet switched to Ethereum Sepolia.");
     } catch {
@@ -202,6 +223,34 @@ export function useWallet() {
         ...current,
         status: "wrong-chain",
         error: "Switch the selected wallet to Ethereum Sepolia.",
+      }));
+    }
+  }, [state.selectedProvider, toasts]);
+
+  const switchToCoston2 = useCallback(async () => {
+    const detail = state.selectedProvider;
+    if (!detail) return;
+    const toastId = toasts.start(
+      "SWITCH NETWORK",
+      "Waiting for the wallet to switch to Flare Coston2…",
+    );
+    try {
+      await detail.provider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: numberToHex(coston2.id) }],
+      });
+      const account = await accounts(detail.provider, false);
+      if (!account) throw new Error("Wallet has no connected account");
+      setState((current) =>
+        connectedState(current, detail, account, coston2.id, "coston2"),
+      );
+      toasts.succeed(toastId, "Wallet switched to Flare Coston2.");
+    } catch {
+      toasts.fail(toastId, "Network switch was rejected or unavailable.");
+      setState((current) => ({
+        ...current,
+        status: "wrong-chain",
+        error: "Switch the selected wallet to Flare Coston2.",
       }));
     }
   }, [state.selectedProvider, toasts]);
@@ -251,12 +300,12 @@ export function useWallet() {
         ]).then(([account, chainId]) => {
           if (account && chainId !== null) {
             setState((current) =>
-              connectedState(current, detail, account, chainId),
+              connectedState(current, detail, account, chainId, network),
             );
           }
         });
       }),
-    [],
+    [network],
   );
 
   useEffect(() => {
@@ -277,6 +326,7 @@ export function useWallet() {
             detail,
             account,
             current.chainId ?? 0,
+            network,
           ),
           sessionRevision: current.sessionRevision + 1,
         }),
@@ -292,6 +342,7 @@ export function useWallet() {
                 detail,
                 current.account,
                 chainId,
+                network,
               ),
               sessionRevision: current.sessionRevision + 1,
             }
@@ -307,7 +358,7 @@ export function useWallet() {
       provider.removeListener?.("chainChanged", onChainChanged);
       provider.removeListener?.("disconnect", onDisconnect);
     };
-  }, [clearSession, state.selectedProvider]);
+  }, [clearSession, network, state.selectedProvider]);
 
-  return { state, connect, switchToSepolia, disconnect };
+  return { state, connect, switchToSepolia, switchToCoston2, disconnect };
 }

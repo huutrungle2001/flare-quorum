@@ -1,9 +1,13 @@
 import { formatUnits } from "viem";
+import { useSearchParams } from "react-router";
 import { useState } from "react";
 import { coston2FlarePublicRelease } from "@veilbid/flare-bindings";
 import type { FlareMarketState } from "../public-market/useFlareMarket";
 import { useFlareMarket } from "../public-market/useFlareMarket";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";
+import type { WalletController } from "../wallet/WalletPanel";
+import { FlareVendorWorkspace } from "./FlareVendorWorkspace";
+import { FlareBuyerWorkspace } from "./FlareBuyerWorkspace";
 
 function short(value: string) {
   return `${value.slice(0, 8)}…${value.slice(-6)}`;
@@ -133,6 +137,8 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
         <div className="intro-copy">
           <p>Wallet-free evidence view for the Flare release. FCC, FTSO, FAssets and Smart Account facts are read only from configured Coston2 contracts.</p>
           <span className="deployment-label">{state.data?.deploymentStatus === "verified" ? "VERIFIED COSTON2 RELEASE" : "PLANNED / NOT YET VERIFIED"}</span>
+          <a className="secondary-button" href="?role=buyer">OPEN BUYER WORKSPACE →</a>
+          <a className="secondary-button" href="?role=vendor">OPEN VENDOR WORKSPACE →</a>
         </div>
       </section>
       <ProtocolFacts />
@@ -153,7 +159,23 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
   );
 }
 
-export function FlareRoom() {
+export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   const { state, refresh } = useFlareMarket();
+  const [params, setParams] = useSearchParams();
+  const role = params.get("role")?.toLowerCase();
+  if ((role === "vendor" || role === "buyer") && wallet && state.status === "ready" && state.data) {
+    return (
+      <>
+        <nav className="rolebar flare-rolebar" aria-label="Coston2 workspaces">
+          <div className="rolebar-links">
+            <button type="button" onClick={() => { const next = new URLSearchParams(params); next.delete("role"); setParams(next); }}>PUBLIC EVIDENCE</button>
+            <button type="button" className={role === "buyer" ? "active" : ""} aria-current={role === "buyer" ? "page" : undefined} onClick={() => { const next = new URLSearchParams(params); next.set("role", "buyer"); setParams(next); }}>BUYER</button>
+            <button type="button" className={role === "vendor" ? "active" : ""} aria-current={role === "vendor" ? "page" : undefined} onClick={() => { const next = new URLSearchParams(params); next.set("role", "vendor"); setParams(next); }}>VENDOR</button>
+          </div>
+        </nav>
+        {role === "buyer" ? <FlareBuyerWorkspace wallet={wallet} onRefresh={() => void refresh()} /> : <FlareVendorWorkspace wallet={wallet} tenders={state.data.tenders} onRefresh={() => void refresh()} />}
+      </>
+    );
+  }
   return <FlareExplorerView state={state} onRetry={() => void refresh()} />;
 }
