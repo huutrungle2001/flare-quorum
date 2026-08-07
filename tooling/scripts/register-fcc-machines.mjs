@@ -47,6 +47,7 @@ if (evidenceRelativePath.startsWith("/") || evidenceRelativePath.split("/").incl
   throw new Error("FCC_MACHINE_EVIDENCE_PATH_INVALID");
 }
 const evidencePath = resolve(repositoryRoot, evidenceRelativePath);
+const evidenceDisplayPath = evidenceRelativePath;
 
 function secureRpcUrl(value) {
   try {
@@ -331,7 +332,7 @@ try {
       status: evidence.status,
       blockNumber: evidence.network.blockNumber,
       machines: verification.machines.map(({ machine, teeId, status, assertions }) => ({ machine, teeId, status, assertions })),
-      evidence: "evidence/coston2/fcc-machines.json",
+      evidence: evidenceDisplayPath,
     }, null, 2));
   }
 } catch (error) {

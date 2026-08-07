@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "gate": "0-fcc-machines",
+  "status": "PASSED",
+  "recordedAt": "2026-08-07T16:08:33.203Z",
+  "sourceCommit": "370d5cfa6212d8bbee0fcfa6f92084734df65282",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33747418"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "0x00000000000000000000000000000000000000000000000000000000000101db",
+    "command": "rRap",
+    "simulatedTee": true,
+    "machines": [
+      {
+        "machine": 1,
+        "teeId": "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
+        "url": "https://veilbid-flare-fcc-1-production.up.railway.app",
+        "status": 2,
+        "publicKeyFingerprintSha256": "6d8717d72e0b05703cb1beb1f179453f2a41d681777221af27606525df05bb60",
+        "assertions": {
+          "productionStatus": true,
+          "extensionMatches": true,
+          "teeIdMatches": true,
+          "urlMatches": true,
+          "codeHashMatches": true,
+          "platformMatches": true,
+          "publicKeyMatches": true
+        }
+      },
+      {
+        "machine": 2,
+        "teeId": "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
+        "url": "https://veilbid-flare-fcc-2-production.up.railway.app",
+        "status": 2,
+        "publicKeyFingerprintSha256": "8a659d02b1e9f043075e1fef412cb9e5537e7e438f4aa97bb81ffbbe4db6e4a1",
+        "assertions": {
+          "productionStatus": true,
+          "extensionMatches": true,
+          "teeIdMatches": true,
+          "urlMatches": true,
+          "codeHashMatches": true,
+          "platformMatches": true,
+          "publicKeyMatches": true
+        }
+      },
+      {
+        "machine": 3,
+        "teeId": "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40",
+        "url": "https://veilbid-flare-fcc-3-production.up.railway.app",
+        "status": 2,
+        "publicKeyFingerprintSha256": "bf2221726c6317bc4a99e742f7d57e9e10841c3a49706291d54dcb1be6d18849",
+        "assertions": {
+          "productionStatus": true,
+          "extensionMatches": true,
+          "teeIdMatches": true,
+          "urlMatches": true,
+          "codeHashMatches": true,
+          "platformMatches": true,
+          "publicKeyMatches": true
+        }
+      }
+    ]
+  },
+  "assertions": {
+    "threeMachinesVerified": true,
+    "allProductionAndBound": true,
+    "threeDistinctIdentities": true
+  },
+  "notes": [
+    "This evidence records public Coston2 machine bindings only and does not claim hardware-backed confidentiality.",
+    "No deployment key, TEE key, proxy key, direct API key, indexer credential, raw signature, attestation, or bid payload is recorded."
+  ]
+}
