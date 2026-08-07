@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-07T23:32:52.059Z",
+  "recordedAt": "2026-08-07T23:38:59.257Z",
   "publicIdentifiers": {
-    "sourceCommit": "676c85da59ae1fa1d70e03295e7fca23606c198d",
+    "sourceCommit": "6859897c116d6931be9f0b97b63cfb62c58b762e",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -43,21 +43,21 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "001d4f2570c10f34e91f5a3e6c9179a636e7cb2639ba45cdab3ebaff6614dadf"
+      "sha256": "633b379632152c4b836b074812cdf743e3da9115f85f60f4068714bb9df656dd"
     },
     "buyer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "a7ffca88d076c49bba4f8017d8173c553e1631b172f68b12baa1d62a78dc9287"
+      "sha256": "e82c42b3b10c02a75f14b81673d5406481d80eedd26a3a3d57c2e8df04b56471"
     },
     "vendor": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "d02e4ac8ca705dbde0d2ac03eab00135850842258dd9e543d7bf365947f88f9f"
+      "sha256": "c017901885bee4bd3f028e14e855a693f388f89e88dbd4b3456b1d56896931f4"
     },
     "docsMobile": {
       "viewport": {
