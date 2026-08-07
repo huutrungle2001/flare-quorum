@@ -59,8 +59,8 @@ function mark(value) {
   if (process.env.FCC_GATE_G_VERBOSE === "1") console.error(`[gate-g] ${value}`);
 }
 
-function safeJson(value) {
-  return JSON.stringify(value, (_key, item) => typeof item === "bigint" ? item.toString() : item);
+function safeJson(value, space) {
+  return JSON.stringify(value, (_key, item) => typeof item === "bigint" ? item.toString() : item, space);
 }
 
 function normalizedPrivateKey(value, code) {
@@ -462,7 +462,7 @@ async function main() {
   };
   mkdirSync(resolve(root, "evidence/coston2"), { recursive: true });
   mark("evidence-write");
-  writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
+  writeFileSync(evidencePath, `${safeJson(evidence, 2)}\n`, { flag: "wx" });
   mkdirSync(resolve(root, ".local/fcc"), { recursive: true, mode: 0o700 });
   writeFileSync(statePath, `${JSON.stringify({ status: "PASSED", tenderId: outcome.tenderId.toString(), directMintingTransactionHash: outcome.directMintingTransactionHash }, null, 2)}\n`, { mode: 0o600, flag: "wx" });
   console.log(safeJson({ gate: "G", status: "PASSED", xrplTransactionId, personalAccount, tenderId: outcome.tenderId, directMintingTransactionHash: outcome.directMintingTransactionHash, evidence: "evidence/coston2/gate-g-smart-account.json" }));
