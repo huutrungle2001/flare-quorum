@@ -110,6 +110,14 @@ function equalHex(left, right) {
   return String(left).toLowerCase() === String(right).toLowerCase();
 }
 
+function assertFreshFtso(feed, blockTimestamp) {
+  const value = field(feed, "value", 0);
+  const timestamp = field(feed, "timestamp", 2);
+  if (value <= 0n || timestamp > blockTimestamp || blockTimestamp - timestamp > 300n) {
+    throw new Error(`FCC_MARKET_FTSO_PREFLIGHT_INVALID_${value}_${timestamp}_${blockTimestamp}`);
+  }
+}
+
 function publicMachineInfo(value, expectedExtension, expectedCodeHash) {
   const machine = value?.machineData;
   const publicKey = machine?.publicKey;
@@ -327,9 +335,7 @@ async function main() {
     const machines = await readTeeSet({ client, manager, urls, extensionId, codeHash });
     const latest = await client.getBlock({ blockTag: "latest" });
     const feed = await client.readContract({ address: ftso, abi: ftsoAbi, functionName: "getFeedById", args: [xrpUsdFeedId] });
-    if (field(feed, "value", 0) <= 0n || field(feed, "timestamp", 2) > latest.timestamp || latest.timestamp - field(feed, "timestamp", 2) > 300n) {
-      throw new Error("FCC_MARKET_FTSO_PREFLIGHT_INVALID");
-    }
+    assertFreshFtso(feed, latest.timestamp);
     const balance = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [account.address] });
     console.log(safeJson({
       status: "READY",
@@ -356,9 +362,7 @@ async function main() {
   const block = await client.getBlock({ blockTag: "latest" });
   const now = block.timestamp;
   const feed = await client.readContract({ address: ftso, abi: ftsoAbi, functionName: "getFeedById", args: [xrpUsdFeedId] });
-  if (field(feed, "value", 0) <= 0n || field(feed, "timestamp", 2) > now || now - field(feed, "timestamp", 2) > 300n) {
-    throw new Error("FCC_MARKET_FTSO_PREFLIGHT_INVALID");
-  }
+  assertFreshFtso(feed, now);
   const bidDeadline = now + 1_800n;
   const ceiling = 1_000_000n;
   const rules = {
