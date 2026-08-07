@@ -118,11 +118,13 @@ claiming those outcomes already exist.
 - [ ] Project name and bounty selection are consistent.
 - [ ] Product description and target users are understandable without protocol
   knowledge.
-- [ ] Live app, wallet-free demo, and video links work.
+- [x] Live app, wallet-free demo, and public evidence links work; the final
+  video recording remains open and is tracked in `PLAN.md` Phase 8.
 - [ ] GitHub repository and technical materials are accessible to judges.
-- [ ] Every Flare integration is explained by user value and live evidence.
-- [ ] Existing/new/ported/integrated/improved work is separated.
-- [ ] Verified addresses, extension ID, code/image version, machine identities,
+- [x] Every Flare integration is explained by user value and live evidence.
+- [x] Existing/new/ported/integrated/improved work is separated in
+  `submission/flare/NEW-WORK-LEDGER.md`.
+- [x] Verified addresses, extension ID, code/image version, machine identities,
   transactions, and deployment network are included.
 - [ ] User testing, community interest, pilots, and traction are reported
   honestly.

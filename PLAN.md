@@ -303,13 +303,18 @@ Exit: the submission contains real user evidence, not only technical claims.
 ### Phase 8 — judge package
 
 - [x] Live Coston2 app and wallet-free finalized tender.
-- [ ] Four-minute video following the single flagship journey.
-- [ ] Architecture diagram and 60-second privacy/trust explanation.
-- [ ] Before/after work ledger with commits and evidence.
-- [ ] Contract addresses, extension ID, code hash, TEE identities, and transactions.
-- [ ] Clear bounty selection and explanation of why every Flare integration is
-  essential.
-- [ ] Roadmap limited to credible mainnet, audit, liveness, and pilot work.
+- [ ] Four-minute video following the single flagship journey (recording
+  storyboard is ready in `submission/flare/README.md`).
+- [x] Architecture diagram and 60-second privacy/trust explanation in
+  `submission/flare/PRIVACY-TRUST-TALK.md`.
+- [x] Before/after work ledger with commits and evidence in
+  `submission/flare/NEW-WORK-LEDGER.md`.
+- [x] Contract addresses, extension ID, code hash, TEE identities, and
+  transactions in `submission/flare/README.md`.
+- [x] Clear bounty selection and explanation of why every Flare integration is
+  essential in `submission/flare/README.md`.
+- [x] Roadmap limited to credible mainnet, audit, liveness, and pilot work;
+  incomplete items remain explicitly labeled.
 
 Exit: a judge can understand usefulness in 30 seconds, verify Flare depth in
 two minutes, and reproduce the public path from the repository.
