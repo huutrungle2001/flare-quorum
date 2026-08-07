@@ -45,6 +45,13 @@ const vendorCount = Number(process.env.FCC_MARKET_VENDOR_COUNT ?? "1");
 if (!Number.isInteger(vendorCount) || vendorCount < 1 || vendorCount > 3) {
   throw new Error("FCC_MARKET_VENDOR_COUNT_INVALID");
 }
+const selectionOutageValue = process.env.FCC_MARKET_SELECTION_OUTAGE_INDEX?.trim();
+const selectionOutageIndex = selectionOutageValue === undefined || selectionOutageValue === ""
+  ? null
+  : Number(selectionOutageValue);
+if (selectionOutageIndex !== null && (!Number.isInteger(selectionOutageIndex) || selectionOutageIndex < 0 || selectionOutageIndex > 2)) {
+  throw new Error("FCC_MARKET_SELECTION_OUTAGE_INDEX_INVALID");
+}
 const managerAbi = parseAbi([
   "function getTeeMachineStatus(address teeId) view returns (uint8)",
   "function getExtensionId(address teeId) view returns (uint256)",
@@ -385,6 +392,7 @@ async function main() {
       extensionId: extensionId.toString(),
       buyer: account.address,
       ftestXrpBalanceRaw: balance,
+      selectionOutageIndex,
       machines: machines.map(({ machine, teeId, fingerprint }) => ({ machine, teeId, fingerprint })),
     }));
     return;
@@ -566,7 +574,10 @@ async function main() {
     teeIds: machines.map(({ teeId }) => teeId),
   };
   currentPhase = "collect-selection-quorum";
-  const quorum = await collectSelection({ urls, requestId, context, expectedVersion: version, vendor: vendorAccounts[0].address });
+  const selectionUrls = selectionOutageIndex === null
+    ? urls
+    : urls.map((url, index) => index === selectionOutageIndex ? "http://127.0.0.1:1" : url);
+  const quorum = await collectSelection({ urls: selectionUrls, requestId, context, expectedVersion: version, vendor: vendorAccounts[0].address });
   currentPhase = "finalize-tender";
   const finalization = await writeContract({ client, wallet: buyerWallet, account, address: market, abi: marketAbi, functionName: "finalizeTender", args: [tenderId, quorum.result, quorum.proofs] });
   const finalized = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
@@ -597,7 +608,7 @@ async function main() {
   const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
   const evidence = {
     schemaVersion: 1,
-    gate: "C-E-F",
+    gate: selectionOutageIndex === null ? "C-E-F" : "C-E-F-RECOVERY",
     status: "PASSED",
     recordedAt: new Date().toISOString(),
     sourceCommit,
@@ -624,6 +635,7 @@ async function main() {
       bidReceiptActionIds: winningRecord.actionIds,
       bidReceiptActionIdsByVendor: bidRecords.map(({ actionIds }) => actionIds),
       requestId,
+      selectionResultCollectionOutageMachineIndex: selectionOutageIndex === null ? null : selectionOutageIndex + 1,
       selectionSignerIds: quorum.signers,
       selectionResultDataHash: quorum.resultDataHash,
       winnerBidId: quorum.result.winnerBidId.toString(),
@@ -655,6 +667,7 @@ async function main() {
       commonBidQuorumIsThree: context.quorumBitmap === 7,
       ftsSnapshotCapturedOnClose: context.ftsoValue > 0n && context.ftsoTimestamp > 0n,
       selectionResultSignedByTwoDistinctFrozenTees: quorum.signers.length === 2,
+      oneSelectionResultUnavailableStillFinalized: selectionOutageIndex === null || quorum.signers.length === 2,
       selectionResultMatchesCommonRoot: equalHex(quorum.result.orderedBidRoot, context.orderedBidRoot),
       ftestXrpWinnerPayoutConserved: buyerDelta === winningAmount && vendorDeltas[0] === winningAmount && vendorDeltas.slice(1).every((delta) => delta === 0n) && marketTokenAfter === marketTokenBefore,
       awardReceiptMintedToWinner: awardOwner === winner,
@@ -666,6 +679,7 @@ async function main() {
       "This is a live Coston2 simulated-TEE lifecycle: FTestXRP escrow, encrypted private bid ingress, FTSO XRP/USD snapshot, FCC private scoring, 2-of-3 result quorum, and award settlement.",
       "Only public commitments, result fields, machine IDs, and transaction identifiers are recorded; bid plaintext, ciphertext, raw signatures, salts, and credentials are not recorded.",
       `${vendorCount} vendor bid(s) were generated in process memory; private keys and bid payloads are not persisted or included in evidence.`,
+      ...(selectionOutageIndex === null ? [] : [`One result endpoint was intentionally unavailable during collection; the two remaining frozen TEE results still formed the threshold quorum.`]),
     ],
   };
   mkdirSync(resolve(root, "evidence/coston2"), { recursive: true });
