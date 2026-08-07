@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-keyboard-accessibility",
-  "recordedAt": "2026-08-07T23:03:15.964Z",
+  "recordedAt": "2026-08-07T23:23:01.076Z",
   "publicIdentifiers": {
-    "sourceCommit": "2633331330939a7b3cda2cd8f15d6fcb16858761",
+    "sourceCommit": "b397e8889a611fdf05431f5626260f4d3cf83bb2",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
