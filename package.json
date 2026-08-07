@@ -113,6 +113,7 @@
     "flare:funding:health": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-funding-cli.js health",
     "flare:funding:execute": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-funding-cli.js execute",
     "flare:funding:resume": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-funding-cli.js resume",
+    "flare:benchmarks": "node --env-file-if-exists=.env.local tooling/scripts/record-flare-benchmarks.mjs",
     "flare:ingress": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-ingress-cli.js"
   }
 }

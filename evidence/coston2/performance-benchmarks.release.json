@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-flare-performance-benchmarks",
+  "recordedAt": "2026-08-07T22:56:11.606Z",
+  "sourceCommit": "b53a8f141f3521c7dfa9feaee019a7480036108f",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "observedBlock": "33757983",
+    "rpcSource": "official-public-coston2-rpc"
+  },
+  "samples": [
+    {
+      "name": "three-vendor-finalization",
+      "gate": "C-E-F",
+      "tenderId": "20",
+      "sourceEvidence": "evidence/coston2/gate-c-e-f-three-vendor.json",
+      "recoveryCondition": "none",
+      "transactions": {
+        "approval": {
+          "hash": "0xfcf0d52dd9d79e212c4de74543e3807d0e50d3ec595715b8a44af371b03d9476",
+          "blockNumber": "33754789",
+          "status": "success",
+          "gasUsed": "51217"
+        },
+        "tender": {
+          "hash": "0xf6164c0f0c13fb3c54ae240ad801847538931a03cb070198e748163d9f268950",
+          "blockNumber": "33754794",
+          "status": "success",
+          "gasUsed": "814467"
+        },
+        "bid-1": {
+          "hash": "0xa19a5e879e20cec388e6e90c9b57398bfe50084074130e92f684c09cb85122f5",
+          "blockNumber": "33754801",
+          "status": "success",
+          "gasUsed": "377574"
+        },
+        "bid-2": {
+          "hash": "0xc83306b98cc269a5855ce889b581f20456656c7dcce0a763b99d4bbb12377a80",
+          "blockNumber": "33754804",
+          "status": "success",
+          "gasUsed": "360500"
+        },
+        "bid-3": {
+          "hash": "0x81edf0bc32efed90302f4c6f8695c5c73e02e7b103da4f65d96cc524de4cb2f3",
+          "blockNumber": "33754806",
+          "status": "success",
+          "gasUsed": "360512"
+        },
+        "close": {
+          "hash": "0x49e996847fa1de6c70af184bfe790847cfd85b3ddb46efede8782a996a1be129",
+          "blockNumber": "33754808",
+          "status": "success",
+          "gasUsed": "178024"
+        },
+        "request": {
+          "hash": "0x5093c522d7963f4452f302dbc3ce456da78a9d31954d615e4f3bed3dcd418014",
+          "blockNumber": "33754811",
+          "status": "success",
+          "gasUsed": "418406"
+        },
+        "finalization": {
+          "hash": "0x675bb0c6aefbdf903abb419af4e38dc5f08c5d5f4276065f40855fd2eaed7818",
+          "blockNumber": "33754813",
+          "status": "success",
+          "gasUsed": "650134"
+        }
+      },
+      "blockTimestamps": {
+        "33754789": "1786135491",
+        "33754794": "1786135496",
+        "33754801": "1786135513",
+        "33754804": "1786135522",
+        "33754806": "1786135528",
+        "33754808": "1786135530",
+        "33754811": "1786135533",
+        "33754813": "1786135543"
+      },
+      "deltas": {
+        "closeAfterTenderBlocks": "14",
+        "requestAfterCloseBlocks": "3",
+        "finalizationAfterRequestBlocks": "2",
+        "finalizationAfterTenderBlocks": "19",
+        "tenderToFinalizationSeconds": 47
+      }
+    },
+    {
+      "name": "three-vendor-one-result-outage",
+      "gate": "C-E-F-RECOVERY",
+      "tenderId": "21",
+      "sourceEvidence": "evidence/coston2/three-vendor-recovery.release.json",
+      "recoveryCondition": "one result endpoint unavailable",
+      "transactions": {
+        "approval": {
+          "hash": "0xd5c4d897d01c1dccab00e7dc6f6c700decf85029e51d28c0ebdbe22e683f9fa6",
+          "blockNumber": "33756503",
+          "status": "success",
+          "gasUsed": "51217"
+        },
+        "tender": {
+          "hash": "0xa12539b4bf1b48eee7e5d6a4df3c07ff2a18197ae7f433d9ca712895d7df6273",
+          "blockNumber": "33756507",
+          "status": "success",
+          "gasUsed": "814455"
+        },
+        "bid-1": {
+          "hash": "0xbe42ef111e77f910809db44f0988d7d62e6a164c51f4b3fb08269a8c2da8759a",
+          "blockNumber": "33756519",
+          "status": "success",
+          "gasUsed": "377600"
+        },
+        "bid-2": {
+          "hash": "0xc473c218c508a9e18119e960b85e9f5605cad7e46684eb01ad0d22c57d75b963",
+          "blockNumber": "33756522",
+          "status": "success",
+          "gasUsed": "360438"
+        },
+        "bid-3": {
+          "hash": "0x7cc169868ce56fc5ed4a00ea4acceac23f0ace1568e03f6bbe4b46e1014e306d",
+          "blockNumber": "33756528",
+          "status": "success",
+          "gasUsed": "360512"
+        },
+        "close": {
+          "hash": "0xcf1a4410c9261c34af2857a6f43fa5cccce6adf9a4879cd505fffcb91d120a99",
+          "blockNumber": "33756530",
+          "status": "success",
+          "gasUsed": "178024"
+        },
+        "request": {
+          "hash": "0x07e539757d55c592f857eda642e56f5388069f9c331dca6e606dc1ff21bc06ca",
+          "blockNumber": "33756533",
+          "status": "success",
+          "gasUsed": "418406"
+        },
+        "finalization": {
+          "hash": "0x9b9003a5597deb8e5396a48f5962bfab2cc4dd518188b4bff58ce0dee8c47403",
+          "blockNumber": "33756537",
+          "status": "success",
+          "gasUsed": "650096"
+        }
+      },
+      "blockTimestamps": {
+        "33756503": "1786139720",
+        "33756507": "1786139725",
+        "33756519": "1786139742",
+        "33756522": "1786139747",
+        "33756528": "1786139753",
+        "33756530": "1786139757",
+        "33756533": "1786139760",
+        "33756537": "1786139771"
+      },
+      "deltas": {
+        "closeAfterTenderBlocks": "23",
+        "requestAfterCloseBlocks": "3",
+        "finalizationAfterRequestBlocks": "4",
+        "finalizationAfterTenderBlocks": "30",
+        "tenderToFinalizationSeconds": 46
+      }
+    }
+  ],
+  "assertions": {
+    "publicReceiptsRead": true,
+    "publicBlockTimestampsRead": true,
+    "gasUsageRecorded": true,
+    "closeRequestFinalizeDeltasRecorded": true,
+    "oneResultEndpointOutageStillFinalized": true,
+    "noBidPayloadsRead": true,
+    "noProviderSecretsRead": true
+  },
+  "blockers": [],
+  "notes": [
+    "These measurements read only public Coston2 receipts and block timestamps from previously recorded lifecycle transactions.",
+    "They are operational benchmarks, not a latency SLA; RPC/indexer/TEE conditions can change across runs.",
+    "No bid plaintext, ciphertext, FDC proof body, credential, private key, or provider secret is read or written."
+  ]
+}

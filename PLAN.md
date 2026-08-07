@@ -284,7 +284,11 @@ confidential bid or settlement boundary:
   tender in `evidence/coston2/three-vendor-recovery.release.json`.
 - [ ] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
   wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay drills.
-- [ ] Record gas, latency, bid-ingress, close-to-result, and recovery benchmarks.
+- [x] Record public gas, block-latency, close-to-result, and recovery benchmarks
+  from the live Coston2 lifecycles in
+  `evidence/coston2/performance-benchmarks.release.json`; bid-ingress latency is
+  not independently instrumented in the public release and remains an open
+  measurement gap.
 - [x] Run current/full-history secret and privacy-output scans.
 - [x] Generate Flare bindings and reject all drift.
 - [x] Deploy the v2 web judge and record desktop/mobile/keyboard smoke evidence;

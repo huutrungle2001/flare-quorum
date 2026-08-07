@@ -85,6 +85,7 @@ This is result-collection recovery evidence, not a claim that a simulated TEE
 identity survives a container restart.
 
 - Evidence: [`three-vendor-recovery.release.json`](../../evidence/coston2/three-vendor-recovery.release.json)
+- Public gas and lifecycle timing: [`performance-benchmarks.release.json`](../../evidence/coston2/performance-benchmarks.release.json)
 - Finalization: [`0x9b9003…47403`](https://coston2-explorer.flare.network/tx/0x9b9003a5597deb8e5396a48f5962bfab2cc4dd518188b4bff58ce0dee8c47403)
 - Tender creation: [`0xa12539…6273`](https://coston2-explorer.flare.network/tx/0xa12539b4bf1b48eee7e5d6a4df3c07ff2a18197ae7f433d9ca712895d7df6273)
 - Selection request: [`0x07e539…06ca`](https://coston2-explorer.flare.network/tx/0x07e539757d55c592f857eda642e56f5388069f9c331dca6e606dc1ff21bc06ca)
