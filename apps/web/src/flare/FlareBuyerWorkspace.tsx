@@ -19,6 +19,7 @@ import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
 import { useToasts } from "../shell/ToastProvider";
 import { useState } from "react";
+import { FlareXrpFundingPanel } from "./FlareXrpFundingPanel";
 
 const coston2 = {
   id: 114,
@@ -239,6 +240,7 @@ export function FlareBuyerWorkspace({
         <p>Approve the exact public FTestXRP ceiling, then create a tender frozen to the verified FCC extension and three production-status identities. Bid values remain outside the contract.</p>
       </section>
       <WalletPanel wallet={wallet} network="coston2" />
+      <FlareXrpFundingPanel />
       <section className="evidence-panel flare-buyer-form" aria-label="Coston2 buyer tender composer">
         <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>Open a Coston2 tender</h2></div><span className="privacy-badge verified">FTestXRP / TESTNET</span></header>
         <label>Public title<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small>The public brief is hashed into immutable metadata; bids remain outside the contract.</small></label>

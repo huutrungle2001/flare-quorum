@@ -142,4 +142,12 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByLabelText("Optional vendor questions")).toBeInTheDocument();
     expect(screen.getByText(/Brief and rules are public; bids are sealed/)).toBeInTheDocument();
   });
+
+  it("keeps the XRP-native funding signature outside the browser", () => {
+    render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} />);
+    expect(screen.getByRole("heading", { name: "Keep the XRPL signature outside VeilBid" })).toBeInTheDocument();
+    expect(screen.getByText(/does not ask for an XRPL seed/)).toBeInTheDocument();
+    expect(screen.getByText(/DirectMintingDelayed/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Coston2 funding runbook/ })).toHaveAttribute("href", "/docs#flare-coston2");
+  });
 });

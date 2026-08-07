@@ -113,6 +113,7 @@ const assertions = {
   publicEvidenceLedgerRendered: evidenceRoute.dom.includes("FINALIZED CHECKPOINT LEDGER") && evidenceRoute.dom.includes("Rules hash") && evidenceRoute.dom.includes("Ordered bid root"),
   publicEvidenceNoWalletGate: evidenceRoute.dom.includes("Trace every public checkpoint") && !evidenceRoute.dom.includes("CONNECT WALLET"),
   buyerBriefRendered: buyerRoute.dom.includes("Public objective") && buyerRoute.dom.includes("Acceptance criteria") && buyerRoute.dom.includes("Optional vendor questions"),
+  xrpFundingBoundaryRendered: buyerRoute.dom.includes("Keep the XRPL signature outside VeilBid") && buyerRoute.dom.includes("DirectMintingDelayed") && buyerRoute.dom.includes("NON-CUSTODIAL"),
   vendorRedemptionBoundaryRendered: vendorRoute.dom.includes("Request XRP redemption") && vendorRoute.dom.includes("Connect the winning Coston2 wallet"),
   noPublicStateFailureRendered: !desktop.dom.includes("Flare state unavailable") && !mobile.dom.includes("Flare state unavailable"),
   mobileTenderNavigationActive: mobile.dom.includes('class="primary-nav-link active"') && mobile.dom.includes('aria-current="page"'),
