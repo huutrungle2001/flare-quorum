@@ -112,7 +112,7 @@ const assertions = {
   publicEvidenceNoWalletGate: evidenceRoute.dom.includes("Trace every public checkpoint") && !evidenceRoute.dom.includes("CONNECT WALLET"),
   noPublicStateFailureRendered: !desktop.dom.includes("Flare state unavailable") && !mobile.dom.includes("Flare state unavailable"),
   mobileTenderNavigationActive: mobile.dom.includes('class="primary-nav-link active"') && mobile.dom.includes('aria-current="page"'),
-  docsRouteRendered: docsMobile.dom.includes("TROUBLESHOOTING") && docsMobile.dom.includes('class="docs-nav"'),
+  docsRouteRendered: docsMobile.dom.includes("CURRENT JUDGE PATH") && docsMobile.dom.includes("TROUBLESHOOTING") && docsMobile.dom.includes('class="docs-nav"'),
   desktopScreenshotCaptured: desktop.screenshot.sha256.length === 64,
   mobileScreenshotCaptured: mobile.screenshot.sha256.length === 64,
   docsMobileScreenshotCaptured: docsMobile.screenshot.sha256.length === 64,

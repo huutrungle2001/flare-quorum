@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 
 const navItems = [
+  ["flare-coston2", "FLARE COSTON2"],
   ["overview", "OVERVIEW"],
   ["quick-start", "QUICK START"],
   ["public", "PUBLIC EXPLORER"],
@@ -46,8 +47,34 @@ export function DocsPage() {
           ))}
         </aside>
         <article className="docs-content">
+          <section id="flare-coston2">
+            <p className="eyebrow">VEILBID FLARE / COSTON2 · CURRENT JUDGE PATH</p>
+            <h1>Public evidence.<br /><em>Private computation.</em></h1>
+            <p className="docs-lede">
+              The verified Summer Signal release runs on Flare Coston2. Buyers
+              fund public FTestXRP rules, vendors encrypt bids to a fixed FCC
+              quorum, and the market accepts only a threshold-signed result.
+              FTSO, FAssets, FDC, and Smart Account bindings are visible as
+              public protocol facts; private bid payloads never enter this UI.
+            </p>
+            <div className="docs-callout">
+              <strong>USE THE CURRENT RELEASE</strong>
+              <p>
+                Start wallet-free, then connect only when a buyer or vendor
+                write is intentional. The Activity/Evidence ledger rereads
+                finalized Coston2 state and never falls back to Sepolia or
+                mock success.
+              </p>
+            </div>
+            <div className="docs-actions">
+              <Link className="primary-button" to="/">OPEN COSTON2 DOSSIERS →</Link>
+              <a className="secondary-button" href="/?role=evidence">OPEN ACTIVITY LEDGER →</a>
+              <a className="secondary-button" href="/?role=buyer">OPEN BUYER →</a>
+              <a className="secondary-button" href="/?role=vendor">OPEN VENDOR →</a>
+            </div>
+          </section>
           <section id="overview">
-            <p className="eyebrow">PROTOCOL GUIDE / SEPOLIA RELEASE</p>
+            <p className="eyebrow">HISTORICAL BASELINE / SEPOLIA + NOX</p>
             <h1>Use VeilBid from tender to settlement.</h1>
             <p className="docs-lede">
               VeilBid is a confidential procurement protocol for Safe
