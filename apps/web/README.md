@@ -9,6 +9,9 @@ the historical EOA/Safe Buyer flows, Private Bids views for
 submission/ownership/granted access, and Activity settlement recovery. The
 default `/` and `/flare` routes read finalized Coston2 contract state; `/room`
 remains the explicitly historical Sepolia/Nox baseline.
+The Flare dossier also exposes sanitized FCC, FTestXRP, FAssets/FXRP, FTSO,
+FDC, Smart Account, and award-receipt addresses so a judge can follow each
+integration without wallet access or confidential payloads.
 
 It intentionally:
 

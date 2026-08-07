@@ -4,13 +4,30 @@
   "status": "verified",
   "source": "packages/flare-contracts/src/VeilBidFlareMarket.sol",
   "deployment": "packages/flare-contracts/deployments/coston2.release.json",
+  "deploymentBlock": "33746695",
   "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
   "awardReceipt": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5",
   "fcc": {
     "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
     "extensionId": "66011",
     "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
-    "resultThreshold": 2
+    "version": "v0.2.2",
+    "resultThreshold": 2,
+    "teeIds": [
+      "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
+      "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
+      "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40"
+    ]
+  },
+  "protocols": {
+    "fTestXRP": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+    "assetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
+    "ftsoV2": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+    "xrpUsdFeedId": "0x015852502f55534400000000000000000000000000",
+    "fdcHub": "0x48aC463d7975828989331F4De43341627b9c5f1D",
+    "fdcVerification": "0x906507E0B64bcD494Db73bd0459d1C667e14B933",
+    "masterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c",
+    "relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE"
   },
   "abis": {
     "VeilBidFlareMarket": "generated/abis/VeilBidFlareMarket.json",

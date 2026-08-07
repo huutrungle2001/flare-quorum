@@ -1,6 +1,7 @@
 import type { Abi, Address, Hex } from "viem";
 import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { type: "json" };
 import awardReceiptAbiJson from "../generated/abis/VeilBidFlareAwardReceipt.json" with { type: "json" };
+import releaseManifestJson from "../generated/manifest.json" with { type: "json" };
 export * from "./protocol.js";
 export * from "./smart-account.js";
 export * from "./fdc.js";
@@ -13,6 +14,35 @@ export * from "./private-bid.js";
 export const coston2ChainId = 114;
 export const veilBidFlareMarketAbi = marketAbiJson as Abi;
 export const veilBidFlareAwardReceiptAbi = awardReceiptAbiJson as Abi;
+
+export interface Coston2FlarePublicRelease {
+  network: "coston2";
+  chainId: 114;
+  status: "planned" | "verified";
+  deploymentBlock: string;
+  market: Address;
+  awardReceipt: Address;
+  fcc: {
+    manager: Address;
+    extensionId: string;
+    codeHash: Hex;
+    version: string;
+    resultThreshold: number;
+    teeIds: readonly Address[];
+  };
+  protocols: {
+    fTestXRP: Address;
+    assetManagerFXRP: Address;
+    ftsoV2: Address;
+    xrpUsdFeedId: Hex;
+    fdcHub: Address;
+    fdcVerification: Address;
+    masterAccountController: Address;
+    relay: Address;
+  };
+}
+
+export const coston2FlarePublicRelease = releaseManifestJson as Coston2FlarePublicRelease;
 
 export interface Coston2FlareDeployment {
   chainId: 114;

@@ -1,5 +1,6 @@
 import { formatUnits } from "viem";
 import { useState } from "react";
+import { coston2FlarePublicRelease } from "@veilbid/flare-bindings";
 import type { FlareMarketState } from "../public-market/useFlareMarket";
 import { useFlareMarket } from "../public-market/useFlareMarket";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";
@@ -12,6 +13,52 @@ function statusClass(status: FlarePublicTender["status"]): string {
   if (status === "Awarded" || status === "Refunded") return "verified";
   if (status === "Open" || status === "Closed" || status === "ComputePending") return "encrypted";
   return "";
+}
+
+function explorerAddress(address: string): string {
+  return `https://coston2-explorer.flare.network/address/${address}`;
+}
+
+function ProtocolFacts() {
+  const release = coston2FlarePublicRelease;
+  const fact = (label: string, address: string, description: string) => (
+    <div key={label}>
+      <dt>{label}</dt>
+      <dd>
+        <a className="text-link" href={explorerAddress(address)} target="_blank" rel="noreferrer">
+          {short(address)} ↗
+        </a>
+        <small>{description}</small>
+      </dd>
+    </div>
+  );
+  return (
+    <section className="evidence-panel protocol-facts" aria-label="Verified Flare integrations">
+      <header className="detail-header">
+        <div>
+          <p className="eyebrow">VERIFIED FLARE INTEGRATIONS</p>
+          <h2>One procurement path, five Flare primitives</h2>
+        </div>
+        <span className="privacy-badge verified">COSTON2 / 114</span>
+      </header>
+      <p>
+        The public page exposes only deployment facts and finalized state. FCC
+        keeps bids private; FTSO supplies the bound XRP/USD snapshot; FAssets,
+        FDC, and Smart Account funding remain explicit testnet paths.
+      </p>
+      <dl className="term-grid">
+        {fact("FCC manager", release.fcc.manager, `extension ${release.fcc.extensionId} · ${release.fcc.version}`)}
+        {fact("FTestXRP escrow", release.protocols.fTestXRP, "public Coston2 settlement token")}
+        {fact("FAssets FXRP manager", release.protocols.assetManagerFXRP, "FXRP mint/redeem integration")}
+        {fact("FTSO v2", release.protocols.ftsoV2, "XRP/USD feed snapshot")}
+        {fact("FDC hub", release.protocols.fdcHub, "XRPL payment attestation request")}
+        {fact("FDC verification", release.protocols.fdcVerification, "proof verification endpoint")}
+        {fact("Smart Account controller", release.protocols.masterAccountController, "XRPL-native direct mint execution")}
+        {fact("Award receipt", release.awardReceipt, "non-transferable public settlement proof")}
+      </dl>
+      <p className="form-hint">FCC code hash: <code>{short(release.fcc.codeHash)}</code> · result threshold: {release.fcc.resultThreshold}/3</p>
+    </section>
+  );
 }
 
 function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
@@ -88,6 +135,7 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
           <span className="deployment-label">{state.data?.deploymentStatus === "verified" ? "VERIFIED COSTON2 RELEASE" : "PLANNED / NOT YET VERIFIED"}</span>
         </div>
       </section>
+      <ProtocolFacts />
       {state.status === "loading" && <section className="state-panel"><span className="loading-mark" /><div><h2>Reading Coston2 state</h2><p>No placeholder tender is inserted.</p></div></section>}
       {state.status === "error" && <section className="state-panel error" role="alert"><span>!</span><div><h2>Flare state unavailable</h2><p>{state.error}</p><button className="secondary-button" onClick={onRetry}>RETRY COSTON2 →</button></div></section>}
       {state.status === "ready" && tenders.length === 0 && <section className="state-panel"><span>0</span><div><h2>No Coston2 tenders yet</h2><p>The configured market has no public tender records.</p></div></section>}
