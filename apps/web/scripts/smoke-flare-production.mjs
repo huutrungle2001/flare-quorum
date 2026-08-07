@@ -84,7 +84,7 @@ async function fetchRoute(path) {
 mkdirSync(dirname(evidencePath), { recursive: true });
 mkdirSync(screenshotDirectory, { recursive: true });
 
-const routes = await Promise.all(["/", "/flare", "/?role=evidence", "/room", "/docs"].map(fetchRoute));
+const routes = await Promise.all(["/", "/flare", "/?role=evidence", "/?role=vendor", "/room", "/docs"].map(fetchRoute));
 const rootHtml = routes.find((route) => route.path === "/")?.body ?? "";
 const assetPaths = [...rootHtml.matchAll(/<script[^>]+src="([^"]+)"/g)].map((match) => match[1]);
 const assetSources = await Promise.all(assetPaths.map(async (path) => {
@@ -97,6 +97,7 @@ const chrome = findChrome();
 const desktop = browserCapture(chrome, "/", { width: 1440, height: 1000 }, "flare-production-desktop.png");
 const mobile = browserCapture(chrome, "/flare", { width: 390, height: 844 }, "flare-production-mobile.png");
 const evidenceRoute = browserCapture(chrome, "/?role=evidence", { width: 1440, height: 1000 }, "flare-production-evidence.png");
+const vendorRoute = browserCapture(chrome, "/?role=vendor", { width: 1440, height: 1000 }, "flare-production-vendor.png");
 const docsMobile = browserCapture(chrome, "/docs", { width: 390, height: 844 }, "flare-production-docs-mobile.png");
 
 const market = release.contracts.VeilBidFlareMarket.address;
@@ -110,6 +111,7 @@ const assertions = {
   privacyBoundaryVisible: desktop.dom.includes("PRIVATE LOSING BIDS") && desktop.dom.includes("Bid payloads are never fetched"),
   publicEvidenceLedgerRendered: evidenceRoute.dom.includes("FINALIZED CHECKPOINT LEDGER") && evidenceRoute.dom.includes("Rules hash") && evidenceRoute.dom.includes("Ordered bid root"),
   publicEvidenceNoWalletGate: evidenceRoute.dom.includes("Trace every public checkpoint") && !evidenceRoute.dom.includes("CONNECT WALLET"),
+  vendorRedemptionBoundaryRendered: vendorRoute.dom.includes("Request XRP redemption") && vendorRoute.dom.includes("Connect the winning Coston2 wallet"),
   noPublicStateFailureRendered: !desktop.dom.includes("Flare state unavailable") && !mobile.dom.includes("Flare state unavailable"),
   mobileTenderNavigationActive: mobile.dom.includes('class="primary-nav-link active"') && mobile.dom.includes('aria-current="page"'),
   docsRouteRendered: docsMobile.dom.includes("CURRENT JUDGE PATH") && docsMobile.dom.includes("TROUBLESHOOTING") && docsMobile.dom.includes('class="docs-nav"'),
@@ -139,6 +141,7 @@ const evidence = {
     desktop: desktop.screenshot,
     mobile: mobile.screenshot,
     evidence: evidenceRoute.screenshot,
+    vendor: vendorRoute.screenshot,
     docsMobile: docsMobile.screenshot,
   },
   assertions,
@@ -146,6 +149,7 @@ const evidence = {
   notes: [
     "The deployed v2 Vercel project loaded the verified Coston2 public market without a wallet.",
     "The dedicated Activity/Evidence route reread the same finalized market snapshot without a wallet or bid payload.",
+    "The Vendor route exposes the official redemption request boundary but keeps approval and redemption behind the winning Coston2 wallet.",
     "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
     "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed.",
   ],
