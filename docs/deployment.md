@@ -208,6 +208,16 @@ extension, URL, code/platform, and public key from one Coston2 block before it
 writes public evidence. The deployment key remains process-local and is never
 placed in an argument, image, state file, output, or evidence.
 
+For a named Cloudflare Tunnel, install the checksum-pinned local client with
+`pnpm flare:tunnel:install` and verify it with `pnpm flare:tunnel:check`. The
+client is stored under ignored `.local/toolchains/`, is owner-executable only,
+and does not auto-update inside VeilBid's release process. Browser authentication
+must be completed by the project owner through `cloudflared tunnel login`; do
+not paste `cert.pem`, a tunnel credential JSON, or a tunnel token into chat,
+`.env.local`, logs, or the repository. One named tunnel may route three public
+hostnames to loopback ports `6674`, `6675`, and `6676`; all three hostnames must
+then be recorded in `FLARE_FCC_PROXY_URLS` in matching machine order.
+
 - Use disposable Coston2/XRPL testnet identities and C2FLR for gas.
 - Keep deployer, executor, XRPL, TEE, proxy, indexer, Redis, and tunnel secrets
   in ignored local configuration or secret storage.
