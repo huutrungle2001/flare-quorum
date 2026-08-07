@@ -199,10 +199,11 @@ async function readTeeSet({ client, manager, urls, extensionId, codeHash }) {
   return machines;
 }
 
-async function writeContract({ client, wallet, account, address, abi, functionName, args, value }) {
+async function writeContract({ client, wallet, account, address, abi, functionName, args, value, gas }) {
   const simulation = await client.simulateContract({
     account, address, abi, functionName, args,
     ...(value === undefined ? {} : { value }),
+    ...(gas === undefined ? {} : { gas }),
   });
   const hash = await wallet.writeContract(simulation.request);
   const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 1 });
@@ -456,6 +457,7 @@ async function main() {
     abi: marketAbi,
     functionName: "submitBidReceipts",
     args: [tenderId, prepared.receipts, prepared.signatures],
+    gas: 1_000_000n,
   });
   const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (field(tenderAfterBid, "bidCount", 6) !== 1n || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
@@ -582,6 +584,8 @@ async function main() {
 try {
   await main();
 } catch (error) {
-  console.error(JSON.stringify({ gate: "C-E-F", status: "FAILED", code: error instanceof Error ? error.message : "FCC_MARKET_LIFECYCLE_FAILED" }));
+  const rawCode = error instanceof Error ? error.message : "";
+  const code = /^FCC_MARKET_[A-Z0-9_]+$/.test(rawCode) ? rawCode : "FCC_MARKET_LIFECYCLE_FAILED";
+  console.error(JSON.stringify({ gate: "C-E-F", status: "FAILED", code }));
   process.exitCode = 1;
 }
