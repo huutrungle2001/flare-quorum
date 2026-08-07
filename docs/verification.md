@@ -55,20 +55,20 @@ wallet/executor secrets are never persisted.
 | Bid privacy | No plaintext/ciphertext in chain, logs, analytics, evidence, or durable browser/proxy state | PARTIAL — live three-machine ciphertext ingress, browser no-persistence path, bounded HTTP/proxy tests, and secret/evidence scans pass; hosted runtime-log review remains |
 | Receipt binding | Wrong chain/market/extension/code/tender/vendor/rules/nonce/commitment/expiry fails | PARTIAL — live receipts and domain-binding tests pass; same-identity restart evidence remains |
 | Quorum continuity | Every accepted bid preserves a common 2-of-3 machine set; weaker receipt sets fail | PASSED for result collection — live `three-vendor-recovery.release.json` finalizes with one unavailable result endpoint; sealed restart and two-machine loss remain open |
-| State integrity | TEE rebuilds ordered root; omitted, duplicated, reordered, and rolled-back state fails | NOT RUN |
-| Eligibility | Missing/forged/duplicate/unsupported credential and every public bound fails closed | NOT RUN |
-| Scoring | XRP/USD conversion, price/delivery/warranty penalties, rounding, bounds, tie, and no-valid cases match golden vectors | NOT RUN |
-| FTSO | Unsupported, zero, malformed, or stale feed data cannot close a USD-enabled tender | NOT RUN |
-| Result threshold | Two distinct approved common-quorum signers agree; one signer, duplicate signer, and split digests fail | NOT RUN |
-| Domain/replay | Wrong root, rule, FTSO snapshot, close block, nonce, expiry, winner ID, or amount fails | NOT RUN |
+| State integrity | TEE rebuilds ordered root; omitted, duplicated, reordered, and rolled-back state fails | PARTIAL — Go sealed-store/selection, Solidity fuzz/invariant, and TypeScript root tests pass; live rollback/restart evidence remains |
+| Eligibility | Missing/forged/duplicate/unsupported credential and every public bound fails closed | PARTIAL — FCC/contract invalid-credential and public-bound tests pass; live invalid-credential drill remains |
+| Scoring | XRP/USD conversion, price/delivery/warranty penalties, rounding, bounds, tie, and no-valid cases match golden vectors | PARTIAL — shared Go/Solidity/TypeScript vectors and live multi-criteria selection pass; full live boundary drill remains |
+| FTSO | Unsupported, zero, malformed, or stale feed data cannot close a USD-enabled tender | PARTIAL — contract negative tests and live XRP/USD snapshot pass; separate live fault injection remains |
+| Result threshold | Two distinct approved common-quorum signers agree; one signer, duplicate signer, and split digests fail | PARTIAL — live two-signature finalization plus local duplicate/split/wrong-domain tests pass; full live negative drill remains |
+| Domain/replay | Wrong root, rule, FTSO snapshot, close block, nonce, expiry, winner ID, or amount fails | PARTIAL — shared contract/binding/relay rejection suites pass; full live replay matrix remains |
 | FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | PASSED (local stateful multi-tender harness plus live C-E-F lifecycle) |
 | FAssets redemption | Awarded vendor can request an official amount-based FTestXRP/FXRP redemption without VeilBid custody | PASSED — live Coston2 approval and `RedemptionRequested` evidence in `fassets-redemption.release.json` |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | PARTIAL — public binding, quote, nonce, proof-domain, and checkpoint-drift tests pass; full live fault-drill evidence remains |
 | Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage is live; XRP funding checkpoint/resume is implemented and tested; browser-native recovery and full fault drills remain |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json`, `evidence/coston2/web-role-workspaces.json`, `evidence/coston2/flare-ingress-production.json`; dedicated `/?role=evidence` ledger is covered by the role smoke |
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PARTIAL — 320px/keyboard/focus/reduced-motion/labels pass in `evidence/coston2/web-keyboard-accessibility.json`; interactive recovery remains |
-| Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | IN PROGRESS — repository/history/evidence scan passes; hosted runtime log review remains |
-| New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | IN PROGRESS |
+| Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; hosted runtime log review remains |
+| New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | PASSED for the current Flare package — `submission/flare/NEW-WORK-LEDGER.md` and judge-package validation agree; historical parent pack remains isolated |
 | User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN |
 
 ## 4. Planned evidence set
