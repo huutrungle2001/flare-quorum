@@ -272,23 +272,29 @@ async function main() {
   process.env.FCC_GATE_G_PAYMENT_ADDRESS = network.directMintingPaymentAddress;
   currentPhase = "xrpl-payment";
   const xrplTransactionId = await submitPayment(xrplWallet, quote.paymentAmountUBA, plan.memoData);
-  const job = parseFlareFundingJob({
-    version: 1,
-    xrplTransactionId,
-    personalAccount,
-    nonce: nonce.toString(),
-    walletId: 0,
-    executorFeeUBA: executorFeeUBA.toString(),
-    terms: {
-      ...terms,
-      extensionId: terms.extensionId.toString(),
-      scoringPolicy: {
-        ...terms.scoringPolicy,
-        ceilingXrpMicros: terms.scoringPolicy.ceilingXrpMicros.toString(),
-        bidDeadline: terms.scoringPolicy.bidDeadline.toString(),
+  lastSafeMarker = "job-parse";
+  let job;
+  try {
+    job = parseFlareFundingJob({
+      version: 1,
+      xrplTransactionId,
+      personalAccount,
+      nonce: nonce.toString(),
+      walletId: 0,
+      executorFeeUBA: executorFeeUBA.toString(),
+      terms: {
+        ...terms,
+        extensionId: terms.extensionId.toString(),
+        scoringPolicy: {
+          ...terms.scoringPolicy,
+          ceilingXrpMicros: terms.scoringPolicy.ceilingXrpMicros.toString(),
+          bidDeadline: terms.scoringPolicy.bidDeadline.toString(),
+        },
       },
-    },
-  });
+    });
+  } catch {
+    throw new Error("FCC_GATE_G_JOB_SCHEMA_INVALID");
+  }
   const executor = new FlareFundingExecutor(config, fundingChain);
   currentPhase = "fdc-smart-account-execution";
   let outcome = await executor.execute(job);
