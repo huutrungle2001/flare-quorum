@@ -323,8 +323,9 @@ Exit: the submission contains real user evidence, not only technical claims.
 ### Phase 8 — judge package
 
 - [x] Live Coston2 app and wallet-free finalized tender.
-- [ ] Four-minute video following the single flagship journey (recording
-  storyboard is ready in `submission/flare/README.md`).
+- [x] Four-minute captioned video following the single flagship journey is
+  checked in at `submission/flare/veilbid-flare-demo.mp4`; it uses live public
+  smoke captures and states the testnet/simulated-TEE limits.
 - [x] Architecture diagram and 60-second privacy/trust explanation in
   `submission/flare/PRIVACY-TRUST-TALK.md`.
 - [x] Before/after work ledger with commits and evidence in

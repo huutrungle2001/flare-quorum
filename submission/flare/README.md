@@ -9,6 +9,7 @@ Ethereum Sepolia/Nox release and must not be used as evidence for this package.
 | Resource | Link |
 | --- | --- |
 | Live app | [veilbid-flare.vercel.app](https://veilbid-flare.vercel.app) |
+| Four-minute demo | [`veilbid-flare-demo.mp4`](veilbid-flare-demo.mp4) |
 | Public evidence ledger | [Coston2 Activity/Evidence view](https://veilbid-flare.vercel.app/?role=evidence) |
 | Buyer workspace | [Coston2 Buyer](https://veilbid-flare.vercel.app/?role=buyer) |
 | Vendor workspace | [Coston2 Vendor](https://veilbid-flare.vercel.app/?role=vendor) |
@@ -122,8 +123,9 @@ flowchart LR
 
 ## Four-minute demo storyboard
 
-This is the recording script. It is intentionally bounded to the single
-flagship story; it does not imply that a recording has already been made.
+The checked-in captioned demo follows this storyboard using the live Vercel
+smoke captures. It is intentionally bounded to the single flagship story and
+contains no wallet, bid, credential, or private-key material.
 
 | Time | Screen and narration | Judge proof |
 | --- | --- | --- |
@@ -166,6 +168,6 @@ Vercel smoke/accessibility evidence.
 
 Still open and deliberately not overstated: same-identity simulated-TEE
 restart recovery, browser-native XRP funding/recovery UI, adversarial/recovery
-breadth beyond the recorded drill, structured buyer/vendor interviews, pilot
-evidence, and the final video recording. The redemption request is live; the
-underlying agent payout remains an external FAssets protocol obligation.
+breadth beyond the recorded drill, structured buyer/vendor interviews, and
+pilot evidence. The redemption request is live; the underlying agent payout
+remains an external FAssets protocol obligation.
