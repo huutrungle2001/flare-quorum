@@ -89,8 +89,9 @@ placeholders are forbidden after that commit.
 - [~] Run full live/adversarial/recovery suites; core live lifecycles and one-
   endpoint recovery pass, while same-identity restart and complete fault drills
   remain open.
-- [~] Publish sanitized evidence and performance benchmarks; release evidence is
-  current, benchmark collection remains open.
+- [~] Publish sanitized evidence and performance benchmarks; release evidence and
+  public receipt/block timing are current, while independent bid-ingress timing
+  and broader fault-drill evidence remain open.
 - [x] Deploy web and relay; verify desktop/mobile/keyboard behavior.
 - [ ] Complete user research, vendor tests, and pilot outreach.
 - [ ] Pass Gate H.
