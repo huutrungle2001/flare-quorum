@@ -273,7 +273,9 @@ confidential bid or settlement boundary:
 - [x] Run a three-vendor lifecycle with the same private multi-criteria and
   threshold path; live evidence is
   `evidence/coston2/gate-c-e-f-three-vendor.json`.
-- [ ] Run the three-vendor recovery variant.
+- [x] Run the three-vendor recovery variant with one result endpoint
+  intentionally unavailable; two remaining frozen TEE results finalized the
+  tender in `evidence/coston2/three-vendor-recovery.release.json`.
 - [ ] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
   wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay drills.
 - [ ] Record gas, latency, bid-ingress, close-to-result, and recovery benchmarks.

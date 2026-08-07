@@ -6,9 +6,10 @@
 > block `33752891`. The pinned images, indexer, three stable Railway origins,
 > three distinct simulated TEE identities in `PRODUCTION`, private receipts,
 > FTSO-bound scoring, exact FTestXRP settlement, and the XRPL/FDC/Smart Account
-> funding path are recorded in public-safe evidence. Same-identity TEE restart
-> recovery remains open because the supported simulated runtime rotates identity
-> on restart. Gate H and release hardening remain mandatory.
+> funding path are recorded in public-safe evidence. A three-vendor recovery
+> run also finalized with one result endpoint unavailable, while same-identity
+> TEE restart recovery remains open because the supported simulated runtime
+> rotates identity on restart. Gate H and release hardening remain mandatory.
 
 ## 1. Rules
 
@@ -96,7 +97,8 @@ plaintext in an application database.
 Live core pass: `evidence/coston2/gate-c-e-f-live-lifecycle.json` records three
 distinct production machines accepting the same three encrypted bids, a common
 three-machine receipt quorum, and the ordered root for tender `11`. The
-surviving-pair outage drill remains part of release hardening.
+additional `evidence/coston2/three-vendor-recovery.release.json` run collected
+only two result endpoints and still finalized with the frozen quorum.
 
 Prove with three registered machines:
 
@@ -144,7 +146,9 @@ or private scoring requires subjective/AI branching.
 Live core pass: two distinct frozen TEE identities signed the exact same result
 digest and the market finalized the result on Coston2. The evidence includes
 the request and finalization transactions and the public binding assertions;
-retry/outage recovery drills remain part of release hardening.
+the recovery run also proves that one unavailable result endpoint does not
+prevent threshold finalization. Same-identity restart and two-machine loss
+remain part of release hardening.
 
 Prove:
 
