@@ -425,6 +425,7 @@ async function main() {
   const vendorTokenBefore = await Promise.all(vendorAccounts.map((vendor) =>
     client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [vendor.address] }),
   ));
+  const marketTokenBefore = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [market] });
   currentPhase = "approve-escrow";
   const approval = await writeContract({ client, wallet: buyerWallet, account, address: token, abi: erc20Abi, functionName: "approve", args: [market, ceiling] });
   const tenderCountBefore = await client.readContract({ address: market, abi: marketAbi, functionName: "tenderCount" });
@@ -583,7 +584,7 @@ async function main() {
   if (
     winner !== getAddress(vendorAccounts[0].address) || buyerDelta !== winningAmount
     || vendorDeltas[0] !== winningAmount || vendorDeltas.slice(1).some((delta) => delta !== 0n)
-    || marketTokenAfter !== 0n
+    || marketTokenAfter !== marketTokenBefore
   ) {
     throw new Error("FCC_MARKET_SETTLEMENT_CONSERVATION_INVALID");
   }
@@ -633,6 +634,8 @@ async function main() {
       ftsoDecimals: context.ftsoDecimals,
       ftsoTimestamp: context.ftsoTimestamp.toString(),
       closeBlock: context.closeBlock.toString(),
+      marketEscrowBalanceBefore: marketTokenBefore.toString(),
+      marketEscrowBalanceAfter: marketTokenAfter.toString(),
       awardReceiptOwner: awardOwner,
       approvalTransaction: approval.hash,
       tenderTransaction: create.hash,
@@ -653,7 +656,7 @@ async function main() {
       ftsSnapshotCapturedOnClose: context.ftsoValue > 0n && context.ftsoTimestamp > 0n,
       selectionResultSignedByTwoDistinctFrozenTees: quorum.signers.length === 2,
       selectionResultMatchesCommonRoot: equalHex(quorum.result.orderedBidRoot, context.orderedBidRoot),
-      ftestXrpWinnerPayoutConserved: buyerDelta === winningAmount && vendorDeltas[0] === winningAmount && vendorDeltas.slice(1).every((delta) => delta === 0n) && marketTokenAfter === 0n,
+      ftestXrpWinnerPayoutConserved: buyerDelta === winningAmount && vendorDeltas[0] === winningAmount && vendorDeltas.slice(1).every((delta) => delta === 0n) && marketTokenAfter === marketTokenBefore,
       awardReceiptMintedToWinner: awardOwner === winner,
       finalTenderAwarded: Number(field(finalized, "status", 21)) === 4,
       noPlaintextOrCiphertextRecorded: true,
