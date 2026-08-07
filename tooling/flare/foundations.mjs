@@ -118,6 +118,31 @@ export function verifyTeeProxyReleaseRecipe(source, recipe) {
   );
 }
 
+export function verifyTeeRegistrationReleaseRecipe(source, recipe) {
+  if (!recipe || typeof source !== "string") return false;
+  const requiredFragments = [
+    `# syntax=${recipe.dockerfileFrontend}`,
+    `FROM --platform=${recipe.platform} ${recipe.builderImage} AS builder`,
+    `ADD --checksum=sha256:${recipe.sourceSha256}`,
+    recipe.sourceUrl,
+    `go mod edit -require=github.com/flare-foundation/tee-node@v${recipe.teeNodeModuleVersion}`,
+    `go mod edit -require=github.com/flare-foundation/go-flare-common@${recipe.goFlareCommonModuleVersion}`,
+    "go get ./cmd/register-tee",
+    "go mod verify",
+    "go build -mod=readonly -trimpath -buildvcs=false",
+    `FROM --platform=${recipe.platform} ${recipe.runtimeImage}`,
+    "COPY --chmod=0555 --chown=65532:65532 --from=builder /out/register-tee /app/register-tee",
+    "USER 65532:65532",
+    'ENTRYPOINT ["/app/register-tee"]',
+  ];
+  return (
+    /^[0-9a-f]{40}$/.test(recipe.sourceCommit ?? "") &&
+    /^[0-9a-f]{64}$/.test(recipe.sourceSha256 ?? "") &&
+    versionAtLeast(recipe.teeNodeModuleVersion, "0.0.22") &&
+    requiredFragments.every((fragment) => source.includes(fragment))
+  );
+}
+
 export function verifyFccExtensionReleaseRecipe(source, recipe) {
   if (!recipe || typeof source !== "string") return false;
   const requiredFragments = [
@@ -228,6 +253,15 @@ export async function inspectFoundations({
   const teeProxyBuildInputsPinned = verifyTeeProxyReleaseRecipe(
     teeProxyDockerfile,
     teeProxyRecipe,
+  );
+  const teeRegistrationRecipe = manifest.docker.teeRegistrationReleaseRecipe;
+  const teeRegistrationDockerfile = readFileSync(
+    resolve(repositoryRoot, teeRegistrationRecipe.dockerfile),
+    "utf8",
+  );
+  const teeRegistrationBuildInputsPinned = verifyTeeRegistrationReleaseRecipe(
+    teeRegistrationDockerfile,
+    teeRegistrationRecipe,
   );
   const rpcUrl = environment[manifest.network.rpcEnvironmentVariable];
   if (!rpcUrl) throw new Error("COSTON2_RPC_URL_MISSING");
@@ -394,6 +428,15 @@ export async function inspectFoundations({
     "--format",
     "{{.Descriptor.digest}}",
   ]);
+  const teeRegistrationImageCheck = command("docker", [
+    "image",
+    "inspect",
+    "--platform",
+    teeRegistrationRecipe.platform,
+    teeRegistrationRecipe.releaseImageTag ?? "",
+    "--format",
+    "{{.Descriptor.digest}}",
+  ]);
   const privateKey = normalizePrivateKey(environment.FLARE_DEPLOYMENT_PRIVATE_KEY);
   const deploymentKeyMatchesDeclaredWallet = privateKey
     ? privateKeyToAccount(privateKey).address === declaredDeployer
@@ -515,6 +558,13 @@ export async function inspectFoundations({
     teeProxyReleaseImageVerified:
       dockerCheck.ok && teeProxyImageCheck.ok &&
       teeProxyImageCheck.output === teeProxyRecipe.releaseImageDigest,
+    teeRegistrationBuildInputsPinned,
+    teeRegistrationReleaseImageDigestRecorded: isSha256Digest(
+      teeRegistrationRecipe.releaseImageDigest,
+    ),
+    teeRegistrationReleaseImageVerified:
+      dockerCheck.ok && teeRegistrationImageCheck.ok &&
+      teeRegistrationImageCheck.output === teeRegistrationRecipe.releaseImageDigest,
     stableProxyConfigured,
     stableProxyReachable,
     indexerConfigured,
@@ -560,6 +610,21 @@ export async function inspectFoundations({
     blockers,
     assertions.teeProxyReleaseImageVerified,
     "TEE_PROXY_RELEASE_IMAGE_NOT_VERIFIED",
+  );
+  addBlocker(
+    blockers,
+    assertions.teeRegistrationBuildInputsPinned,
+    "TEE_REGISTRATION_BUILD_INPUTS_UNPINNED",
+  );
+  addBlocker(
+    blockers,
+    assertions.teeRegistrationReleaseImageDigestRecorded,
+    "TEE_REGISTRATION_RELEASE_IMAGE_DIGEST_MISSING",
+  );
+  addBlocker(
+    blockers,
+    assertions.teeRegistrationReleaseImageVerified,
+    "TEE_REGISTRATION_RELEASE_IMAGE_NOT_VERIFIED",
   );
   addBlocker(blockers, assertions.stableProxyConfigured, "STABLE_PROXY_NOT_CONFIGURED");
   addBlocker(blockers, assertions.stableProxyReachable, "STABLE_PROXY_NOT_REACHABLE");
@@ -648,6 +713,19 @@ export async function inspectFoundations({
         releaseImageDigest: teeProxyRecipe.releaseImageDigest,
         releaseBinarySha256: teeProxyRecipe.releaseBinarySha256,
       },
+      teeRegistrationReleaseRecipe: {
+        dockerfile: teeRegistrationRecipe.dockerfile,
+        platform: teeRegistrationRecipe.platform,
+        sourceCommit: teeRegistrationRecipe.sourceCommit,
+        sourceSha256: teeRegistrationRecipe.sourceSha256,
+        teeNodeModuleVersion: teeRegistrationRecipe.teeNodeModuleVersion,
+        goFlareCommonModuleVersion: teeRegistrationRecipe.goFlareCommonModuleVersion,
+        builderImage: teeRegistrationRecipe.builderImage,
+        runtimeImage: teeRegistrationRecipe.runtimeImage,
+        releaseImageTag: teeRegistrationRecipe.releaseImageTag,
+        releaseImageDigest: teeRegistrationRecipe.releaseImageDigest,
+        releaseBinarySha256: teeRegistrationRecipe.releaseBinarySha256,
+      },
       configuredMachineCount: machineIds.length,
       productionMachineCount,
     },
@@ -657,6 +735,7 @@ export async function inspectFoundations({
       "The official scaffold main branch is reference-only; VeilBid pins the organizer-directed tee-node module and tee-proxy release recipe independently.",
       "The VeilBid extension build inputs and executable linux/amd64 image digest are pinned and locally verifiable without recording runtime secrets.",
       "The tee-proxy build inputs and executable linux/amd64 image digest are pinned and verified against the local Docker content store.",
+      "The official register-tee operator is checksum-pinned, aligned to the selected FCC wire/ABI modules, and verified as a separate non-root image.",
       "No RPC URL, deployment key, indexer credential, proxy response, or machine secret is recorded.",
       "Simulated TEE mode is the declared Coston2 judging target; it is not hardware-backed confidentiality.",
     ],

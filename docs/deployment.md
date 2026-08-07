@@ -182,6 +182,16 @@ API key, raw signatures, action ID, attestation, or TEE public key. This is a
 local simulated smoke check; it is not a bid, registered machine, production
 status, stable public endpoint, or Gate 0 pass.
 
+The registration client is also a pinned release artifact rather than an
+unreviewed command from a moving scaffold checkout. Build and verify it with
+`sg docker -c 'pnpm flare:registration:image:build'`; subsequent verification
+uses `sg docker -c 'pnpm flare:registration:image:verify'`. The recipe downloads
+the exact official scaffold archive, aligns its `tee-node` and
+`go-flare-common` modules with the running stack, builds only `register-tee`,
+and runs as a non-root distroless image. Runtime invocation supplies the
+deployment key without storing it in the image and must use `-command rRap`
+plus one state file and stable public HTTPS URL per machine.
+
 - Use disposable Coston2/XRPL testnet identities and C2FLR for gas.
 - Keep deployer, executor, XRPL, TEE, proxy, indexer, Redis, and tunnel secrets
   in ignored local configuration or secret storage.

@@ -116,6 +116,11 @@
       "sha256": "c158350ea5a9bbba8c6485a680252b8f401bc2e25ea10830101eb6d0b40b022e"
     },
     {
+      "id": "fcc-scaffold-source-archive",
+      "url": "https://codeload.github.com/flare-foundation/fce-extension-scaffold/tar.gz/f48cafb889441a62e47c083f4be8dd7d3f456f83",
+      "sha256": "ff2c61c5054ebb6636539db0417e41565d6c8afd24368f8b54578c32503290d4"
+    },
+    {
       "id": "fcc-scaffold-go-module",
       "url": "https://raw.githubusercontent.com/flare-foundation/fce-extension-scaffold/f48cafb889441a62e47c083f4be8dd7d3f456f83/go/go.mod",
       "sha256": "76eb9f5e4e1994a913a272e3b0b7114656ac9fcdbdc331a58326736821d1f5d9"
@@ -228,6 +233,21 @@
       "releaseImageTag": "veilbid/tee-proxy:coston2-0c6d016b",
       "releaseImageDigest": "sha256:59f8abcd380ded3c180e16dd5366118af37488822057ef6c562d9cf07e060ecb",
       "releaseBinarySha256": "76b83c8e09ae01e3457e8463fc044aca98504ddb0e335456f6f9d0e078258488"
+    },
+    "teeRegistrationReleaseRecipe": {
+      "dockerfile": "apps/fcc-extension/registration/Dockerfile",
+      "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
+      "platform": "linux/amd64",
+      "sourceCommit": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
+      "sourceUrl": "https://codeload.github.com/flare-foundation/fce-extension-scaffold/tar.gz/f48cafb889441a62e47c083f4be8dd7d3f456f83",
+      "sourceSha256": "ff2c61c5054ebb6636539db0417e41565d6c8afd24368f8b54578c32503290d4",
+      "teeNodeModuleVersion": "0.0.23",
+      "goFlareCommonModuleVersion": "v1.2.2-0.20260727094511-09a10067e6a4",
+      "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
+      "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
+      "releaseImageTag": "veilbid/fcc-register-tee:coston2-f48cafb",
+      "releaseImageDigest": "sha256:95cd528b5bef931d216ad0fc92b14b6315f5345c337fddcd74eb062f7258febf",
+      "releaseBinarySha256": "d88d6816fb132275cd60a5e13bb181ee96db2811d3f78a309b842fb382b2a012"
     },
     "redisImage": "redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2",
     "policy": "VeilBid's tee-proxy recipe pins the official source archive and both image stages. The executable linux/amd64 OCI manifest and binary SHA-256 are recorded separately from timestamp-bearing provenance attestations."

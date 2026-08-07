@@ -9,6 +9,7 @@ import {
   verifyFccExtensionReleaseRecipe,
   verifyFccRuntimeAlignment,
   verifyTeeProxyReleaseRecipe,
+  verifyTeeRegistrationReleaseRecipe,
   verifyPinnedSources,
   versionAtLeast,
 } from "../flare/foundations.mjs";
@@ -85,6 +86,38 @@ test("requires an exact checksum-pinned tee-proxy release recipe", () => {
   assert.equal(verifyTeeProxyReleaseRecipe(source, recipe), true);
   assert.equal(
     verifyTeeProxyReleaseRecipe(source.replace("go mod verify", "go mod download"), recipe),
+    false,
+  );
+});
+
+test("requires an aligned checksum-pinned register-tee recipe", () => {
+  const recipe = {
+    platform: "linux/amd64",
+    sourceCommit: "1".repeat(40),
+    sourceUrl: "https://example.invalid/scaffold.tar.gz",
+    sourceSha256: "2".repeat(64),
+    teeNodeModuleVersion: "0.0.23",
+    goFlareCommonModuleVersion: "v1.2.2-test",
+    dockerfileFrontend: `frontend@sha256:${"5".repeat(64)}`,
+    builderImage: `builder@sha256:${"3".repeat(64)}`,
+    runtimeImage: `runtime@sha256:${"4".repeat(64)}`,
+  };
+  const source = [
+    `# syntax=${recipe.dockerfileFrontend}`,
+    `FROM --platform=${recipe.platform} ${recipe.builderImage} AS builder`,
+    `ADD --checksum=sha256:${recipe.sourceSha256} ${recipe.sourceUrl} /tmp/source.tar.gz`,
+    `RUN go mod edit -require=github.com/flare-foundation/tee-node@v${recipe.teeNodeModuleVersion}`,
+    `RUN go mod edit -require=github.com/flare-foundation/go-flare-common@${recipe.goFlareCommonModuleVersion}`,
+    "RUN go get ./cmd/register-tee && go mod verify",
+    "RUN go build -mod=readonly -trimpath -buildvcs=false",
+    `FROM --platform=${recipe.platform} ${recipe.runtimeImage}`,
+    "COPY --chmod=0555 --chown=65532:65532 --from=builder /out/register-tee /app/register-tee",
+    "USER 65532:65532",
+    'ENTRYPOINT ["/app/register-tee"]',
+  ].join("\n");
+  assert.equal(verifyTeeRegistrationReleaseRecipe(source, recipe), true);
+  assert.equal(
+    verifyTeeRegistrationReleaseRecipe(source.replace("v0.0.23", "v0.0.21"), recipe),
     false,
   );
 });

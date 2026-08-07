@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "gate": "0-registration-image",
+  "status": "PASSED",
+  "recordedAt": "2026-08-07T13:27:33.083Z",
+  "sourceCommit": "2b53c5c91f264732d5ccc235242b7ef85c93ef27",
+  "upstreamSourceCommit": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
+  "alignedModules": {
+    "teeNode": "v0.0.23",
+    "goFlareCommon": "v1.2.2-0.20260727094511-09a10067e6a4"
+  },
+  "publicIdentifiers": {
+    "imageTag": "veilbid/fcc-register-tee:coston2-f48cafb",
+    "imageDigest": "sha256:95cd528b5bef931d216ad0fc92b14b6315f5345c337fddcd74eb062f7258febf",
+    "imageMediaType": "application/vnd.oci.image.manifest.v1+json",
+    "platform": "linux/amd64",
+    "runtimeUser": "65532:65532",
+    "entrypoint": [
+      "/app/register-tee"
+    ],
+    "binarySha256": "d88d6816fb132275cd60a5e13bb181ee96db2811d3f78a309b842fb382b2a012",
+    "binaryBytes": 10129556,
+    "binaryMode": "555"
+  },
+  "assertions": {
+    "releaseDigestMatches": true,
+    "platformMatches": true,
+    "runtimeUserMatches": true,
+    "entrypointMatches": true,
+    "binaryDigestMatches": true,
+    "binaryIsElf64Amd64": true,
+    "binaryIsExecutableReadOnly": true
+  },
+  "notes": [
+    "This image contains only the pinned official register-tee operator and uses rRap at invocation time.",
+    "No deployment key, proxy key, API key, indexer credential, URL, or registration state is copied into the image or evidence."
+  ]
+}
