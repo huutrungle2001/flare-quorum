@@ -65,6 +65,7 @@ const sleep = (milliseconds) => new Promise((resolveSleep) => setTimeout(resolve
 const zeroHash = `0x${"00".repeat(32)}`;
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const xrpUsdFeedId = "0x015852502f55534400000000000000000000000000";
+let currentPhase = "startup";
 
 function required(value, code) {
   if (typeof value !== "string" || value.trim() === "") throw new Error(code);
@@ -341,6 +342,7 @@ async function main() {
 
   const client = createPublicClient({ chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
   const buyerWallet = createWalletClient({ account, chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
+  currentPhase = "machine-preflight";
   const machines = await readTeeSet({ client, manager, urls, extensionId, codeHash });
   const block = await client.getBlock({ blockTag: "latest" });
   const now = block.timestamp;
@@ -390,6 +392,7 @@ async function main() {
   };
   const buyerTokenBefore = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [account.address] });
   const vendorTokenBefore = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [vendorAccount.address] });
+  currentPhase = "approve-escrow";
   const approval = await writeContract({ client, wallet: buyerWallet, account, address: token, abi: erc20Abi, functionName: "approve", args: [market, ceiling] });
   const tenderCountBefore = await client.readContract({ address: market, abi: marketAbi, functionName: "tenderCount" });
   const terms = {
@@ -401,17 +404,20 @@ async function main() {
     teeIds: machines.map(({ teeId }) => teeId),
     teeKeyFingerprints: machines.map(({ fingerprint }) => fingerprint),
   };
+  currentPhase = "create-tender";
   const create = await writeContract({ client, wallet: buyerWallet, account, address: market, abi: marketAbi, functionName: "createTender", args: [terms] });
   const tenderCountAfter = await client.readContract({ address: market, abi: marketAbi, functionName: "tenderCount" });
   if (tenderCountAfter !== tenderCountBefore + 1n) throw new Error("FCC_MARKET_TENDER_ID_INVALID");
   const tenderId = tenderCountAfter;
   bid.tenderId = tenderId;
+  currentPhase = "vendor-funding";
   const vendorFunding = await buyerWallet.sendTransaction({ account, to: vendorAccount.address, value: 50_000_000_000_000_000n });
   const vendorFundingReceipt = await client.waitForTransactionReceipt({ hash: vendorFunding, confirmations: 1 });
   if (vendorFundingReceipt.status !== "success") throw new Error("FCC_MARKET_VENDOR_FUNDING_FAILED");
 
   const plaintext = encodePrivateBidSubmission(bid);
   const commitment = privateBidCommitment(bid);
+  currentPhase = "encrypted-bids";
   const ciphertexts = await Promise.all(machines.map(({ publicKey }) => encryptPrivateBidForTee(
     Uint8Array.from(Buffer.from(plaintext.slice(2), "hex")), publicKey,
   )));
@@ -449,6 +455,7 @@ async function main() {
     teeIds: machines.map(({ teeId }) => teeId),
   });
   const vendorWallet = createWalletClient({ account: vendorAccount, chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
+  currentPhase = "submit-bid-receipts";
   const bidTx = await writeContract({
     client,
     wallet: vendorWallet,
@@ -461,12 +468,14 @@ async function main() {
   });
   const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (field(tenderAfterBid, "bidCount", 6) !== 1n || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
+  currentPhase = "close-tender";
   const close = await writeContract({ client, wallet: buyerWallet, account, address: market, abi: marketAbi, functionName: "closeTender", args: [tenderId] });
   const closed = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (Number(field(closed, "status", 21)) !== 2) throw new Error("FCC_MARKET_CLOSE_STATUS_INVALID");
   if (field(closed, "ftsoValue", 13) === 0n || field(closed, "ftsoTimestamp", 15) === 0n) throw new Error("FCC_MARKET_FTSO_SNAPSHOT_INVALID");
   const instructionFee = BigInt(process.env.FLARE_FCC_INSTRUCTION_FEE_WEI ?? "1000000");
   if (instructionFee <= 0n) throw new Error("FCC_MARKET_INSTRUCTION_FEE_INVALID");
+  currentPhase = "request-selection";
   const request = await writeContract({ client, wallet: buyerWallet, account, address: market, abi: marketAbi, functionName: "requestSelection", args: [tenderId], value: instructionFee });
   const pending = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (Number(field(pending, "status", 21)) !== 3 || field(pending, "requestId", 20) === zeroHash) throw new Error("FCC_MARKET_COMPUTE_REQUEST_INVALID");
@@ -489,7 +498,9 @@ async function main() {
     requestId,
     teeIds: machines.map(({ teeId }) => teeId),
   };
+  currentPhase = "collect-selection-quorum";
   const quorum = await collectSelection({ urls, requestId, context, expectedVersion: version, vendor: vendorAccount.address });
+  currentPhase = "finalize-tender";
   const finalization = await writeContract({ client, wallet: buyerWallet, account, address: market, abi: marketAbi, functionName: "finalizeTender", args: [tenderId, quorum.result, quorum.proofs] });
   const finalized = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (Number(field(finalized, "status", 21)) !== 4) throw new Error("FCC_MARKET_FINAL_STATUS_INVALID");
@@ -498,6 +509,7 @@ async function main() {
   const marketTokenAfter = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [market] });
   const winner = getAddress(quorum.result.winner);
   const winningAmount = quorum.result.winningAmountXrp;
+  currentPhase = "settlement-checks";
   const buyerDelta = buyerTokenBefore - buyerTokenAfter;
   const vendorDelta = vendorTokenAfter - vendorTokenBefore;
   if (winner !== getAddress(vendorAccount.address) || buyerDelta !== winningAmount || vendorDelta !== winningAmount || marketTokenAfter !== 0n) {
@@ -586,6 +598,6 @@ try {
 } catch (error) {
   const rawCode = error instanceof Error ? error.message : "";
   const code = /^FCC_MARKET_[A-Z0-9_]+$/.test(rawCode) ? rawCode : "FCC_MARKET_LIFECYCLE_FAILED";
-  console.error(JSON.stringify({ gate: "C-E-F", status: "FAILED", code }));
+  console.error(JSON.stringify({ gate: "C-E-F", status: "FAILED", phase: currentPhase, code }));
   process.exitCode = 1;
 }
