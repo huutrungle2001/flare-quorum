@@ -75,6 +75,8 @@
     "flare:foundation:register:preflight": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/deploy-register-fcc-foundation.mjs",
     "flare:foundation:register": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/deploy-register-fcc-foundation.mjs --execute",
     "flare:foundation:registration:verify": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/verify-fcc-foundation-registration.mjs",
+    "flare:code-version:preflight": "node --env-file-if-exists=.env.local tooling/scripts/allow-fcc-code-version.mjs",
+    "flare:code-version:allow": "node --env-file-if-exists=.env.local tooling/scripts/allow-fcc-code-version.mjs --execute",
     "flare:proxy:image:build": "node tooling/scripts/build-fcc-proxy-image.mjs --build --write",
     "flare:proxy:image:verify": "node tooling/scripts/build-fcc-proxy-image.mjs --write",
     "flare:mcp": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/operator-console build && node --env-file-if-exists=.env.local apps/console/dist/flare-mcp-stdio.js",

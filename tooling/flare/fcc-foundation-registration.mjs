@@ -17,6 +17,10 @@ export const teeManagerRegistrationAbi = parseAbi([
   "function addAllowedTeeWalletProjectOwners(uint256 extensionId, address[] owners)",
   "function isKeyTypeSupported(uint256 extensionId, bytes32 keyType) view returns (bool)",
   "function addSupportedKeyTypes(uint256 extensionId, bytes32[] keyTypes)",
+  "event TeeVersionAdded(uint256 indexed extensionId, bytes32 version, bytes32 indexed codeHash, bytes32[] platforms)",
+  "function addTeeVersion(uint256 extensionId, bytes32 version, bytes32 codeHash, bytes32[] platforms)",
+  "function isCodeHashPlatformSupported(uint256 extensionId, bytes32 codeHash, bytes32 platform) view returns (bool)",
+  "function getCodeHashInfo(uint256 extensionId, bytes32 codeHash) view returns (bytes32 version, bytes32[] platforms)",
 ]);
 
 export const foundationSenderReadAbi = parseAbi([
