@@ -1,9 +1,11 @@
 import {
+  calculateFlareRulesHash,
   coston2FlarePublicRelease,
   veilBidFlareMarketAbi,
 } from "@veilbid/flare-bindings";
 import {
   createPublicClient,
+  decodeEventLog,
   getAddress,
   http,
   isAddress,
@@ -137,9 +139,43 @@ export function FlareBuyerWorkspace({
       const creationHash = await wallet.state.walletClient!.writeContract(creation.request);
       const receipt = await publicClient.waitForTransactionReceipt({ hash: creationHash });
       if (receipt.status !== "success") throw new Error("FLARE_TENDER_CREATION_FAILED");
-      const count = await publicClient.readContract({ address: market, abi: veilBidFlareMarketAbi, functionName: "tenderCount" });
-      setLast({ hash: creationHash, tenderId: String(count) });
-      toasts.succeed(toastId, `Tender #${String(count)} is open on Coston2.`);
+      const createdLog = receipt.logs
+        .filter((log) => log.address.toLowerCase() === market.toLowerCase())
+        .map((log) => {
+          try {
+            return decodeEventLog({
+              abi: veilBidFlareMarketAbi,
+              data: log.data,
+              topics: log.topics,
+              strict: true,
+            });
+          } catch {
+            return null;
+          }
+        })
+        .find((event) => event?.eventName === "TenderCreated");
+      if (!createdLog || !createdLog.args || typeof createdLog.args !== "object") {
+        throw new Error("FLARE_TENDER_CREATED_EVENT_MISSING");
+      }
+      const args = createdLog.args as {
+        tenderId?: unknown;
+        buyer?: unknown;
+        rulesHash?: unknown;
+        ceiling?: unknown;
+      };
+      if (
+        typeof args.tenderId !== "bigint" ||
+        typeof args.buyer !== "string" ||
+        typeof args.rulesHash !== "string" ||
+        args.ceiling !== amount ||
+        args.buyer.toLowerCase() !== wallet.state.account!.toLowerCase() ||
+        args.rulesHash.toLowerCase() !== calculateFlareRulesHash(terms.scoringPolicy).toLowerCase()
+      ) {
+        throw new Error("FLARE_TENDER_CREATED_EVENT_MISMATCH");
+      }
+      const tenderId = args.tenderId;
+      setLast({ hash: creationHash, tenderId: tenderId.toString() });
+      toasts.succeed(toastId, `Tender #${tenderId.toString()} is open on Coston2.`);
       onRefresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "FLARE_TENDER_CREATION_FAILED");
