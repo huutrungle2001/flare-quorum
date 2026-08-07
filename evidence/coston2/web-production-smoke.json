@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-07T23:21:21.465Z",
+  "recordedAt": "2026-08-07T23:32:52.059Z",
   "publicIdentifiers": {
-    "sourceCommit": "b397e8889a611fdf05431f5626260f4d3cf83bb2",
+    "sourceCommit": "676c85da59ae1fa1d70e03295e7fca23606c198d",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -29,14 +29,14 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "e30f4bbb72e44ed94e97d264b131c9c567ae08dca141aec7730032f30668f8f2"
+      "sha256": "a410fc088d1678fe9f8fc2792022f0f8522ac6df7571b2f190b2300b739cece5"
     },
     "mobile": {
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sha256": "87fe34e93d39e7875664b963ffaee29db93f74335dcf1e624ce3f6df278da662"
+      "sha256": "cf88f545e0dc24a8835756c9339cb167af4c60efea7bcd8484c1fa627893668e"
     },
     "evidence": {
       "viewport": {
