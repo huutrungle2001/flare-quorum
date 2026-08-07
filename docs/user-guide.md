@@ -1,8 +1,9 @@
 # VeilBid Flare Championship User Guide
 
 > Status: verified Coston2 experience. The checked-in `/` and `/flare` routes
-> provide the fail-closed wallet-free evidence view, and explicit Coston2 EVM
-> Buyer/Vendor role routes are live. The XRP-native funding protocol and
+> provide the fail-closed wallet-free evidence view and dedicated public
+> Activity/Evidence ledger, and explicit Coston2 EVM Buyer/Vendor role routes
+> are live. The XRP-native funding protocol and
 > executor have live Gate G evidence; its browser composer remains a separate
 > recovery/UI hardening item. `/room` remains the historical Sepolia baseline.
 
@@ -35,6 +36,11 @@ The wallet-free judge path must let a reviewer:
    and funding trail for the flagship tender.
 7. Compare the page with sanitized release evidence without seeing a bid or
    encrypted payload.
+
+Use `/?role=evidence` for the dedicated public Activity/Evidence ledger. It
+re-reads the same finalized market snapshot and presents each tender's public
+rules hash, receipt quorum, ordered root, FTSO checkpoint, FCC binding, and
+award/refund state. It never unlocks bid data or requires a wallet.
 
 The public path is live and release-labeled. Any missing dependency keeps its
 own operation unavailable; the UI never substitutes Sepolia data or mock

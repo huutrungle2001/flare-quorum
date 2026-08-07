@@ -5,6 +5,7 @@
 > explicitly historical Sepolia/Nox baseline.
 
 VeilBid's browser product. It includes the wallet-free Flare Coston2 explorer,
+the dedicated public Activity/Evidence ledger at `/?role=evidence`,
 the historical EOA/Safe Buyer flows, Private Bids views for
 submission/ownership/granted access, and Activity settlement recovery. The
 default `/` and `/flare` routes read finalized Coston2 contract state; `/room`

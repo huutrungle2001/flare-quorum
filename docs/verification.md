@@ -34,7 +34,7 @@ in-memory and save only an allowlisted pass/fail code.
 | E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED (core threshold) — two frozen machines signed and finalized exact two- and three-vendor digests; retry/outage drill remains open |
 | F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP | Feed snapshot, discovered asset IDs, balance conservation | PASSED — live FTSO snapshot and conserved FTestXRP award |
 | G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | PASSED — live evidence in `gate-g-smart-account.json` |
-| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — wallet-free Coston2 judge path, buyer/vendor role render, 320px/keyboard accessibility, and hosted ingress smoke pass; recovery interaction and user validation remain |
+| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — wallet-free Coston2 judge path, public Activity/Evidence ledger, buyer/vendor role render, 320px/keyboard accessibility, and hosted ingress smoke pass; XRP recovery interaction and user validation remain |
 
 No later gate converts an earlier failure into success. Private ingress, FCC
 selection, FTestXRP conservation, and the XRP-native flagship path are product
@@ -63,7 +63,7 @@ wallet/executor secrets are never persisted.
 | FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | PASSED (local stateful multi-tender harness plus live C-E-F lifecycle) |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | NOT RUN |
 | Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | NOT RUN |
-| Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json`, `evidence/coston2/web-role-workspaces.json`, and `evidence/coston2/flare-ingress-production.json` |
+| Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json`, `evidence/coston2/web-role-workspaces.json`, `evidence/coston2/flare-ingress-production.json`; dedicated `/?role=evidence` ledger is covered by the role smoke |
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PARTIAL — 320px/keyboard/focus/reduced-motion/labels pass in `evidence/coston2/web-keyboard-accessibility.json`; recovery interaction remains |
 | Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | IN PROGRESS — repository/history/evidence scan passes; hosted runtime log review remains |
 | New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | IN PROGRESS |

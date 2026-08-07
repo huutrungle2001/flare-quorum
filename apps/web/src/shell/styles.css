@@ -1462,6 +1462,36 @@ main {
   gap: 48px;
 }
 
+.flare-evidence-ledger {
+  border-top: 1px solid var(--color-ink-black);
+}
+
+.flare-evidence-row {
+  border-bottom: 1px solid var(--color-ink-black);
+  padding: 24px 0 8px;
+}
+
+.flare-evidence-row .detail-header {
+  border-bottom: 0;
+  padding-bottom: 20px;
+}
+
+.flare-evidence-row .detail-header h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  margin: 6px 0 0;
+}
+
+.flare-evidence-row .lifecycle {
+  margin: 0 0 8px;
+}
+
+.flare-evidence-row .term-grid {
+  padding-bottom: 16px;
+}
+
 .workspace-intro {
   border-bottom: 1px solid var(--color-ink-black);
   display: grid;

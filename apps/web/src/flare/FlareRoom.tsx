@@ -123,6 +123,124 @@ function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
   );
 }
 
+export function FlareEvidenceWorkspace({
+  state,
+  onRetry,
+}: {
+  state: FlareMarketState;
+  onRetry: () => void;
+}) {
+  const tenders = state.data?.tenders ?? [];
+  return (
+    <main id="main-content" className="role-workspace flare-evidence-workspace">
+      <section className="workspace-intro">
+        <p className="eyebrow">COSTON2 ACTIVITY / PUBLIC EVIDENCE</p>
+        <h1>Trace every public checkpoint.</h1>
+        <p>
+          This ledger rereads finalized Coston2 state only. It shows how a
+          tender moved from public rules to FCC quorum and settlement without
+          fetching bid payloads, credentials, or private TEE results.
+        </p>
+      </section>
+      <ProtocolFacts />
+      {state.status === "loading" && (
+        <section className="state-panel" aria-live="polite">
+          <span className="loading-mark" aria-hidden="true" />
+          <div><h2>Reading finalized Coston2 checkpoints</h2><p>No placeholder activity is inserted.</p></div>
+        </section>
+      )}
+      {state.status === "error" && (
+        <section className="state-panel error" role="alert">
+          <span aria-hidden="true">!</span>
+          <div><h2>Evidence state unavailable</h2><p>{state.error}</p><button className="secondary-button" onClick={onRetry}>RETRY COSTON2 →</button></div>
+        </section>
+      )}
+      {state.status === "ready" && state.data && tenders.length === 0 && (
+        <section className="state-panel">
+          <span aria-hidden="true">0</span>
+          <div><h2>No public checkpoints yet</h2><p>The verified market has no tender records at its finalized block.</p></div>
+        </section>
+      )}
+      {state.status === "ready" && state.data && tenders.length > 0 && (
+        <section className="evidence-panel" aria-label="Coston2 public evidence ledger">
+          <header className="detail-header">
+            <div><p className="eyebrow">FINALIZED CHECKPOINT LEDGER</p><h2>{tenders.length} tender{tenders.length === 1 ? "" : "s"} in public state</h2></div>
+            <button className="icon-button" onClick={onRetry} aria-label="Refresh Coston2 evidence">↻</button>
+          </header>
+          <div className="flare-evidence-ledger">
+            {tenders.map((tender) => (
+              <article className="flare-evidence-row" key={tender.tenderId.toString()}>
+                <header className="detail-header">
+                  <div><p className="eyebrow">TENDER {tender.tenderId.toString()}</p><h3>Public rules → private compute → public outcome</h3></div>
+                  <span className={`privacy-badge ${statusClass(tender.status)}`}>{tender.status.toUpperCase()}</span>
+                </header>
+                <ol className="lifecycle" aria-label={`Public lifecycle for tender ${tender.tenderId.toString()}`}>
+                  {[
+                    { label: "Rules / escrow", complete: tender.publicCeilingXrp > 0n },
+                    { label: "TEE receipt quorum", complete: tender.bidCount > 0n },
+                    { label: "FTSO close snapshot", complete: tender.closeBlock > 0n },
+                    { label: "Settlement / refund", complete: tender.status === "Awarded" || tender.status === "Refunded" },
+                  ].map(({ label, complete }, index) => (
+                    <li key={label} className={complete ? "complete" : index === 0 ? "active" : ""}>
+                      <span>{complete ? "✓" : index + 1}</span>{label}
+                    </li>
+                  ))}
+                </ol>
+                <dl className="term-grid">
+                  <div><dt>Escrow ceiling</dt><dd>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</dd></div>
+                  <div><dt>Receipt quorum</dt><dd>{tender.commonQuorumBitmap.toString(2).padStart(3, "0")} · {tender.bidCount.toString()} accepted</dd></div>
+                  <div><dt>Rules hash</dt><dd title={tender.rulesHash}>{short(tender.rulesHash)}</dd></div>
+                  <div><dt>Ordered bid root</dt><dd title={tender.orderedBidRoot}>{short(tender.orderedBidRoot)}</dd></div>
+                  <div><dt>FTSO snapshot</dt><dd>{tender.ftsoTimestamp > 0n ? `${tender.ftsoValue.toString()} @ ${tender.ftsoTimestamp.toString()}` : "Not captured"}</dd></div>
+                  <div><dt>Close block</dt><dd>{tender.closeBlock > 0n ? tender.closeBlock.toString() : "Not closed"}</dd></div>
+                  <div><dt>FCC binding</dt><dd>ext {tender.extensionId.toString()} · {short(tender.codeVersion)}</dd></div>
+                  <div><dt>Outcome</dt><dd>{tender.winner ? `Winner ${short(tender.winner)} · ${formatUnits(tender.winningAmountXrp ?? 0n, 6)} FTestXRP` : tender.status === "Refunded" ? "Escrow refunded" : "Threshold result pending"}</dd></div>
+                </dl>
+                <p className="form-hint">Only public commitments, finalized checkpoints, and the award/refund state are exposed. Losing prices and TEE plaintext never enter this ledger.</p>
+              </article>
+            ))}
+          </div>
+          <footer className="form-hint">Finalized through block {state.data.finalizedBlock.toString()} · latest observed block {state.data.latestBlock.toString()}</footer>
+        </section>
+      )}
+    </main>
+  );
+}
+
+type FlareRole = "public" | "buyer" | "vendor" | "evidence";
+
+function FlareRoleBar({
+  activeRole,
+  onRoleChange,
+}: {
+  activeRole: FlareRole;
+  onRoleChange: (role: FlareRole) => void;
+}) {
+  const items: readonly [FlareRole, string][] = [
+    ["public", "PUBLIC EVIDENCE"],
+    ["buyer", "BUYER"],
+    ["vendor", "VENDOR"],
+    ["evidence", "ACTIVITY / EVIDENCE"],
+  ];
+  return (
+    <nav className="rolebar flare-rolebar" aria-label="Coston2 workspaces">
+      <div className="rolebar-links">
+        {items.map(([role, label]) => (
+          <button
+            key={role}
+            type="button"
+            className={activeRole === role ? "active" : ""}
+            aria-current={activeRole === role ? "page" : undefined}
+            onClick={() => onRoleChange(role)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
 export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState; onRetry: () => void }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const tenders = state.data?.tenders ?? [];
@@ -139,6 +257,7 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
           <span className="deployment-label">{state.data?.deploymentStatus === "verified" ? "VERIFIED COSTON2 RELEASE" : "PLANNED / NOT YET VERIFIED"}</span>
           <a className="secondary-button" href="?role=buyer">OPEN BUYER WORKSPACE →</a>
           <a className="secondary-button" href="?role=vendor">OPEN VENDOR WORKSPACE →</a>
+          <a className="secondary-button" href="?role=evidence">OPEN ACTIVITY LEDGER →</a>
         </div>
       </section>
       <ProtocolFacts />
@@ -163,16 +282,25 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   const { state, refresh } = useFlareMarket();
   const [params, setParams] = useSearchParams();
   const role = params.get("role")?.toLowerCase();
+  const activeRole: FlareRole = role === "buyer" || role === "vendor" || role === "evidence" ? role : "public";
+  const onRoleChange = (next: FlareRole) => {
+    const updated = new URLSearchParams(params);
+    if (next === "public") updated.delete("role");
+    else updated.set("role", next);
+    setParams(updated);
+  };
+  if (activeRole === "evidence") {
+    return (
+      <>
+        <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
+        <FlareEvidenceWorkspace state={state} onRetry={() => void refresh()} />
+      </>
+    );
+  }
   if ((role === "vendor" || role === "buyer") && wallet && state.status === "ready" && state.data) {
     return (
       <>
-        <nav className="rolebar flare-rolebar" aria-label="Coston2 workspaces">
-          <div className="rolebar-links">
-            <button type="button" onClick={() => { const next = new URLSearchParams(params); next.delete("role"); setParams(next); }}>PUBLIC EVIDENCE</button>
-            <button type="button" className={role === "buyer" ? "active" : ""} aria-current={role === "buyer" ? "page" : undefined} onClick={() => { const next = new URLSearchParams(params); next.set("role", "buyer"); setParams(next); }}>BUYER</button>
-            <button type="button" className={role === "vendor" ? "active" : ""} aria-current={role === "vendor" ? "page" : undefined} onClick={() => { const next = new URLSearchParams(params); next.set("role", "vendor"); setParams(next); }}>VENDOR</button>
-          </div>
-        </nav>
+        <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
         {role === "buyer" ? <FlareBuyerWorkspace wallet={wallet} onRefresh={() => void refresh()} /> : <FlareVendorWorkspace wallet={wallet} tenders={state.data.tenders} onRefresh={() => void refresh()} />}
       </>
     );

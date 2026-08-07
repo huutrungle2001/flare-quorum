@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
-import { FlareExplorerView } from "../src/flare/FlareRoom";
+import { FlareEvidenceWorkspace, FlareExplorerView } from "../src/flare/FlareRoom";
 import { PrimaryNavigation } from "../src/shell/PrimaryNavigation";
 import type { WalletController } from "../src/wallet/WalletPanel";
 
@@ -102,5 +102,24 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("XRP + USD")).toBeInTheDocument();
     expect(screen.getByText("60% price / 25% delivery / 15% warranty")).toBeInTheDocument();
     expect(screen.getByText("≤ 30d delivery / 12–36d warranty")).toBeInTheDocument();
+  });
+
+  it("renders the dedicated public activity ledger without exposing bid data", () => {
+    render(<MemoryRouter><FlareEvidenceWorkspace state={{
+      status: "ready",
+      error: null,
+      data: {
+        chainId: 114,
+        tenders: [publicTender],
+        indexedBlock: 100n,
+        finalizedBlock: 100n,
+        latestBlock: 112n,
+        deploymentStatus: "verified",
+      },
+    }} onRetry={() => undefined} /></MemoryRouter>);
+    expect(screen.getByRole("heading", { name: "1 tender in public state" })).toBeInTheDocument();
+    expect(screen.getByText("Threshold result pending")).toBeInTheDocument();
+    expect(screen.getByText(/Only public commitments, finalized checkpoints/)).toBeInTheDocument();
+    expect(screen.queryByText(/plaintext bid|ciphertext/i)).toBeNull();
   });
 });
