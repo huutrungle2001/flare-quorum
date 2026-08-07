@@ -15,14 +15,19 @@ The Flare server requires all four public configuration values:
 
 ```dotenv
 COSTON2_RPC_URL=https://coston2-api.flare.network/ext/C/rpc
-FLARE_MARKET_ADDRESS=0x...
-FLARE_MARKET_DEPLOYMENT_BLOCK=...
-FLARE_DEPLOYMENT_STATUS=planned
+FLARE_MARKET_ADDRESS=0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05
+FLARE_MARKET_DEPLOYMENT_BLOCK=33746695
+FLARE_DEPLOYMENT_STATUS=verified
 ```
 
-It refuses missing metadata, another chain, absent bytecode, and a deployment
-block that has not reached the 12-block read finality boundary. Public tender
-state and award logs are both read at the same finalized block.
+These values identify the verified release in
+`packages/flare-contracts/deployments/coston2.release.json`; keep them public
+and do not add credentials or signer variables to the MCP process. It refuses
+missing metadata, another chain, absent bytecode, and a deployment block that
+has not reached the 12-block read finality boundary. Public tender state and
+award receipt state are read at the same finalized block. The reader does not
+scan an unbounded event history, so it remains usable against the Coston2 RPC
+range limit.
 
 The four tools are:
 
