@@ -24,6 +24,11 @@ import { privateKeyToAccount } from "viem/accounts";
 import type { FlareFundingConfig } from "./flare-funding-config.js";
 
 const FINALITY_DEPTH = 12n;
+// The first 0xFE execution may deploy the deterministic Personal Account via
+// the singleton factory before running the approval and tender calls. Coston2
+// RPC estimators have returned a lower limit than the actual CREATE2 path, so
+// reserve a bounded margin while staying well below the 8M block gas limit.
+const SMART_ACCOUNT_DIRECT_MINT_GAS_LIMIT = 3_000_000n;
 
 const coston2Chain = {
   id: 114,
@@ -504,10 +509,11 @@ export class LiveFlareFundingChain implements FlareFundingChain {
       await this.publicClient.simulateContract({
         account: writer.account,
         address: assetManager,
-        abi: assetManagerFAssetsAbi,
-        functionName: "executeDirectMintingWithData",
-        args: [proof, userOperationData],
-        value,
+      abi: assetManagerFAssetsAbi,
+      functionName: "executeDirectMintingWithData",
+      args: [proof, userOperationData],
+      value,
+      gas: SMART_ACCOUNT_DIRECT_MINT_GAS_LIMIT,
       });
     } catch (error) {
       throw new Error(directMintFailureCode(error));
@@ -521,6 +527,7 @@ export class LiveFlareFundingChain implements FlareFundingChain {
         functionName: "executeDirectMintingWithData",
         args: [proof, userOperationData],
         value,
+        gas: SMART_ACCOUNT_DIRECT_MINT_GAS_LIMIT,
       });
     } catch (error) {
       throw new Error(directMintFailureCode(error));
