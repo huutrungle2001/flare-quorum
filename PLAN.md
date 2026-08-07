@@ -257,7 +257,10 @@ confidential bid or settlement boundary:
 - [x] Publish exact source/runtime mapping and the verified Coston2 release
   manifest.
 - [x] Verify extension image/code hash, governance, machines, and key policy.
-- [ ] Run two-vendor and three-vendor lifecycles.
+- [x] Run a two-vendor lifecycle with both encrypted bids, three-machine
+  receipts, FCC selection, threshold finalize, and conserved FTestXRP; live
+  evidence is `evidence/coston2/gate-c-e-f-two-vendor.json`.
+- [ ] Run the three-vendor lifecycle and recovery variant.
 - [ ] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
   wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay drills.
 - [ ] Record gas, latency, bid-ingress, close-to-result, and recovery benchmarks.

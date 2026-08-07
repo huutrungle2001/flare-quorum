@@ -1,8 +1,9 @@
 # VeilBid Flare Championship Verification Plan
 
 > Status: Gates 0–A, the live Gate-B ingress/replay portion, Gates C–F, and Gate
-> G are recorded on Coston2. The canonical release is verified and the wallet-free
-> Coston2 judge smoke is live; Gate B restart hardening and the remaining Gate H
+> G are recorded on Coston2. A two-vendor encrypted lifecycle is now also
+> recorded; the canonical release is verified and the wallet-free Coston2 judge
+> smoke is live. Gate B restart hardening and the remaining Gate H
 > role/accessibility/user-validation work remain open. Historical Sepolia/Nox
 > artifacts are pre-hackathon baseline only.
 
@@ -27,9 +28,9 @@ in-memory and save only an allowlisted pass/fail code.
 | 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | PASSED — block `33745484`; extension `66007` has three distinct simulated TEE machines in `PRODUCTION` with exact URL/code/platform/key bindings |
 | A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | PASSED — block `33745987`; `PING_V1` binding, TEE signature domain, production signer mapping, wrong-binding rejection, and fresh-process recovery all pass |
 | B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext and survives sealed restart | Commitment/receipt IDs, redaction assertions, restart checkpoint | IN PROGRESS — live three-machine ingress, receipt binding, idempotent retry, and changed-ciphertext rejection pass; same-identity restart remains open |
-| C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | PASSED (core quorum) — live three-bid lifecycle; surviving-pair outage drill remains open |
+| C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | PASSED (core quorum) — live two-vendor and three-bid lifecycles; surviving-pair outage drill remains open |
 | D — Private scoring | Real TEEs match shared `SCORING_V1` vectors and select the deterministic eligible winner | Vector hashes, public inputs, result digest, Boolean expectations | PASSED — live FCC selection bound to XRP/USD terms and the common root |
-| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED (core threshold) — two frozen machines signed and finalized one exact digest; retry/outage drill remains open |
+| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED (core threshold) — two frozen machines signed and finalized exact two-vendor and three-bid digests; retry/outage drill remains open |
 | F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP | Feed snapshot, discovered asset IDs, balance conservation | PASSED — live FTSO snapshot and conserved FTestXRP award |
 | G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | PASSED — live evidence in `gate-g-smart-account.json` |
 | H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — wallet-free Coston2 judge path passes live smoke; role journeys, accessibility, and user validation remain |
@@ -83,7 +84,7 @@ evidence/coston2/threshold-result-adversarial.release.json
 evidence/coston2/ftso-fassets-settlement.release.json
 evidence/coston2/xrpl-smart-account-funding.release.json
 evidence/coston2/deployment-consistency.release.json
-evidence/coston2/two-vendor-lifecycle.release.json
+evidence/coston2/gate-c-e-f-two-vendor.json
 evidence/coston2/three-vendor-recovery.release.json
 evidence/coston2/web-desktop-mobile-keyboard.release.json
 evidence/coston2/production-smoke.release.json
