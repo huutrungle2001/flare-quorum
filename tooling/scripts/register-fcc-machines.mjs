@@ -24,11 +24,13 @@ import {
   machineRegistrationEnvironment,
   registrationAddresses,
   requiredMachineRouteUpdate,
+  isTeeNotFoundError,
 } from "../flare/fcc-machine-registration.mjs";
 import { normalizePrivateKey, readFoundationManifest } from "../flare/foundations.mjs";
 import { setLocalEnvironmentValues } from "../flare/local-fcc-secrets.mjs";
 
 const managerAbi = parseAbi([
+  "error TeeNotFound()",
   "function getTeeMachineStatus(address) view returns (uint8)",
   "function getExtensionId(address) view returns (uint256)",
   "function getPublicKey(address) view returns ((bytes32 x,bytes32 y))",
@@ -105,12 +107,18 @@ function publicPreflight(result, extraBlockers) {
 }
 
 async function reconcileMachineRoute({ client, walletClient, account, manager, machine }) {
-  const record = await client.readContract({
-    address: manager,
-    abi: managerAbi,
-    functionName: "getTeeMachine",
-    args: [machine.teeId],
-  });
+  let record;
+  try {
+    record = await client.readContract({
+      address: manager,
+      abi: managerAbi,
+      functionName: "getTeeMachine",
+      args: [machine.teeId],
+    });
+  } catch (error) {
+    if (isTeeNotFoundError(error)) return;
+    throw error;
+  }
   const update = requiredMachineRouteUpdate(record, machine);
   if (!update) return;
   const transactionHash = await walletClient.writeContract({
@@ -140,6 +148,20 @@ async function reconcileMachineRoute({ client, walletClient, account, manager, m
     transactionHash,
     blockNumber: receipt.blockNumber.toString(),
   }));
+}
+
+async function machineStatus({ client, manager, machine }) {
+  try {
+    return Number(await client.readContract({
+      address: manager,
+      abi: managerAbi,
+      functionName: "getTeeMachineStatus",
+      args: [machine.teeId],
+    }));
+  } catch (error) {
+    if (isTeeNotFoundError(error)) return 0;
+    throw error;
+  }
 }
 
 async function verifyOnchainMachines({ client, manager, extensionId, endpointResult }) {
@@ -231,6 +253,15 @@ try {
         manager,
         machine,
       });
+      const status = await machineStatus({ client, manager, machine });
+      if (status === 2) {
+        console.log(JSON.stringify({
+          event: "FCC_MACHINE_ALREADY_PRODUCTION",
+          machine: machine.machine,
+          teeId: machine.teeId,
+        }));
+        continue;
+      }
       const statePath = resolve(runtimeDirectory, `${machine.teeId.toLowerCase()}.state.json`);
       const execution = spawnSync(binaryPath, [
         "-a", addressesPath,

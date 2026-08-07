@@ -5,6 +5,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import {
   evaluateRegisteredMachine,
   inspectMachineRegistrationEndpoints,
+  isTeeNotFoundError,
   machineRegistrationEnvironment,
   normalizeMachineOrigin,
   parseMachineInfo,
@@ -108,6 +109,12 @@ test("repairs only an existing machine whose registered route differs", () => {
     teeProxyId: "0x0000000000000000000000000000000000000000",
     url: "",
   }, machine), null);
+});
+
+test("recognizes only the current manager's TeeNotFound error", () => {
+  assert.equal(isTeeNotFoundError(new Error("execution reverted: 0xceb05b68")), true);
+  assert.equal(isTeeNotFoundError({ cause: { errorName: "TeeNotFound" } }), true);
+  assert.equal(isTeeNotFoundError(new Error("RPC timeout")), false);
 });
 
 test("writes the exact address keys expected by the FCC registration client", () => {

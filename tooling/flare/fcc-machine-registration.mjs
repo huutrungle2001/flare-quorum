@@ -194,6 +194,15 @@ export function requiredMachineRouteUpdate(record, machine) {
   };
 }
 
+export function isTeeNotFoundError(error) {
+  let current = error;
+  while (current && typeof current === "object") {
+    if (current.errorName === "TeeNotFound" || current.data === "0xceb05b68") return true;
+    current = current.cause;
+  }
+  return /(?:TeeNotFound|0xceb05b68)/.test(String(error?.message ?? error));
+}
+
 export function registrationAddresses(manifest) {
   return {
     FlareSystemsManager: manifest.contracts.flareSystemsManager,
