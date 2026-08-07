@@ -88,7 +88,8 @@ placeholders are forbidden after that commit.
 - [x] Deploy and verify canonical Coston2 contracts/extension/machine policy.
 - [~] Run full live/adversarial/recovery suites; core live lifecycles and one-
   endpoint recovery pass, while same-identity restart and complete fault drills
-  remain open.
+  remain open. Local rejection coverage and read-only Coston2 terminal/invalid-
+  terms calls are recorded without promoting them to stateful live evidence.
 - [~] Publish sanitized evidence and performance benchmarks; release evidence and
   public receipt/block timing are current, while independent bid-ingress timing
   and broader fault-drill evidence remain open.

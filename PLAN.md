@@ -285,8 +285,10 @@ confidential bid or settlement boundary:
 - [~] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
   wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay
   coverage. Local Go/Forge/relay rejection suites are recorded in
-  `evidence/local/flare-adversarial-coverage.json`; live fault injection,
-  process restart, and two-machine-loss drills remain open.
+  `evidence/local/flare-adversarial-coverage.json`; live read-only terminal and
+  zero-term guard calls are recorded in
+  `evidence/coston2/live-negative-calls.release.json`. Stateful live fault
+  injection, process restart, and two-machine-loss drills remain open.
 - [x] Record public gas, block-latency, close-to-result, and recovery benchmarks
   from the live Coston2 lifecycles in
   `evidence/coston2/performance-benchmarks.release.json`; bid-ingress latency is

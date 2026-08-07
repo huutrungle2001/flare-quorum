@@ -92,6 +92,7 @@ evidence/coston2/gate-c-e-f-two-vendor.json
 evidence/coston2/gate-c-e-f-three-vendor.json
 evidence/coston2/three-vendor-recovery.release.json
 evidence/coston2/performance-benchmarks.release.json
+evidence/coston2/live-negative-calls.release.json
 evidence/coston2/web-desktop-mobile-keyboard.release.json
 evidence/coston2/production-smoke.release.json
 evidence/coston2/web-production-smoke.json
@@ -112,6 +113,12 @@ The current local rejection/continuity coverage is recorded in
 It proves the checked-in Go, Forge, and relay suites without performing live
 writes; its blocker list deliberately keeps live fault-drill and simulated-TEE
 identity-restart claims open.
+
+The read-only live negative observations are recorded in
+[`evidence/coston2/live-negative-calls.release.json`](../evidence/coston2/live-negative-calls.release.json).
+They exercise terminal-state and zero-term guards through `eth_call` only;
+they do not replace stateful credential, stale-FTSO, process-restart, or
+two-machine-loss drills.
 
 ## 5. Required adversarial suites
 

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-live-negative-eth-calls",
+  "status": "PARTIAL",
+  "recordedAt": "2026-08-07T23:09:51.219Z",
+  "sourceCommit": "4343dc672028f597ff83b460366f97db8c643220",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "observedBlock": "33758456",
+    "rpcSource": "official-public-coston2-rpc"
+  },
+  "publicIdentifiers": {
+    "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
+    "finalizedTenderId": "21",
+    "sourceRecoveryEvidence": "evidence/coston2/three-vendor-recovery.release.json"
+  },
+  "cases": [
+    {
+      "name": "close-finalized-tender",
+      "functionName": "closeTender",
+      "reverted": true
+    },
+    {
+      "name": "request-selection-finalized-tender",
+      "functionName": "requestSelection",
+      "reverted": true
+    },
+    {
+      "name": "submit-empty-receipts-finalized-tender",
+      "functionName": "submitBidReceipts",
+      "reverted": true
+    },
+    {
+      "name": "finalize-zero-result-finalized-tender",
+      "functionName": "finalizeTender",
+      "reverted": true
+    },
+    {
+      "name": "create-zero-terms",
+      "functionName": "createTender",
+      "reverted": true
+    }
+  ],
+  "assertions": {
+    "liveFinalizedTenderRead": true,
+    "allReadOnlyCallsReverted": true,
+    "noWriteTransactionsSubmitted": true,
+    "noConfidentialPayloadRead": true,
+    "close-finalized-tenderReverted": true,
+    "request-selection-finalized-tenderReverted": true,
+    "submit-empty-receipts-finalized-tenderReverted": true,
+    "finalize-zero-result-finalized-tenderReverted": true,
+    "create-zero-termsReverted": true
+  },
+  "blockers": [
+    "LIVE_INVALID_CREDENTIAL_AND_STALE_FTSO_STATE_NOT_CREATED",
+    "LIVE_PROXY_RESTART_AND_TWO_MACHINE_LOSS_NOT_RUN",
+    "SAME_IDENTITY_TEE_RESTART_NOT_SUPPORTED_BY_CURRENT_SIMULATED_RUNTIME"
+  ],
+  "notes": [
+    "Every case is an eth_call against the verified Coston2 market; no signer, gas, or state mutation was used.",
+    "Terminal tender guards and zero-term validation are live negative observations, not a replacement for stateful fault injection.",
+    "No bid plaintext, ciphertext, proof body, raw signature, credential, private key, or provider secret is read or written."
+  ]
+}

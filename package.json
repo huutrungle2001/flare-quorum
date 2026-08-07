@@ -115,6 +115,7 @@
     "flare:funding:resume": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-funding-cli.js resume",
     "flare:benchmarks": "node --env-file-if-exists=.env.local tooling/scripts/record-flare-benchmarks.mjs",
     "flare:adversarial:local": "node tooling/scripts/record-flare-adversarial.mjs",
+    "flare:negative:live": "node --env-file-if-exists=.env.local tooling/scripts/record-flare-live-negative.mjs",
     "flare:ingress": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-ingress-cli.js"
   }
 }
