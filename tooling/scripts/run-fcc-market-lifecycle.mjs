@@ -7,6 +7,7 @@ import {
   createPublicClient,
   createWalletClient,
   encodeAbiParameters,
+  encodeFunctionData,
   getAddress,
   http,
   isAddressEqual,
@@ -209,6 +210,14 @@ async function writeContract({ client, wallet, account, address, abi, functionNa
   const hash = await wallet.writeContract(simulation.request);
   const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 1 });
   if (receipt.status !== "success") throw new Error(`FCC_MARKET_${functionName.toUpperCase()}_FAILED`);
+  return { hash, receipt };
+}
+
+async function writeEncodedTransaction({ client, wallet, account, to, data, gas, code }) {
+  await client.call({ account, to, data, gas });
+  const hash = await wallet.sendTransaction({ account, to, data, gas });
+  const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 1 });
+  if (receipt.status !== "success") throw new Error(code);
   return { hash, receipt };
 }
 
@@ -456,15 +465,14 @@ async function main() {
   });
   const vendorWallet = createWalletClient({ account: vendorAccount, chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
   currentPhase = "submit-bid-receipts";
-  const bidTx = await writeContract({
-    client,
-    wallet: vendorWallet,
-    account: vendorAccount,
-    address: market,
+  const bidData = encodeFunctionData({
     abi: marketAbi,
     functionName: "submitBidReceipts",
     args: [tenderId, prepared.receipts, prepared.signatures],
-    gas: 1_000_000n,
+  });
+  const bidTx = await writeEncodedTransaction({
+    client, wallet: vendorWallet, account: vendorAccount, to: market, data: bidData,
+    gas: 1_000_000n, code: "FCC_MARKET_SUBMIT_BID_RECEIPTS_FAILED",
   });
   const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (field(tenderAfterBid, "bidCount", 6) !== 1n || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
