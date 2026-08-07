@@ -42,7 +42,11 @@ const repositoryRoot = resolve(import.meta.dirname, "../..");
 const environmentPath = resolve(repositoryRoot, ".env.local");
 const runtimeDirectory = resolve(repositoryRoot, ".local/fcc/registration");
 const binaryDirectory = resolve(repositoryRoot, ".local/fcc/bin");
-const evidencePath = resolve(repositoryRoot, "evidence/coston2/fcc-machines.json");
+const evidenceRelativePath = process.env.FCC_MACHINE_EVIDENCE_PATH?.trim() || "evidence/coston2/fcc-machines.json";
+if (evidenceRelativePath.startsWith("/") || evidenceRelativePath.split("/").includes("..")) {
+  throw new Error("FCC_MACHINE_EVIDENCE_PATH_INVALID");
+}
+const evidencePath = resolve(repositoryRoot, evidenceRelativePath);
 
 function secureRpcUrl(value) {
   try {
