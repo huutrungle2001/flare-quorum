@@ -1,8 +1,8 @@
 # Tender Room
 
-> Historical runtime note: this workspace currently targets the verified
-> Sepolia/Nox baseline. The Summer Signal plan migrates it to Coston2 only after
-> the dedicated Flare bindings and FCC gates pass.
+> Runtime note: the default judge path targets the verified Coston2 release when
+> its public `VITE_*` configuration is supplied. The `/room` route remains the
+> explicitly historical Sepolia/Nox baseline.
 
 VeilBid's browser product. It includes the wallet-free Public explorer, EOA and
 Safe Buyer flows, Private Bids views for submission/ownership/granted access,
@@ -42,5 +42,6 @@ bindings, require explicit `VITE_COSTON2_RPC_URL`,
 `VITE_FLARE_MARKET_ADDRESS`, and `VITE_FLARE_MARKET_DEPLOYMENT_BLOCK`, and fail
 closed when a verified release manifest is absent. They do not fall back to
 Sepolia data, fabricate FDC proofs, or enable writes from a planned market.
-The existing UI remains the historical Sepolia baseline until a verified
-Coston2 market and FCC gates authorize the final route switch.
+The default `/` and `/flare` routes use the verified Coston2 public market when
+configured. A missing or unverified Coston2 configuration fails closed; it never
+falls back to Sepolia data on the Flare route.

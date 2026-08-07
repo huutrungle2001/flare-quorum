@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { resolveFlareMarketConfig } from "../src/public-market/loadFlareMarket";
+import { isFlareReleaseEnabled, resolveFlareMarketConfig } from "../src/public-market/loadFlareMarket";
 
 describe("Flare public market configuration", () => {
+  it("enables the default judge route only for a complete verified release", () => {
+    const base = {
+      VITE_COSTON2_RPC_URL: "https://coston2.example.invalid/rpc",
+      VITE_FLARE_MARKET_ADDRESS: "0x1000000000000000000000000000000000000001",
+      VITE_FLARE_MARKET_DEPLOYMENT_BLOCK: "33590000",
+    };
+    expect(isFlareReleaseEnabled({ ...base, VITE_FLARE_DEPLOYMENT_STATUS: "planned" })).toBe(false);
+    expect(isFlareReleaseEnabled({ ...base, VITE_FLARE_DEPLOYMENT_STATUS: "verified" })).toBe(true);
+    expect(isFlareReleaseEnabled({ ...base, VITE_FLARE_DEPLOYMENT_STATUS: "verified", VITE_FLARE_MARKET_ADDRESS: "" })).toBe(false);
+  });
+
   it("fails closed when no verified Coston2 market is configured", () => {
     expect(() => resolveFlareMarketConfig({})).toThrow("FLARE_MARKET_NOT_CONFIGURED");
   });

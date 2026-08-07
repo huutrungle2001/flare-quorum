@@ -10,6 +10,17 @@ export type FlareMarketConfig = Coston2MarketConfig;
 export type FlarePublicTender = Coston2PublicTender;
 export type LoadedFlarePublicMarket = Coston2PublicMarket;
 
+export function isFlareReleaseEnabled(
+  env: Record<string, string | undefined> = import.meta.env,
+): boolean {
+  return env.VITE_FLARE_DEPLOYMENT_STATUS === "verified"
+    && Boolean(
+      env.VITE_COSTON2_RPC_URL?.trim()
+      && env.VITE_FLARE_MARKET_ADDRESS?.trim()
+      && env.VITE_FLARE_MARKET_DEPLOYMENT_BLOCK?.trim(),
+    );
+}
+
 export function resolveFlareMarketConfig(
   env: Record<string, string | undefined> = import.meta.env,
 ): FlareMarketConfig {

@@ -31,6 +31,7 @@ import {
   type BuyerSection,
 } from "../workspaces/CombinedWorkspaces";
 import { FlareRoom } from "../flare/FlareRoom";
+import { isFlareReleaseEnabled } from "../public-market/loadFlareMarket";
 
 type RoomRole =
   | "PUBLIC"
@@ -875,6 +876,7 @@ function TenderRoomApp({ wallet }: { wallet: WalletController }) {
 export function App() {
   const location = useLocation();
   const wallet = useWallet();
+  const flareReleaseEnabled = isFlareReleaseEnabled();
   const legacyRoomLink =
     new URLSearchParams(location.search).has("role") ||
     new URLSearchParams(location.search).has("tender");
@@ -882,6 +884,8 @@ export function App() {
     location.pathname === "/docs" ? (
       <DocsPage />
     ) : location.pathname === "/flare" ? (
+      <FlareRoom />
+    ) : location.pathname === "/" && flareReleaseEnabled ? (
       <FlareRoom />
     ) : location.pathname === "/room" || legacyRoomLink ? (
       <TenderRoomApp wallet={wallet} />

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import type { WalletController } from "../wallet/WalletPanel";
 import { scrollToPageTop } from "./navigationScroll";
+import { isFlareReleaseEnabled } from "../public-market/loadFlareMarket";
 
 type NavigationItem = {
   label: string;
@@ -159,13 +160,15 @@ export function PrimaryNavigation({ wallet }: { wallet: WalletController }) {
   const legacyTenderRoute =
     searchParams.has("role") || searchParams.has("tender");
   const isHome = location.pathname === "/" && !legacyTenderRoute;
+  const flareReleaseEnabled = isFlareReleaseEnabled();
+  const tenderPath = flareReleaseEnabled ? "/flare" : "/room";
   const isTenders =
-    location.pathname === "/room" || legacyTenderRoute;
+    location.pathname === tenderPath || (!flareReleaseEnabled && legacyTenderRoute);
   const isDocs = location.pathname === "/docs";
-  const isFlare = location.pathname === "/flare";
+  const isFlare = location.pathname === "/flare" || (flareReleaseEnabled && location.pathname === "/");
   const items: NavigationItem[] = [
-    { label: "TENDERS", to: "/room", active: isTenders },
-    ...(import.meta.env.VITE_FLARE_MARKET_ADDRESS
+    { label: "TENDERS", to: tenderPath, active: isTenders },
+    ...(!flareReleaseEnabled && import.meta.env.VITE_FLARE_MARKET_ADDRESS
       ? [{ label: "FLARE", to: "/flare", active: isFlare }]
       : []),
     { label: "DOCS", to: "/docs", active: isDocs },
