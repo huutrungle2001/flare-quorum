@@ -104,12 +104,53 @@ function receipt(value: {
 
 function directMintFailureCode(error: unknown): string {
   const strings: string[] = [];
+  const selectors: string[] = [];
+  const selectorNames: Record<string, string> = {
+    "a5fa8d2b": "callfailed",
+    "5c0dee5d": "personalaccountcallfailed",
+    "8164f842": "approvalfailed",
+    "b780453e": "invalidtender",
+    "289aef69": "invalidtokentransfer",
+    "0ec288f4": "invalidcodeversion",
+    "c82c69fc": "notregisteredtee",
+    "4c7a9c61": "notenoughteeidentities",
+    "a0581a0e": "invalidscoringpolicy",
+    "e6c4247b": "invalidaddress",
+    "f924664d": "invalidstatus",
+  };
+  const addSelector = (value: string): void => {
+    const normalized = value.toLowerCase();
+    selectors.push(normalized);
+    const name = selectorNames[normalized];
+    if (name) strings.push(name);
+  };
+  const inspectHexPayload = (value: string): void => {
+    const matches = value.match(/0x[0-9a-fA-F]{8,}/g) ?? [];
+    for (const match of matches) {
+      const body = match.slice(2);
+      if (body.length < 8) continue;
+      addSelector(body.slice(0, 8));
+      // IMemoInstructionsFacet.CallFailed(bytes) ABI-encodes the inner
+      // personal-account revert after a dynamic offset and length. Keep only
+      // the nested selector; never surface the return-data body itself.
+      if (body.slice(0, 8).toLowerCase() === "a5fa8d2b" && body.length >= 8 + 64 + 64) {
+        const offset = Number.parseInt(body.slice(8, 8 + 64), 16);
+        const lengthStart = 8 + offset * 2;
+        if (Number.isSafeInteger(offset) && lengthStart + 64 <= body.length) {
+          const length = Number.parseInt(body.slice(lengthStart, lengthStart + 64), 16);
+          const dataStart = lengthStart + 64;
+          if (Number.isSafeInteger(length) && length >= 4 && dataStart + 8 <= body.length) {
+            addSelector(body.slice(dataStart, dataStart + 8));
+          }
+        }
+      }
+    }
+  };
   const visit = (value: unknown, depth: number): void => {
     if (depth > 4 || value === null || value === undefined) return;
     if (typeof value === "string") {
       strings.push(value);
-      const selector = value.match(/(?:^|[^0-9a-fA-F])0x([0-9a-fA-F]{8})(?:[^0-9a-fA-F]|$)/);
-      if (selector) strings.push(`selector:${selector[1]}`);
+      inspectHexPayload(value);
       return;
     }
     if (typeof value !== "object") return;
@@ -121,6 +162,17 @@ function directMintFailureCode(error: unknown): string {
   visit(error, 0);
   const normalized = strings.join(" ").toLowerCase();
   const known = [
+    // Prefer a nested personal-account/market error over the outer
+    // IMemoInstructionsFacet.CallFailed(bytes) wrapper.
+    "invalidtender",
+    "invalidtokentransfer",
+    "invalidcodeversion",
+    "notregisteredtee",
+    "notenoughteeidentities",
+    "invalidscoringpolicy",
+    "approvalfailed",
+    "invalidstatus",
+    "personalaccountcallfailed",
     "invalidsender",
     "invalidnonce",
     "wrongexecutor",
@@ -135,8 +187,8 @@ function directMintFailureCode(error: unknown): string {
   ];
   const knownError = known.find((name) => normalized.includes(name));
   if (knownError) return `DIRECT_MINT_${knownError.toUpperCase()}`;
-  const selectorMarker = strings.find((value) => value.startsWith("selector:"));
-  if (selectorMarker) return `DIRECT_MINT_REVERT_${selectorMarker.slice("selector:".length).toUpperCase()}`;
+  const selectorMarker = selectors[0];
+  if (selectorMarker) return `DIRECT_MINT_REVERT_${selectorMarker.toUpperCase()}`;
   if (normalized.includes("insufficient funds")) return "DIRECT_MINT_INSUFFICIENT_FUNDS";
   if (normalized.includes("nonce")) return "DIRECT_MINT_NONCE_ERROR";
   if (normalized.includes("gas")) return "DIRECT_MINT_GAS_ERROR";
