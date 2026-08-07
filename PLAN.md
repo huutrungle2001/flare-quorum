@@ -178,7 +178,8 @@ for every golden vector without exposing losing fields.
 - [x] Implement and unit-test winner payout, buyer remainder, zero-winner
   refund, and receipt.
 - [x] Add unit, fuzz, reentrancy, signer, root, nonce, and expiry tests.
-- [ ] Add a dedicated stateful invariant harness for multi-tender conservation.
+- [x] Add a dedicated stateful multi-tender conservation harness covering
+  award, zero-winner refund, and cancellation outcomes.
 
 Exit: a two-vendor Coston2 tender settles FTestXRP only through threshold FCC
 selection and conserves the public escrow.

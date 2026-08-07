@@ -58,7 +58,7 @@ wallet/executor secrets are never persisted.
 | FTSO | Unsupported, zero, malformed, or stale feed data cannot close a USD-enabled tender | NOT RUN |
 | Result threshold | Two distinct approved common-quorum signers agree; one signer, duplicate signer, and split digests fail | NOT RUN |
 | Domain/replay | Wrong root, rule, FTSO snapshot, close block, nonce, expiry, winner ID, or amount fails | NOT RUN |
-| FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | NOT RUN |
+| FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | PASSED (local stateful multi-tender harness plus live C-E-F lifecycle) |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | NOT RUN |
 | Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | NOT RUN |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json` |
