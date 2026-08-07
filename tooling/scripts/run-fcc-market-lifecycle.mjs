@@ -424,7 +424,7 @@ async function main() {
   const tenderId = tenderCountAfter;
   bid.tenderId = tenderId;
   currentPhase = "vendor-funding";
-  const vendorFunding = await buyerWallet.sendTransaction({ account, to: vendorAccount.address, value: 50_000_000_000_000_000n });
+  const vendorFunding = await buyerWallet.sendTransaction({ account, to: vendorAccount.address, value: 1_000_000_000_000_000_000n });
   const vendorFundingReceipt = await client.waitForTransactionReceipt({ hash: vendorFunding, confirmations: 1 });
   if (vendorFundingReceipt.status !== "success") throw new Error("FCC_MARKET_VENDOR_FUNDING_FAILED");
 
@@ -476,7 +476,7 @@ async function main() {
   });
   const bidTx = await writeEncodedTransaction({
     client, wallet: vendorWallet, account: vendorAccount, to: market, data: bidData,
-    gas: 1_000_000n, code: "FCC_MARKET_SUBMIT_BID_RECEIPTS_FAILED", preflight: false,
+    gas: 300_000n, code: "FCC_MARKET_SUBMIT_BID_RECEIPTS_FAILED", preflight: false,
   });
   const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (field(tenderAfterBid, "bidCount", 6) !== 1n || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
