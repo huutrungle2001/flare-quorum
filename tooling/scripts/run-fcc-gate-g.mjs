@@ -259,6 +259,12 @@ async function main() {
   currentPhase = "smart-account-preparation";
   const network = await fundingChain.inspectNetwork();
   const block = await publicClient.getBlock({ blockTag: "latest" });
+  const ftestXrpBalanceBefore = await publicClient.readContract({
+    address: network.fTestXrp,
+    abi: [{ type: "function", name: "balanceOf", stateMutability: "view", inputs: [{ name: "owner", type: "address" }], outputs: [{ name: "", type: "uint256" }] }],
+    functionName: "balanceOf",
+    args: [market],
+  });
   const vendorAccount = privateKeyToAccount(generatePrivateKey());
   const terms = termsFor({
     extensionId,
@@ -363,7 +369,12 @@ async function main() {
   const ftestXrpBalance = await publicClient.readContract({ address: network.fTestXrp, abi: [{ type: "function", name: "balanceOf", stateMutability: "view", inputs: [{ name: "owner", type: "address" }], outputs: [{ name: "", type: "uint256" }] }], functionName: "balanceOf", args: [market] });
   const tenderBuyer = getAddress(field(tender, "buyer", 0));
   const ceiling = field(tender, "publicCeilingXrp", 3);
-  if (!isAddressEqual(tenderBuyer, personalAccount) || ceiling !== terms.scoringPolicy.ceilingXrpMicros || ftestXrpBalance !== ceiling) {
+  const escrowIncrease = ftestXrpBalance - ftestXrpBalanceBefore;
+  if (
+    !isAddressEqual(tenderBuyer, personalAccount) ||
+    ceiling !== terms.scoringPolicy.ceilingXrpMicros ||
+    escrowIncrease !== ceiling
+  ) {
     throw new Error("FCC_GATE_G_TENDER_ESCROW_INVALID");
   }
   const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
@@ -403,6 +414,9 @@ async function main() {
       mintedAmountUBA: outcome.mintedAmountUBA,
       mintingFeeUBA: outcome.mintingFeeUBA,
       executorFeeUBA,
+      marketFTestXrpBalanceBefore: ftestXrpBalanceBefore,
+      marketFTestXrpBalanceAfter: ftestXrpBalance,
+      marketEscrowIncreaseUBA: escrowIncrease,
       xrplTransactionLedgerIndex: outcome.xrplFinality.transactionLedgerIndex,
       xrplValidatedLedgerIndex: outcome.xrplFinality.validatedLedgerIndex,
       xrplConfirmations: outcome.xrplFinality.confirmations,
@@ -417,7 +431,7 @@ async function main() {
       smartAccountNonceBound: outcome.nonce === nonce,
       atomicApprovalAndTenderCreation: true,
       tenderBuyerIsPersonalAccount: isAddressEqual(tenderBuyer, personalAccount),
-      ftestXrpEscrowFunded: ftestXrpBalance === ceiling,
+      ftestXrpEscrowFunded: escrowIncrease === ceiling,
       noCustodialXrplSecretRecorded: true,
       noMainnetAssetUsed: network.fTestXrp.toLowerCase() === "0x0b6a3645c240605887a5532109323a3e12273dc7",
     },
