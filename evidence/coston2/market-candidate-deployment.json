@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "gate": "MARKET_CANDIDATE_DEPLOYMENT",
+  "status": "IN_PROGRESS",
+  "recordedAt": "2026-08-07T15:47:49.951Z",
+  "sourceCommit": "1cdaa60a833bda3cc2a834c532888cbc925e5ab6",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33746695"
+  },
+  "publicIdentifiers": {
+    "VeilBidFlareMarket": {
+      "address": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
+      "deploymentTransaction": "0x908861fecad1c9a35d7c3b47f63c4f2c197e4af4b745b5816f2cca85d95e655f",
+      "deploymentBlock": "33746695",
+      "runtimeHash": "0x27a884c8e3d82e38286f8ab83729bc1d273b919024764ec4625fe49016dccf10",
+      "maskedRuntimeHash": "0x752dba153b00bb05850cd939b323e1fca31df74f7726c99d6b28288a9edbb9be",
+      "artifactMaskedRuntimeHash": "0x752dba153b00bb05850cd939b323e1fca31df74f7726c99d6b28288a9edbb9be"
+    },
+    "VeilBidFlareAwardReceipt": {
+      "address": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5"
+    }
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "transactionSucceeded": true,
+    "constructorTransactionDecoded": true,
+    "constructorArgumentsMatch": true,
+    "runtimeSizeMatches": true,
+    "runtimeLogicMatchesArtifact": true,
+    "paymentTokenBindingMatches": true,
+    "teeManagerBindingMatches": true,
+    "ftsoBindingMatches": true,
+    "extensionRegistryBindingMatches": true,
+    "awardReceiptCodePresent": true,
+    "awardReceiptMarketBindingMatches": true
+  },
+  "blockers": [
+    "MARKET_EXTENSION_NOT_REGISTERED",
+    "PRODUCT_TEE_MACHINES_NOT_REGISTERED",
+    "GATES_C_E_NOT_PASSED"
+  ],
+  "notes": [
+    "This is an immutable market candidate deployed to break the sender-registration cycle; it is not a verified release.",
+    "The next step registers this market address as a fresh FCC extension sender and binds three product TEE machines.",
+    "No bid payload, proxy credential, deployment key, or private material is recorded."
+  ]
+}
