@@ -260,7 +260,10 @@ confidential bid or settlement boundary:
 - [x] Run a two-vendor lifecycle with both encrypted bids, three-machine
   receipts, FCC selection, threshold finalize, and conserved FTestXRP; live
   evidence is `evidence/coston2/gate-c-e-f-two-vendor.json`.
-- [ ] Run the three-vendor lifecycle and recovery variant.
+- [x] Run a three-vendor lifecycle with the same private multi-criteria and
+  threshold path; live evidence is
+  `evidence/coston2/gate-c-e-f-three-vendor.json`.
+- [ ] Run the three-vendor recovery variant.
 - [ ] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
   wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay drills.
 - [ ] Record gas, latency, bid-ingress, close-to-result, and recovery benchmarks.

@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "gate": "C-E-F",
+  "status": "PASSED",
+  "recordedAt": "2026-08-07T20:45:21.411Z",
+  "sourceCommit": "8da30c053f5718f16ea1f32defce9cbfa7112dd3",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33754822"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
+    "awardReceipt": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5",
+    "paymentToken": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+    "ftso": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+    "extensionId": "66011",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "version": "0.2.2",
+    "buyer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "vendor": "0xAecCf8dbe54433060C2BACC6A9289e72E5d12930",
+    "vendors": [
+      "0xAecCf8dbe54433060C2BACC6A9289e72E5d12930",
+      "0x9559c6A6a1dD0398Bb5487a9a428F541CEb8A694",
+      "0x1706783d48022aa2A085ECd188C0A3c7Dd1f9929"
+    ],
+    "teeIds": [
+      "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
+      "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
+      "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40"
+    ],
+    "teeKeyFingerprints": [
+      "0xe2595ee89e3afc5f005be802fd3c204b11cd47ea7521d5beffea1b4e5419d28a",
+      "0xbd09962a41d295b6f2e230fb0c05e52c19348b8c30370fc936d26cbd8e2882ba",
+      "0xfe95fb421110f8af54a739c7874c3fcb0a988dbc6264723ee3f89dd56266bb40"
+    ],
+    "tenderId": "20",
+    "rulesHash": "0x0ef2a21b44ff41d04fe0e078b6f062b0b3dd601e81e08881b62b0755d342e981",
+    "orderedBidRoot": "0x66231bdf720907ba42058671d51bac778f82c7765573216fced230cbe21d60bd",
+    "plaintextCommitment": "0xe5be0367707499758ee8f256263a8455c2c44550741297204b967f56dab35373",
+    "plaintextCommitments": [
+      "0xe5be0367707499758ee8f256263a8455c2c44550741297204b967f56dab35373",
+      "0x15f368e4274499d585cbaa38cb34c1bd0e096cb5ed74ddf4efeee74983239bfd",
+      "0xfd81308450d66bad7a665a50630ca82c9da28a057b659c5aa7548ad01997cdbe"
+    ],
+    "bidReceiptActionIds": [
+      "0xb5ced98c27d444d2e25ea2cc39d55a7ed4dde7891950f927c4e63b7b86466463",
+      "0x9077ce17c2db96127aec4a84407e3955d3c4fc0042863e14dbeb1d481c62f4ba",
+      "0x1bf2f69efca29e948fedf3cd4979d631ed4e84d19ab2e882ffa2a785abaa3ba8"
+    ],
+    "bidReceiptActionIdsByVendor": [
+      [
+        "0xb5ced98c27d444d2e25ea2cc39d55a7ed4dde7891950f927c4e63b7b86466463",
+        "0x9077ce17c2db96127aec4a84407e3955d3c4fc0042863e14dbeb1d481c62f4ba",
+        "0x1bf2f69efca29e948fedf3cd4979d631ed4e84d19ab2e882ffa2a785abaa3ba8"
+      ],
+      [
+        "0x03ef1b3c8d01d9a9f69b182079cf5d8c528996538ad2712cf874b2e262698af1",
+        "0x9c786d695e26bca1a2f9048c9f9cd7f5c7b7ef344ce859153cf38e2c70d8e432",
+        "0x7ce3681d8fda946c70b0ca0ffd41f87bffb8c47ba2dc464e875a90de6b729d56"
+      ],
+      [
+        "0xe9305e6161a038699ebec4165d016110f20f8e8a2e7a067a38d4197c61fb77f8",
+        "0xbff1e115980e377c148d7520ea3700b6e422117f216cc34196797d0f39cff2ab",
+        "0xdbbf081b60272374f6a3aa3e2a45f4712e8793da573fa5aee8986c4911e80540"
+      ]
+    ],
+    "requestId": "0x9dec87ac083fdd672dc3fdd4822c95067320584151e2b0fa96cac314d616a93c",
+    "selectionSignerIds": [
+      "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
+      "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba"
+    ],
+    "selectionResultDataHash": "0x1069182177eba89cc49d3703bdcc09ca310b1c5df0b4e8cf62ce345722ad0c07",
+    "winnerBidId": "1",
+    "winner": "0xAecCf8dbe54433060C2BACC6A9289e72E5d12930",
+    "winningAmountXrp": "683537",
+    "ftsoFeedId": "0x015852502f55534400000000000000000000000000",
+    "ftsoValue": "1024086",
+    "ftsoDecimals": 6,
+    "ftsoTimestamp": "1786135529",
+    "closeBlock": "33754808",
+    "marketEscrowBalanceBefore": "6000000",
+    "marketEscrowBalanceAfter": "6000000",
+    "awardReceiptOwner": "0xAecCf8dbe54433060C2BACC6A9289e72E5d12930",
+    "approvalTransaction": "0xfcf0d52dd9d79e212c4de74543e3807d0e50d3ec595715b8a44af371b03d9476",
+    "tenderTransaction": "0xf6164c0f0c13fb3c54ae240ad801847538931a03cb070198e748163d9f268950",
+    "vendorFundingTransaction": "0xb85cacbd653deb3bdde28725cc2762b487f8fa3d2dd631a8cc64f597025c1c5f",
+    "vendorFundingTransactions": [
+      "0xb85cacbd653deb3bdde28725cc2762b487f8fa3d2dd631a8cc64f597025c1c5f",
+      "0x0fa65fae69bce731a31428573ceded36e9a94e350ffa6c74c3efcc310d439a18",
+      "0x0e7be8a4c0ab73db1a519bff6cbca3378c4c1a4ad9906209601338ff77662d47"
+    ],
+    "bidTransaction": "0xa19a5e879e20cec388e6e90c9b57398bfe50084074130e92f684c09cb85122f5",
+    "bidTransactions": [
+      "0xa19a5e879e20cec388e6e90c9b57398bfe50084074130e92f684c09cb85122f5",
+      "0xc83306b98cc269a5855ce889b581f20456656c7dcce0a763b99d4bbb12377a80",
+      "0x81edf0bc32efed90302f4c6f8695c5c73e02e7b103da4f65d96cc524de4cb2f3"
+    ],
+    "closeTransaction": "0x49e996847fa1de6c70af184bfe790847cfd85b3ddb46efede8782a996a1be129",
+    "requestTransaction": "0x5093c522d7963f4452f302dbc3ce456da78a9d31954d615e4f3bed3dcd418014",
+    "finalizationTransaction": "0x675bb0c6aefbdf903abb419af4e38dc5f08c5d5f4276065f40855fd2eaed7818"
+  },
+  "assertions": {
+    "marketSenderBoundToExtension": true,
+    "threeProductionMachinesFrozen": true,
+    "threeEncryptedBidsAcceptedByDistinctTees": true,
+    "allBidReceiptsBindCommitment": true,
+    "commonBidQuorumIsThree": true,
+    "ftsSnapshotCapturedOnClose": true,
+    "selectionResultSignedByTwoDistinctFrozenTees": true,
+    "selectionResultMatchesCommonRoot": true,
+    "ftestXrpWinnerPayoutConserved": true,
+    "awardReceiptMintedToWinner": true,
+    "finalTenderAwarded": true,
+    "noPlaintextOrCiphertextRecorded": true
+  },
+  "blockers": [],
+  "notes": [
+    "This is a live Coston2 simulated-TEE lifecycle: FTestXRP escrow, encrypted private bid ingress, FTSO XRP/USD snapshot, FCC private scoring, 2-of-3 result quorum, and award settlement.",
+    "Only public commitments, result fields, machine IDs, and transaction identifiers are recorded; bid plaintext, ciphertext, raw signatures, salts, and credentials are not recorded.",
+    "3 vendor bid(s) were generated in process memory; private keys and bid payloads are not persisted or included in evidence."
+  ]
+}
