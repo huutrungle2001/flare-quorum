@@ -18,11 +18,11 @@ The project targets **Flare Summer Signal** with:
 - **Target settlement asset:** FTestXRP on Coston2 and FXRP on Flare Mainnet.
 
 > [!IMPORTANT]
-> The Flare edition is in Phase 0 feasibility validation. Live Coston2 registry,
-> FCC manager, FTestXRP, FTSO, FDC, Smart Account, toolchain, and source-pin
-> checks pass, while TEE registration infrastructure remains incomplete. The
-> Gate-A foundation sender is live and runtime-verified on Coston2; it is not a
-> product release and no successful FCC lifecycle is claimed yet.
+> Phase 0 feasibility validation is complete for the live Coston2 core path:
+> the registered FCC market, three-machine private bid lifecycle, FTSO-bound
+> scoring, FTestXRP settlement, and XRPL/FDC/Smart Account funding are recorded
+> in public-safe evidence. Same-identity restart recovery is still unsupported
+> by the simulated runtime, and the product/UI release gate remains open.
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
@@ -96,13 +96,13 @@ accounting layer is research scope and must not be described as shipped.
 
 | Flare capability | Product role | Delivery status |
 |---|---|---|
-| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Implemented/tested locally; live extension pending |
-| Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Market tested locally; Gate-A sender live; release pending |
-| FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Direct-mint executor implemented/tested locally; live lifecycle pending |
-| Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Request/fee/round/DA proof path implemented/tested locally; live proof pending |
-| FTSOv2 | Freeze XRP/USD close snapshot for XRP/USD bid normalization | Canonical policy/feed and conditional snapshot tested locally; live close pending |
-| Flare Smart Accounts | Atomically mint FXRP and create/fund tender from an XRPL instruction | Exact `0xFE` batch and receipt verifier implemented/tested locally; live execution pending |
-| Multi-TEE threshold | Fixed three-machine bid custody and two matching selection results | All-three receipt custody and one-outage recovery tested locally; live Gate C/E pending |
+| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Live core lifecycle passed; simulated same-identity restart remains open |
+| Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Verified release manifest and live deployment consistency evidence |
+| FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Live FTestXRP escrow and direct mint passed; redemption UX remains release work |
+| Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Live `XRPPayment` proof recorded in Gate G evidence |
+| FTSOv2 | Freeze XRP/USD close snapshot for XRP/USD bid normalization | Live close snapshot is bound to the FCC result and settlement |
+| Flare Smart Accounts | Atomically mint FXRP and create/fund tender from an XRPL instruction | Live `0xFE` direct-mint-and-fund lifecycle passed |
+| Multi-TEE threshold | Fixed three-machine bid custody and two matching selection results | Live three-bid common quorum and two-signature result passed; outage hardening remains |
 
 Every integration must be exercised by the single flagship product journey and
 recorded in evidence.
@@ -152,10 +152,11 @@ pass. See the [Championship Plan](PLAN.md),
 [Feasibility Plan](docs/feasibility-plan.md), and
 [Build Plan](docs/build-plan.md).
 
-## Current usable baseline
+## Verified Coston2 judge path
 
-The checked-in application still runs against the historical Sepolia release
-until the Coston2 bindings and Flare runtime are implemented:
+The browser uses the verified Coston2 public route when the four sanitized
+`VITE_*` values below are supplied. `/room` remains the explicitly historical
+Sepolia/Nox baseline and must not be used as Flare evidence:
 
 ```bash
 corepack enable
@@ -163,8 +164,18 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm --filter @veilbid/tender-room dev --host 0.0.0.0
 ```
 
-Do not present this command as a Flare demo. The Flare judge path will be added
-only after a verified Coston2 release exists.
+Open `/` or `/flare` for the wallet-free Coston2 evidence view. If the verified
+public configuration is missing, the app fails closed and does not substitute
+Sepolia or mock state.
+
+Verified public release facts:
+
+- Market: `0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05` (deployment block
+  `33746695`).
+- Award receipt: `0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5`.
+- Extension `66011`, code hash
+  `0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2`.
+- Canonical manifest: `packages/flare-contracts/deployments/coston2.release.json`.
 
 ## Documentation
 

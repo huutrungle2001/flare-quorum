@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "gate": "DEPLOYMENT_CONSISTENCY",
+  "status": "PASSED",
+  "recordedAt": "2026-08-07T19:34:18.187Z",
+  "sourceCommit": "a482934fe600d1061a01691a852dd90f391daa98",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33753124"
+  },
+  "publicIdentifiers": {
+    "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
+    "awardReceipt": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5",
+    "deploymentTransaction": "0x908861fecad1c9a35d7c3b47f63c4f2c197e4af4b745b5816f2cca85d95e655f",
+    "deploymentBlock": "33746695",
+    "runtimeHash": "0x27a884c8e3d82e38286f8ab83729bc1d273b919024764ec4625fe49016dccf10",
+    "extensionId": "66011",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "teeIds": [
+      "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
+      "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
+      "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40"
+    ],
+    "resultSignerIds": [
+      "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
+      "0x0C05e52C19348b8c30370FC936d26cBD8E2882BA"
+    ],
+    "resultDataHash": "0xbdaad8adcfbad1647940f5c90ea52df5cc27cc02a978f8d8def4108c03306ebe",
+    "gateGDirectMintingTransaction": "0x78fd1239c87daa069f839023d20fb176f679809a1073d7e6aba6144728183af4",
+    "gateGTenderId": "17"
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "deploymentRuntimeMatchesArtifact": true,
+    "deploymentConstructorBindingsMatch": true,
+    "liveMarketDependenciesMatch": true,
+    "awardReceiptBindingMatches": true,
+    "extensionSenderMatchesMarket": true,
+    "extensionCodeVersionMatchesLifecycle": true,
+    "threeMachinesMatchRelease": true,
+    "resultSignersAreFrozenMachines": true,
+    "resultThresholdMatchesRelease": true,
+    "fassetsFdcSmartAccountEvidencePresent": true,
+    "noBlockers": true
+  },
+  "blockers": [],
+  "notes": [
+    "The immutable Coston2 market candidate is promoted only after live bytecode, constructor, dependency getter, award receipt, extension, machine, result-signer, and Gate G mappings agree.",
+    "Gate B remains IN_PROGRESS for same-identity simulated-TEE restart recovery; this release does not claim that unsupported capability.",
+    "Only public addresses, hashes, checkpoints, and booleans are recorded; no bid, ciphertext, credential, signature, or secret is included."
+  ]
+}

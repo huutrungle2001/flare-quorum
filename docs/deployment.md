@@ -1,7 +1,8 @@
 # VeilBid Flare Championship Deployment Guide
 
-> Status: target workflow; no canonical Coston2 release exists. Current scripts
-> deploy only the historical Sepolia/Nox baseline.
+> Status: the canonical Coston2 market release is live and verified. The
+> remaining work is Gate-B identity-restart hardening, release smoke, UI, and
+> judge-package validation; the historical Sepolia/Nox baseline remains separate.
 
 FCC registration and proxy operations must also satisfy the current
 [`FCC Coston2 Operational Baseline`](fcc-coston2-operations.md), derived from
@@ -12,7 +13,7 @@ the preserved organizer-group redeploy bulletin and official scaffold sources.
 | Release | Canonical authority | Status |
 |---|---|---|
 | Historical Sepolia/Nox | `packages/contracts/deployments/sepolia.release.json` | Verified pre-hackathon baseline |
-| Coston2/FCC championship | `packages/flare-contracts/deployments/coston2.release.json` | Planned; absent until deployment |
+| Coston2/FCC championship | `packages/flare-contracts/deployments/coston2.release.json` | Verified live candidate promoted after runtime/wiring/evidence checks |
 
 Never put Flare addresses into the Sepolia manifest/bindings or reuse historical
 deployment artifacts as Coston2 evidence.
@@ -281,7 +282,10 @@ fallbacks.
 
 ## 5. Canonical Coston2 release manifest
 
-The release manifest begins with `verified: false` and records at least:
+Release construction starts from a candidate manifest with `verified: false`.
+The current immutable Coston2 manifest is promoted to `verified: true` only
+after the live deployment-consistency check; Gate H is still a separate product
+release gate. The manifest records at least:
 
 ```text
 schemaVersion, network, chainId, kind, verified, sourceCommit, deployer
@@ -398,8 +402,8 @@ award-receipt immutable bindings are checked independently on-chain.
 ### Synchronize atomically
 
 - Generate `packages/flare-bindings/generated/` from the Flare Foundry artifact
-  with `pnpm bindings:flare:generate`; the package remains `planned` until a
-  Coston2 deployment manifest and runtime verification are present.
+  with `pnpm bindings:flare:generate`; the checked-in package is now `verified`
+  because the Coston2 deployment manifest and runtime verification are present.
 - Point web, relay, and console only at generated Coston2 bindings.
 - Commit manifest, source mapping, bindings, schemas, and sanitized evidence as
   one release unit; never rewrite an old release manifest.

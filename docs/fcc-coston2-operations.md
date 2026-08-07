@@ -1,12 +1,12 @@
 # FCC Coston2 Operational Baseline
 
-> Status: Phase 0 machine-registration checks are in progress, derived from the
-> project-owner-supplied
+> Status: Phase 0 machine-registration checks passed for the championship
+> extension, derived from the project-owner-supplied
 > [FCC redeploy message](original/fcc-coston2-redeploy-message.md) and current
-> official FCC sources. The live manager and core protocol discovery checks
-> pass. VeilBid extension `66007`, its foundation sender, and simulated code
-> version `v0.2.2` are registered on Coston2; no VeilBid TEE machine has reached
-> `PRODUCTION` yet.
+> official FCC sources. The live manager, core protocol discovery, extension
+> `66011`, and three simulated product machines are verified at `PRODUCTION`
+> with stable Railway HTTPS origins. Extension `66007` remains foundation-only
+> compatibility evidence.
 
 ## 1. Authority and drift rule
 
@@ -101,13 +101,13 @@ Reusing a historical extension ID, machine record, challenge, or address is a
 failure. Re-running `pre-build --force` casually is also forbidden because it
 can detach a machine from the expected extension.
 
-Steps 1–3 are now evidenced by
-`evidence/coston2/fcc-extension-registration.json`: sender
-`0xf522b863fb19496D21ac7D0D1d71435C1DDc2EdE` is explicitly bound to extension
-`66007`. The allowed `v0.2.2` code/platform record is in
-`evidence/coston2/fcc-code-version.json`. The three local machines share that
-binding and image but have distinct identities; they remain local-only until
-three stable public origins pass `pnpm flare:machines:preflight`.
+The foundation sender evidence remains under
+`evidence/coston2/fcc-extension-registration.json`. The product sender
+`0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05` is explicitly bound to extension
+`66011` in `evidence/coston2/fcc-market-extension-registration.json`. The
+allowed `v0.2.2` code/platform record is in `evidence/coston2/fcc-code-version.json`;
+the three product machines share that binding and image while retaining
+distinct identities and stable public origins.
 
 VeilBid performs the missing governance step explicitly with
 `pnpm flare:governance:preflight` followed by `pnpm flare:governance:set`. The
@@ -227,9 +227,12 @@ Three-machine availability, private ingress, and sealed recovery remain
 separate feasibility gates. A one-machine `PRODUCTION` result does not satisfy
 the championship quorum requirement.
 
-The current partial live record is
-`evidence/coston2/gate-0-foundations.json`. It is explicitly
-`IN_PROGRESS`: source hashes, toolchains, manager interface, registry discovery,
-FTestXRP binding, XRP/USD feed, indexer configuration, extension registration,
-code-version allowlisting, and all three pinned FCC images pass. Stable proxy
-reachability and three production machines remain blockers.
+The current live records are `evidence/coston2/gate-0-foundations.json`,
+`evidence/coston2/fcc-market-extension-registration.json`,
+`evidence/coston2/fcc-market-machines.json`, and
+`evidence/coston2/fcc-market-governance.json`. They record the resolved source
+hashes, toolchains, manager interface, registry discovery, FTestXRP binding,
+XRP/USD feed, indexer configuration, extension registration, code-version
+allowlisting, governance, stable proxy reachability, and all three production
+machines. Same-identity simulated-TEE restart remains the explicit Gate-B
+limitation.
