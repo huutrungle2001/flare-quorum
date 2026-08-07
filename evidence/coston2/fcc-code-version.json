@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "gate": "FCC_CODE_VERSION",
+  "status": "ALLOWED_SIMULATED_VERSION",
+  "recordedAt": "2026-08-07T13:12:58.973Z",
+  "sourceCommit": "5c94c64fe8a200998ffb3dfebca58faa738fc096",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33741578"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "66007",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "platform": "0x544553545f504c4154464f524d00000000000000000000000000000000000000",
+    "version": "v0.2.2",
+    "transactionHash": "0x99fc87b4a473b198ff449690c7d3ec85e8f5e577561fafbbf240921fa870ef2f"
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "managerCodePresent": true,
+    "extensionMatchesLiveInfo": true,
+    "codeHashIsNonzero": true,
+    "platformIsSimulated": true,
+    "versionMatchesRelease": true,
+    "transactionSucceeded": true,
+    "codeHashPlatformSupported": true,
+    "onchainVersionMatches": true,
+    "onchainPlatformSetMatches": true
+  },
+  "blockers": [
+    "THREE_PRODUCTION_MACHINES_NOT_REGISTERED",
+    "LIVE_FCC_FOUNDATION_ACTION_NOT_VERIFIED"
+  ],
+  "notes": [
+    "The code hash and platform are read from the signed local proxy info envelope for the simulated Coston2 runtime.",
+    "This evidence does not claim hardware attestation, a registered machine, production status, or Gate A pass.",
+    "No private key, API key, proxy signature, attestation body, TEE public key, or bid data is recorded."
+  ]
+}
