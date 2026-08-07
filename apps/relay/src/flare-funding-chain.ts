@@ -186,6 +186,11 @@ function directMintFailureCode(error: unknown): string {
     "directmintingpaymenttoosmallforfee",
   ];
   const knownError = known.find((name) => normalized.includes(name));
+  if (knownError && knownError !== "callfailed") {
+    return `DIRECT_MINT_${knownError.toUpperCase()}`;
+  }
+  const nestedSelector = selectors.find((selector) => selector !== "a5fa8d2b");
+  if (nestedSelector) return `DIRECT_MINT_REVERT_${nestedSelector.toUpperCase()}`;
   if (knownError) return `DIRECT_MINT_${knownError.toUpperCase()}`;
   const selectorMarker = selectors[0];
   if (selectorMarker) return `DIRECT_MINT_REVERT_${selectorMarker.toUpperCase()}`;
