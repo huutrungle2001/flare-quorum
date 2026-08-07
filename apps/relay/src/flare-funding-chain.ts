@@ -67,11 +67,20 @@ export interface FundingTransactionReceipt {
   logs: readonly Log[];
 }
 
+export interface FlareFundingTenderFact {
+  buyer: Address;
+  rulesHash: Hex;
+  publicCeilingXrp: bigint;
+}
+
 export interface FlareFundingChain {
   readonly executorAddress: Address | null;
   inspectNetwork(): Promise<FlareFundingNetwork>;
   getSmartAccountNonce(controller: Address, personalAccount: Address): Promise<bigint>;
   getPersonalAccount(controller: Address, xrplOwner: string): Promise<Address>;
+  /** Optional state fallback when a nested receipt log is temporarily incomplete. */
+  getMarketTenderCount?(market: Address): Promise<bigint>;
+  getMarketTender?(market: Address, tenderId: bigint): Promise<FlareFundingTenderFact>;
   getRequestFee(fdcHub: Address, request: Hex): Promise<bigint>;
   submitAttestationRequest(
     fdcHub: Address,
@@ -407,6 +416,38 @@ export class LiveFlareFundingChain implements FlareFundingChain {
       functionName: "getPersonalAccount",
       args: [xrplOwner],
     }));
+  }
+
+  async getMarketTenderCount(market: Address): Promise<bigint> {
+    const count = await this.publicClient.readContract({
+      address: market,
+      abi: veilBidFlareMarketAbi,
+      functionName: "tenderCount",
+    }) as bigint;
+    return count;
+  }
+
+  async getMarketTender(market: Address, tenderId: bigint): Promise<FlareFundingTenderFact> {
+    const value = await this.publicClient.readContract({
+      address: market,
+      abi: veilBidFlareMarketAbi,
+      functionName: "getTender",
+      args: [tenderId],
+    }) as Record<string, unknown> & readonly unknown[];
+    const buyer = value.buyer ?? value[0];
+    const rulesHash = value.rulesHash ?? value[2];
+    const publicCeilingXrp = value.publicCeilingXrp ?? value[3];
+    if (
+      typeof buyer !== "string" || typeof rulesHash !== "string" ||
+      typeof publicCeilingXrp !== "bigint"
+    ) {
+      throw new Error("FLARE_MARKET_TENDER_STATE_INVALID");
+    }
+    return {
+      buyer: getAddress(buyer),
+      rulesHash: rulesHash as Hex,
+      publicCeilingXrp,
+    };
   }
 
   async getRequestFee(fdcHub: Address, request: Hex): Promise<bigint> {

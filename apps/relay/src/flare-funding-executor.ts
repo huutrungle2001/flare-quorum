@@ -19,6 +19,7 @@ import type { FlareFundingConfig } from "./flare-funding-config.js";
 import type {
   FlareFundingChain,
   FlareFundingNetwork,
+  FlareFundingTenderFact,
 } from "./flare-funding-chain.js";
 import type { FlareFundingJob } from "./flare-funding-job.js";
 import { waitForXrplFinality, type XrplFinality } from "./xrpl-finality.js";
@@ -84,6 +85,17 @@ export interface FlareFundingExecutorOptions {
   fetchImplementation?: typeof fetch;
   sleep?: (milliseconds: number) => Promise<void>;
   onStage?: (stage: string) => void;
+}
+
+const MAX_TENDER_STATE_FALLBACK_SCAN = 16n;
+
+interface TenderCreatedFact {
+  args: {
+    tenderId: bigint;
+    buyer: Address;
+    rulesHash: Hex;
+    ceiling: bigint;
+  };
 }
 
 export class FlareFundingExecutor {
@@ -278,6 +290,10 @@ export class FlareFundingExecutor {
       job.personalAccount,
     );
     if (currentNonce !== job.nonce) throw new Error("STALE_SMART_ACCOUNT_NONCE");
+    this.stage("read-tender-count");
+    const tenderCountBefore = this.chain.getMarketTenderCount
+      ? await this.chain.getMarketTenderCount(this.config.marketAddress)
+      : null;
     const totalCallValue = plan.calls.reduce((sum, call) => sum + call.value, 0n);
     this.stage("direct-mint");
     const mintReceipt = await this.chain.executeDirectMinting(
@@ -318,7 +334,7 @@ export class FlareFundingExecutor {
       throw new Error("DIRECT_MINTING_UNDERFUNDED");
     }
     this.stage("prove-tender-created");
-    const tender = parseEventLogs({
+    let tender = parseEventLogs({
       abi: tenderCreatedEventAbi,
       eventName: "TenderCreated",
       logs: [...mintReceipt.logs],
@@ -328,7 +344,39 @@ export class FlareFundingExecutor {
       event.args.buyer.toLowerCase() === job.personalAccount.toLowerCase() &&
       event.args.rulesHash.toLowerCase() === calculateFlareRulesHash(job.terms.scoringPolicy).toLowerCase() &&
       event.args.ceiling === job.terms.scoringPolicy.ceilingXrpMicros
-    );
+    ) as TenderCreatedFact | undefined;
+    // Some Coston2 RPC responses can briefly omit deeply nested logs even
+    // though the state transition is committed. Re-read only the bounded
+    // set of tenders created after our preflight count and require the exact
+    // buyer/rules/ceiling tuple before accepting the funding result.
+    if (
+      !tender && tenderCountBefore !== null && this.chain.getMarketTender &&
+      this.chain.getMarketTenderCount
+    ) {
+      const tenderCountAfter = await this.chain.getMarketTenderCount(this.config.marketAddress);
+      const createdCount = tenderCountAfter - tenderCountBefore;
+      if (createdCount > 0n && createdCount <= MAX_TENDER_STATE_FALLBACK_SCAN) {
+        for (let id = tenderCountBefore + 1n; id <= tenderCountAfter; id += 1n) {
+          const state: FlareFundingTenderFact = await this.chain.getMarketTender(
+            this.config.marketAddress,
+            id,
+          );
+          if (
+            state.buyer.toLowerCase() === job.personalAccount.toLowerCase() &&
+            state.rulesHash.toLowerCase() === calculateFlareRulesHash(job.terms.scoringPolicy).toLowerCase() &&
+            state.publicCeilingXrp === job.terms.scoringPolicy.ceilingXrpMicros
+          ) {
+            tender = { args: {
+              tenderId: id,
+              buyer: state.buyer,
+              rulesHash: state.rulesHash,
+              ceiling: state.publicCeilingXrp,
+            } };
+            break;
+          }
+        }
+      }
+    }
     if (!tender) throw new Error("TENDER_CREATION_NOT_PROVEN");
     return {
       outcome: "executed",
