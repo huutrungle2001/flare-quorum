@@ -7,7 +7,7 @@ FROM golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d8
 
 WORKDIR /build
 COPY apps/fcc-extension/go.mod apps/fcc-extension/go.sum ./
-RUN --mount=type=cache,target=/go/pkg/mod go mod download && go mod verify
+RUN go mod download && go mod verify
 
 COPY apps/fcc-extension/cmd/ ./cmd/
 COPY apps/fcc-extension/internal/ ./internal/
@@ -51,6 +51,5 @@ ENV MODE=1 \
     LOG_LEVEL=INFO \
     PORT=6662
 
-VOLUME ["/data"]
 EXPOSE 6662
 ENTRYPOINT ["/app/entrypoint.sh"]
