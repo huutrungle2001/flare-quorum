@@ -9,9 +9,9 @@
 > payment, FDC proof, Smart Account direct mint, and atomic tender funding.
 > Same-identity restart recovery remains open under the supported simulated
 > runtime; a one-result-endpoint outage recovery, verified release, hosted
-> ingress, public Evidence workspace, and wallet-free Coston2 judge smoke are
-> live, while XRP browser recovery, user validation, and final video remain
-> open.
+> ingress, public Evidence workspace, wallet-free Coston2 judge smoke, and
+> read-only live negative guards are live, while XRP browser recovery, full
+> stateful fault drills, user validation, and final video remain open.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
