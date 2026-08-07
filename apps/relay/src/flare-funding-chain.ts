@@ -105,6 +105,7 @@ function receipt(value: {
 function directMintFailureCode(error: unknown): string {
   const strings: string[] = [];
   const selectors: string[] = [];
+  const nestedSelectors: string[] = [];
   const selectorNames: Record<string, string> = {
     "a5fa8d2b": "callfailed",
     "5c0dee5d": "personalaccountcallfailed",
@@ -118,45 +119,51 @@ function directMintFailureCode(error: unknown): string {
     "e6c4247b": "invalidaddress",
     "f924664d": "invalidstatus",
   };
-  const addSelector = (value: string): void => {
+  const addSelector = (value: string, nested = false): void => {
     const normalized = value.toLowerCase();
-    selectors.push(normalized);
+    (nested ? nestedSelectors : selectors).push(normalized);
     const name = selectorNames[normalized];
     if (name) strings.push(name);
   };
-  const inspectHexPayload = (value: string): void => {
+  const inspectHexPayload = (value: string, allowEncoded = false): void => {
     const matches = value.match(/0x[0-9a-fA-F]{8,}/g) ?? [];
     for (const match of matches) {
       const body = match.slice(2);
       if (body.length < 8) continue;
-      addSelector(body.slice(0, 8));
+      const selector = body.slice(0, 8).toLowerCase();
+      // Addresses and hashes frequently occur in viem's diagnostic text.
+      // Treat a long hex value as revert data only when it is attached to a
+      // data-bearing error field, or when its selector is a known error.
+      if (body.length === 8 || allowEncoded || selector in selectorNames) {
+        addSelector(selector);
+      }
       // IMemoInstructionsFacet.CallFailed(bytes) ABI-encodes the inner
       // personal-account revert after a dynamic offset and length. Keep only
       // the nested selector; never surface the return-data body itself.
-      if (body.slice(0, 8).toLowerCase() === "a5fa8d2b" && body.length >= 8 + 64 + 64) {
+      if (selector === "a5fa8d2b" && body.length >= 8 + 64 + 64) {
         const offset = Number.parseInt(body.slice(8, 8 + 64), 16);
         const lengthStart = 8 + offset * 2;
         if (Number.isSafeInteger(offset) && lengthStart + 64 <= body.length) {
           const length = Number.parseInt(body.slice(lengthStart, lengthStart + 64), 16);
           const dataStart = lengthStart + 64;
           if (Number.isSafeInteger(length) && length >= 4 && dataStart + 8 <= body.length) {
-            addSelector(body.slice(dataStart, dataStart + 8));
+            addSelector(body.slice(dataStart, dataStart + 8), true);
           }
         }
       }
     }
   };
-  const visit = (value: unknown, depth: number): void => {
+  const visit = (value: unknown, depth: number, sourceKey = ""): void => {
     if (depth > 4 || value === null || value === undefined) return;
     if (typeof value === "string") {
       strings.push(value);
-      inspectHexPayload(value);
+      inspectHexPayload(value, sourceKey === "data" || sourceKey === "originalError");
       return;
     }
     if (typeof value !== "object") return;
     const record = value as Record<string, unknown>;
     for (const key of ["data", "cause", "error", "originalError", "details", "shortMessage", "message"]) {
-      visit(record[key], depth + 1);
+      visit(record[key], depth + 1, key);
     }
   };
   visit(error, 0);
@@ -189,7 +196,7 @@ function directMintFailureCode(error: unknown): string {
   if (knownError && knownError !== "callfailed") {
     return `DIRECT_MINT_${knownError.toUpperCase()}`;
   }
-  const nestedSelector = selectors.find((selector) => selector !== "a5fa8d2b");
+  const nestedSelector = nestedSelectors[0];
   if (nestedSelector) return `DIRECT_MINT_REVERT_${nestedSelector.toUpperCase()}`;
   if (knownError) return `DIRECT_MINT_${knownError.toUpperCase()}`;
   const selectorMarker = selectors[0];
