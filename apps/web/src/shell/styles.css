@@ -1303,6 +1303,110 @@ main {
   font-size: 0.82rem;
 }
 
+.funding-lede {
+  line-height: 1.5;
+  margin: 0;
+  padding: 0 32px 24px;
+}
+
+.funding-handoff-form {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  padding: 24px 32px;
+}
+
+.funding-handoff-form label,
+.funding-code-field {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.76rem;
+  font-weight: 700;
+  gap: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.funding-handoff-form input,
+.funding-code-field textarea {
+  background: var(--color-paper-white);
+  border: 1px solid var(--color-ink-black);
+  border-radius: 0;
+  color: var(--color-ink-black);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  min-height: 48px;
+  padding: 12px;
+}
+
+.funding-handoff-form small {
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-transform: none;
+}
+
+.funding-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 32px 24px;
+}
+
+.funding-preview {
+  border-top: 1px solid var(--color-ink-black);
+  display: grid;
+  gap: 18px;
+  padding: 24px 32px;
+}
+
+.funding-preview .detail-header {
+  padding: 0;
+}
+
+.funding-preview h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.funding-preview .term-grid {
+  padding: 0;
+}
+
+.funding-code-field textarea {
+  min-height: 84px;
+  overflow-wrap: anywhere;
+  resize: vertical;
+  text-transform: none;
+}
+
+.funding-job-details {
+  border: 1px solid var(--color-ink-black);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 12px 14px;
+}
+
+.funding-job-details summary {
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.funding-job-details pre {
+  max-height: 360px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .term-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -5108,6 +5212,27 @@ footer p {
   .wallet-connect {
     gap: 24px;
     padding: 24px 20px;
+  }
+
+  .funding-handoff-form {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .funding-lede,
+  .funding-actions,
+  .funding-preview {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .funding-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .funding-actions > :is(.primary-button, .secondary-button) {
+    width: 100%;
   }
 
   .write-form {

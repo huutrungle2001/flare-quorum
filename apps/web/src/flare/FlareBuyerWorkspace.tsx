@@ -1,7 +1,10 @@
 import {
+  buildMintAndFundPlan,
   calculateFlareRulesHash,
   coston2FlarePublicRelease,
+  smartAccountReaderAbi,
   veilBidFlareMarketAbi,
+  type FlareTenderTerms,
 } from "@veilbid/flare-bindings";
 import {
   createPublicClient,
@@ -14,12 +17,13 @@ import {
   stringToHex,
   type Abi,
   type Address,
+  type Hex,
 } from "viem";
 import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
 import { useToasts } from "../shell/ToastProvider";
 import { useState } from "react";
-import { FlareXrpFundingPanel } from "./FlareXrpFundingPanel";
+import { FlareXrpFundingPanel, type XrpFundingPrepareInput, type XrpFundingPreview } from "./FlareXrpFundingPanel";
 
 const coston2 = {
   id: 114,
@@ -90,6 +94,97 @@ export function hashFlareBuyerBrief(input: FlareBuyerBriefInput) {
   return keccak256(stringToHex(canonical));
 }
 
+interface BuyerFormValues {
+  title: string;
+  category: FlareBuyerBriefCategory;
+  objective: string;
+  acceptanceCriteria: string;
+  vendorQuestions: string;
+  ceiling: string;
+  vendors: string;
+  deadlineMinutes: string;
+  priceWeight: string;
+  deliveryWeight: string;
+  warrantyWeight: string;
+}
+
+function buildFlareTenderTerms(input: BuyerFormValues, blockTimestamp: bigint): FlareTenderTerms {
+  const minutes = Number(input.deadlineMinutes);
+  if (!Number.isSafeInteger(minutes) || minutes < 5 || minutes > 30 * 24 * 60) throw new Error("Deadline must be between 5 minutes and 30 days.");
+  const price = parseWeight(input.priceWeight, "Price");
+  const delivery = parseWeight(input.deliveryWeight, "Delivery");
+  const warranty = parseWeight(input.warrantyWeight, "Warranty");
+  if (price + delivery + warranty !== 10_000) throw new Error("Scoring weights must total 10000 bps.");
+  const approvedVendors = parseVendors(input.vendors);
+  const amount = parseCeiling(input.ceiling);
+  const metadata = input.title.trim();
+  if (metadata.length < 3 || metadata.length > 160) throw new Error("Add a short public procurement title (3–160 characters).");
+  const briefObjective = input.objective.trim();
+  if (briefObjective.length < 20 || briefObjective.length > 1200) throw new Error("Describe the public outcome in 20–1200 characters.");
+  const briefAcceptance = input.acceptanceCriteria.trim();
+  if (briefAcceptance.length < 10 || briefAcceptance.length > 1200) throw new Error("Add acceptance criteria in 10–1200 characters.");
+  const briefQuestions = input.vendorQuestions.trim();
+  if (briefQuestions.length > 1200) throw new Error("Vendor questions must be at most 1200 characters.");
+  const scoringPolicy = {
+    schemaVersion: 1,
+    ceilingXrpMicros: amount,
+    bidDeadline: blockTimestamp + BigInt(minutes * 60),
+    allowXrp: true,
+    allowUsd: true,
+    ftsoFeedId: coston2FlarePublicRelease.protocols.xrpUsdFeedId,
+    maxDeliveryDays: 30,
+    minWarrantyDays: 7,
+    maxWarrantyDays: 90,
+    priceWeightBps: price,
+    deliveryWeightBps: delivery,
+    warrantyWeightBps: warranty,
+    requiredCredentials: [],
+  } as const;
+  return {
+    metadataHash: hashFlareBuyerBrief({
+      title: metadata,
+      category: input.category,
+      objective: briefObjective,
+      acceptanceCriteria: briefAcceptance,
+      vendorQuestions: briefQuestions,
+      bidDeadline: scoringPolicy.bidDeadline,
+      approvedVendors,
+    }),
+    scoringPolicy,
+    approvedVendors,
+    extensionId: BigInt(coston2FlarePublicRelease.fcc.extensionId),
+    codeVersion: coston2FlarePublicRelease.fcc.codeHash,
+    teeIds: coston2FlarePublicRelease.fcc.teeIds as [Address, Address, Address],
+    teeKeyFingerprints: coston2FlarePublicRelease.fcc.teeKeyFingerprints as [Hex, Hex, Hex],
+  };
+}
+
+function parseXrplOwner(value: string): string {
+  const owner = value.trim();
+  if (!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(owner)) throw new Error("XRPL_OWNER_ADDRESS_INVALID");
+  return owner;
+}
+
+function parseXrplTransactionId(value: string): Hex {
+  const normalized = value.trim().replace(/^0x/i, "");
+  if (!/^[0-9a-fA-F]{64}$/.test(normalized)) throw new Error("XRPL_TRANSACTION_ID_INVALID");
+  return `0x${normalized.toLowerCase()}` as Hex;
+}
+
+function parseWalletId(value: string): number {
+  if (!/^\d+$/.test(value.trim())) throw new Error("SMART_ACCOUNT_WALLET_ID_INVALID");
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed) || parsed < 0 || parsed > 255) throw new Error("SMART_ACCOUNT_WALLET_ID_INVALID");
+  return parsed;
+}
+
+function parseExecutorFee(value: string): bigint {
+  if (!/^\d+$/.test(value.trim())) throw new Error("EXECUTOR_FEE_UBA_INVALID");
+  const parsed = BigInt(value);
+  if (parsed > 0xffff_ffff_ffff_ffffn) throw new Error("EXECUTOR_FEE_UBA_INVALID");
+  return parsed;
+}
+
 export function FlareBuyerWorkspace({
   wallet,
   onRefresh,
@@ -127,54 +222,20 @@ export function FlareBuyerWorkspace({
       if (!rpcUrl) throw new Error("COSTON2_RPC_URL_MISSING");
       const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl) });
       const block = await publicClient.getBlock({ blockTag: "latest" });
-      const minutes = Number(deadlineMinutes);
-      if (!Number.isSafeInteger(minutes) || minutes < 5 || minutes > 30 * 24 * 60) throw new Error("Deadline must be between 5 minutes and 30 days.");
-      const price = parseWeight(priceWeight, "Price");
-      const delivery = parseWeight(deliveryWeight, "Delivery");
-      const warranty = parseWeight(warrantyWeight, "Warranty");
-      if (price + delivery + warranty !== 10_000) throw new Error("Scoring weights must total 10000 bps.");
-      const approvedVendors = parseVendors(vendors);
-      const amount = parseCeiling(ceiling);
-      const metadata = title.trim();
-      if (metadata.length < 3 || metadata.length > 160) throw new Error("Add a short public procurement title (3–160 characters).");
-      const briefObjective = objective.trim();
-      if (briefObjective.length < 20 || briefObjective.length > 1200) throw new Error("Describe the public outcome in 20–1200 characters.");
-      const briefAcceptance = acceptanceCriteria.trim();
-      if (briefAcceptance.length < 10 || briefAcceptance.length > 1200) throw new Error("Add acceptance criteria in 10–1200 characters.");
-      const briefQuestions = vendorQuestions.trim();
-      if (briefQuestions.length > 1200) throw new Error("Vendor questions must be at most 1200 characters.");
-      const scoringPolicy = {
-        schemaVersion: 1,
-        ceilingXrpMicros: amount,
-        bidDeadline: block.timestamp + BigInt(minutes * 60),
-        allowXrp: true,
-        allowUsd: true,
-        ftsoFeedId: coston2FlarePublicRelease.protocols.xrpUsdFeedId,
-        maxDeliveryDays: 30,
-        minWarrantyDays: 7,
-        maxWarrantyDays: 90,
-        priceWeightBps: price,
-        deliveryWeightBps: delivery,
-        warrantyWeightBps: warranty,
-        requiredCredentials: [],
-      } as const;
-      const terms = {
-        metadataHash: hashFlareBuyerBrief({
-          title: metadata,
-          category,
-          objective: briefObjective,
-          acceptanceCriteria: briefAcceptance,
-          vendorQuestions: briefQuestions,
-          bidDeadline: scoringPolicy.bidDeadline,
-          approvedVendors,
-        }),
-        scoringPolicy,
-        approvedVendors,
-        extensionId: BigInt(coston2FlarePublicRelease.fcc.extensionId),
-        codeVersion: coston2FlarePublicRelease.fcc.codeHash,
-        teeIds: coston2FlarePublicRelease.fcc.teeIds as [Address, Address, Address],
-        teeKeyFingerprints: coston2FlarePublicRelease.fcc.teeKeyFingerprints as [string, string, string],
-      };
+      const terms = buildFlareTenderTerms({
+        title,
+        category,
+        objective,
+        acceptanceCriteria,
+        vendorQuestions,
+        ceiling,
+        vendors,
+        deadlineMinutes,
+        priceWeight,
+        deliveryWeight,
+        warrantyWeight,
+      }, block.timestamp);
+      const amount = terms.scoringPolicy.ceilingXrpMicros;
       if (terms.teeKeyFingerprints.length !== 3) throw new Error("COSTON2_FCC_KEYS_UNAVAILABLE");
       const approval = await publicClient.simulateContract({ account: wallet.state.account!, address: token, abi: erc20Abi, functionName: "approve", args: [market, amount] });
       toasts.update(toastId, "Approving the exact public FTestXRP ceiling…");
@@ -232,6 +293,72 @@ export function FlareBuyerWorkspace({
     }
   }
 
+  async function prepareXrpFunding(input: XrpFundingPrepareInput): Promise<XrpFundingPreview> {
+    const rpcUrl = import.meta.env.VITE_COSTON2_RPC_URL?.trim();
+    if (!rpcUrl) throw new Error("COSTON2_RPC_URL_MISSING");
+    const xrplOwner = parseXrplOwner(input.xrplOwner);
+    const xrplTransactionId = parseXrplTransactionId(input.xrplTransactionId);
+    const walletId = parseWalletId(input.walletId);
+    const executorFeeUBA = parseExecutorFee(input.executorFeeUBA);
+    const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl) });
+    const block = await publicClient.getBlock({ blockTag: "latest" });
+    const terms = buildFlareTenderTerms({
+      title,
+      category,
+      objective,
+      acceptanceCriteria,
+      vendorQuestions,
+      ceiling,
+      vendors,
+      deadlineMinutes,
+      priceWeight,
+      deliveryWeight,
+      warrantyWeight,
+    }, block.timestamp);
+    const personalAccount = await publicClient.readContract({
+      address: coston2FlarePublicRelease.protocols.masterAccountController,
+      abi: smartAccountReaderAbi,
+      functionName: "getPersonalAccount",
+      args: [xrplOwner],
+    });
+    if (personalAccount.toLowerCase() === "0x0000000000000000000000000000000000000000") {
+      throw new Error("SMART_ACCOUNT_PERSONAL_ACCOUNT_UNAVAILABLE");
+    }
+    const nonce = await publicClient.readContract({
+      address: coston2FlarePublicRelease.protocols.masterAccountController,
+      abi: smartAccountReaderAbi,
+      functionName: "getNonce",
+      args: [personalAccount],
+    });
+    const plan = buildMintAndFundPlan({
+      personalAccount,
+      nonce,
+      fTestXrp: coston2FlarePublicRelease.protocols.fTestXRP,
+      market: coston2FlarePublicRelease.market,
+      terms,
+      walletId,
+      executorFee: executorFeeUBA,
+    });
+    const job = {
+      version: 1,
+      xrplTransactionId,
+      personalAccount,
+      nonce,
+      walletId,
+      executorFeeUBA,
+      terms,
+    };
+    return {
+      personalAccount,
+      nonce: nonce.toString(),
+      walletId,
+      executorFeeUBA: executorFeeUBA.toString(),
+      xrplTransactionId,
+      memoData: plan.memoData,
+      jobJson: JSON.stringify(job, (_key, value) => typeof value === "bigint" ? value.toString() : value, 2),
+    };
+  }
+
   return (
     <main id="main-content" className="role-workspace flare-buyer-workspace">
       <section className="workspace-intro">
@@ -240,8 +367,8 @@ export function FlareBuyerWorkspace({
         <p>Approve the exact public FTestXRP ceiling, then create a tender frozen to the verified FCC extension and three production-status identities. Bid values remain outside the contract.</p>
       </section>
       <WalletPanel wallet={wallet} network="coston2" />
-      <FlareXrpFundingPanel />
-      <section className="evidence-panel flare-buyer-form" aria-label="Coston2 buyer tender composer">
+      <FlareXrpFundingPanel onPrepare={prepareXrpFunding} />
+      <section id="buyer-brief" className="evidence-panel flare-buyer-form" aria-label="Coston2 buyer tender composer">
         <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>Open a Coston2 tender</h2></div><span className="privacy-badge verified">FTestXRP / TESTNET</span></header>
         <label>Public title<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small>The public brief is hashed into immutable metadata; bids remain outside the contract.</small></label>
         <div className="form-grid-two">

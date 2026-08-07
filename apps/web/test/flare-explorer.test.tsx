@@ -1,9 +1,10 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { FlareEvidenceWorkspace, FlareExplorerView } from "../src/flare/FlareRoom";
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
+import { FlareXrpFundingPanel } from "../src/flare/FlareXrpFundingPanel";
 import { PrimaryNavigation } from "../src/shell/PrimaryNavigation";
 import type { WalletController } from "../src/wallet/WalletPanel";
 
@@ -159,8 +160,27 @@ describe("Coston2 public evidence boundary", () => {
   it("keeps the XRP-native funding signature outside the browser", () => {
     render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} />);
     expect(screen.getByRole("heading", { name: "Keep the XRPL signature outside VeilBid" })).toBeInTheDocument();
-    expect(screen.getByText(/does not ask for an XRPL seed/)).toBeInTheDocument();
+    expect(screen.getByText(/never asks for a seed/)).toBeInTheDocument();
     expect(screen.getByText(/DirectMintingDelayed/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Coston2 funding runbook/ })).toHaveAttribute("href", "/docs#flare-coston2");
+    expect(screen.getByRole("link", { name: "READ FUNDING RUNBOOK ↗" })).toHaveAttribute("href", "/docs#flare-coston2");
+  });
+
+  it("prepares only a public XRP funding handoff", async () => {
+    const onPrepare = vi.fn(async () => ({
+      personalAccount: "0x1000000000000000000000000000000000000001" as const,
+      nonce: "4",
+      walletId: 0,
+      executorFeeUBA: "0",
+      xrplTransactionId: `0x${"ab".repeat(32)}` as `0x${string}`,
+      memoData: `0x${"fe".repeat(42)}` as `0x${string}`,
+      jobJson: "{\"version\":1}",
+    }));
+    render(<FlareXrpFundingPanel onPrepare={onPrepare} />);
+    expect(screen.getByLabelText(/XRPL owner address/)).toBeInTheDocument();
+    expect(screen.getByText(/never asks for a seed/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "PREPARE PUBLIC 0xFE JOB →" }));
+    await waitFor(() => expect(onPrepare).toHaveBeenCalledTimes(1));
+    expect(screen.getByText("PUBLIC-SAFE HANDOFF READY")).toBeInTheDocument();
+    expect(screen.getByText("PersonalAccount", { exact: true })).toBeInTheDocument();
   });
 });
