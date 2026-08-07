@@ -511,7 +511,10 @@ async function main() {
   const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (field(tenderAfterBid, "bidCount", 6) !== 1n || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
   currentPhase = "close-tender";
-  const close = await writeContract({ client, wallet: buyerWallet, account, address: market, abi: marketAbi, functionName: "closeTender", args: [tenderId] });
+  const close = await writeContract({
+    client, wallet: buyerWallet, account, address: market, abi: marketAbi,
+    functionName: "closeTender", args: [tenderId], gas: 500_000n,
+  });
   const closed = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (Number(field(closed, "status", 21)) !== 2) throw new Error("FCC_MARKET_CLOSE_STATUS_INVALID");
   if (field(closed, "ftsoValue", 13) === 0n || field(closed, "ftsoTimestamp", 15) === 0n) throw new Error("FCC_MARKET_FTSO_SNAPSHOT_INVALID");
