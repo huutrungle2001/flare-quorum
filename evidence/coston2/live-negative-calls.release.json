@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "suite": "coston2-live-negative-eth-calls",
   "status": "PARTIAL",
-  "recordedAt": "2026-08-07T23:09:51.219Z",
-  "sourceCommit": "4343dc672028f597ff83b460366f97db8c643220",
+  "recordedAt": "2026-08-07T23:13:28.733Z",
+  "sourceCommit": "db60462c0dd0bdcd5f0a9801e19fc2d74ee3a4d2",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "observedBlock": "33758456",
+    "observedBlock": "33758592",
     "rpcSource": "official-public-coston2-rpc"
   },
   "publicIdentifiers": {
@@ -40,6 +40,16 @@
       "name": "create-zero-terms",
       "functionName": "createTender",
       "reverted": true
+    },
+    {
+      "name": "create-invalid-credential",
+      "functionName": "createTender",
+      "reverted": true
+    },
+    {
+      "name": "create-unsupported-feed",
+      "functionName": "createTender",
+      "reverted": true
     }
   ],
   "assertions": {
@@ -51,10 +61,12 @@
     "request-selection-finalized-tenderReverted": true,
     "submit-empty-receipts-finalized-tenderReverted": true,
     "finalize-zero-result-finalized-tenderReverted": true,
-    "create-zero-termsReverted": true
+    "create-zero-termsReverted": true,
+    "create-invalid-credentialReverted": true,
+    "create-unsupported-feedReverted": true
   },
   "blockers": [
-    "LIVE_INVALID_CREDENTIAL_AND_STALE_FTSO_STATE_NOT_CREATED",
+    "LIVE_STALE_FTSO_STATE_NOT_CREATED",
     "LIVE_PROXY_RESTART_AND_TWO_MACHINE_LOSS_NOT_RUN",
     "SAME_IDENTITY_TEE_RESTART_NOT_SUPPORTED_BY_CURRENT_SIMULATED_RUNTIME"
   ],

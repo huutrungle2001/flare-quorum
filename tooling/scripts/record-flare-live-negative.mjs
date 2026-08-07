@@ -72,6 +72,38 @@ const zeroTerms = [
   [zeroBytes32(), zeroBytes32(), zeroBytes32()],
 ];
 
+function publicTerms(blockTimestamp, {
+  allowXrp = true,
+  allowUsd = true,
+  feedId = release.protocols.xrpUsdFeedId,
+  requiredCredentials = [],
+} = {}) {
+  const policy = [
+    1,
+    1_000_000n,
+    blockTimestamp + 600n,
+    allowXrp,
+    allowUsd,
+    feedId,
+    30,
+    7,
+    90,
+    6_000,
+    2_500,
+    1_500,
+    requiredCredentials,
+  ];
+  return [
+    zeroBytes32().replace(/^0x00/, "0x01"),
+    policy,
+    [zeroAddress().replace(/^0x00/, "0x01")],
+    BigInt(release.fcc.extensionId),
+    release.fcc.codeHash,
+    release.fcc.teeIds,
+    release.fcc.teeKeyFingerprints,
+  ];
+}
+
 async function readTender() {
   const tender = await client.readContract({ address: market, abi, functionName: "getTender", args: [tenderId] });
   const status = tender?.status ?? tender?.[21];
@@ -91,14 +123,23 @@ async function expectRevert(name, functionName, args, value) {
 
 const tender = await readTender();
 if (tender.status !== 4) throw new Error("LIVE_NEGATIVE_TENDER_NOT_FINALIZED");
-const [close, request, receipts, finalize, create] = await Promise.all([
+const latest = await client.getBlock({ blockTag: "latest" });
+const invalidCredentialTerms = publicTerms(latest.timestamp, {
+  requiredCredentials: [[zeroBytes32(), zeroAddress()]],
+});
+const unsupportedFeedTerms = publicTerms(latest.timestamp, {
+  allowUsd: false,
+});
+const [close, request, receipts, finalize, create, invalidCredential, unsupportedFeed] = await Promise.all([
   expectRevert("close-finalized-tender", "closeTender", [tenderId]),
   expectRevert("request-selection-finalized-tender", "requestSelection", [tenderId], 1_000_000n),
   expectRevert("submit-empty-receipts-finalized-tender", "submitBidReceipts", [tenderId, [zeroReceipt, zeroReceipt, zeroReceipt], ["0x", "0x", "0x"]]),
   expectRevert("finalize-zero-result-finalized-tender", "finalizeTender", [tenderId, zeroResult(), []]),
   expectRevert("create-zero-terms", "createTender", [zeroTerms]),
+  expectRevert("create-invalid-credential", "createTender", [invalidCredentialTerms]),
+  expectRevert("create-unsupported-feed", "createTender", [unsupportedFeedTerms]),
 ]);
-const cases = [close, request, receipts, finalize, create];
+const cases = [close, request, receipts, finalize, create, invalidCredential, unsupportedFeed];
 const assertions = Object.fromEntries(cases.map(({ name, reverted }) => [`${name}Reverted`, reverted]));
 const latestBlock = await client.getBlockNumber();
 const evidence = {
@@ -127,7 +168,7 @@ const evidence = {
     ...assertions,
   },
   blockers: [
-    "LIVE_INVALID_CREDENTIAL_AND_STALE_FTSO_STATE_NOT_CREATED",
+    "LIVE_STALE_FTSO_STATE_NOT_CREATED",
     "LIVE_PROXY_RESTART_AND_TWO_MACHINE_LOSS_NOT_RUN",
     "SAME_IDENTITY_TEE_RESTART_NOT_SUPPORTED_BY_CURRENT_SIMULATED_RUNTIME",
   ],
