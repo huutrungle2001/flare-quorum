@@ -1,9 +1,9 @@
 # VeilBid Flare Championship Execution Plan
 
-> Status: Phase 0 and Gate 0 pass with three stable Railway FCC origins and
-> three independently registered simulated TEE identities in `PRODUCTION` on
-> Coston2. Phase 1 foundation code is local and tested; Gate A remains open
-> until a live registered FCC action result is verified end to end.
+> Status: Phase 0, Gate 0, and Gate A pass on Coston2. Three stable Railway FCC
+> origins and three independently registered simulated TEE identities are in
+> `PRODUCTION`; a domain-bound `PING_V1` result has been verified from a
+> registered TEE with fresh-process recovery. Gates B–E remain open.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -125,7 +125,7 @@ product code depends on it.
   verify its runtime plus both live manager/registry constructor bindings.
   Keep V1 unregistered and use the tested constant-time V2 replacement for the
   fresh Gate-A registration.
-- [ ] Send and verify a domain-correct Coston2 result.
+- [x] Send and verify a domain-correct Coston2 result.
 - [x] Implement private bid ingress through the supported proxy/TEE path (local
   loopback crypto client and sealed store; live proxy proof remains open).
 - [x] Return and verify one TEE-signed `BidReceipt` in the local extension

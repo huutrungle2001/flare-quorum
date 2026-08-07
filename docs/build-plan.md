@@ -1,8 +1,9 @@
 # VeilBid Flare Championship Build Plan
 
-> Status: Phase 0 and Gate 0 pass with three registered Coston2 FCC machines.
-> Product scope and architecture are decided; the registered Gate-A action and
-> complete Coston2 VeilBid lifecycle have not passed yet.
+> Status: Phase 0, Gate 0, and Gate A pass with three registered Coston2 FCC
+> machines and a verified domain-bound `PING_V1` result. Product scope and
+> architecture are decided; private ingress and the complete Coston2 VeilBid
+> lifecycle have not passed yet.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.

@@ -1,46 +1,54 @@
 {
   "schemaVersion": 1,
   "gate": "A",
-  "status": "IN_PROGRESS",
-  "recordedAt": "2026-08-03T17:37:34.210Z",
-  "sourceCommit": "e48e04d11a007eb307e118913d9e1fb7dd0fc60a",
+  "status": "PASSED",
+  "recordedAt": "2026-08-07T15:27:40.595Z",
+  "sourceCommit": "7cc27cf371e5dc3dc22e490d5bc58da03948d569",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "blockNumber": "33588101",
-    "blockTimestamp": 1785778615,
-    "blockHash": "0xa4179a9eeebceee58806754cccc5fc8965e09232ab4a1646062e24b32c5617cf"
+    "blockNumber": "33745987",
+    "blockTimestamp": 1786116480
   },
   "publicIdentifiers": {
-    "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
-    "foundationSender": "0x44A322A45e8D796d890271209D59d529501113B9",
-    "deploymentTransaction": "0x4bb293f3bc2ed3653d28482a8acf56d04a932b5e30672b3f1b598f37e8facb00",
-    "deploymentGasUsed": "557021",
-    "runtimeCodeSize": 2306,
-    "runtimeCodeHash": "0x059735f55c7c8df15e4c73b707f7cb772f03804aa4137f01e2acc76a363e7971",
-    "teeExtensionRegistry": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
-    "teeMachineRegistry": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
-    "extensionId": "0"
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "foundationSender": "0xf522b863fb19496D21ac7D0D1d71435C1DDc2EdE",
+    "extensionId": "66007",
+    "teeId": "0x4bFf0cc88768a04e4137125A84c14EbE63C86312",
+    "proxyUrl": "https://veilbid-flare-fcc-2-production.up.railway.app",
+    "requestTransaction": "0x1dcb49233cd03f96fee7570cfcf2c9f7e63cc7198449a5e86318286e9382cce7",
+    "requestBlock": "33745987",
+    "instructionId": "0x3c3dea7b1ea7b0f052703c44624d81e4338823b9c22d5bd6e081fd262f349d6e",
+    "actionResultHash": "0xaee745ad242a14d91f93648b62d9de1c3fc851da86ed94a330487098b54f4b33",
+    "signingDigest": "0x2fcb9ba988f076b24f9a01846622c84d2f9883b2c3ecad7f6ebb3fdc7e226086",
+    "bindingHash": "0x833e495bf07c757aa362307698bc3aaf75ffbd38ec9dce3b6042d0b6ab95dd64",
+    "expectedBindingHash": "0x833e495bf07c757aa362307698bc3aaf75ffbd38ec9dce3b6042d0b6ab95dd64",
+    "submissionTag": "threshold",
+    "status": 1,
+    "extensionVersion": "0.2.2",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "platform": "0x544553545f504c4154464f524d00000000000000000000000000000000000000",
+    "feeWei": "1000000"
   },
   "assertions": {
-    "deploymentTransactionSucceeded": true,
-    "chainIdMatches": true,
-    "constructorRegistryBindingsMatch": true,
-    "runtimeLengthMatchesArtifact": true,
-    "runtimeHashMatchesArtifactWithImmutables": true,
-    "freshExtensionConfigured": false,
-    "registeredTeeResultRetrieved": false,
-    "registeredTeeResultVerifiedOnChain": false,
-    "freshProcessRecoveryVerified": false
+    "dispatchTransactionSucceeded": true,
+    "instructionBoundToExtension": true,
+    "instructionOperationMatches": true,
+    "resultRetrieved": true,
+    "resultStatusSuccess": true,
+    "resultBindingMatches": true,
+    "signingDomainVerified": true,
+    "signerRegisteredProduction": true,
+    "signerExtensionMatches": true,
+    "signerUrlMatches": true,
+    "signerCodeHashMatches": true,
+    "signerPlatformMatches": true,
+    "wrongBindingRejected": true,
+    "freshProcessRecoveryVerified": true
   },
-  "blockers": [
-    "FRESH_EXTENSION_NOT_REGISTERED",
-    "PRODUCTION_TEE_NOT_REGISTERED",
-    "FCC_RESULT_NOT_AVAILABLE"
-  ],
   "notes": [
-    "This is a live Coston2 contract deployment, not a Gate A pass.",
-    "No extension ID has been attached and no TEE result has been requested or accepted.",
-    "No RPC URL, deployment key, signature, bid payload, or credential is recorded."
+    "This evidence records a public-safe PING_V1 FCC result and its TEE signer mapping on Coston2.",
+    "The extension runs in SIMULATED_TEE mode; this does not claim hardware-backed attestation.",
+    "No raw ActionResponse, signature, private key, credential, bid payload, or proxy/indexer secret is recorded."
   ]
 }
