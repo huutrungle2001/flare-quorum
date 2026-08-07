@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "suite": "coston2-live-negative-eth-calls",
   "status": "PARTIAL",
-  "recordedAt": "2026-08-07T23:26:49.653Z",
-  "sourceCommit": "9f76a7e3ca5af5f9b779ee6793b7e345001b6f59",
+  "recordedAt": "2026-08-07T23:44:09.281Z",
+  "sourceCommit": "bf753c5ea0133d22e2ed7e9948849864d3559391",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "observedBlock": "33759023",
+    "observedBlock": "33759537",
     "rpcSource": "official-public-coston2-rpc"
   },
   "publicIdentifiers": {
@@ -50,6 +50,21 @@
       "name": "create-unsupported-feed",
       "functionName": "createTender",
       "reverted": true
+    },
+    {
+      "name": "create-zero-code-version",
+      "functionName": "createTender",
+      "reverted": true
+    },
+    {
+      "name": "create-duplicate-tee",
+      "functionName": "createTender",
+      "reverted": true
+    },
+    {
+      "name": "create-foreign-extension",
+      "functionName": "createTender",
+      "reverted": true
     }
   ],
   "assertions": {
@@ -63,7 +78,10 @@
     "finalize-zero-result-finalized-tenderReverted": true,
     "create-zero-termsReverted": true,
     "create-invalid-credentialReverted": true,
-    "create-unsupported-feedReverted": true
+    "create-unsupported-feedReverted": true,
+    "create-zero-code-versionReverted": true,
+    "create-duplicate-teeReverted": true,
+    "create-foreign-extensionReverted": true
   },
   "blockers": [
     "LIVE_STALE_FTSO_STATE_NOT_CREATED",
@@ -72,7 +90,7 @@
   ],
   "notes": [
     "Every case is an eth_call against the verified Coston2 market; no signer, gas, or state mutation was used.",
-    "Terminal tender guards and zero-term validation are live negative observations, not a replacement for stateful fault injection.",
+    "Terminal tender guards, invalid policy, code-version, extension, and duplicate-machine validation are live negative observations, not a replacement for stateful fault injection.",
     "No bid plaintext, ciphertext, proof body, raw signature, credential, private key, or provider secret is read or written."
   ]
 }

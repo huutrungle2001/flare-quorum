@@ -130,7 +130,14 @@ const invalidCredentialTerms = publicTerms(latest.timestamp, {
 const unsupportedFeedTerms = publicTerms(latest.timestamp, {
   allowUsd: false,
 });
-const [close, request, receipts, finalize, create, invalidCredential, unsupportedFeed] = await Promise.all([
+const invalidCodeTerms = publicTerms(latest.timestamp);
+invalidCodeTerms[4] = zeroBytes32();
+const duplicateTeeTerms = publicTerms(latest.timestamp);
+duplicateTeeTerms[5] = [...duplicateTeeTerms[5]];
+duplicateTeeTerms[5][2] = duplicateTeeTerms[5][0];
+const foreignExtensionTerms = publicTerms(latest.timestamp);
+foreignExtensionTerms[3] = 1n;
+const [close, request, receipts, finalize, create, invalidCredential, unsupportedFeed, invalidCode, duplicateTee, foreignExtension] = await Promise.all([
   expectRevert("close-finalized-tender", "closeTender", [tenderId]),
   expectRevert("request-selection-finalized-tender", "requestSelection", [tenderId], 1_000_000n),
   expectRevert("submit-empty-receipts-finalized-tender", "submitBidReceipts", [tenderId, [zeroReceipt, zeroReceipt, zeroReceipt], ["0x", "0x", "0x"]]),
@@ -138,8 +145,11 @@ const [close, request, receipts, finalize, create, invalidCredential, unsupporte
   expectRevert("create-zero-terms", "createTender", [zeroTerms]),
   expectRevert("create-invalid-credential", "createTender", [invalidCredentialTerms]),
   expectRevert("create-unsupported-feed", "createTender", [unsupportedFeedTerms]),
+  expectRevert("create-zero-code-version", "createTender", [invalidCodeTerms]),
+  expectRevert("create-duplicate-tee", "createTender", [duplicateTeeTerms]),
+  expectRevert("create-foreign-extension", "createTender", [foreignExtensionTerms]),
 ]);
-const cases = [close, request, receipts, finalize, create, invalidCredential, unsupportedFeed];
+const cases = [close, request, receipts, finalize, create, invalidCredential, unsupportedFeed, invalidCode, duplicateTee, foreignExtension];
 const assertions = Object.fromEntries(cases.map(({ name, reverted }) => [`${name}Reverted`, reverted]));
 const latestBlock = await client.getBlockNumber();
 const evidence = {
@@ -174,7 +184,7 @@ const evidence = {
   ],
   notes: [
     "Every case is an eth_call against the verified Coston2 market; no signer, gas, or state mutation was used.",
-    "Terminal tender guards and zero-term validation are live negative observations, not a replacement for stateful fault injection.",
+    "Terminal tender guards, invalid policy, code-version, extension, and duplicate-machine validation are live negative observations, not a replacement for stateful fault injection.",
     "No bid plaintext, ciphertext, proof body, raw signature, credential, private key, or provider secret is read or written.",
   ],
 };
