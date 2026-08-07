@@ -54,6 +54,11 @@ const teeManagerPublicKeyAbi = [{
 let currentPhase = "startup";
 let lastSafeMarker = "startup";
 
+function mark(value) {
+  lastSafeMarker = value;
+  if (process.env.FCC_GATE_G_VERBOSE === "1") console.error(`[gate-g] ${value}`);
+}
+
 function safeJson(value) {
   return JSON.stringify(value, (_key, item) => typeof item === "bigint" ? item.toString() : item);
 }
@@ -112,11 +117,11 @@ async function connectWithTimeout(client) {
 async function submitPayment(wallet, amountDrops, memoData) {
   const client = new Client(xrplWebsocketUrl);
   let stage = "connect";
-  lastSafeMarker = "xrpl-connect";
+  mark("xrpl-connect");
   try {
     await connectWithTimeout(client);
     stage = "await-faucet-funding";
-    lastSafeMarker = "xrpl-await-faucet-funding";
+    mark("xrpl-await-faucet-funding");
     let funded = false;
     for (let attempt = 0; attempt < 20; attempt += 1) {
       try {
@@ -137,7 +142,7 @@ async function submitPayment(wallet, amountDrops, memoData) {
     }
     if (!funded) throw new Error("FCC_GATE_G_XRPL_FAUCET_NOT_SETTLED");
     stage = "autofill";
-    lastSafeMarker = "xrpl-autofill";
+    mark("xrpl-autofill");
     const prepared = await client.autofill({
       TransactionType: "Payment",
       Account: wallet.address,
@@ -146,7 +151,7 @@ async function submitPayment(wallet, amountDrops, memoData) {
       Memos: [{ Memo: { MemoData: memoData.slice(2).toUpperCase() } }],
     });
     stage = "submit";
-    lastSafeMarker = "xrpl-submit";
+    mark("xrpl-submit");
     const signed = wallet.sign(prepared);
     const submitted = await client.submitAndWait(signed.tx_blob);
     const result = submitted?.result;
@@ -161,7 +166,7 @@ async function submitPayment(wallet, amountDrops, memoData) {
     return `0x${result.hash.toLowerCase()}`;
   } catch (error) {
     const errorName = String(error?.name ?? "unknown").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "unknown";
-    lastSafeMarker = `${lastSafeMarker}-${errorName}`;
+    mark(`${lastSafeMarker}-${errorName}`);
     if (error instanceof Error && /^FCC_GATE_G_/.test(error.message)) throw error;
     const message = String(error?.message ?? "");
     if (/tecUNFUNDED|insufficient|unfunded/i.test(message)) {
@@ -238,7 +243,7 @@ async function main() {
 
   const xrplWallet = Wallet.generate();
   currentPhase = "xrpl-faucet";
-  lastSafeMarker = "xrpl-faucet";
+  mark("xrpl-faucet");
   const faucetTransactionId = await faucet(xrplWallet.address);
   const executorKey = generatePrivateKey();
   const env = {
@@ -318,7 +323,7 @@ async function main() {
   process.env.FCC_GATE_G_PAYMENT_ADDRESS = network.directMintingPaymentAddress;
   currentPhase = "xrpl-payment";
   const xrplTransactionId = await submitPayment(xrplWallet, quote.paymentAmountUBA, plan.memoData);
-  lastSafeMarker = "job-parse";
+  mark("job-parse");
   let job;
   const rawJob = {
       version: 1,
@@ -346,12 +351,12 @@ async function main() {
   }
   const executor = new FlareFundingExecutor(config, fundingChain, {
     onStage: (stage) => {
-      lastSafeMarker = `executor-${stage}`;
+      mark(`executor-${stage}`);
     },
   });
   currentPhase = "fdc-smart-account-execution";
   const executeFunding = async () => {
-    lastSafeMarker = "executor";
+    mark("executor");
     try {
       return await executor.execute(job);
     } catch (error) {
@@ -373,14 +378,14 @@ async function main() {
   }
   if (outcome.outcome !== "executed") throw new Error("FCC_GATE_G_DIRECT_MINT_NOT_EXECUTED");
   currentPhase = "smart-account-settlement-checks";
-  lastSafeMarker = "settlement-read-tender";
+  mark("settlement-read-tender");
   const tender = await publicClient.readContract({ address: market, abi: veilBidFlareMarketAbi, functionName: "getTender", args: [outcome.tenderId] });
-  lastSafeMarker = "settlement-read-balance";
+  mark("settlement-read-balance");
   const ftestXrpBalance = await publicClient.readContract({ address: network.fTestXrp, abi: [{ type: "function", name: "balanceOf", stateMutability: "view", inputs: [{ name: "owner", type: "address" }], outputs: [{ name: "", type: "uint256" }] }], functionName: "balanceOf", args: [market] });
   const tenderBuyer = getAddress(field(tender, "buyer", 0));
   const ceiling = field(tender, "publicCeilingXrp", 3);
   const escrowIncrease = ftestXrpBalance - ftestXrpBalanceBefore;
-  lastSafeMarker = "settlement-assertions";
+  mark("settlement-assertions");
   if (
     !isAddressEqual(tenderBuyer, personalAccount) ||
     ceiling !== terms.scoringPolicy.ceilingXrpMicros ||
@@ -389,7 +394,7 @@ async function main() {
     throw new Error("FCC_GATE_G_TENDER_ESCROW_INVALID");
   }
   const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
-  lastSafeMarker = "evidence-build";
+  mark("evidence-build");
   const evidence = {
     schemaVersion: 1,
     gate: "G",
@@ -456,7 +461,7 @@ async function main() {
     ],
   };
   mkdirSync(resolve(root, "evidence/coston2"), { recursive: true });
-  lastSafeMarker = "evidence-write";
+  mark("evidence-write");
   writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
   mkdirSync(resolve(root, ".local/fcc"), { recursive: true, mode: 0o700 });
   writeFileSync(statePath, `${JSON.stringify({ status: "PASSED", tenderId: outcome.tenderId.toString(), directMintingTransactionHash: outcome.directMintingTransactionHash }, null, 2)}\n`, { mode: 0o600, flag: "wx" });
