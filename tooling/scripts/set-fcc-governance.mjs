@@ -35,7 +35,25 @@ const governanceAbi = parseAbi([
 ]);
 
 const root = resolve(import.meta.dirname, "../..");
-const evidencePath = resolve(root, "evidence/coston2/fcc-governance.json");
+
+function evidenceFilePath(value, fallback, variableName) {
+  const relativePath = String(value ?? fallback).trim();
+  if (!relativePath || relativePath.startsWith("/") || relativePath.split("/").includes("..")) {
+    throw new Error(`${variableName}_INVALID`);
+  }
+  return resolve(root, relativePath);
+}
+
+const registrationEvidencePath = evidenceFilePath(
+  process.env.FCC_GOVERNANCE_REGISTRATION_EVIDENCE_PATH,
+  "evidence/coston2/fcc-extension-registration.json",
+  "FCC_GOVERNANCE_REGISTRATION_EVIDENCE_PATH",
+);
+const evidencePath = evidenceFilePath(
+  process.env.FCC_GOVERNANCE_EVIDENCE_PATH,
+  "evidence/coston2/fcc-governance.json",
+  "FCC_GOVERNANCE_EVIDENCE_PATH",
+);
 
 function secureRpcUrl(value) {
   try {
@@ -83,10 +101,7 @@ async function governanceState(client, manager, extensionId, blockNumber) {
 async function main() {
   const execute = process.argv.includes("--execute");
   const foundations = readFoundationManifest(root);
-  const registration = JSON.parse(readFileSync(
-    resolve(root, "evidence/coston2/fcc-extension-registration.json"),
-    "utf8",
-  ));
+  const registration = JSON.parse(readFileSync(registrationEvidencePath, "utf8"));
   const codeVersion = JSON.parse(readFileSync(
     resolve(root, "evidence/coston2/fcc-code-version.json"),
     "utf8",
@@ -196,7 +211,12 @@ async function main() {
       abi: governanceAbi,
       eventName: "NewTeeGovernanceSet",
       args: { extensionId, governanceHash: desired.hash },
-      fromBlock: BigInt(registration.publicIdentifiers.registrationBlock),
+      fromBlock: BigInt(
+        registration.publicIdentifiers.registrationBlock ??
+        registration.network?.registrationBlock ??
+        registration.network?.blockNumber ??
+        0,
+      ),
       toBlock: "latest",
       strict: true,
     });

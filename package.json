@@ -79,6 +79,8 @@
     "flare:code-version:allow": "node --env-file-if-exists=.env.local tooling/scripts/allow-fcc-code-version.mjs --execute",
     "flare:governance:preflight": "node --env-file-if-exists=.env.local tooling/scripts/set-fcc-governance.mjs",
     "flare:governance:set": "node --env-file-if-exists=.env.local tooling/scripts/set-fcc-governance.mjs --execute",
+    "flare:market:governance:preflight": "FCC_GOVERNANCE_REGISTRATION_EVIDENCE_PATH=evidence/coston2/fcc-market-extension-registration.json FCC_GOVERNANCE_EVIDENCE_PATH=evidence/coston2/fcc-market-governance.json node --env-file-if-exists=.env.local tooling/scripts/set-fcc-governance.mjs",
+    "flare:market:governance:set": "FCC_GOVERNANCE_REGISTRATION_EVIDENCE_PATH=evidence/coston2/fcc-market-extension-registration.json FCC_GOVERNANCE_EVIDENCE_PATH=evidence/coston2/fcc-market-governance.json node --env-file-if-exists=.env.local tooling/scripts/set-fcc-governance.mjs --execute",
     "flare:proxy:image:build": "node tooling/scripts/build-fcc-proxy-image.mjs --build --write",
     "flare:proxy:image:verify": "node tooling/scripts/build-fcc-proxy-image.mjs --write",
     "flare:registration:image:build": "node tooling/scripts/build-fcc-registration-image.mjs --build --write",
