@@ -18,6 +18,7 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
   buildMintAndFundPlan,
   quoteSmartAccountDirectMinting,
+  teePublicKeyFingerprint,
   veilBidFlareMarketAbi,
 } from "../../packages/flare-bindings/dist/index.js";
 import { parseFlareFundingJob } from "../../apps/relay/dist/flare-funding-job.js";
@@ -39,6 +40,16 @@ const chain = {
   rpcUrls: { default: { http: ["https://coston2-api.flare.network/ext/C/rpc"] } },
 };
 const zeroHash = `0x${"00".repeat(32)}`;
+const teeManagerPublicKeyAbi = [{
+  type: "function",
+  name: "getPublicKey",
+  stateMutability: "view",
+  inputs: [{ name: "teeId", type: "address" }],
+  outputs: [{ name: "", type: "tuple", components: [
+    { name: "x", type: "bytes32" },
+    { name: "y", type: "bytes32" },
+  ] }],
+}];
 let currentPhase = "startup";
 let lastSafeMarker = "startup";
 
@@ -154,7 +165,7 @@ async function submitPayment(wallet, amountDrops, memoData) {
   }
 }
 
-function termsFor({ extensionId, codeHash, machines, vendor, bidDeadline }) {
+function termsFor({ extensionId, codeHash, machines, teeKeyFingerprints, vendor, bidDeadline }) {
   const scoringPolicy = {
     schemaVersion: 1,
     ceilingXrpMicros: 1_000_000n,
@@ -177,7 +188,7 @@ function termsFor({ extensionId, codeHash, machines, vendor, bidDeadline }) {
     extensionId,
     codeVersion: codeHash,
     teeIds: machines.map(({ teeId }) => getAddress(teeId)),
-    teeKeyFingerprints: machines.map(({ publicKeyFingerprintSha256 }) => `0x${publicKeyFingerprintSha256.padStart(64, "0")}`),
+    teeKeyFingerprints,
   };
 }
 
@@ -253,6 +264,22 @@ async function main() {
     extensionId,
     codeHash,
     machines,
+    teeKeyFingerprints: await Promise.all(machines.map(async ({ teeId }) => {
+      const publicKey = await publicClient.readContract({
+        address: await publicClient.readContract({
+          address: market,
+          abi: veilBidFlareMarketAbi,
+          functionName: "teeManager",
+        }),
+        abi: teeManagerPublicKeyAbi,
+        functionName: "getPublicKey",
+        args: [getAddress(teeId)],
+      });
+      return teePublicKeyFingerprint({
+        x: field(publicKey, "x", 0),
+        y: field(publicKey, "y", 1),
+      });
+    })),
     vendor: vendorAccount.address,
     bidDeadline: block.timestamp + 7_200n,
   });
