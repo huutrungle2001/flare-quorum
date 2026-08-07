@@ -67,6 +67,7 @@ const zeroHash = `0x${"00".repeat(32)}`;
 const zeroAddress = "0x0000000000000000000000000000000000000000";
 const xrpUsdFeedId = "0x015852502f55534400000000000000000000000000";
 let currentPhase = "startup";
+let currentTransactionHash = null;
 
 function required(value, code) {
   if (typeof value !== "string" || value.trim() === "") throw new Error(code);
@@ -216,6 +217,7 @@ async function writeContract({ client, wallet, account, address, abi, functionNa
     ...(gas === undefined ? {} : { gas }),
   });
   const hash = await wallet.writeContract(simulation.request);
+  currentTransactionHash = hash;
   const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 1 });
   if (receipt.status !== "success") throw new Error(`FCC_MARKET_${functionName.toUpperCase()}_FAILED`);
   return { hash, receipt };
@@ -224,6 +226,7 @@ async function writeContract({ client, wallet, account, address, abi, functionNa
 async function writeEncodedTransaction({ client, wallet, account, to, data, gas, code, preflight = true }) {
   if (preflight) await client.call({ account, to, data, gas });
   const hash = await wallet.sendTransaction({ account, to, data, gas });
+  currentTransactionHash = hash;
   const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 1 });
   if (receipt.status !== "success") throw new Error(code);
   return { hash, receipt };
@@ -610,6 +613,12 @@ try {
 } catch (error) {
   const rawCode = error instanceof Error ? error.message : "";
   const code = /^FCC_MARKET_[A-Z0-9_]+$/.test(rawCode) ? rawCode : "FCC_MARKET_LIFECYCLE_FAILED";
-  console.error(JSON.stringify({ gate: "C-E-F", status: "FAILED", phase: currentPhase, code }));
+  console.error(JSON.stringify({
+    gate: "C-E-F",
+    status: "FAILED",
+    phase: currentPhase,
+    code,
+    ...(currentTransactionHash ? { transactionHash: currentTransactionHash } : {}),
+  }));
   process.exitCode = 1;
 }
