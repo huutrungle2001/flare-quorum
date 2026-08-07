@@ -40,6 +40,7 @@ const chain = {
 };
 const zeroHash = `0x${"00".repeat(32)}`;
 let currentPhase = "startup";
+let lastSafeMarker = "startup";
 
 function safeJson(value) {
   return JSON.stringify(value, (_key, item) => typeof item === "bigint" ? item.toString() : item);
@@ -91,9 +92,11 @@ async function faucet(destination) {
 async function submitPayment(wallet, amountDrops, memoData) {
   const client = new Client(xrplWebsocketUrl);
   let stage = "connect";
+  lastSafeMarker = "xrpl-connect";
   try {
     await client.connect();
     stage = "await-faucet-funding";
+    lastSafeMarker = "xrpl-await-faucet-funding";
     let funded = false;
     for (let attempt = 0; attempt < 20; attempt += 1) {
       try {
@@ -114,6 +117,7 @@ async function submitPayment(wallet, amountDrops, memoData) {
     }
     if (!funded) throw new Error("FCC_GATE_G_XRPL_FAUCET_NOT_SETTLED");
     stage = "autofill";
+    lastSafeMarker = "xrpl-autofill";
     const prepared = await client.autofill({
       TransactionType: "Payment",
       Account: wallet.address,
@@ -122,6 +126,7 @@ async function submitPayment(wallet, amountDrops, memoData) {
       Memos: [{ Memo: { MemoData: memoData.slice(2).toUpperCase() } }],
     });
     stage = "submit";
+    lastSafeMarker = "xrpl-submit";
     const signed = wallet.sign(prepared);
     const submitted = await client.submitAndWait(signed.tx_blob);
     const result = submitted?.result;
@@ -133,6 +138,8 @@ async function submitPayment(wallet, amountDrops, memoData) {
     ) throw new Error("FCC_GATE_G_XRPL_PAYMENT_FAILED");
     return result.hash.toLowerCase();
   } catch (error) {
+    const errorName = String(error?.name ?? "unknown").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "unknown";
+    lastSafeMarker = `${lastSafeMarker}-${errorName}`;
     if (error instanceof Error && /^FCC_GATE_G_/.test(error.message)) throw error;
     const message = String(error?.message ?? "");
     if (/tecUNFUNDED|insufficient|unfunded/i.test(message)) {
@@ -376,6 +383,6 @@ try {
 } catch (error) {
   const rawCode = error instanceof Error ? error.message : "";
   const code = /^FCC_GATE_G_[A-Z0-9_]+$/.test(rawCode) ? rawCode : "FCC_GATE_G_OPERATION_FAILED";
-  console.error(JSON.stringify({ gate: "G", status: "FAILED", phase: currentPhase, code }));
+  console.error(JSON.stringify({ gate: "G", status: "FAILED", phase: currentPhase, code, diagnostic: lastSafeMarker }));
   process.exitCode = 1;
 }
