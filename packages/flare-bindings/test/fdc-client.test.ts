@@ -101,6 +101,18 @@ test("decodes the DA raw response and treats a pending response as non-success",
     }),
   });
   assert.equal(pending, null);
+
+  const indexing = await retrieveXrpPaymentProof({
+    daLayerBaseUrl: "https://ctn2-data-availability.flare.network",
+    votingRoundId: 700n,
+    abiEncodedRequest: "0x1234",
+  }, {
+    fetchImplementation: async () => new Response(
+      JSON.stringify({ error: "attestation request not found" }),
+      { status: 400, headers: { "content-type": "application/json" } },
+    ),
+  });
+  assert.equal(indexing, null);
 });
 
 test("calculates the request voting round from the mined block timestamp", () => {

@@ -215,6 +215,15 @@ export async function retrieveXrpPaymentProof(
     options,
   );
   if (response.status === 404 || response.status === 202) return null;
+  // The current public Coston2 DA API uses HTTP 400 while an attestation
+  // result is still being indexed. Treat only its stable not-found marker as
+  // pending; all other client errors remain fail-closed.
+  if (
+    response.status === 400 &&
+    record(response.value).error === "attestation request not found"
+  ) {
+    return null;
+  }
   if (response.status !== 200) throw new Error("FDC_DA_UNAVAILABLE");
   const body = record(response.value);
   if (body.response_hex === undefined) return null;

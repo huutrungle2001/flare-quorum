@@ -228,6 +228,7 @@ async function main() {
     FLARE_FUNDING_EXECUTOR_PRIVATE_KEY: executorKey,
     XRPL_TESTNET_RPC_URL: process.env.XRPL_TESTNET_RPC_URL?.trim() || "https://s.altnet.rippletest.net:51234",
     VERIFIER_API_KEY_TESTNET: process.env.VERIFIER_API_KEY_TESTNET?.trim() || publicVerifierApiKey,
+    COSTON2_DA_LAYER_API_KEY: process.env.COSTON2_DA_LAYER_API_KEY?.trim() || process.env.VERIFIER_API_KEY_TESTNET?.trim() || publicVerifierApiKey,
   };
   const config = loadFlareFundingConfig("execute", env);
   const fundingChain = new LiveFlareFundingChain(config);
