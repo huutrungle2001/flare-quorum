@@ -85,6 +85,7 @@
     "flare:registration:image:verify": "node tooling/scripts/build-fcc-registration-image.mjs --write",
     "flare:machines:preflight": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs",
     "flare:machines:register": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs --execute",
+    "flare:gate:a": "pnpm --filter @veilbid/flare-bindings build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-foundation-action.mjs --execute",
     "flare:tunnel:install": "node tooling/scripts/ensure-cloudflared.mjs --install",
     "flare:tunnel:check": "node tooling/scripts/ensure-cloudflared.mjs",
     "flare:mcp": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/operator-console build && node --env-file-if-exists=.env.local apps/console/dist/flare-mcp-stdio.js",
