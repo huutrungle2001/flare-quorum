@@ -1,0 +1,29 @@
+# Railway simulated FCC machine
+
+This image runs one Coston2 simulated FCC machine as three co-located
+processes: the pinned Redis queue, the pinned official `tee-proxy`, and the
+byte-identical VeilBid extension/`tee-node` binary. Deploy three independent
+Railway services from this image to obtain three stable HTTPS origins and
+three independently generated TEE identities.
+
+This is Coston2 feasibility infrastructure. It is not hardware attestation and
+must never be described as GCP Confidential Space or a production-security
+deployment.
+
+Secrets are supplied only as Railway runtime variables. The entrypoint renders
+the proxy config into a mode-0600 runtime file and does not print values.
+
+Required service variables:
+
+- `FCC_INDEXER_HOST`, `FCC_INDEXER_PORT`, `FCC_INDEXER_DATABASE`
+- `FCC_INDEXER_USER`, `FCC_INDEXER_PASSWORD`
+- `PROXY_PRIVATE_KEY`, `FCC_DIRECT_API_KEY`
+- `COSTON2_RPC_URL`
+- `INITIAL_OWNER`, `EXTENSION_ID`
+- `GOVERNANCE_SIGNERS`, `GOVERNANCE_THRESHOLD`
+- `RAILWAY_DOCKERFILE_PATH=/apps/fcc-extension/railway/Dockerfile`
+
+Attach a Railway volume at `/data` before registration. Upstream `tee-node`
+v0.0.23 creates a new simulated identity whenever its process starts, so any
+restart requires endpoint identity verification and re-registration. Do not
+redeploy a registered machine during the demo window.
