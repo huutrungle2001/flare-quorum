@@ -11,6 +11,7 @@ import { resolve } from "node:path";
 
 import {
   createPublicClient,
+  createWalletClient,
   getAddress,
   http,
   parseAbi,
@@ -22,6 +23,7 @@ import {
   inspectMachineRegistrationEndpoints,
   machineRegistrationEnvironment,
   registrationAddresses,
+  requiredMachineRouteUpdate,
 } from "../flare/fcc-machine-registration.mjs";
 import { normalizePrivateKey, readFoundationManifest } from "../flare/foundations.mjs";
 import { setLocalEnvironmentValues } from "../flare/local-fcc-secrets.mjs";
@@ -30,7 +32,9 @@ const managerAbi = parseAbi([
   "function getTeeMachineStatus(address) view returns (uint8)",
   "function getExtensionId(address) view returns (uint256)",
   "function getPublicKey(address) view returns ((bytes32 x,bytes32 y))",
+  "function getTeeMachine(address) view returns ((address teeId,address teeProxyId,string url))",
   "function getTeeMachineWithAttestationData(address) view returns ((address teeId,address initialTeeId,string url,bytes32 codeHash,bytes32 platform))",
+  "function updateTeeMachineSettings(address teeId,address teeProxyId,string url)",
 ]);
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 const environmentPath = resolve(repositoryRoot, ".env.local");
@@ -100,6 +104,44 @@ function publicPreflight(result, extraBlockers) {
   };
 }
 
+async function reconcileMachineRoute({ client, walletClient, account, manager, machine }) {
+  const record = await client.readContract({
+    address: manager,
+    abi: managerAbi,
+    functionName: "getTeeMachine",
+    args: [machine.teeId],
+  });
+  const update = requiredMachineRouteUpdate(record, machine);
+  if (!update) return;
+  const transactionHash = await walletClient.writeContract({
+    account,
+    address: manager,
+    abi: managerAbi,
+    functionName: "updateTeeMachineSettings",
+    args: [update.teeId, update.teeProxyId, update.url],
+  });
+  const receipt = await client.waitForTransactionReceipt({ hash: transactionHash });
+  if (receipt.status !== "success") throw new Error("FCC_MACHINE_ROUTE_UPDATE_REVERTED");
+  const verified = await client.readContract({
+    address: manager,
+    abi: managerAbi,
+    functionName: "getTeeMachine",
+    args: [machine.teeId],
+    blockNumber: receipt.blockNumber,
+  });
+  if (verified.url !== update.url || getAddress(verified.teeProxyId) !== update.teeProxyId) {
+    throw new Error("FCC_MACHINE_ROUTE_UPDATE_VERIFICATION_FAILED");
+  }
+  console.log(JSON.stringify({
+    event: "FCC_MACHINE_ROUTE_UPDATED",
+    machine: machine.machine,
+    teeId: update.teeId,
+    url: update.url,
+    transactionHash,
+    blockNumber: receipt.blockNumber.toString(),
+  }));
+}
+
 async function verifyOnchainMachines({ client, manager, extensionId, endpointResult }) {
   const blockNumber = await client.getBlockNumber();
   const machines = [];
@@ -142,10 +184,11 @@ try {
     extraBlockers.push("FCC_EXTENSION_ID_NOT_CONFIGURED");
   }
   if (!secureRpcUrl(rpcUrl)) extraBlockers.push("COSTON2_RPC_URL_INVALID");
+  let deploymentAccount;
   let deploymentKeyMatches = false;
   try {
-    deploymentKeyMatches = Boolean(deploymentKey) &&
-      privateKeyToAccount(deploymentKey).address === getAddress(manifest.network.declaredDeployer);
+    deploymentAccount = deploymentKey ? privateKeyToAccount(deploymentKey) : undefined;
+    deploymentKeyMatches = deploymentAccount?.address === getAddress(manifest.network.declaredDeployer);
   } catch {
     deploymentKeyMatches = false;
   }
@@ -173,8 +216,21 @@ try {
     const addressesPath = resolve(runtimeDirectory, "coston2-addresses.json");
     writeRegistrationAddresses(addressesPath, manifest);
     const binaryPath = extractRegistrationBinary(manifest.docker.teeRegistrationReleaseRecipe);
+    const manager = getAddress(manifest.contracts.flareTeeManager);
+    const client = createPublicClient({ transport: http(rpcUrl, { retryCount: 2, timeout: 20_000 }) });
+    const walletClient = createWalletClient({
+      account: deploymentAccount,
+      transport: http(rpcUrl, { retryCount: 2, timeout: 20_000 }),
+    });
 
     for (const machine of endpointResult.machines) {
+      await reconcileMachineRoute({
+        client,
+        walletClient,
+        account: deploymentAccount,
+        manager,
+        machine,
+      });
       const statePath = resolve(runtimeDirectory, `${machine.teeId.toLowerCase()}.state.json`);
       const execution = spawnSync(binaryPath, [
         "-a", addressesPath,
@@ -199,10 +255,9 @@ try {
       }
     }
 
-    const client = createPublicClient({ transport: http(rpcUrl, { retryCount: 2, timeout: 20_000 }) });
     const verification = await verifyOnchainMachines({
       client,
-      manager: getAddress(manifest.contracts.flareTeeManager),
+      manager,
       extensionId: BigInt(extensionIdHex),
       endpointResult,
     });

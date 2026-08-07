@@ -32,6 +32,18 @@ function securePublicUrl(value) {
   }
 }
 
+export function normalizeMachineOrigin(value) {
+  try {
+    const url = new URL(value);
+    if (url.pathname !== "/" || url.search || url.hash || url.username || url.password) {
+      return value;
+    }
+    return url.origin;
+  } catch {
+    return value;
+  }
+}
+
 function fixedHex(value) {
   const normalized = String(value ?? "").replace(/^0x/i, "").padStart(64, "0");
   if (!/^[0-9a-f]{64}$/i.test(normalized)) throw new Error("FCC_MACHINE_PUBLIC_KEY_INVALID");
@@ -155,16 +167,30 @@ export async function inspectMachineRegistrationEndpoints({
 }
 
 export function machineRegistrationEnvironment(environment = process.env) {
-  const configuredControlUrls = list(environment.FCC_PROXY_CONTROL_URLS);
+  const publicUrls = list(environment.FLARE_FCC_PROXY_URLS).map(normalizeMachineOrigin);
+  const configuredControlUrls = list(environment.FCC_PROXY_CONTROL_URLS).map(normalizeMachineOrigin);
+  const configuredLocalUrls = list(environment.FCC_PROXY_LOCAL_URLS).map(normalizeMachineOrigin);
   return {
-    publicUrls: list(environment.FLARE_FCC_PROXY_URLS),
+    publicUrls,
     controlUrls: configuredControlUrls.length > 0
       ? configuredControlUrls
-      : list(environment.FCC_PROXY_LOCAL_URLS).length > 0
-        ? list(environment.FCC_PROXY_LOCAL_URLS)
-        : ["http://127.0.0.1:6674/", "http://127.0.0.1:6675/", "http://127.0.0.1:6676/"],
+      : configuredLocalUrls.length > 0
+        ? configuredLocalUrls
+        : ["http://127.0.0.1:6674", "http://127.0.0.1:6675", "http://127.0.0.1:6676"],
     normalProxyUrl:
       environment.NORMAL_PROXY_URL?.trim() || "https://tee-proxy-coston2-1.flare.rocks/",
+  };
+}
+
+export function requiredMachineRouteUpdate(record, machine) {
+  const teeId = getAddress(record.teeId);
+  if (teeId === "0x0000000000000000000000000000000000000000") return null;
+  const desiredUrl = normalizeMachineOrigin(machine.publicUrl);
+  if (record.url === desiredUrl) return null;
+  return {
+    teeId,
+    teeProxyId: getAddress(record.teeProxyId),
+    url: desiredUrl,
   };
 }
 

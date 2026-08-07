@@ -141,6 +141,11 @@ setting `FCC_PROXY_CONTROL_URLS`. If a URL or identity rotates, update
 configuration and re-run the supported post-build registration flow before any
 test is accepted.
 
+Register each machine with the bare origin and no trailing slash, for example
+`https://tee.example` rather than `https://tee.example/`. The relay appends
+`/instruction`; a trailing slash can produce a redirecting `//instruction`
+route that changes the request method and prevents the TEE from receiving it.
+
 Championship 2-of-3 operation requires one stable public origin and independent
 machine identity per registered TEE unless the supported infrastructure defines
 another routing model.

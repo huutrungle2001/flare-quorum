@@ -6,8 +6,10 @@ import {
   evaluateRegisteredMachine,
   inspectMachineRegistrationEndpoints,
   machineRegistrationEnvironment,
+  normalizeMachineOrigin,
   parseMachineInfo,
   registrationAddresses,
+  requiredMachineRouteUpdate,
 } from "../flare/fcc-machine-registration.mjs";
 
 const expected = {
@@ -75,6 +77,37 @@ test("uses three loopback proxy defaults without exposing configuration values",
   const result = machineRegistrationEnvironment({});
   assert.equal(result.controlUrls.length, 3);
   assert.equal(result.publicUrls.length, 0);
+});
+
+test("removes the root slash that would redirect FCC instruction POSTs", () => {
+  assert.equal(normalizeMachineOrigin("https://tee.example/"), "https://tee.example");
+  assert.equal(normalizeMachineOrigin("https://tee.example/path/"), "https://tee.example/path/");
+  const environment = machineRegistrationEnvironment({
+    FLARE_FCC_PROXY_URLS: "https://tee-1.example/,https://tee-2.example/,https://tee-3.example/",
+  });
+  assert.deepEqual(environment.publicUrls, [
+    "https://tee-1.example",
+    "https://tee-2.example",
+    "https://tee-3.example",
+  ]);
+});
+
+test("repairs only an existing machine whose registered route differs", () => {
+  const machine = { teeId: "0x1111111111111111111111111111111111111111", publicUrl: "https://tee.example/" };
+  assert.deepEqual(requiredMachineRouteUpdate({
+    teeId: machine.teeId,
+    teeProxyId: "0x2222222222222222222222222222222222222222",
+    url: "https://tee.example/",
+  }, machine), {
+    teeId: machine.teeId,
+    teeProxyId: "0x2222222222222222222222222222222222222222",
+    url: "https://tee.example",
+  });
+  assert.equal(requiredMachineRouteUpdate({
+    teeId: "0x0000000000000000000000000000000000000000",
+    teeProxyId: "0x0000000000000000000000000000000000000000",
+    url: "",
+  }, machine), null);
 });
 
 test("writes the exact address keys expected by the FCC registration client", () => {
