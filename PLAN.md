@@ -255,14 +255,15 @@ This is intentionally scheduled after the live protocol gates and before the
 judge-package UX pass. It improves buyer comprehension without changing the
 confidential bid or settlement boundary:
 
-- [ ] Add a structured Buyer Brief with title, category, public goal,
+- [x] Add a structured Buyer Brief with title, category, public goal,
   acceptance criteria, delivery deadline, budget/asset, vendor eligibility,
   scoring weights, and optional vendor questions.
-- [ ] Show a clear public/private map: brief and rules are public; bids,
+- [x] Show a clear public/private map: brief and rules are public; bids,
   private answers, credentials, and losing commercial terms remain inside FCC.
-- [ ] Commit the immutable `rulesHash` on-chain and explain it in the buyer and
-  evidence views so a buyer cannot silently change the rules after bidding.
-- [ ] Add judge-facing copy and examples that explain the procurement story in
+- [x] Commit the canonical brief hash plus immutable `rulesHash` on-chain and
+  explain both in the buyer and evidence views so a buyer cannot silently
+  change the rules after bidding.
+- [x] Add judge-facing copy and examples that explain the procurement story in
   one screen without weakening the fail-closed privacy claims.
 
 ### Phase 6 — security and release evidence

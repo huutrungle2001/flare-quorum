@@ -2,6 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it } from "vitest";
 import { FlareEvidenceWorkspace, FlareExplorerView } from "../src/flare/FlareRoom";
+import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
 import { PrimaryNavigation } from "../src/shell/PrimaryNavigation";
 import type { WalletController } from "../src/wallet/WalletPanel";
@@ -130,5 +131,15 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText(/Connect the winning Coston2 wallet/)).toBeInTheDocument();
     expect(screen.getByText(/never asks for an XRPL secret/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /APPROVE & REQUEST XRP REDEMPTION/i })).toBeNull();
+  });
+
+  it("renders the structured public brief before wallet authorization", () => {
+    render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} />);
+    expect(screen.getByLabelText(/Public title/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Category")).toBeInTheDocument();
+    expect(screen.getByLabelText("Public objective")).toBeInTheDocument();
+    expect(screen.getByLabelText("Acceptance criteria")).toBeInTheDocument();
+    expect(screen.getByLabelText("Optional vendor questions")).toBeInTheDocument();
+    expect(screen.getByText(/Brief and rules are public; bids are sealed/)).toBeInTheDocument();
   });
 });

@@ -2,9 +2,9 @@
 
 > Status: Product and architecture direction approved; the verified Coston2
 > market, FCC extension/quorum, FTestXRP settlement, Gate G XRP-native funding
-> evidence, hosted ingress, public/EVM role surfaces, and an official
-> amount-based redemption request are implemented. XRP browser
-> funding/recovery and user validation remain open.
+> evidence, hosted ingress, public/EVM role surfaces, the structured Buyer
+> Brief, and an official amount-based redemption request are implemented. XRP
+> browser funding/recovery and user validation remain open.
 
 ## 1. Product identity
 

@@ -61,6 +61,34 @@ function parseWeight(value: string, label: string): number {
   return parsed;
 }
 
+export type FlareBuyerBriefCategory = "software" | "design" | "marketing" | "operations" | "research";
+
+export interface FlareBuyerBriefInput {
+  title: string;
+  category: FlareBuyerBriefCategory;
+  objective: string;
+  acceptanceCriteria: string;
+  vendorQuestions: string;
+  bidDeadline: bigint;
+  approvedVendors: readonly Address[];
+}
+
+/** Hash the public brief deterministically; the brief itself never contains bid data. */
+export function hashFlareBuyerBrief(input: FlareBuyerBriefInput) {
+  const canonical = JSON.stringify({
+    schemaVersion: 1,
+    title: input.title.trim(),
+    category: input.category,
+    objective: input.objective.trim().replace(/\r\n/g, "\n"),
+    acceptanceCriteria: input.acceptanceCriteria.trim().replace(/\r\n/g, "\n"),
+    vendorQuestions: input.vendorQuestions.trim().replace(/\r\n/g, "\n"),
+    asset: "FTestXRP",
+    bidDeadline: input.bidDeadline.toString(),
+    approvedVendors: input.approvedVendors.map((vendor) => vendor.toLowerCase()),
+  });
+  return keccak256(stringToHex(canonical));
+}
+
 export function FlareBuyerWorkspace({
   wallet,
   onRefresh,
@@ -70,6 +98,10 @@ export function FlareBuyerWorkspace({
 }) {
   const toasts = useToasts();
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<FlareBuyerBriefCategory>("software");
+  const [objective, setObjective] = useState("");
+  const [acceptanceCriteria, setAcceptanceCriteria] = useState("");
+  const [vendorQuestions, setVendorQuestions] = useState("");
   const [ceiling, setCeiling] = useState("1");
   const [vendors, setVendors] = useState("");
   const [deadlineMinutes, setDeadlineMinutes] = useState("30");
@@ -104,6 +136,12 @@ export function FlareBuyerWorkspace({
       const amount = parseCeiling(ceiling);
       const metadata = title.trim();
       if (metadata.length < 3 || metadata.length > 160) throw new Error("Add a short public procurement title (3–160 characters).");
+      const briefObjective = objective.trim();
+      if (briefObjective.length < 20 || briefObjective.length > 1200) throw new Error("Describe the public outcome in 20–1200 characters.");
+      const briefAcceptance = acceptanceCriteria.trim();
+      if (briefAcceptance.length < 10 || briefAcceptance.length > 1200) throw new Error("Add acceptance criteria in 10–1200 characters.");
+      const briefQuestions = vendorQuestions.trim();
+      if (briefQuestions.length > 1200) throw new Error("Vendor questions must be at most 1200 characters.");
       const scoringPolicy = {
         schemaVersion: 1,
         ceilingXrpMicros: amount,
@@ -120,7 +158,15 @@ export function FlareBuyerWorkspace({
         requiredCredentials: [],
       } as const;
       const terms = {
-        metadataHash: keccak256(stringToHex(metadata)),
+        metadataHash: hashFlareBuyerBrief({
+          title: metadata,
+          category,
+          objective: briefObjective,
+          acceptanceCriteria: briefAcceptance,
+          vendorQuestions: briefQuestions,
+          bidDeadline: scoringPolicy.bidDeadline,
+          approvedVendors,
+        }),
         scoringPolicy,
         approvedVendors,
         extensionId: BigInt(coston2FlarePublicRelease.fcc.extensionId),
@@ -195,12 +241,16 @@ export function FlareBuyerWorkspace({
       <WalletPanel wallet={wallet} network="coston2" />
       <section className="evidence-panel flare-buyer-form" aria-label="Coston2 buyer tender composer">
         <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>Open a Coston2 tender</h2></div><span className="privacy-badge verified">FTestXRP / TESTNET</span></header>
-        <label>Public title<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small>Only its hash is committed in this release slice; the Buyer Brief clarity pass remains scheduled.</small></label>
+        <label>Public title<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small>The public brief is hashed into immutable metadata; bids remain outside the contract.</small></label>
         <div className="form-grid-two">
+          <label>Category<select value={category} onChange={(event) => setCategory(event.target.value as FlareBuyerBriefCategory)} disabled={busy}><option value="software">Software</option><option value="design">Design</option><option value="marketing">Marketing</option><option value="operations">Operations</option><option value="research">Research</option></select></label>
           <label>Escrow ceiling (FTestXRP)<input inputMode="decimal" value={ceiling} onChange={(event) => setCeiling(event.target.value)} disabled={busy} /></label>
           <label>Bid deadline (minutes)<input type="number" min={5} max={43200} value={deadlineMinutes} onChange={(event) => setDeadlineMinutes(event.target.value)} disabled={busy} /></label>
+          <label>Public objective<textarea value={objective} onChange={(event) => setObjective(event.target.value)} rows={4} maxLength={1200} placeholder="What outcome should the selected vendor deliver?" disabled={busy} /></label>
+          <label>Acceptance criteria<textarea value={acceptanceCriteria} onChange={(event) => setAcceptanceCriteria(event.target.value)} rows={4} maxLength={1200} placeholder="How will delivery be checked?" disabled={busy} /></label>
+          <label>Optional vendor questions<textarea value={vendorQuestions} onChange={(event) => setVendorQuestions(event.target.value)} rows={3} maxLength={1200} placeholder="What should every vendor answer?" disabled={busy} /></label>
           <label>Approved vendor addresses<textarea value={vendors} onChange={(event) => setVendors(event.target.value)} rows={3} placeholder="0x… (one or more, comma/newline separated)" disabled={busy} /></label>
-          <div className="form-hint"><strong>Rules are public; bids are sealed.</strong><br />The market records only the rules hash, ceiling, vendor allowlist, FCC binding, and lifecycle checkpoints.</div>
+          <div className="form-hint"><strong>Brief and rules are public; bids are sealed.</strong><br />The market records the canonical brief hash, ceiling, vendor allowlist, FCC binding, and lifecycle checkpoints.</div>
         </div>
         <div className="form-grid-three">
           <label>Price weight (bps)<input inputMode="numeric" value={priceWeight} onChange={(event) => setPriceWeight(event.target.value)} disabled={busy} /></label>
