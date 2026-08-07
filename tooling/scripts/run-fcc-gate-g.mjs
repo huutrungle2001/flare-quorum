@@ -74,7 +74,8 @@ async function faucet(destination) {
     body: JSON.stringify({ destination }),
     signal: AbortSignal.timeout(30_000),
   });
-  if (!response.ok) throw new Error("FCC_GATE_G_XRPL_FAUCET_FAILED");
+  if (response.status === 429) throw new Error("FCC_GATE_G_XRPL_FAUCET_RATE_LIMITED");
+  if (!response.ok) throw new Error(`FCC_GATE_G_XRPL_FAUCET_HTTP_${response.status}`);
   let body;
   try {
     body = await response.json();
@@ -218,6 +219,7 @@ async function main() {
 
   const xrplWallet = Wallet.generate();
   currentPhase = "xrpl-faucet";
+  lastSafeMarker = "xrpl-faucet";
   const faucetTransactionId = await faucet(xrplWallet.address);
   const executorKey = generatePrivateKey();
   const env = {
