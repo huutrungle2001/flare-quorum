@@ -106,6 +106,7 @@ function directMintFailureCode(error: unknown): string {
   const strings: string[] = [];
   const selectors: string[] = [];
   const nestedSelectors: string[] = [];
+  let hasEncodedCallFailure = false;
   const selectorNames: Record<string, string> = {
     "a5fa8d2b": "callfailed",
     "5c0dee5d": "personalaccountcallfailed",
@@ -141,6 +142,7 @@ function directMintFailureCode(error: unknown): string {
       // personal-account revert after a dynamic offset and length. Keep only
       // the nested selector; never surface the return-data body itself.
       if (selector === "a5fa8d2b" && body.length >= 8 + 64 + 64) {
+        hasEncodedCallFailure = true;
         const offset = Number.parseInt(body.slice(8, 8 + 64), 16);
         const lengthStart = 8 + offset * 2;
         if (Number.isSafeInteger(offset) && lengthStart + 64 <= body.length) {
@@ -198,6 +200,9 @@ function directMintFailureCode(error: unknown): string {
   }
   const nestedSelector = nestedSelectors[0];
   if (nestedSelector) return `DIRECT_MINT_REVERT_${nestedSelector.toUpperCase()}`;
+  if (knownError === "callfailed") {
+    return hasEncodedCallFailure ? "DIRECT_MINT_CALLFAILED_NO_NESTED_DATA" : "DIRECT_MINT_CALLFAILED_NO_PAYLOAD";
+  }
   if (knownError) return `DIRECT_MINT_${knownError.toUpperCase()}`;
   const selectorMarker = selectors[0];
   if (selectorMarker) return `DIRECT_MINT_REVERT_${selectorMarker.toUpperCase()}`;
