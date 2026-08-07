@@ -93,6 +93,7 @@
     "flare:verify:foundation": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/verify-flare-foundation-sender.mjs",
     "flare:deploy:market": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/deploy-flare-market.mjs",
     "flare:deploy:market:candidate": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/deploy-flare-market-candidate.mjs",
+    "flare:register:market-extension": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-market-extension.mjs",
     "flare:relay:health": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js health",
     "flare:relay:dry-run": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js dry-run",
     "flare:relay:once": "pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build && node --env-file-if-exists=.env.local apps/relay/dist/flare-cli.js once",
