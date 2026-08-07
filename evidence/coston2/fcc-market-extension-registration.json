@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "gate": "FCC_MARKET_EXTENSION_REGISTRATION",
+  "status": "REGISTERED_BOUND_CONFIGURATION_READY",
+  "recordedAt": "2026-08-07T15:51:03.718Z",
+  "sourceCommit": "7df4fda7413f7f4f829ea75b3b1a29da79c3f6ec",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33746794"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "sender": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
+    "extensionId": "66011",
+    "extensionIdHex": "0x00000000000000000000000000000000000000000000000000000000000101db",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "platform": "0x544553545f504c4154464f524d00000000000000000000000000000000000000",
+    "version": "v0.2.2",
+    "registrationTransaction": "0xcfc8c7b91028f68fb80558ac4489857f6c2ff575811606c809f0e5cbbe0c2fe8"
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "managerCodePresent": true,
+    "marketCodePresent": true,
+    "deployerMayRegister": true,
+    "publicExtensionRangeActive": true,
+    "codeHashPresent": true,
+    "platformIsSimulated": true,
+    "registrationSucceeded": true,
+    "extensionIdPublic": true,
+    "senderMatchesMarket": true,
+    "stateVerifierIsZero": true,
+    "machineOwnerAllowed": true,
+    "walletProjectOwnerAllowed": true,
+    "keyTypeSupported": true,
+    "codeHashPlatformSupported": true,
+    "versionMatches": true,
+    "platformMatches": true
+  },
+  "blockers": [
+    "PRODUCT_TEE_MACHINES_NOT_REGISTERED",
+    "GATES_C_E_NOT_PASSED"
+  ],
+  "notes": [
+    "The immutable VeilBidFlareMarket is the registered instructions sender for this product extension.",
+    "The three foundation machines remain bound to extension 66007; product machines are registered separately before tender creation.",
+    "No deployment key, proxy credential, attestation body, raw signature, or bid data is recorded."
+  ]
+}
