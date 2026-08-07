@@ -13,7 +13,8 @@ const binary = Buffer.alloc(64);
 binary.set([0x7f, 0x45, 0x4c, 0x46, 2, 1]);
 binary.writeUInt16LE(62, 18);
 const launchPolicy = [
-  "LOG_LEVEL", "PROXY_URL", "INITIAL_OWNER", "EXTENSION_ID", "CHAIN_URL",
+  "LOG_LEVEL", "PROXY_URL", "INITIAL_OWNER", "EXTENSION_ID", "CHAIN_ID", "CHAIN_URL",
+  "GOVERNANCE_SIGNERS", "GOVERNANCE_THRESHOLD",
   "MODE", "CONFIG_PORT", "SIGN_PORT", "EXTENSION_PORT", "SEALED_STORE_DIR",
 ].join(",");
 
@@ -27,7 +28,7 @@ const inspection = parseExtensionImageInspection([{
   Config: {
     User: "0:0",
     Cmd: ["/app/extension-tee"],
-    Env: ["MODE=0", "SEALED_STORE_DIR=/var/lib/veilbid/sealed"],
+    Env: ["MODE=0", "CHAIN_ID=114", "SEALED_STORE_DIR=/var/lib/veilbid/sealed"],
     Labels: { "tee.launch_policy.allow_env_override": launchPolicy },
     Volumes: { "/var/lib/veilbid/sealed": {} },
   },

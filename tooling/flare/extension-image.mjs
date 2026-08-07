@@ -11,7 +11,10 @@ const expectedLaunchPolicy = [
   "PROXY_URL",
   "INITIAL_OWNER",
   "EXTENSION_ID",
+  "CHAIN_ID",
   "CHAIN_URL",
+  "GOVERNANCE_SIGNERS",
+  "GOVERNANCE_THRESHOLD",
   "MODE",
   "CONFIG_PORT",
   "SIGN_PORT",
@@ -97,6 +100,7 @@ export function evaluateExtensionImage({ inspection, binary, binaryMode, recipe 
       inspection.command.length === 1 &&
       inspection.command[0] === "/app/extension-tee",
     productionAttestationIsDefault: defaults.MODE === "0",
+    coston2ChainIsDefault: defaults.CHAIN_ID === "114",
     sealedStoreIsPersistent:
       defaults.SEALED_STORE_DIR === "/var/lib/veilbid/sealed" &&
       Object.hasOwn(inspection.volumes, "/var/lib/veilbid/sealed"),

@@ -122,13 +122,37 @@ The configured proxy order must match the tender's frozen TEE order and each
 URL must equal that machine's on-chain registered URL.
 
 Generate the ignored runtime proxy configuration with
-`pnpm flare:proxy:config`. The command writes
+`pnpm flare:local:secrets` followed by `pnpm flare:proxy:config`. The first
+command creates only missing proxy/direct keys, never replaces an existing
+value, prints no secret, and keeps `.env.local` at mode `0600`. The second writes
 `.local/fcc/extension-proxy.coston2.toml` with mode `0600`, does not print any
 credential, and takes the Coston2 system addresses from the pinned foundation
 manifest. The config keeps the internal port private, requires an API key for
 `POST /direct`, and explicitly labels/accepts simulated-TEE attestation. Mount
 the file read-only at `/app/config/config.toml`; never copy it into the image or
 evidence.
+
+The one-machine smoke stack is defined in
+`apps/fcc-extension/compose.coston2.yaml`. It copies the owner-only proxy config
+into a private Docker volume readable by the proxy's non-root runtime user,
+publishes only the external proxy port on loopback, and injects only the two
+required proxy secrets. Run it with Docker Compose's `--env-file .env.local`;
+never render the resolved Compose model to logs because it contains substituted
+runtime secrets.
+
+Start the stack and run its sanitized negative-path verification with:
+
+```bash
+sg docker -c 'docker compose --env-file .env.local -f apps/fcc-extension/compose.coston2.yaml up -d'
+pnpm flare:local:smoke
+```
+
+The verifier checks the public info envelope, API-key boundary, Redis/direct
+queue, proxy-to-TEE routing, deliberate malformed-ciphertext rejection, and
+both result signatures. It prints only assertions and fingerprints, never the
+API key, raw signatures, action ID, attestation, or TEE public key. This is a
+local simulated smoke check; it is not a bid, registered machine, production
+status, stable public endpoint, or Gate 0 pass.
 
 - Use disposable Coston2/XRPL testnet identities and C2FLR for gas.
 - Keep deployer, executor, XRPL, TEE, proxy, indexer, Redis, and tunnel secrets

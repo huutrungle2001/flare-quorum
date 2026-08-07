@@ -129,6 +129,7 @@ export function verifyFccExtensionReleaseRecipe(source, recipe) {
     "go build -trimpath",
     "COPY --chmod=555 --chown=0:0 --from=builder /app/extension-tee /app/extension-tee",
     "ENV MODE=0",
+    "CHAIN_ID=114",
     "SEALED_STORE_DIR=/var/lib/veilbid/sealed",
     "USER 0:0",
     'VOLUME ["/var/lib/veilbid/sealed"]',

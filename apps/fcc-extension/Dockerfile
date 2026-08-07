@@ -21,9 +21,9 @@ WORKDIR /app
 COPY --chmod=555 --chown=0:0 --from=builder /app/extension-tee /app/extension-tee
 
 # Production attestation is the safe image default. Local simulation must opt in with MODE=1.
-ENV MODE=0 CONFIG_PORT=5501 SIGN_PORT=7701 EXTENSION_PORT=7702 SEALED_STORE_DIR=/var/lib/veilbid/sealed
+ENV MODE=0 CHAIN_ID=114 CONFIG_PORT=5501 SIGN_PORT=7701 EXTENSION_PORT=7702 SEALED_STORE_DIR=/var/lib/veilbid/sealed
 USER 0:0
-LABEL "tee.launch_policy.allow_env_override"="LOG_LEVEL,PROXY_URL,INITIAL_OWNER,EXTENSION_ID,CHAIN_URL,MODE,CONFIG_PORT,SIGN_PORT,EXTENSION_PORT,SEALED_STORE_DIR"
+LABEL "tee.launch_policy.allow_env_override"="LOG_LEVEL,PROXY_URL,INITIAL_OWNER,EXTENSION_ID,CHAIN_ID,CHAIN_URL,GOVERNANCE_SIGNERS,GOVERNANCE_THRESHOLD,MODE,CONFIG_PORT,SIGN_PORT,EXTENSION_PORT,SEALED_STORE_DIR"
 VOLUME ["/var/lib/veilbid/sealed"]
 EXPOSE 5501 7701 7702
 CMD ["/app/extension-tee"]

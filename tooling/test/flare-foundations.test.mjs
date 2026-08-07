@@ -105,7 +105,7 @@ test("requires exact pinned inputs and safe defaults for the FCC extension image
     'RUN GOFLAGS="-buildvcs=false" go build -trimpath',
     `FROM ${recipe.runtimeImage}`,
     "COPY --chmod=555 --chown=0:0 --from=builder /app/extension-tee /app/extension-tee",
-    "ENV MODE=0 SEALED_STORE_DIR=/var/lib/veilbid/sealed",
+    "ENV MODE=0 CHAIN_ID=114 SEALED_STORE_DIR=/var/lib/veilbid/sealed",
     "USER 0:0",
     'VOLUME ["/var/lib/veilbid/sealed"]',
     'CMD ["/app/extension-tee"]',

@@ -67,6 +67,8 @@
     "flare:foundations:check": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs",
     "flare:foundations:collect": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write",
     "flare:gate:0": "node --env-file-if-exists=.env.local tooling/scripts/check-flare-foundations.mjs --write --require-complete",
+    "flare:local:secrets": "node tooling/scripts/ensure-fcc-local-secrets.mjs",
+    "flare:local:smoke": "node --env-file-if-exists=.env.local tooling/scripts/verify-fcc-local-stack.mjs",
     "flare:proxy:config": "node --env-file-if-exists=.env.local tooling/scripts/render-fcc-proxy-config.mjs",
     "flare:extension:image:build": "node tooling/scripts/build-fcc-extension-image.mjs --build --write",
     "flare:extension:image:verify": "node tooling/scripts/build-fcc-extension-image.mjs --write",

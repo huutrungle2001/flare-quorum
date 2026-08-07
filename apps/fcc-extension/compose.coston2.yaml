@@ -1,0 +1,102 @@
+name: veilbid-fcc-coston2
+
+services:
+  redis:
+    image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    tmpfs:
+      - /data:rw,noexec,nosuid,nodev
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+    security_opt:
+      - no-new-privileges:true
+
+  proxy-config-init:
+    image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
+    user: "0:0"
+    command:
+      - /bin/sh
+      - -euc
+      - cp /source/config.toml /target/config.toml && chown 65532:65532 /target/config.toml && chmod 0400 /target/config.toml
+    read_only: true
+    volumes:
+      - ../../.local/fcc/extension-proxy.coston2.toml:/source/config.toml:ro
+      - proxy-config:/target
+    security_opt:
+      - no-new-privileges:true
+
+  ext-proxy:
+    image: veilbid/tee-proxy:coston2-0c6d016b
+    pull_policy: never
+    environment:
+      PROXY_PRIVATE_KEY: ${PROXY_PRIVATE_KEY:?PROXY_PRIVATE_KEY is required}
+      FCC_DIRECT_API_KEY: ${FCC_DIRECT_API_KEY:?FCC_DIRECT_API_KEY is required}
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev
+    volumes:
+      - proxy-config:/app/config:ro
+    ports:
+      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT:-6674}:6662"
+    depends_on:
+      redis:
+        condition: service_healthy
+      proxy-config-init:
+        condition: service_completed_successfully
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  proxy-port-ready:
+    image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
+    command:
+      - /bin/sh
+      - -euc
+      - for attempt in $$(seq 1 120); do nc -z ext-proxy 6661 && exit 0; sleep 0.25; done; exit 1
+    read_only: true
+    depends_on:
+      ext-proxy:
+        condition: service_started
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  extension-tee:
+    image: veilbid/fcc-extension:coston2-v0.2.2
+    pull_policy: never
+    environment:
+      MODE: "1"
+      CHAIN_ID: "114"
+      CHAIN_URL: ${COSTON2_RPC_URL:?COSTON2_RPC_URL is required}
+      INITIAL_OWNER: ${FCC_INITIAL_OWNER:-0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E}
+      EXTENSION_ID: ${FCC_LOCAL_EXTENSION_ID:-0x0000000000000000000000000000000000000000000000000000000000010000}
+      GOVERNANCE_SIGNERS: ${FCC_GOVERNANCE_SIGNERS:-0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E}
+      GOVERNANCE_THRESHOLD: ${FCC_GOVERNANCE_THRESHOLD:-1}
+      PROXY_URL: http://ext-proxy:6661
+      CONFIG_PORT: "5501"
+      SIGN_PORT: "7701"
+      EXTENSION_PORT: "7702"
+      SEALED_STORE_DIR: /var/lib/veilbid/sealed
+      LOG_LEVEL: INFO
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev
+    volumes:
+      - extension-sealed:/var/lib/veilbid/sealed
+    depends_on:
+      proxy-port-ready:
+        condition: service_completed_successfully
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 10s
+
+volumes:
+  proxy-config:
+  extension-sealed:
