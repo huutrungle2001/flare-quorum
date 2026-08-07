@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-keyboard-accessibility",
-  "recordedAt": "2026-08-07T20:14:25.862Z",
+  "recordedAt": "2026-08-07T21:22:10.948Z",
   "publicIdentifiers": {
-    "sourceCommit": "b6983b1d20caabd447eab77a610b128fbba01dca",
+    "sourceCommit": "0e59652a96ba8eb74f6adf9ec89e11054defaa55",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -12,7 +12,7 @@
     "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05"
   },
   "measurements": {
-    "desktopInteractiveCount": 30,
+    "desktopInteractiveCount": 35,
     "mobileViewportWidth": 320,
     "focusSequence": [
       {
@@ -45,6 +45,20 @@
       },
       {
         "tag": "A",
+        "text": "OPEN BUYER WORKSPACE →",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "A",
+        "text": "OPEN VENDOR WORKSPACE →",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "A",
         "text": "0x1a9C4A…7618aE ↗",
         "ariaLabel": null,
         "visible": true,
@@ -53,20 +67,6 @@
       {
         "tag": "A",
         "text": "0x0b6A36…273dc7 ↗",
-        "ariaLabel": null,
-        "visible": true,
-        "focusIndicator": true
-      },
-      {
-        "tag": "A",
-        "text": "0xc1Ca88…4fbDFA ↗",
-        "ariaLabel": null,
-        "visible": true,
-        "focusIndicator": true
-      },
-      {
-        "tag": "A",
-        "text": "0xC4e9c7…6B304d ↗",
         "ariaLabel": null,
         "visible": true,
         "focusIndicator": true

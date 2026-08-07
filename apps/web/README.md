@@ -12,6 +12,12 @@ remains the explicitly historical Sepolia/Nox baseline.
 The Flare dossier also exposes sanitized FCC, FTestXRP, FAssets/FXRP, FTSO,
 FDC, Smart Account, and award-receipt addresses so a judge can follow each
 integration without wallet access or confidential payloads.
+When the hosted ingress origin is configured, `/?role=vendor` opens the
+Coston2 browser composer: each bid is encrypted separately to the three
+tender-frozen TEE keys, authorized with EIP-712, receipt-checked, and submitted
+as one atomic receipt set. `/?role=buyer` is the direct EVM funding/recovery
+path; the XRP-native Smart Account journey remains a separate server-side
+executor until its delayed-mint recovery UI is complete.
 
 It intentionally:
 
@@ -34,7 +40,9 @@ pnpm test:flare:production https://veilbid-flare.vercel.app
 pnpm test:flare:accessibility https://veilbid-flare.vercel.app
 ```
 
-`VITE_SEPOLIA_RPC_URL` may override the public read-only RPC. Buyer, Vendor,
+`VITE_SEPOLIA_RPC_URL` may override the public read-only RPC. The Coston2 role
+composer additionally requires the public `VITE_FLARE_INGRESS_URL` origin; it
+does not accept API keys or credentials. Buyer, Vendor,
 review, Activity, and Safe writes always require an explicitly connected
 wallet. Tender Room does not determine winners or own canonical lifecycle
 state.
