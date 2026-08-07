@@ -54,6 +54,9 @@ const evidencePath = evidenceFilePath(
   "evidence/coston2/fcc-governance.json",
   "FCC_GOVERNANCE_EVIDENCE_PATH",
 );
+const evidenceDisplayPath = evidencePath.startsWith(`${root}/`)
+  ? evidencePath.slice(root.length + 1)
+  : evidencePath;
 
 function secureRpcUrl(value) {
   try {
@@ -291,7 +294,7 @@ async function main() {
     transactionHash,
     governanceHash: desired.hash,
     assertions: evidence.assertions,
-    evidence: "evidence/coston2/fcc-governance.json",
+    evidence: evidenceDisplayPath,
   }, null, 2));
 }
 
