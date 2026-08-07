@@ -125,9 +125,12 @@ FCC_INDEXER_PORT=3306
 FCC_INDEXER_DATABASE=indexer
 FCC_INDEXER_USER=...
 FCC_INDEXER_PASSWORD=...
-FCC_PROXY_REDIS_ENDPOINT=redis:6379
-PROXY_PRIVATE_KEY=...
-FCC_DIRECT_API_KEY=...
+PROXY_PRIVATE_KEY_1=...
+FCC_DIRECT_API_KEY_1=...
+PROXY_PRIVATE_KEY_2=...
+FCC_DIRECT_API_KEY_2=...
+PROXY_PRIVATE_KEY_3=...
+FCC_DIRECT_API_KEY_3=...
 XRPL_TESTNET_RPC_URL=https://...
 VERIFIER_URL_TESTNET=https://fdc-verifiers-testnet.flare.network
 VERIFIER_API_KEY_TESTNET=...
@@ -148,20 +151,21 @@ Generate the ignored runtime proxy configuration with
 `pnpm flare:local:secrets` followed by `pnpm flare:proxy:config`. The first
 command creates only missing proxy/direct keys, never replaces an existing
 value, prints no secret, and keeps `.env.local` at mode `0600`. The second writes
-`.local/fcc/extension-proxy.coston2.toml` with mode `0600`, does not print any
-credential, and takes the Coston2 system addresses from the pinned foundation
-manifest. The config keeps the internal port private, requires an API key for
-`POST /direct`, and explicitly labels/accepts simulated-TEE attestation. Mount
-the file read-only at `/app/config/config.toml`; never copy it into the image or
-evidence.
+the three `.local/fcc/extension-proxy-{1,2,3}.coston2.toml` files with mode
+`0600`, does not print any credential, and takes the Coston2 system addresses
+from the pinned foundation manifest. Each config uses its own Redis endpoint;
+all keep the internal port private, require a distinct API key for
+`POST /direct`, and explicitly label/accept simulated-TEE attestation. Mount
+each file read-only at `/app/config/config.toml`; never copy one into the image
+or evidence.
 
-The one-machine smoke stack is defined in
+The three-machine smoke stack is defined in
 `apps/fcc-extension/compose.coston2.yaml`. It copies the owner-only proxy config
-into a private Docker volume readable by the proxy's non-root runtime user,
-publishes only the external proxy port on loopback, and injects only the two
-required proxy secrets. Run it with Docker Compose's `--env-file .env.local`;
-never render the resolved Compose model to logs because it contains substituted
-runtime secrets.
+into three private Docker volumes readable by the proxies' non-root runtime
+users. Every machine has an independent Redis queue, proxy signing key, direct
+API key, sealed store, TEE identity, and loopback port (`6674`–`6676`). Run it
+with Docker Compose's `--env-file .env.local`; never render the resolved Compose
+model to logs because it contains substituted runtime secrets.
 
 Start the stack and run its sanitized negative-path verification with:
 
@@ -170,9 +174,10 @@ sg docker -c 'docker compose --env-file .env.local -f apps/fcc-extension/compose
 pnpm flare:local:smoke
 ```
 
-The verifier checks the public info envelope, API-key boundary, Redis/direct
-queue, proxy-to-TEE routing, deliberate malformed-ciphertext rejection, and
-both result signatures. It prints only assertions and fingerprints, never the
+The verifier checks all three public info envelopes, distinct public-key
+fingerprints, API-key boundaries, Redis/direct queues, proxy-to-TEE routing,
+deliberate malformed-ciphertext rejection, and both result signatures. It
+prints only assertions and fingerprints, never the
 API key, raw signatures, action ID, attestation, or TEE public key. This is a
 local simulated smoke check; it is not a bid, registered machine, production
 status, stable public endpoint, or Gate 0 pass.

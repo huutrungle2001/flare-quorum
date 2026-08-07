@@ -2,8 +2,12 @@ import { randomBytes } from "node:crypto";
 import { chmodSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 
 const secretSpecifications = {
-  PROXY_PRIVATE_KEY: (bytes) => bytes.toString("hex"),
-  FCC_DIRECT_API_KEY: (bytes) => bytes.toString("base64url"),
+  PROXY_PRIVATE_KEY_1: (bytes) => bytes.toString("hex"),
+  FCC_DIRECT_API_KEY_1: (bytes) => bytes.toString("base64url"),
+  PROXY_PRIVATE_KEY_2: (bytes) => bytes.toString("hex"),
+  FCC_DIRECT_API_KEY_2: (bytes) => bytes.toString("base64url"),
+  PROXY_PRIVATE_KEY_3: (bytes) => bytes.toString("hex"),
+  FCC_DIRECT_API_KEY_3: (bytes) => bytes.toString("base64url"),
 };
 
 function assignmentPattern(name) {

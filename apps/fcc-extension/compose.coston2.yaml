@@ -1,102 +1,209 @@
 name: veilbid-fcc-coston2
 
+x-redis: &redis
+  image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
+  command: ["redis-server", "--save", "", "--appendonly", "no"]
+  tmpfs:
+    - /data:rw,noexec,nosuid,nodev
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 2s
+    timeout: 2s
+    retries: 15
+  security_opt:
+    - no-new-privileges:true
+
+x-config-init: &config-init
+  image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
+  user: "0:0"
+  command:
+    - /bin/sh
+    - -euc
+    - cp /source/config.toml /target/config.toml && chown 65532:65532 /target/config.toml && chmod 0400 /target/config.toml
+  read_only: true
+  security_opt:
+    - no-new-privileges:true
+
+x-proxy: &proxy
+  image: veilbid/tee-proxy:coston2-0c6d016b
+  pull_policy: never
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
+x-proxy-ready: &proxy-ready
+  image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
+  command:
+    - /bin/sh
+    - -euc
+    - for attempt in $$(seq 1 120); do nc -z "$${PROXY_HOST}" 6661 && exit 0; sleep 0.25; done; exit 1
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
+x-extension: &extension
+  image: veilbid/fcc-extension:coston2-v0.2.2
+  pull_policy: never
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  stop_grace_period: 10s
+
 services:
-  redis:
-    image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
-    command: ["redis-server", "--save", "", "--appendonly", "no"]
-    tmpfs:
-      - /data:rw,noexec,nosuid,nodev
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 2s
-      timeout: 2s
-      retries: 15
-    security_opt:
-      - no-new-privileges:true
+  redis-1:
+    <<: *redis
 
-  proxy-config-init:
-    image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
-    user: "0:0"
-    command:
-      - /bin/sh
-      - -euc
-      - cp /source/config.toml /target/config.toml && chown 65532:65532 /target/config.toml && chmod 0400 /target/config.toml
-    read_only: true
+  proxy-config-init-1:
+    <<: *config-init
     volumes:
-      - ../../.local/fcc/extension-proxy.coston2.toml:/source/config.toml:ro
-      - proxy-config:/target
-    security_opt:
-      - no-new-privileges:true
+      - ../../.local/fcc/extension-proxy-1.coston2.toml:/source/config.toml:ro
+      - proxy-config-1:/target
 
-  ext-proxy:
-    image: veilbid/tee-proxy:coston2-0c6d016b
-    pull_policy: never
+  ext-proxy-1:
+    <<: *proxy
     environment:
-      PROXY_PRIVATE_KEY: ${PROXY_PRIVATE_KEY:?PROXY_PRIVATE_KEY is required}
-      FCC_DIRECT_API_KEY: ${FCC_DIRECT_API_KEY:?FCC_DIRECT_API_KEY is required}
-    read_only: true
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev
+      PROXY_PRIVATE_KEY: ${PROXY_PRIVATE_KEY_1:?PROXY_PRIVATE_KEY_1 is required}
+      FCC_DIRECT_API_KEY: ${FCC_DIRECT_API_KEY_1:?FCC_DIRECT_API_KEY_1 is required}
     volumes:
-      - proxy-config:/app/config:ro
+      - proxy-config-1:/app/config:ro
     ports:
-      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT:-6674}:6662"
+      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_1:-6674}:6662"
     depends_on:
-      redis:
+      redis-1:
         condition: service_healthy
-      proxy-config-init:
+      proxy-config-init-1:
         condition: service_completed_successfully
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
 
-  proxy-port-ready:
-    image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
-    command:
-      - /bin/sh
-      - -euc
-      - for attempt in $$(seq 1 120); do nc -z ext-proxy 6661 && exit 0; sleep 0.25; done; exit 1
-    read_only: true
-    depends_on:
-      ext-proxy:
-        condition: service_started
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-
-  extension-tee:
-    image: veilbid/fcc-extension:coston2-v0.2.2
-    pull_policy: never
+  proxy-port-ready-1:
+    <<: *proxy-ready
     environment:
+      PROXY_HOST: ext-proxy-1
+    depends_on:
+      ext-proxy-1:
+        condition: service_started
+
+  extension-tee-1:
+    <<: *extension
+    environment: &extension-environment-1
       MODE: "1"
       CHAIN_ID: "114"
       CHAIN_URL: ${COSTON2_RPC_URL:?COSTON2_RPC_URL is required}
       INITIAL_OWNER: ${FCC_INITIAL_OWNER:-0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E}
-      EXTENSION_ID: ${FCC_EXTENSION_ID:-0x0000000000000000000000000000000000000000000000000000000000010000}
+      EXTENSION_ID: ${FCC_EXTENSION_ID:?FCC_EXTENSION_ID is required}
       GOVERNANCE_SIGNERS: ${FCC_GOVERNANCE_SIGNERS:-0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E}
       GOVERNANCE_THRESHOLD: ${FCC_GOVERNANCE_THRESHOLD:-1}
-      PROXY_URL: http://ext-proxy:6661
+      PROXY_URL: http://ext-proxy-1:6661
       CONFIG_PORT: "5501"
       SIGN_PORT: "7701"
       EXTENSION_PORT: "7702"
       SEALED_STORE_DIR: /var/lib/veilbid/sealed
       LOG_LEVEL: INFO
-    read_only: true
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev
     volumes:
-      - extension-sealed:/var/lib/veilbid/sealed
+      - extension-sealed-1:/var/lib/veilbid/sealed
     depends_on:
-      proxy-port-ready:
+      proxy-port-ready-1:
         condition: service_completed_successfully
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    stop_grace_period: 10s
+
+  redis-2:
+    <<: *redis
+
+  proxy-config-init-2:
+    <<: *config-init
+    volumes:
+      - ../../.local/fcc/extension-proxy-2.coston2.toml:/source/config.toml:ro
+      - proxy-config-2:/target
+
+  ext-proxy-2:
+    <<: *proxy
+    environment:
+      PROXY_PRIVATE_KEY: ${PROXY_PRIVATE_KEY_2:?PROXY_PRIVATE_KEY_2 is required}
+      FCC_DIRECT_API_KEY: ${FCC_DIRECT_API_KEY_2:?FCC_DIRECT_API_KEY_2 is required}
+    volumes:
+      - proxy-config-2:/app/config:ro
+    ports:
+      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_2:-6675}:6662"
+    depends_on:
+      redis-2:
+        condition: service_healthy
+      proxy-config-init-2:
+        condition: service_completed_successfully
+
+  proxy-port-ready-2:
+    <<: *proxy-ready
+    environment:
+      PROXY_HOST: ext-proxy-2
+    depends_on:
+      ext-proxy-2:
+        condition: service_started
+
+  extension-tee-2:
+    <<: *extension
+    environment:
+      <<: *extension-environment-1
+      PROXY_URL: http://ext-proxy-2:6661
+    volumes:
+      - extension-sealed-2:/var/lib/veilbid/sealed
+    depends_on:
+      proxy-port-ready-2:
+        condition: service_completed_successfully
+
+  redis-3:
+    <<: *redis
+
+  proxy-config-init-3:
+    <<: *config-init
+    volumes:
+      - ../../.local/fcc/extension-proxy-3.coston2.toml:/source/config.toml:ro
+      - proxy-config-3:/target
+
+  ext-proxy-3:
+    <<: *proxy
+    environment:
+      PROXY_PRIVATE_KEY: ${PROXY_PRIVATE_KEY_3:?PROXY_PRIVATE_KEY_3 is required}
+      FCC_DIRECT_API_KEY: ${FCC_DIRECT_API_KEY_3:?FCC_DIRECT_API_KEY_3 is required}
+    volumes:
+      - proxy-config-3:/app/config:ro
+    ports:
+      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_3:-6676}:6662"
+    depends_on:
+      redis-3:
+        condition: service_healthy
+      proxy-config-init-3:
+        condition: service_completed_successfully
+
+  proxy-port-ready-3:
+    <<: *proxy-ready
+    environment:
+      PROXY_HOST: ext-proxy-3
+    depends_on:
+      ext-proxy-3:
+        condition: service_started
+
+  extension-tee-3:
+    <<: *extension
+    environment:
+      <<: *extension-environment-1
+      PROXY_URL: http://ext-proxy-3:6661
+    volumes:
+      - extension-sealed-3:/var/lib/veilbid/sealed
+    depends_on:
+      proxy-port-ready-3:
+        condition: service_completed_successfully
 
 volumes:
-  proxy-config:
-  extension-sealed:
+  proxy-config-1:
+  proxy-config-2:
+  proxy-config-3:
+  extension-sealed-1:
+  extension-sealed-2:
+  extension-sealed-3:

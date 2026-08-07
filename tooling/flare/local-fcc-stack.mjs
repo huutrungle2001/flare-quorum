@@ -202,3 +202,24 @@ export async function verifyLocalFccStack({
     direct,
   };
 }
+
+export function evaluateLocalFccMachineSet(results) {
+  if (!Array.isArray(results) || results.length !== 3) {
+    throw new Error("FCC_LOCAL_MACHINE_SET_INVALID");
+  }
+  const fingerprints = results.map((result) =>
+    result?.info?.publicIdentifiers?.publicKeyFingerprintSha256
+  );
+  const assertions = {
+    allMachineSmokesPassed: results.every((result) => result?.status === "PASSED"),
+    threeDistinctPublicKeys:
+      fingerprints.every((value) => typeof value === "string" && /^[0-9a-f]{64}$/.test(value)) &&
+      new Set(fingerprints).size === 3,
+  };
+  return {
+    status: Object.values(assertions).every(Boolean) ? "PASSED" : "FAILED",
+    scope: "three independent local simulated Coston2 machines; not registered production TEEs",
+    assertions,
+    machines: results.map((result, index) => ({ machine: index + 1, ...result })),
+  };
+}

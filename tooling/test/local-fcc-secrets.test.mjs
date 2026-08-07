@@ -19,11 +19,15 @@ test("creates missing FCC runtime secrets without replacing existing values", ()
     const statuses = ensureLocalFccSecrets(path, () => Buffer.alloc(32, 0x11));
     const source = readFileSync(path, "utf8");
     assert.deepEqual(statuses, {
-      PROXY_PRIVATE_KEY: "existing",
-      FCC_DIRECT_API_KEY: "created",
+      PROXY_PRIVATE_KEY_1: "created",
+      FCC_DIRECT_API_KEY_1: "created",
+      PROXY_PRIVATE_KEY_2: "created",
+      FCC_DIRECT_API_KEY_2: "created",
+      PROXY_PRIVATE_KEY_3: "created",
+      FCC_DIRECT_API_KEY_3: "created",
     });
     assert.match(source, /^PROXY_PRIVATE_KEY=already-set$/mu);
-    assert.match(source, /^FCC_DIRECT_API_KEY=ERERERERERERERERERERERERERERERERERERERERERE$/mu);
+    assert.match(source, /^FCC_DIRECT_API_KEY=$/mu);
     assert.equal(statSync(path).mode & 0o777, 0o600);
   } finally {
     rmSync(directory, { recursive: true, force: true });

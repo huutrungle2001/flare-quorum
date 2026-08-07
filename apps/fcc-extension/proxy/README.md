@@ -19,8 +19,9 @@ printing its values:
 pnpm flare:proxy:config
 ```
 
-The result is `.local/fcc/extension-proxy.coston2.toml`. It enables authenticated
-private ingress using `FCC_DIRECT_API_KEY`, verifies the simulated-TEE
+The results are `.local/fcc/extension-proxy-{1,2,3}.coston2.toml`. They enable
+authenticated private ingress using the corresponding numbered
+`FCC_DIRECT_API_KEY_*`, verify the simulated-TEE
 `magic_pass` challenge explicitly, and contains the indexer credentials because
 the official proxy currently reads those fields from TOML. Mount it read-only
 and never copy it into an image or evidence directory.

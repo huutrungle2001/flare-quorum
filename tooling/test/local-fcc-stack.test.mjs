@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   bytes32Text,
+  evaluateLocalFccMachineSet,
   evaluateLocalDirectProbe,
   evaluateLocalFccInfo,
 } from "../flare/local-fcc-stack.mjs";
@@ -18,6 +19,15 @@ test("encodes FCC operation identifiers as zero-padded bytes32 text", () => {
   );
   assert.throws(() => bytes32Text(""), /FCC_BYTES32_TEXT_INVALID/);
   assert.throws(() => bytes32Text("x".repeat(33)), /FCC_BYTES32_TEXT_INVALID/);
+});
+
+test("requires three passing machines with distinct public keys", () => {
+  const machines = ["11", "22", "33"].map((byte) => ({
+    status: "PASSED",
+    info: { publicIdentifiers: { publicKeyFingerprintSha256: byte.repeat(32) } },
+  }));
+  assert.equal(evaluateLocalFccMachineSet(machines).status, "PASSED");
+  assert.equal(evaluateLocalFccMachineSet([machines[0], machines[0], machines[2]]).status, "FAILED");
 });
 
 test("sanitizes and verifies simulated local FCC info", () => {
