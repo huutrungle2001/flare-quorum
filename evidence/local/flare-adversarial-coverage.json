@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "suite": "flare-adversarial-local-coverage",
+  "status": "PARTIAL",
+  "recordedAt": "2026-08-07T23:06:00.162Z",
+  "sourceCommit": "95efdae3061ec1fc5e18befbf89af782498073e4",
+  "scope": {
+    "environment": "local-unit-and-integration-tests",
+    "targetNetwork": "flare-coston2",
+    "chainId": 114,
+    "liveWritesPerformed": false,
+    "liveFaultDrillsPerformed": false
+  },
+  "testCommands": [
+    {
+      "name": "fcc-extension-go-tests",
+      "passed": true
+    },
+    {
+      "name": "flare-contract-forge-tests",
+      "passed": true
+    },
+    {
+      "name": "settlement-relay-tests",
+      "passed": true
+    }
+  ],
+  "assertions": {
+    "testCommandsPassed": true,
+    "invalidBidRejected": true,
+    "credentialDomainBindingRejected": true,
+    "tieAndPermutationDeterministic": true,
+    "ciphertextReplayRejected": true,
+    "malformedWireRejected": true,
+    "sealedStoreRestartAndSlotRewriteRejected": true,
+    "staleFtsoCannotBecomeRefund": true,
+    "zeroWinnerConservation": true,
+    "resultDomainReplayRejected": true,
+    "wrongRootAndWrongBindingRejected": true,
+    "staleFtsoRejected": true,
+    "duplicateSignerAndSplitQuorumRejected": true,
+    "signerLossThresholdBehavior": true,
+    "competingFinalizationAndTerminalReplayRejected": true,
+    "wrongDomainAndMalformedIngressRejected": true,
+    "resultSplitAndDuplicateSignerRemainPending": true,
+    "competingRelayBenignRace": true,
+    "checkpointQuoteNonceAndCommitmentDriftRejected": true,
+    "proxyUnavailableRemainsPending": true,
+    "noMockSuccessPathUsed": true,
+    "noConfidentialPayloadRecorded": true
+  },
+  "blockers": [
+    "LIVE_FAULT_DRILLS_NOT_RUN",
+    "SAME_IDENTITY_TEE_RESTART_NOT_SUPPORTED_BY_CURRENT_SIMULATED_RUNTIME"
+  ],
+  "notes": [
+    "This record proves local Go, Forge, and relay rejection/continuity coverage only; it is not live Coston2 adversarial evidence.",
+    "Live Coston2 positive lifecycles and one-result-endpoint recovery are recorded separately under evidence/coston2/.",
+    "The proxy restart case uses the sealed-store restart contract; a production proxy/TEE process restart was not claimed.",
+    "No bid plaintext, ciphertext, credential, raw signature, proof body, private key, or provider secret is written."
+  ]
+}

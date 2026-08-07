@@ -282,8 +282,11 @@ confidential bid or settlement boundary:
 - [x] Run the three-vendor recovery variant with one result endpoint
   intentionally unavailable; two remaining frozen TEE results finalized the
   tender in `evidence/coston2/three-vendor-recovery.release.json`.
-- [ ] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
-  wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay drills.
+- [~] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
+  wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay
+  coverage. Local Go/Forge/relay rejection suites are recorded in
+  `evidence/local/flare-adversarial-coverage.json`; live fault injection,
+  process restart, and two-machine-loss drills remain open.
 - [x] Record public gas, block-latency, close-to-result, and recovery benchmarks
   from the live Coston2 lifecycles in
   `evidence/coston2/performance-benchmarks.release.json`; bid-ingress latency is
@@ -305,7 +308,8 @@ all agree and contain no confidential material.
 - [ ] Conduct at least five vendor usability tests.
 - [ ] Recruit at least one pilot buyer or ecosystem design partner.
 - [ ] Record problems, decisions, and changes without inventing traction.
-- [ ] Publish a short integration guide for other procurement/treasury teams.
+- [x] Publish [`docs/integration-guide.md`](docs/integration-guide.md) for
+  procurement/treasury teams and infrastructure partners.
 - [ ] Prepare Telegram/community updates and request Flare technical feedback.
 
 Exit: the submission contains real user evidence, not only technical claims.

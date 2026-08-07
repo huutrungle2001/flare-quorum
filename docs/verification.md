@@ -7,7 +7,8 @@
 > pass. Gate B restart hardening, browser-native funding recovery, and
 > user-validation work remain open; the server-side XRP funding checkpoint/
 > resume path now has fail-closed unit coverage. Historical Sepolia/Nox
-> artifacts are pre-hackathon baseline only.
+> artifacts are pre-hackathon baseline only. Local adversarial coverage is
+> recorded separately and is not promoted to live Coston2 evidence.
 
 ## 1. Evidence policy
 
@@ -105,6 +106,12 @@ File names are targets, not evidence that the tests ran. Each schema records
 `sourceCommit`, public environment identity, assertions, blockers, and
 collection time. A release file never changes from failed to passed without new
 live identifiers.
+
+The current local rejection/continuity coverage is recorded in
+[`evidence/local/flare-adversarial-coverage.json`](../evidence/local/flare-adversarial-coverage.json).
+It proves the checked-in Go, Forge, and relay suites without performing live
+writes; its blocker list deliberately keeps live fault-drill and simulated-TEE
+identity-restart claims open.
 
 ## 5. Required adversarial suites
 
