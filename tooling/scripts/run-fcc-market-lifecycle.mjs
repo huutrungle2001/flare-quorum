@@ -33,8 +33,18 @@ import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smar
 
 const root = resolve(import.meta.dirname, "../..");
 const execute = process.argv.includes("--execute");
-const evidencePath = resolve(root, "evidence/coston2/gate-c-e-f-live-lifecycle.json");
-const statePath = resolve(root, ".local/fcc/market-lifecycle.state.json");
+const evidencePath = resolve(
+  root,
+  process.env.FCC_MARKET_EVIDENCE_PATH ?? "evidence/coston2/gate-c-e-f-live-lifecycle.json",
+);
+const statePath = resolve(
+  root,
+  process.env.FCC_MARKET_STATE_PATH ?? ".local/fcc/market-lifecycle.state.json",
+);
+const vendorCount = Number(process.env.FCC_MARKET_VENDOR_COUNT ?? "1");
+if (!Number.isInteger(vendorCount) || vendorCount < 1 || vendorCount > 3) {
+  throw new Error("FCC_MARKET_VENDOR_COUNT_INVALID");
+}
 const managerAbi = parseAbi([
   "function getTeeMachineStatus(address teeId) view returns (uint8)",
   "function getExtensionId(address teeId) view returns (uint256)",
@@ -407,37 +417,21 @@ async function main() {
     requiredCredentials: [],
   };
   const rulesHash = calculateFlareRulesHash(rules);
-  const vendorKey = generatePrivateKey();
-  const vendorAccount = privateKeyToAccount(vendorKey);
-  const submissionNonce = BigInt(Date.now()) * 1_000n + BigInt(randomBytes(2).readUInt16BE(0));
   const receiptExpiry = bidDeadline - 60n;
-  const bid = {
-    schemaVersion: 1,
-    chainId: 114n,
-    market,
-    extensionId,
-    codeVersion: codeHash,
-    tenderId: 0n,
-    vendor: getAddress(vendorAccount.address),
-    submissionNonce,
-    rules,
-    receiptExpiry,
-    quoteCurrency: 1,
-    priceMicros: 1_000_000n,
-    deliveryDays: 5,
-    warrantyDays: 24,
-    credentials: [],
-    salt: `0x${randomBytes(32).toString("hex")}`,
-  };
+  const vendorAccounts = Array.from({ length: vendorCount }, () =>
+    privateKeyToAccount(generatePrivateKey()),
+  );
   const buyerTokenBefore = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [account.address] });
-  const vendorTokenBefore = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [vendorAccount.address] });
+  const vendorTokenBefore = await Promise.all(vendorAccounts.map((vendor) =>
+    client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [vendor.address] }),
+  ));
   currentPhase = "approve-escrow";
   const approval = await writeContract({ client, wallet: buyerWallet, account, address: token, abi: erc20Abi, functionName: "approve", args: [market, ceiling] });
   const tenderCountBefore = await client.readContract({ address: market, abi: marketAbi, functionName: "tenderCount" });
   const terms = {
     metadataHash: keccak256(stringToHex(`VEILBID_C2_LIVE_TENDER_${Date.now()}`)),
     scoringPolicy: rules,
-    approvedVendors: [vendorAccount.address],
+    approvedVendors: vendorAccounts.map((vendor) => vendor.address),
     extensionId,
     codeVersion: codeHash,
     teeIds: machines.map(({ teeId }) => teeId),
@@ -448,68 +442,95 @@ async function main() {
   const tenderCountAfter = await client.readContract({ address: market, abi: marketAbi, functionName: "tenderCount" });
   if (tenderCountAfter !== tenderCountBefore + 1n) throw new Error("FCC_MARKET_TENDER_ID_INVALID");
   const tenderId = tenderCountAfter;
-  bid.tenderId = tenderId;
   currentPhase = "vendor-funding";
-  const vendorFunding = await buyerWallet.sendTransaction({ account, to: vendorAccount.address, value: 2_000_000_000_000_000_000n });
-  const vendorFundingReceipt = await client.waitForTransactionReceipt({ hash: vendorFunding, confirmations: 1 });
-  if (vendorFundingReceipt.status !== "success") throw new Error("FCC_MARKET_VENDOR_FUNDING_FAILED");
+  const vendorFundingTransactions = [];
+  for (const vendor of vendorAccounts) {
+    const vendorFunding = await buyerWallet.sendTransaction({ account, to: vendor.address, value: 2_000_000_000_000_000_000n });
+    const vendorFundingReceipt = await client.waitForTransactionReceipt({ hash: vendorFunding, confirmations: 1 });
+    if (vendorFundingReceipt.status !== "success") throw new Error("FCC_MARKET_VENDOR_FUNDING_FAILED");
+    vendorFundingTransactions.push(vendorFunding);
+  }
 
-  const plaintext = encodePrivateBidSubmission(bid);
-  const commitment = privateBidCommitment(bid);
-  currentPhase = "encrypted-bids";
-  const ciphertexts = await Promise.all(machines.map(({ publicKey }) => encryptPrivateBidForTee(
-    Uint8Array.from(Buffer.from(plaintext.slice(2), "hex")), publicKey,
-  )));
-  const receipts = [];
-  const actionIds = [];
-  for (let index = 0; index < machines.length; index += 1) {
-    const actionId = await sendDirect(urls[index], keys[index], ciphertexts[index]);
-    const actionValue = await readActionResult(urls[index], actionId, "submit");
-    const receipt = await verifyBidReceipt(actionValue, {
-      actionId,
+  const bidRecords = [];
+  const bidGas = 1_000_000n;
+  const bidGasPrice = await client.getGasPrice();
+  for (let vendorIndex = 0; vendorIndex < vendorAccounts.length; vendorIndex += 1) {
+    const vendorAccount = vendorAccounts[vendorIndex];
+    const submissionNonce = BigInt(Date.now()) * 1_000n + BigInt(vendorIndex) * 10_000n + BigInt(randomBytes(2).readUInt16BE(0));
+    const bid = {
+      schemaVersion: 1,
       chainId: 114n,
       market,
       extensionId,
       codeVersion: codeHash,
       tenderId,
+      vendor: getAddress(vendorAccount.address),
+      submissionNonce,
+      rules,
+      receiptExpiry,
+      quoteCurrency: 1,
+      priceMicros: 700_000n + BigInt(vendorIndex) * 100_000n,
+      deliveryDays: 5,
+      warrantyDays: 24,
+      credentials: [],
+      salt: `0x${randomBytes(32).toString("hex")}`,
+    };
+    const plaintext = encodePrivateBidSubmission(bid);
+    const commitment = privateBidCommitment(bid);
+    currentPhase = `encrypted-bids-${vendorIndex + 1}`;
+    const ciphertexts = await Promise.all(machines.map(({ publicKey }) => encryptPrivateBidForTee(
+      Uint8Array.from(Buffer.from(plaintext.slice(2), "hex")), publicKey,
+    )));
+    const receipts = [];
+    const actionIds = [];
+    for (let machineIndex = 0; machineIndex < machines.length; machineIndex += 1) {
+      const actionId = await sendDirect(urls[machineIndex], keys[machineIndex], ciphertexts[machineIndex]);
+      const actionValue = await readActionResult(urls[machineIndex], actionId, "submit");
+      const receipt = await verifyBidReceipt(actionValue, {
+        actionId,
+        chainId: 114n,
+        market,
+        extensionId,
+        codeVersion: codeHash,
+        tenderId,
+        vendor: vendorAccount.address,
+        submissionNonce,
+        rulesHash,
+        commitment,
+        receiptExpiry,
+      }, machines[machineIndex].teeId);
+      actionIds.push(actionId);
+      receipts.push(receipt);
+    }
+    const prepared = await prepareBidReceiptSet(receipts, {
+      market,
+      extensionId,
+      codeVersion: codeHash,
+      tenderId,
+      rulesHash,
       vendor: vendorAccount.address,
       submissionNonce,
-      rulesHash,
-      commitment,
-      receiptExpiry,
-    }, machines[index].teeId);
-    actionIds.push(actionId);
-    receipts.push(receipt);
+      plaintextCommitment: commitment,
+      bidDeadline,
+      teeIds: machines.map(({ teeId }) => teeId),
+    });
+    const vendorWallet = createWalletClient({ account: vendorAccount, chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
+    currentPhase = `submit-bid-receipts-${vendorIndex + 1}`;
+    const vendorBalance = await client.getBalance({ address: vendorAccount.address });
+    if (vendorBalance < bidGas * bidGasPrice) throw new Error("FCC_MARKET_VENDOR_GAS_BUDGET_INVALID");
+    const bidData = encodeFunctionData({
+      abi: marketAbi,
+      functionName: "submitBidReceipts",
+      args: [tenderId, prepared.receipts, prepared.signatures],
+    });
+    const bidTx = await writeEncodedTransaction({
+      client, wallet: vendorWallet, account: vendorAccount, to: market, data: bidData,
+      gas: bidGas, code: "FCC_MARKET_SUBMIT_BID_RECEIPTS_FAILED", preflight: false,
+    });
+    const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
+    if (field(tenderAfterBid, "bidCount", 6) !== BigInt(vendorIndex + 1) || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
+    bidRecords.push({ vendor: vendorAccount.address, commitment, actionIds, receipts, bidTx: bidTx.hash, fundingTransaction: vendorFundingTransactions[vendorIndex] });
   }
-  const prepared = await prepareBidReceiptSet(receipts, {
-    market,
-    extensionId,
-    codeVersion: codeHash,
-    tenderId,
-    rulesHash,
-    vendor: vendorAccount.address,
-    submissionNonce,
-    plaintextCommitment: commitment,
-    bidDeadline,
-    teeIds: machines.map(({ teeId }) => teeId),
-  });
-  const vendorWallet = createWalletClient({ account: vendorAccount, chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
-  currentPhase = "submit-bid-receipts";
-  const bidGas = 1_000_000n;
-  const bidGasPrice = await client.getGasPrice();
-  const vendorBalance = await client.getBalance({ address: vendorAccount.address });
-  if (vendorBalance < bidGas * bidGasPrice) throw new Error("FCC_MARKET_VENDOR_GAS_BUDGET_INVALID");
-  const bidData = encodeFunctionData({
-    abi: marketAbi,
-    functionName: "submitBidReceipts",
-    args: [tenderId, prepared.receipts, prepared.signatures],
-  });
-  const bidTx = await writeEncodedTransaction({
-    client, wallet: vendorWallet, account: vendorAccount, to: market, data: bidData,
-    gas: bidGas, code: "FCC_MARKET_SUBMIT_BID_RECEIPTS_FAILED", preflight: false,
-  });
-  const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
-  if (field(tenderAfterBid, "bidCount", 6) !== 1n || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
   currentPhase = "close-tender";
   const close = await writeContract({
     client, wallet: buyerWallet, account, address: market, abi: marketAbi,
@@ -544,22 +565,29 @@ async function main() {
     teeIds: machines.map(({ teeId }) => teeId),
   };
   currentPhase = "collect-selection-quorum";
-  const quorum = await collectSelection({ urls, requestId, context, expectedVersion: version, vendor: vendorAccount.address });
+  const quorum = await collectSelection({ urls, requestId, context, expectedVersion: version, vendor: vendorAccounts[0].address });
   currentPhase = "finalize-tender";
   const finalization = await writeContract({ client, wallet: buyerWallet, account, address: market, abi: marketAbi, functionName: "finalizeTender", args: [tenderId, quorum.result, quorum.proofs] });
   const finalized = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (Number(field(finalized, "status", 21)) !== 4) throw new Error("FCC_MARKET_FINAL_STATUS_INVALID");
   const buyerTokenAfter = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [account.address] });
-  const vendorTokenAfter = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [vendorAccount.address] });
+  const vendorTokenAfter = await Promise.all(vendorAccounts.map((vendor) =>
+    client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [vendor.address] }),
+  ));
   const marketTokenAfter = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [market] });
   const winner = getAddress(quorum.result.winner);
   const winningAmount = quorum.result.winningAmountXrp;
   currentPhase = "settlement-checks";
   const buyerDelta = buyerTokenBefore - buyerTokenAfter;
-  const vendorDelta = vendorTokenAfter - vendorTokenBefore;
-  if (winner !== getAddress(vendorAccount.address) || buyerDelta !== winningAmount || vendorDelta !== winningAmount || marketTokenAfter !== 0n) {
+  const vendorDeltas = vendorTokenAfter.map((balance, index) => balance - vendorTokenBefore[index]);
+  if (
+    winner !== getAddress(vendorAccounts[0].address) || buyerDelta !== winningAmount
+    || vendorDeltas[0] !== winningAmount || vendorDeltas.slice(1).some((delta) => delta !== 0n)
+    || marketTokenAfter !== 0n
+  ) {
     throw new Error("FCC_MARKET_SETTLEMENT_CONSERVATION_INVALID");
   }
+  const winningRecord = bidRecords[0];
   let awardOwner = null;
   if (awardReceipt !== zeroAddress) {
     awardOwner = getAddress(await client.readContract({ address: awardReceipt, abi: awardReceiptAbi, functionName: "ownerOf", args: [tenderId] }));
@@ -583,14 +611,17 @@ async function main() {
       codeHash,
       version,
       buyer: account.address,
-      vendor: vendorAccount.address,
+      vendor: winner,
+      vendors: vendorAccounts.map(({ address }) => address),
       teeIds: machines.map(({ teeId }) => teeId),
       teeKeyFingerprints: machines.map(({ fingerprint }) => fingerprint),
       tenderId: tenderId.toString(),
       rulesHash: context.rulesHash,
       orderedBidRoot: context.orderedBidRoot,
-      plaintextCommitment: commitment,
-      bidReceiptActionIds: actionIds,
+      plaintextCommitment: winningRecord.commitment,
+      plaintextCommitments: bidRecords.map(({ commitment }) => commitment),
+      bidReceiptActionIds: winningRecord.actionIds,
+      bidReceiptActionIdsByVendor: bidRecords.map(({ actionIds }) => actionIds),
       requestId,
       selectionSignerIds: quorum.signers,
       selectionResultDataHash: quorum.resultDataHash,
@@ -605,8 +636,10 @@ async function main() {
       awardReceiptOwner: awardOwner,
       approvalTransaction: approval.hash,
       tenderTransaction: create.hash,
-      vendorFundingTransaction: vendorFunding,
-      bidTransaction: bidTx.hash,
+      vendorFundingTransaction: winningRecord.fundingTransaction,
+      vendorFundingTransactions,
+      bidTransaction: winningRecord.bidTx,
+      bidTransactions: bidRecords.map(({ bidTx }) => bidTx),
       closeTransaction: close.hash,
       requestTransaction: request.hash,
       finalizationTransaction: finalization.hash,
@@ -614,13 +647,13 @@ async function main() {
     assertions: {
       marketSenderBoundToExtension: true,
       threeProductionMachinesFrozen: true,
-      threeEncryptedBidsAcceptedByDistinctTees: receipts.length === 3,
-      allBidReceiptsBindCommitment: receipts.every((receipt) => equalHex(receipt.plaintextCommitment, commitment)),
+      threeEncryptedBidsAcceptedByDistinctTees: bidRecords.length === vendorCount && bidRecords.every(({ receipts }) => receipts.length === 3),
+      allBidReceiptsBindCommitment: bidRecords.every(({ commitment, receipts }) => receipts.every((receipt) => equalHex(receipt.plaintextCommitment, commitment))),
       commonBidQuorumIsThree: context.quorumBitmap === 7,
       ftsSnapshotCapturedOnClose: context.ftsoValue > 0n && context.ftsoTimestamp > 0n,
       selectionResultSignedByTwoDistinctFrozenTees: quorum.signers.length === 2,
       selectionResultMatchesCommonRoot: equalHex(quorum.result.orderedBidRoot, context.orderedBidRoot),
-      ftestXrpWinnerPayoutConserved: buyerDelta === winningAmount && vendorDelta === winningAmount && marketTokenAfter === 0n,
+      ftestXrpWinnerPayoutConserved: buyerDelta === winningAmount && vendorDeltas[0] === winningAmount && vendorDeltas.slice(1).every((delta) => delta === 0n) && marketTokenAfter === 0n,
       awardReceiptMintedToWinner: awardOwner === winner,
       finalTenderAwarded: Number(field(finalized, "status", 21)) === 4,
       noPlaintextOrCiphertextRecorded: true,
@@ -629,13 +662,13 @@ async function main() {
     notes: [
       "This is a live Coston2 simulated-TEE lifecycle: FTestXRP escrow, encrypted private bid ingress, FTSO XRP/USD snapshot, FCC private scoring, 2-of-3 result quorum, and award settlement.",
       "Only public commitments, result fields, machine IDs, and transaction identifiers are recorded; bid plaintext, ciphertext, raw signatures, salts, and credentials are not recorded.",
-      "The vendor key was generated in process memory for this test and is not persisted or included in evidence.",
+      `${vendorCount} vendor bid(s) were generated in process memory; private keys and bid payloads are not persisted or included in evidence.`,
     ],
   };
   mkdirSync(resolve(root, "evidence/coston2"), { recursive: true });
   writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
   writeFileSync(statePath, `${JSON.stringify({ status: "PASSED", tenderId: tenderId.toString(), finalizationTransaction: finalization.hash }, null, 2)}\n`, { mode: 0o600, flag: "wx" });
-  console.log(safeJson({ gate: evidence.gate, status: evidence.status, tenderId, requestId, winner, winningAmountXrp: winningAmount, finalizationTransaction: finalization.hash, evidence: "evidence/coston2/gate-c-e-f-live-lifecycle.json" }));
+  console.log(safeJson({ gate: evidence.gate, status: evidence.status, vendorCount, tenderId, requestId, winner, winningAmountXrp: winningAmount, finalizationTransaction: finalization.hash, evidence: evidencePath.replace(`${root}/`, "") }));
 }
 
 try {
