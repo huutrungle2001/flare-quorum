@@ -168,6 +168,14 @@ export function machineRegistrationEnvironment(environment = process.env) {
   };
 }
 
+export function registrationAddresses(manifest) {
+  return {
+    FlareSystemsManager: manifest.contracts.flareSystemsManager,
+    Fdc2Hub: manifest.contracts.fccFdc2Hub,
+    FlareTeeManager: manifest.contracts.flareTeeManager,
+  };
+}
+
 export function evaluateRegisteredMachine({
   machine,
   status,

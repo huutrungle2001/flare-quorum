@@ -21,6 +21,7 @@ import {
   evaluateRegisteredMachine,
   inspectMachineRegistrationEndpoints,
   machineRegistrationEnvironment,
+  registrationAddresses,
 } from "../flare/fcc-machine-registration.mjs";
 import { normalizePrivateKey, readFoundationManifest } from "../flare/foundations.mjs";
 import { setLocalEnvironmentValues } from "../flare/local-fcc-secrets.mjs";
@@ -50,11 +51,7 @@ function secureRpcUrl(value) {
 }
 
 function writeRegistrationAddresses(path, manifest) {
-  const addresses = {
-    FlareSystemManager: manifest.contracts.flareSystemsManager,
-    Fdc2Hub: manifest.contracts.fccFdc2Hub,
-    FlareTeeManager: manifest.contracts.flareTeeManager,
-  };
+  const addresses = registrationAddresses(manifest);
   writeFileSync(path, `${JSON.stringify(addresses, null, 2)}\n`, { mode: 0o600 });
   chmodSync(path, 0o600);
 }

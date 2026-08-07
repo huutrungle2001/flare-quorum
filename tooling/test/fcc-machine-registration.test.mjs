@@ -7,6 +7,7 @@ import {
   inspectMachineRegistrationEndpoints,
   machineRegistrationEnvironment,
   parseMachineInfo,
+  registrationAddresses,
 } from "../flare/fcc-machine-registration.mjs";
 
 const expected = {
@@ -74,6 +75,22 @@ test("uses three loopback proxy defaults without exposing configuration values",
   const result = machineRegistrationEnvironment({});
   assert.equal(result.controlUrls.length, 3);
   assert.equal(result.publicUrls.length, 0);
+});
+
+test("writes the exact address keys expected by the FCC registration client", () => {
+  const addresses = registrationAddresses({
+    contracts: {
+      flareSystemsManager: "0x1111111111111111111111111111111111111111",
+      fccFdc2Hub: "0x2222222222222222222222222222222222222222",
+      flareTeeManager: "0x3333333333333333333333333333333333333333",
+    },
+  });
+  assert.deepEqual(Object.keys(addresses), [
+    "FlareSystemsManager",
+    "Fdc2Hub",
+    "FlareTeeManager",
+  ]);
+  assert.equal("FlareSystemManager" in addresses, false);
 });
 
 test("accepts stable remote control endpoints for hosted Railway machines", async () => {
