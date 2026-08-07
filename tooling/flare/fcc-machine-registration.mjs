@@ -91,19 +91,26 @@ async function jsonInfo(origin, fetchImplementation) {
 export async function inspectMachineRegistrationEndpoints({
   publicUrls,
   localUrls,
+  controlUrls,
   normalProxyUrl,
   expected,
   forbiddenHostnameSuffix = "trycloudflare.com",
   fetchImplementation = fetch,
 }) {
+  const effectiveControlUrls = controlUrls ?? localUrls ?? [];
   const blockers = [];
   if (
     publicUrls.length !== 3 ||
     !publicUrls.every((url) => isStableProxyUrl(url, forbiddenHostnameSuffix)) ||
     new Set(publicUrls).size !== 3
   ) blockers.push("THREE_STABLE_PROXY_URLS_NOT_CONFIGURED");
-  if (localUrls.length !== 3 || !localUrls.every(localOrigin)) {
-    blockers.push("THREE_LOCAL_PROXY_URLS_INVALID");
+  if (
+    effectiveControlUrls.length !== 3 ||
+    !effectiveControlUrls.every((url) =>
+      localOrigin(url) || isStableProxyUrl(url, forbiddenHostnameSuffix)
+    )
+  ) {
+    blockers.push("THREE_CONTROL_PROXY_URLS_INVALID");
   }
   if (!securePublicUrl(normalProxyUrl)) blockers.push("NORMAL_PROXY_URL_INVALID");
   if (blockers.length > 0) return { status: "BLOCKED", blockers, machines: [] };
@@ -118,7 +125,7 @@ export async function inspectMachineRegistrationEndpoints({
   for (let index = 0; index < 3; index += 1) {
     try {
       const [local, remote] = await Promise.all([
-        jsonInfo(localUrls[index], fetchImplementation),
+        jsonInfo(effectiveControlUrls[index], fetchImplementation),
         jsonInfo(publicUrls[index], fetchImplementation),
       ]);
       const localMachine = parseMachineInfo(local, expected);
@@ -129,7 +136,7 @@ export async function inspectMachineRegistrationEndpoints({
       }
       machines.push({
         machine: index + 1,
-        localUrl: localUrls[index],
+        controlUrl: effectiveControlUrls[index],
         publicUrl: publicUrls[index],
         ...localMachine,
       });
@@ -148,11 +155,14 @@ export async function inspectMachineRegistrationEndpoints({
 }
 
 export function machineRegistrationEnvironment(environment = process.env) {
+  const configuredControlUrls = list(environment.FCC_PROXY_CONTROL_URLS);
   return {
     publicUrls: list(environment.FLARE_FCC_PROXY_URLS),
-    localUrls: list(environment.FCC_PROXY_LOCAL_URLS).length > 0
-      ? list(environment.FCC_PROXY_LOCAL_URLS)
-      : ["http://127.0.0.1:6674/", "http://127.0.0.1:6675/", "http://127.0.0.1:6676/"],
+    controlUrls: configuredControlUrls.length > 0
+      ? configuredControlUrls
+      : list(environment.FCC_PROXY_LOCAL_URLS).length > 0
+        ? list(environment.FCC_PROXY_LOCAL_URLS)
+        : ["http://127.0.0.1:6674/", "http://127.0.0.1:6675/", "http://127.0.0.1:6676/"],
     normalProxyUrl:
       environment.NORMAL_PROXY_URL?.trim() || "https://tee-proxy-coston2-1.flare.rocks/",
   };

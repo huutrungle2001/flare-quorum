@@ -193,10 +193,13 @@ deployment key without storing it in the image and must use `-command rRap`
 plus one state file and stable public HTTPS URL per machine.
 
 Configure exactly three comma-separated stable origins in
-`FLARE_FCC_PROXY_URLS`, with each origin tunneling to its matching loopback port
-in order. `pnpm flare:machines:preflight` compares every public `/info` response
-with its local machine, rejects credential-bearing/path/quick-tunnel URLs, and
-prints only TEE IDs and public-key fingerprints. When it reports `READY`, run:
+`FLARE_FCC_PROXY_URLS`. For the local Compose stack, each origin tunnels to its
+matching loopback port in order. For remotely hosted machines, also configure
+the same three origins in `FCC_PROXY_CONTROL_URLS`; the registration client then
+uses the remote HTTPS control endpoint instead of assuming a local process.
+`pnpm flare:machines:preflight` compares every public `/info` response with its
+control endpoint, rejects credential-bearing/path/quick-tunnel URLs, and prints
+only TEE IDs and public-key fingerprints. When it reports `READY`, run:
 
 ```bash
 pnpm flare:machines:register
@@ -207,6 +210,15 @@ The runner extracts and re-hashes the verified registration binary, invokes
 extension, URL, code/platform, and public key from one Coston2 block before it
 writes public evidence. The deployment key remains process-local and is never
 placed in an argument, image, state file, output, or evidence.
+
+The Railway Coston2 option deploys
+`apps/fcc-extension/railway/Dockerfile` as three separate services. Each service
+co-locates the exact approved extension and proxy binaries with its own Redis
+queue, runtime secrets, volume, HTTPS domain, and simulated identity. Railway
+builds must use `apps/fcc-extension/railway/railway.json`; the repository-root
+`railway.json` belongs to the relay and must not be reused. A Railway restart
+still rotates the upstream simulated identity, so do not redeploy a registered
+machine during the demonstration window.
 
 For a named Cloudflare Tunnel, install the checksum-pinned local client with
 `pnpm flare:tunnel:install` and verify it with `pnpm flare:tunnel:check`. The

@@ -182,7 +182,7 @@ try {
       const execution = spawnSync(binaryPath, [
         "-a", addressesPath,
         "-c", rpcUrl,
-        "-p", machine.localUrl,
+        "-p", machine.controlUrl,
         "-h", machine.publicUrl,
         "-ep", endpointConfiguration.normalProxyUrl,
         "-state", statePath,

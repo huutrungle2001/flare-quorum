@@ -58,6 +58,7 @@ test("requires three stable public endpoints exposing the same local identities"
   });
   assert.equal(result.status, "READY");
   assert.equal(result.machines.length, 3);
+  assert.deepEqual(result.machines.map(({ controlUrl }) => controlUrl), localUrls);
 
   const blocked = await inspectMachineRegistrationEndpoints({
     publicUrls: ["https://random.trycloudflare.com/"],
@@ -71,8 +72,30 @@ test("requires three stable public endpoints exposing the same local identities"
 
 test("uses three loopback proxy defaults without exposing configuration values", () => {
   const result = machineRegistrationEnvironment({});
-  assert.equal(result.localUrls.length, 3);
+  assert.equal(result.controlUrls.length, 3);
   assert.equal(result.publicUrls.length, 0);
+});
+
+test("accepts stable remote control endpoints for hosted Railway machines", async () => {
+  const publicUrls = [1, 2, 3].map(
+    (n) => `https://veilbid-flare-fcc-${n}-production.up.railway.app/`,
+  );
+  const fetchImplementation = async (url) => {
+    if (url.href === "https://tee-proxy-coston2-1.flare.rocks/info") {
+      return new Response(JSON.stringify({ ready: true }), { status: 200 });
+    }
+    const machine = publicUrls.findIndex((origin) => url.href.startsWith(origin)) + 1;
+    return new Response(JSON.stringify(info(String(machine).repeat(2))), { status: 200 });
+  };
+  const result = await inspectMachineRegistrationEndpoints({
+    publicUrls,
+    controlUrls: publicUrls,
+    normalProxyUrl: "https://tee-proxy-coston2-1.flare.rocks/",
+    expected,
+    fetchImplementation,
+  });
+  assert.equal(result.status, "READY");
+  assert.deepEqual(result.machines.map(({ controlUrl }) => controlUrl), publicUrls);
 });
 
 test("accepts only a production on-chain machine with exact frozen bindings", () => {

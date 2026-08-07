@@ -121,11 +121,14 @@ valid across restarts:
 
 - named Cloudflare Tunnel; or
 - reserved ngrok domain; or
+- a persistent Railway service domain backed by one FCC machine service; or
 - another organizer-approved stable HTTPS origin.
 
 Do not register a `trycloudflare` quick-tunnel hostname. Before and after
-registration, compare on-chain machine URL with `EXT_PROXY_URL` and verify the
-same `/info` response through local and public origins. If a URL rotates, update
+registration, compare on-chain machine URL with the configured public URL and
+verify the same `/info` identity through the registration control endpoint and
+public origin. A hosted machine may use the same stable HTTPS URL for both by
+setting `FCC_PROXY_CONTROL_URLS`. If a URL or identity rotates, update
 configuration and re-run the supported post-build registration flow before any
 test is accepted.
 
