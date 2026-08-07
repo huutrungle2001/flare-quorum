@@ -15,7 +15,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import {
   foundationBindingHash,
   verifyFoundationActionResponse,
-} from "@veilbid/flare-bindings";
+} from "../../packages/flare-bindings/dist/fcc-result.js";
 import { normalizePrivateKey } from "../flare/foundations.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
@@ -82,8 +82,8 @@ async function fetchResult(url, request, allowedTeeIds, expectedVersion, attempt
 
 function verifyInFreshProcess(url, request, allowedTeeIds, expectedVersion) {
   const child = [
-    "import { verifyFoundationActionResponse } from '@veilbid/flare-bindings';",
     "const input = JSON.parse(process.argv[1]);",
+    "const { verifyFoundationActionResponse } = await import(input.bindingsPath);",
     "const response = await fetch(input.url, { headers: { accept: 'application/json' }, redirect: 'error' });",
     "if (!response.ok) throw new Error(`HTTP_${response.status}`);",
     "const value = await response.json();",
@@ -96,6 +96,7 @@ function verifyInFreshProcess(url, request, allowedTeeIds, expectedVersion) {
     fields: { ...request.fields, chainId: request.fields.chainId.toString() },
     allowedTeeIds,
     expectedVersion,
+    bindingsPath: new URL("../../packages/flare-bindings/dist/fcc-result.js", import.meta.url).href,
   });
   const result = spawnSync(process.execPath, ["--input-type=module", "-e", child, input], {
     cwd: root,
