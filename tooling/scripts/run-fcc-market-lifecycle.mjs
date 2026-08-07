@@ -479,7 +479,7 @@ async function main() {
   });
   const bidTx = await writeEncodedTransaction({
     client, wallet: vendorWallet, account: vendorAccount, to: market, data: bidData,
-    gas: 300_000n, code: "FCC_MARKET_SUBMIT_BID_RECEIPTS_FAILED", preflight: false,
+    gas: 1_000_000n, code: "FCC_MARKET_SUBMIT_BID_RECEIPTS_FAILED", preflight: false,
   });
   const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   if (field(tenderAfterBid, "bidCount", 6) !== 1n || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
