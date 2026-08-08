@@ -221,7 +221,7 @@ try {
     notes: [
       "This browser smoke used a public XRPL testnet owner and a known public vendor address only; it performed Coston2 reads and no wallet, XRPL, FDC, or EVM write.",
       "The draft and memo are inspected in memory and are not written to evidence; only shape, byte length, boundary, and redaction assertions are recorded.",
-      "A transaction ID is deliberately omitted so the browser produces a payment draft first; the strict executor job is deferred until an external XRPL wallet supplies the public transaction ID.",
+      "A transaction ID is deliberately omitted so the browser produces a payment draft first; the optional GemWallet action is not clicked in this wallet-free smoke, and the strict executor job remains deferred until a wallet supplies the public transaction ID.",
     ],
   };
   mkdirSync(dirname(evidencePath), { recursive: true });
