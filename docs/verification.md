@@ -72,7 +72,7 @@ wallet/executor secrets are never persisted.
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PARTIAL — 320px/keyboard/focus/reduced-motion/labels pass in `evidence/coston2/web-keyboard-accessibility.json`; browser-native signing/recovery remains |
 | Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; 602 latest hosted Railway JSON log records were inspected in memory with zero forbidden-material pattern matches; longer retention and stateful fault coverage remain |
 | New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | PASSED for the current Flare package — `submission/flare/NEW-WORK-LEDGER.md` and judge-package validation agree; historical parent pack remains isolated |
-| User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN |
+| User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN — explicit zero-session record in [`evidence/coston2/user-validation.release.json`](../evidence/coston2/user-validation.release.json); no traction is claimed |
 
 ## 4. Planned evidence set
 

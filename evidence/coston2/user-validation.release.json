@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-user-validation",
+  "status": "NOT_RUN",
+  "recordedAt": "2026-08-08T07:30:00.000Z",
+  "sourceCommit": "4980ce6e1ceedc7e07c042579b6462050631a469",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114
+  },
+  "counts": {
+    "xrpTreasuryInterviews": 0,
+    "vendorUsabilityTests": 0,
+    "pilotDesignPartners": 0
+  },
+  "assertions": {
+    "noSyntheticParticipants": true,
+    "noTractionClaim": true,
+    "validationProtocolPublished": true,
+    "publicJudgePathReadyForTesting": true
+  },
+  "blockers": [
+    "BUYER_VALIDATION_NOT_RUN",
+    "VENDOR_VALIDATION_NOT_RUN",
+    "PILOT_VALIDATION_NOT_RUN"
+  ],
+  "notes": [
+    "No buyer, vendor, or pilot session is being represented as completed in this release.",
+    "The structured validation protocol is published in submission/flare/VALIDATION-PLAN.md and requires five treasury/buyer sessions, five vendor sessions, and one honest pilot or design-partner signal before Gate H can pass.",
+    "This record contains no participant identity, quote, private bid, credential, wallet secret, or confidential payload."
+  ]
+}

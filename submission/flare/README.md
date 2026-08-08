@@ -183,7 +183,9 @@ review recorded without retaining log bodies.
 Still open and deliberately not overstated: same-identity simulated-TEE
 restart recovery, browser-native XRP interactive recovery and broader wallet
 coverage, adversarial/recovery breadth beyond the recorded drill, structured
-buyer/vendor interviews, and pilot evidence. The public-safe Buyer
+buyer/vendor interviews, and pilot evidence. The explicit
+`evidence/coston2/user-validation.release.json` record is `NOT_RUN`; it is not
+traction evidence. The public-safe Buyer
 wallet-ready Payment/job/memo preview and optional GemWallet Testnet
 signing/submission are shipped; the browser does not receive a secret or
 signed private material. The
