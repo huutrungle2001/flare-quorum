@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-08T04:55:10.796Z",
+  "recordedAt": "2026-08-08T05:47:03.591Z",
   "publicIdentifiers": {
-    "sourceCommit": "ef9312a69ab74465134749e111c8b0cef5a789cc",
+    "sourceCommit": "f401fa211fb25fe8628b831520380159fdcf7936",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -93,7 +93,7 @@
     "The dedicated Activity/Evidence route reread the same finalized market snapshot without a wallet or bid payload.",
     "The Vendor route exposes the official redemption request boundary but keeps approval and redemption behind the winning Coston2 wallet.",
     "The Buyer route exposes the structured public brief and commits its canonical hash without collecting bid plaintext.",
-    "The Buyer route exposes a public-safe XRPL 0xFE wallet-ready payment draft and job/memo preview; it does not sign or submit an XRPL payment and does not accept an XRPL secret.",
+    "The Buyer route exposes a public-safe XRPL 0xFE wallet-ready payment draft and optional GemWallet Testnet submit action; this wallet-free smoke does not click it and no XRPL secret is accepted.",
     "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
     "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed."
   ]
