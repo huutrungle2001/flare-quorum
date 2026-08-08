@@ -63,7 +63,8 @@ FCC is essential: the winner is computed from sealed bid state inside the
    wallet-ready XRPL Payment draft, then preview the public-safe Smart Account
    `0xFE` job and memo. This is a read-only handoff; XRPL signing/submission
    stays with the buyer's external wallet and dedicated executor, and no XRPL
-   secret enters the browser.
+   secret enters the browser. The live draft shape/memo smoke is recorded in
+   `evidence/coston2/web-xrp-funding-draft.json`.
 5. Open the awarded Coston2 tender and follow the public market and award
    receipt contracts in the explorer.
 6. Use the [Flare docs](https://veilbid-flare.vercel.app/docs#flare-coston2) to

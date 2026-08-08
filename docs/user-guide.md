@@ -6,8 +6,10 @@
 > are live. The XRP-native funding protocol and executor have live Gate G
 > evidence plus a public-safe delayed-mint checkpoint/resume path. The Buyer
 > workspace can also prepare a wallet-ready XRPL Payment draft and public-safe
-> `0xFE` executor job preview from read-only Coston2 state; XRPL signing,
-> submission, and recovery remain outside the browser custody boundary. `/room` remains the historical
+> `0xFE` executor job preview from read-only Coston2 state; the live
+> wallet-ready draft smoke is recorded in
+> `evidence/coston2/web-xrp-funding-draft.json`. XRPL signing, submission, and
+> recovery remain outside the browser custody boundary. `/room` remains the historical
 > Sepolia baseline.
 
 ## 1. What the product will do
