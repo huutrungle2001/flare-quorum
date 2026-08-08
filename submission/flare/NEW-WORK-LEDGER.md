@@ -15,6 +15,7 @@ Summer Signal. Commit IDs refer to the Flare v2 repository's `main` branch.
 | Live hardening | Result-collection outage drill: one endpoint unavailable, two frozen machines finalize | `evidence/coston2/three-vendor-recovery.release.json`, commit `03c51a3` | Demonstrates threshold liveness without weakening the quorum |
 | Live hardening | Read-only hosted runtime-log review across the three FCC services and ingress; forbidden-material scan runs in memory only | `evidence/coston2/hosted-runtime-log-review.json`, commit `5c743ab` | Adds an auditable privacy check without publishing runtime bodies or credentials |
 | Live hardening | Market-machine preflight now targets the hosted product extension separately from the local foundation extension | `evidence/coston2/fcc-market-machine-preflight.json`, commit `b3f519e` | Prevents a foundation/product ID mix-up from falsely blocking registered machines |
+| Release hardening | Market lifecycle preflight is repeatable after a prior evidence/state record, while execute mode still refuses overwrite | `tooling/flare/market-lifecycle-guards.mjs`, `tooling/test/market-lifecycle-guards.test.mjs` | Lets operators re-check live readiness without weakening immutable evidence safety |
 
 ## Not claimed as complete
 

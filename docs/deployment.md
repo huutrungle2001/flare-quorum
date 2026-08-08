@@ -415,6 +415,10 @@ award-receipt immutable bindings are checked independently on-chain.
 - Run wrong-domain/root/rules/feed/machine/key/nonce/expiry, weak/split quorum,
   stale oracle, rollback, proxy/TEE restart, competing relay, reentrancy, and
   conservation cases.
+- Re-run `pnpm flare:market:lifecycle:preflight` whenever live readiness needs
+  checking; it is read-only and remains valid after evidence/state exists.
+  Only `pnpm flare:market:lifecycle` reserves fresh evidence/state paths and
+  refuses to overwrite an earlier lifecycle record.
 - Promote `verified: true` only when every mandatory verification row passes and
   blockers are empty.
 

@@ -30,6 +30,7 @@ import {
   veilBidDirectSubmitCommand,
 } from "../../packages/flare-bindings/dist/index.js";
 import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
+import { lifecyclePathBlocker } from "../flare/market-lifecycle-guards.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const execute = process.argv.includes("--execute");
@@ -375,8 +376,6 @@ async function main() {
   const keys = apiKeys();
   const machineIds = machinesEvidence.publicIdentifiers.machines.map(({ teeId }) => getAddress(teeId));
   if (machineIds.length !== 3 || new Set(machineIds.map((id) => id.toLowerCase())).size !== 3) throw new Error("FCC_MARKET_MACHINE_EVIDENCE_INVALID");
-  if (existsSync(evidencePath)) throw new Error("FCC_MARKET_LIFECYCLE_EVIDENCE_EXISTS");
-  if (existsSync(statePath)) throw new Error("FCC_MARKET_LIFECYCLE_STATE_EXISTS");
   if (!execute) {
     const client = createPublicClient({ chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
     const machines = await readTeeSet({ client, manager, urls, extensionId, codeHash });
@@ -397,6 +396,12 @@ async function main() {
     }));
     return;
   }
+  const pathBlocker = lifecyclePathBlocker({
+    execute,
+    evidenceExists: existsSync(evidencePath),
+    stateExists: existsSync(statePath),
+  });
+  if (pathBlocker) throw new Error(pathBlocker);
   if (execFileSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" }).trim()) {
     throw new Error("FCC_MARKET_LIFECYCLE_REQUIRES_CLEAN_WORKTREE");
   }
