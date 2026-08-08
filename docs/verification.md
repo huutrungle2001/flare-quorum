@@ -131,6 +131,12 @@ The local identity-rotation boundary is recorded in
 It confirms the supported runtime's replacement-identity behavior and keeps
 same-identity restart recovery explicitly open.
 
+The local two-machine-loss fail-closed drill is recorded in
+[`evidence/local/fcc-local-two-machine-loss.json`](../evidence/local/fcc-local-two-machine-loss.json).
+It stops two simulated containers, observes both as unavailable while the
+surviving machine remains healthy, and restores the stack; it is not a live
+Coston2 outage claim.
+
 The read-only live negative observations are recorded in
 [`evidence/coston2/live-negative-calls.release.json`](../evidence/coston2/live-negative-calls.release.json).
 They exercise terminal-state and zero-term guards through `eth_call` only;

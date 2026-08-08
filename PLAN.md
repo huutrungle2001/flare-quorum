@@ -299,8 +299,9 @@ confidential bid or settlement boundary:
   `evidence/local/flare-adversarial-coverage.json`; live read-only terminal and
   zero-term guard calls are recorded in
   `evidence/coston2/live-negative-calls.release.json`; the local Docker
-  identity-rotation boundary is recorded in
-  `evidence/local/fcc-local-tee-restart-boundary.json`. Stateful Coston2 fault
+  identity-rotation boundary and fail-closed two-machine-loss drill are
+  recorded in `evidence/local/fcc-local-tee-restart-boundary.json` and
+  `evidence/local/fcc-local-two-machine-loss.json`. Stateful Coston2 fault
   injection, process restart, and two-machine-loss drills remain open.
 - [x] Record public gas, block-latency, close-to-result, recovery, and
   independently measured bid-ingress benchmarks from live Coston2 lifecycles in

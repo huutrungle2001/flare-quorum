@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "suite": "local-simulated-tee-restart-boundary",
-  "recordedAt": "2026-08-08T05:00:00.552Z",
-  "sourceCommit": "17c94f792c592c1651cfd0237898e73d28cd0c4e",
+  "recordedAt": "2026-08-08T07:25:42.114Z",
+  "sourceCommit": "d6b49df3c57a7cb2318873385834aef77e969ade",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
@@ -11,8 +11,8 @@
   "scope": "local Docker Compose stack only; no Railway service or Coston2 state was changed",
   "publicIdentifiers": {
     "machine": 1,
-    "fingerprintBeforeRestartSha256": "3a96e1e0b151408542c03cac281b0b30c14f974776b29373047ffdb53c42c04",
-    "fingerprintAfterRestartAndProxyRefreshSha256": "c23a8a6edda57330d8486604731998710c1da6cf7a4806587e760b7b39b0a17d"
+    "fingerprintBeforeRestartSha256": "a5d2a2ea6f28e3920f8930444e86f8312f69f76817c601a6cc1b4d05487bcfb9",
+    "fingerprintAfterRestartAndProxyRefreshSha256": "9c8a57b3ad687d0968f8f809922e8f6bea7f386ddeddfa5ac25079d0a33b882f"
   },
   "assertions": {
     "teeContainerRestartCompleted": true,

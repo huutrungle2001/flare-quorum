@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "suite": "local-simulated-fcc-two-machine-loss",
+  "recordedAt": "2026-08-08T07:25:42.114Z",
+  "sourceCommit": "d6b49df3c57a7cb2318873385834aef77e969ade",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "mode": "simulated-local"
+  },
+  "scope": "local Docker Compose stack only; no Railway service, registration, or Coston2 state was changed",
+  "publicIdentifiers": {
+    "extensionId": "0x00000000000000000000000000000000000000000000000000000000000101d7",
+    "codeVersion": "0.2.2",
+    "unavailableMachines": [1, 2],
+    "survivingMachine": 3,
+    "survivingMachineFingerprintSha256": "b3521ee4e6d2353e812c31f98c54d0f9803a96269220c7d447e1b55a445327dc"
+  },
+  "assertions": {
+    "machineOneStopped": true,
+    "machineTwoStopped": true,
+    "machineOneUnavailable": true,
+    "machineTwoUnavailable": true,
+    "survivingMachinePassedDirectSmoke": true,
+    "twoMachineLossFailClosed": true,
+    "stackRestoredAfterDrill": true,
+    "productionServicesUntouched": true,
+    "rawIdentityKeyNotReadOrRecorded": true,
+    "bidMaterialNotReadOrRecorded": true
+  },
+  "blockers": [
+    "LIVE_C2_TWO_MACHINE_LOSS_NOT_RUN",
+    "SAME_IDENTITY_TEE_RESTART_NOT_SUPPORTED_BY_CURRENT_SIMULATED_RUNTIME"
+  ],
+  "notes": [
+    "Two local simulated TEE containers were stopped together. The surviving third machine remained healthy, while the normal three-machine verifier reported both stopped endpoints as unavailable and did not report a false all-machine success.",
+    "The local stack was restored and the full three-machine smoke passed after the drill. This is fail-closed local evidence, not a Coston2 production outage claim.",
+    "No production service, on-chain registration, tender, credential, private key, ciphertext, or bid payload was accessed or modified."
+  ]
+}

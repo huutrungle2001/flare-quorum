@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "suite": "local-three-machine-fcc-stack-smoke",
-  "recordedAt": "2026-08-08T04:57:06.849Z",
-  "sourceCommit": "4328152f220e7171f5dc64d176f6cc306358da50",
+  "recordedAt": "2026-08-08T07:25:42.114Z",
+  "sourceCommit": "d6b49df3c57a7cb2318873385834aef77e969ade",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
@@ -12,18 +12,18 @@
   "machines": [
     {
       "machine": 1,
-      "publicKeyFingerprintSha256": "3a96e1e0b151408542c03cac281b0b30c14f974776b29373047ffdb53c42c04",
-      "actionIdFingerprintSha256": "2aeb4ccffcdcefa1724e3a5e4a0bff15d00d455f087db93721a1dbcd6dd790e9"
+      "publicKeyFingerprintSha256": "9c8a57b3ad687d0968f8f809922e8f6bea7f386ddeddfa5ac25079d0a33b882f",
+      "actionIdFingerprintSha256": "94d76b3eba0a6a65d081cde73df64acdd7b48e59984c8e6e043c09f73fc21990"
     },
     {
       "machine": 2,
-      "publicKeyFingerprintSha256": "2325b6d004aca5bfa3e36d294d168643f84b017bd6a28abd8f412fd27e570710",
-      "actionIdFingerprintSha256": "a61880859ddae23d83ce1205daf6bcae0400fdac406ef8c3dd3c19fbac8910bb"
+      "publicKeyFingerprintSha256": "4c8e01c6dfe547da9fc52ed8a0f4e226794ebda093dcf4bb3306461bf41e1d48",
+      "actionIdFingerprintSha256": "0e3d2603e9993362b57730357770a3061d22c0e03fcd97339783d4f41981d002"
     },
     {
       "machine": 3,
       "publicKeyFingerprintSha256": "b3521ee4e6d2353e812c31f98c54d0f9803a96269220c7d447e1b55a445327dc",
-      "actionIdFingerprintSha256": "00d60ef78196cc84fe74d5e860ffc3ec4004d08bdee3fb49baf57b47cd02acf4"
+      "actionIdFingerprintSha256": "df0c1fbef61ed65adac19404714999205511cf831c222731ee8f5fb53f2b23a5"
     }
   ],
   "assertions": {
