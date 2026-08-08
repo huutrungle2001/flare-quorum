@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-market-machine-registration-preflight",
+  "status": "PASSED",
+  "recordedAt": "2026-08-08T05:09:08.131Z",
+  "sourceCommit": "b3f519e7b5cec80cf1f7a746e93383f20de7a155",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "observedBlock": "33767227",
+    "rpcSource": "official-public-coston2-rpc"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "66011",
+    "command": "rRap",
+    "simulatedTee": true,
+    "machines": [
+      {
+        "machine": 1,
+        "teeId": "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
+        "publicUrl": "https://veilbid-flare-fcc-1-production.up.railway.app",
+        "publicKeyFingerprintSha256": "6d8717d72e0b05703cb1beb1f179453f2a41d681777221af27606525df05bb60"
+      },
+      {
+        "machine": 2,
+        "teeId": "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
+        "publicUrl": "https://veilbid-flare-fcc-2-production.up.railway.app",
+        "publicKeyFingerprintSha256": "8a659d02b1e9f043075e1fef412cb9e5537e7e438f4aa97bb81ffbbe4db6e4a1"
+      },
+      {
+        "machine": 3,
+        "teeId": "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40",
+        "publicUrl": "https://veilbid-flare-fcc-3-production.up.railway.app",
+        "publicKeyFingerprintSha256": "bf2221726c6317bc4a99e742f7d57e9e10841c3a49706291d54dcb1be6d18849"
+      }
+    ]
+  },
+  "assertions": {
+    "marketExtensionSelectedWithoutChangingFoundationId": true,
+    "normalProxyReachable": true,
+    "threeStablePublicOrigins": true,
+    "threeControlOriginsReachable": true,
+    "publicAndControlIdentitiesMatch": true,
+    "threeDistinctTeeIdentities": true,
+    "noRegistrationTransactionSubmitted": true,
+    "noSecretsOrPayloadsRecorded": true
+  },
+  "blockers": [],
+  "notes": [
+    "This is a read-only preflight of the already registered market extension and its three Railway origins; it does not call rRap or update on-chain routes.",
+    "The local Compose foundation extension remains separate. The resolver fix is covered by tooling tests and selects market extension 66011 for hosted machine URLs.",
+    "Only public IDs, origins, fingerprints, and Boolean assertions are recorded."
+  ]
+}
