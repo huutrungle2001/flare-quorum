@@ -122,7 +122,7 @@ const assertions = {
   vendorRedemptionBoundaryRendered: vendorRoute.dom.includes("Request XRP redemption") && vendorRoute.dom.includes("Connect the winning Coston2 wallet"),
   noPublicStateFailureRendered: !desktop.dom.includes("Flare state unavailable") && !mobile.dom.includes("Flare state unavailable"),
   mobileTenderNavigationActive: mobile.dom.includes('class="primary-nav-link active"') && mobile.dom.includes('aria-current="page"'),
-  docsRouteRendered: docsMobile.dom.includes("CURRENT JUDGE PATH") && docsMobile.dom.includes("Five primitives, one product path") && docsMobile.dom.includes("same-identity restore is not claimed") && docsMobile.dom.includes('class="docs-nav"'),
+  docsRouteRendered: docsMobile.dom.includes("CURRENT JUDGE PATH") && docsMobile.dom.includes("Five primitives, one product path") && docsMobile.dom.includes("Same-identity restore is not claimed") && docsMobile.dom.includes('class="docs-nav"'),
   historicalDocsRemainSeparated: docsMobile.dom.includes("OPEN HISTORICAL SEPOLIA BASELINE") && !docsMobile.dom.includes("Use VeilBid from tender to settlement"),
   desktopScreenshotCaptured: desktop.screenshot.sha256.length === 64,
   mobileScreenshotCaptured: mobile.screenshot.sha256.length === 64,
