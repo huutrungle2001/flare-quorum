@@ -52,6 +52,7 @@ for (const pattern of forbiddenPatterns) {
 }
 
 const release = readJson(resolve(root, "packages/flare-contracts/deployments/coston2.release.json"), "JUDGE_PACKAGE_RELEASE_INVALID");
+const gateB = readJson(resolve(root, "evidence/coston2/gate-b-private-ingress.json"), "JUDGE_PACKAGE_GATE_B_EVIDENCE_INVALID");
 const recovery = readJson(resolve(root, "evidence/coston2/three-vendor-recovery.release.json"), "JUDGE_PACKAGE_RECOVERY_EVIDENCE_INVALID");
 const replacement = readJson(resolve(root, "evidence/coston2/fcc-replacement-recovery.json"), "JUDGE_PACKAGE_REPLACEMENT_EVIDENCE_INVALID");
 const currentLifecycle = readJson(resolve(root, "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json"), "JUDGE_PACKAGE_CURRENT_LIFECYCLE_INVALID");
@@ -67,6 +68,10 @@ const assertions = {
   currentV2LinksPresent: requiredText.every((text) => packageText.includes(text)),
   noForbiddenSecretOrHistoricalLink: forbiddenPatterns.every((pattern) => !pattern.test(packageText)),
   verifiedCoston2Release: release.chainId === 114 && release.verified === true,
+  privateIngressGatePassed: gateB.status === "PASSED"
+    && gateB.gate === "B"
+    && Object.values(gateB.assertions ?? {}).every(Boolean)
+    && gateB.publicIdentifiers?.postReplacementTenderId === "23",
   recoveryEvidencePassed: recovery.status === "PASSED" && recovery.gate === "C-E-F-RECOVERY",
   recoveryThresholdProof: recoveryAssertions.oneSelectionResultUnavailableStillFinalized === true && recoveryAssertions.selectionResultSignedByTwoDistinctFrozenTees === true,
   replacementRecoveryPassed: replacement.status === "PASSED" && replacement.gate === "FCC_REPLACEMENT_RECOVERY"

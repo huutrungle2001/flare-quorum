@@ -73,8 +73,8 @@ Live partial result: `evidence/coston2/gate-b-private-ingress.json` records thre
 production-status Coston2 simulated TEEs accepting independently encrypted
 XRP bids, binding signed receipts to the same market/tender/vendor/rules
 commitment, an exact-ciphertext idempotent retry, and rejection of a changed
-ciphertext for the occupied sealed slot. It intentionally remains
-the immutable ingress record for that run; combined with
+ciphertext for the occupied sealed slot. It now aggregates that immutable run
+with
 `evidence/coston2/fcc-replacement-recovery.json` and the post-replacement tender
 `23` lifecycle, Gate B now passes. Same-identity restoration is neither
 supported nor a gate requirement.

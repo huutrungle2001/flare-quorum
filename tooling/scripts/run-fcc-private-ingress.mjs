@@ -27,6 +27,8 @@ const evidencePath = resolve(root, "evidence/coston2/gate-b-private-ingress.json
 const registrationPath = resolve(root, "evidence/coston2/fcc-extension-registration.json");
 const codeVersionPath = resolve(root, "evidence/coston2/fcc-code-version.json");
 const machinesPath = resolve(root, "evidence/coston2/fcc-machines.json");
+const replacementPath = resolve(root, "evidence/coston2/fcc-replacement-recovery.json");
+const currentLifecyclePath = resolve(root, "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json");
 
 const managerAbi = [{
   type: "function",
@@ -276,6 +278,21 @@ async function main() {
   if (!replayRejected) throw new Error("FCC_GATE_B_REPLAY_NOT_REJECTED");
 
   const receiptAssertions = submissions.map(({ index, verified }) => ({ machine: index + 1, ...verified.assertions }));
+  const replacement = JSON.parse(readFileSync(replacementPath, "utf8"));
+  const currentLifecycle = JSON.parse(readFileSync(currentLifecyclePath, "utf8"));
+  const replacementIds = replacement.publicIdentifiers?.currentMachines?.map(({ teeId }) => getAddress(teeId)) ?? [];
+  const lifecycleIds = (currentLifecycle.publicIdentifiers?.teeIds ?? []).map(getAddress);
+  const normalizedSet = (values) => [...values].map((value) => value.toLowerCase()).sort();
+  if (
+    replacement.status !== "PASSED"
+    || replacement.gate !== "FCC_REPLACEMENT_RECOVERY"
+    || !Object.values(replacement.assertions ?? {}).every(Boolean)
+    || currentLifecycle.status !== "PASSED"
+    || currentLifecycle.gate !== "C-E-F"
+    || !sameHex(currentLifecycle.publicIdentifiers?.codeHash, codeHash)
+    || replacementIds.length !== 3
+    || JSON.stringify(normalizedSet(replacementIds)) !== JSON.stringify(normalizedSet(lifecycleIds))
+  ) throw new Error("FCC_GATE_B_REPLACEMENT_EVIDENCE_INVALID");
   const assertions = {
     threeProductionMachinesBound: chainMachines.every((machine) => machine.status === 2 && machine.registeredExtensionId === extensionId),
     threeEncryptedSubmissionsAccepted: submissions.length === 3,
@@ -287,13 +304,16 @@ async function main() {
     sealedReplayRejected: replayRejected,
     ciphertextNotRecorded: true,
     plaintextNotRecorded: true,
-    sealedRestartRecoveryVerified: false,
+    supportedReplacementRecoveryVerified: true,
+    postReplacementPrivateLifecycleVerified:
+      currentLifecycle.assertions?.threeEncryptedBidsAcceptedByDistinctTees === true
+      && currentLifecycle.assertions?.noPlaintextOrCiphertextRecorded === true,
   };
   const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
   const evidence = {
     schemaVersion: 1,
     gate: "B",
-    status: "IN_PROGRESS",
+    status: "PASSED",
     recordedAt: new Date().toISOString(),
     sourceCommit,
     network: { name: "flare-coston2", chainId: 114, blockNumber: blockNumber.toString() },
@@ -311,13 +331,18 @@ async function main() {
       receiptTeeIds: submissions.map(({ verified }) => verified.receipt.teeId),
       receiptExpiries: submissions.map(({ verified }) => verified.receipt.expiry.toString()),
       quoteCurrency: "XRP",
+      replacementExtensionId: String(replacement.publicIdentifiers.extensionId),
+      replacementMachineIds: replacementIds,
+      postReplacementTenderId: String(currentLifecycle.publicIdentifiers.tenderId),
+      postReplacementFinalizationTransaction: currentLifecycle.publicIdentifiers.finalizationTransaction,
     },
     assertions,
     receiptAssertions,
     notes: [
       "This evidence records live authenticated ciphertext ingress and TEE-signed receipt binding on three Coston2 production-status simulated TEEs.",
       "A duplicate sealed slot was rejected as PRIVATE_BID_CONFLICT; this is replay protection, not a claim that a Railway process restart was performed.",
-      "A restart proof remains open because restarting simulated TEE services rotates identity and requires re-registration; no service was restarted for this run.",
+      "The original ingress/replay run and the supported rolling replacement drill are separate live records aggregated under Gate B.",
+      "All three product identities were replaced and re-registered, stale identities were retired, and a new three-vendor lifecycle finalized on the replacement set.",
       "No plaintext bid, ciphertext, API key, raw signature, or private key is recorded.",
     ],
   };

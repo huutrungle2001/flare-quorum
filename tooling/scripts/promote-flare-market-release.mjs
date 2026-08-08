@@ -51,7 +51,7 @@ const gateG = read("evidence/coston2/gate-g-smart-account.json");
 
 requireStatus(gate0, "PASSED", "GATE_0_NOT_PASSED");
 requireStatus(gateA, "PASSED", "GATE_A_NOT_PASSED");
-if (!["IN_PROGRESS", "PASSED"].includes(gateB.status)) throw new Error("GATE_B_STATUS_INVALID");
+if (gateB.status !== "PASSED") throw new Error("GATE_B_STATUS_INVALID");
 const liveIngressAssertions = [
   "threeProductionMachinesBound",
   "threeEncryptedSubmissionsAccepted",
@@ -63,6 +63,8 @@ const liveIngressAssertions = [
   "sealedReplayRejected",
   "ciphertextNotRecorded",
   "plaintextNotRecorded",
+  "supportedReplacementRecoveryVerified",
+  "postReplacementPrivateLifecycleVerified",
 ];
 if (!liveIngressAssertions.every((key) => gateB.assertions?.[key] === true)) {
   throw new Error("GATE_B_LIVE_ASSERTIONS_MISSING");
