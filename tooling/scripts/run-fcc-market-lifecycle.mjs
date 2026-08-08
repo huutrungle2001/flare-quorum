@@ -31,6 +31,7 @@ import {
 } from "../../packages/flare-bindings/dist/index.js";
 import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
 import { lifecyclePathBlocker } from "../flare/market-lifecycle-guards.mjs";
+import { roundMilliseconds, summarizeIngressTimings } from "../flare/ingress-benchmarks.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const execute = process.argv.includes("--execute");
@@ -497,9 +498,13 @@ async function main() {
     )));
     const receipts = [];
     const actionIds = [];
+    const ingressTimings = [];
     for (let machineIndex = 0; machineIndex < machines.length; machineIndex += 1) {
+      const ingressStartedAt = performance.now();
       const actionId = await sendDirect(urls[machineIndex], keys[machineIndex], ciphertexts[machineIndex]);
+      const directResponseAt = performance.now();
       const actionValue = await readActionResult(urls[machineIndex], actionId, "submit");
+      const resultResponseAt = performance.now();
       const receipt = await verifyBidReceipt(actionValue, {
         actionId,
         chainId: 114n,
@@ -515,6 +520,12 @@ async function main() {
       }, machines[machineIndex].teeId);
       actionIds.push(actionId);
       receipts.push(receipt);
+      ingressTimings.push({
+        machine: machineIndex + 1,
+        directResponseMs: roundMilliseconds(directResponseAt - ingressStartedAt),
+        resultResponseMs: roundMilliseconds(resultResponseAt - directResponseAt),
+        endToEndMs: roundMilliseconds(resultResponseAt - ingressStartedAt),
+      });
     }
     const prepared = await prepareBidReceiptSet(receipts, {
       market,
@@ -543,7 +554,15 @@ async function main() {
     });
     const tenderAfterBid = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
     if (field(tenderAfterBid, "bidCount", 6) !== BigInt(vendorIndex + 1) || field(tenderAfterBid, "commonQuorumBitmap", 8) !== 7) throw new Error("FCC_MARKET_BID_QUORUM_INVALID");
-    bidRecords.push({ vendor: vendorAccount.address, commitment, actionIds, receipts, bidTx: bidTx.hash, fundingTransaction: vendorFundingTransactions[vendorIndex] });
+    bidRecords.push({
+      vendor: vendorAccount.address,
+      commitment,
+      actionIds,
+      receipts,
+      ingressTimings,
+      bidTx: bidTx.hash,
+      fundingTransaction: vendorFundingTransactions[vendorIndex],
+    });
   }
   currentPhase = "close-tender";
   const close = await writeContract({
@@ -664,6 +683,14 @@ async function main() {
       requestTransaction: request.hash,
       finalizationTransaction: finalization.hash,
     },
+    ingressBenchmarks: {
+      vendorCount,
+      perVendor: bidRecords.map(({ ingressTimings: timings }, index) => ({
+        vendorIndex: index + 1,
+        ...summarizeIngressTimings(timings),
+      })),
+      allSamples: summarizeIngressTimings(bidRecords.flatMap(({ ingressTimings: timings }) => timings)),
+    },
     assertions: {
       marketSenderBoundToExtension: true,
       threeProductionMachinesFrozen: true,
@@ -677,6 +704,7 @@ async function main() {
       ftestXrpWinnerPayoutConserved: buyerDelta === winningAmount && vendorDeltas[0] === winningAmount && vendorDeltas.slice(1).every((delta) => delta === 0n) && marketTokenAfter === marketTokenBefore,
       awardReceiptMintedToWinner: awardOwner === winner,
       finalTenderAwarded: Number(field(finalized, "status", 21)) === 4,
+      independentBidIngressLatencyRecorded: bidRecords.every(({ ingressTimings: timings }) => timings.length === 3),
       noPlaintextOrCiphertextRecorded: true,
     },
     blockers: [],
@@ -684,6 +712,7 @@ async function main() {
       "This is a live Coston2 simulated-TEE lifecycle: FTestXRP escrow, encrypted private bid ingress, FTSO XRP/USD snapshot, FCC private scoring, 2-of-3 result quorum, and award settlement.",
       "Only public commitments, result fields, machine IDs, and transaction identifiers are recorded; bid plaintext, ciphertext, raw signatures, salts, and credentials are not recorded.",
       `${vendorCount} vendor bid(s) were generated in process memory; private keys and bid payloads are not persisted or included in evidence.`,
+      "Bid-ingress timings are wall-clock measurements for direct acknowledgment and signed receipt retrieval; they are public timing metadata only, not an SLA.",
       ...(selectionOutageIndex === null ? [] : [`One result endpoint was intentionally unavailable during collection; the two remaining frozen TEE results still formed the threshold quorum.`]),
     ],
   };
