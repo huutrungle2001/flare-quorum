@@ -115,6 +115,26 @@ describe("standalone public routes", () => {
     );
   });
 
+  it("uses the current Flare documentation when the verified release is enabled", () => {
+    vi.stubEnv("VITE_FLARE_DEPLOYMENT_STATUS", "verified");
+    vi.stubEnv("VITE_COSTON2_RPC_URL", "https://coston2.example/rpc");
+    vi.stubEnv("VITE_FLARE_MARKET_ADDRESS", "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05");
+    vi.stubEnv("VITE_FLARE_MARKET_DEPLOYMENT_BLOCK", "33746695");
+    try {
+      render(
+        <MemoryRouter initialEntries={["/docs#flare-coston2"]}>
+          <App />
+        </MemoryRouter>,
+      );
+      expect(screen.getByRole("heading", { name: /Public evidence/i })).toBeInTheDocument();
+      expect(screen.getByText(/Five primitives, one product path/i)).toBeInTheDocument();
+      expect(screen.queryByText(/Use VeilBid from tender to settlement/i)).toBeNull();
+      expect(screen.getByText(/same-identity restore is not claimed/i)).toBeInTheDocument();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("keeps Docs active for every documentation section", () => {
     render(
       <MemoryRouter initialEntries={["/docs#evidence"]}>

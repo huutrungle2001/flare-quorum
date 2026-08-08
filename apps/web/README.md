@@ -8,8 +8,10 @@ VeilBid's browser product. It includes the wallet-free Flare Coston2 explorer,
 the dedicated public Activity/Evidence ledger at `/?role=evidence`,
 the historical EOA/Safe Buyer flows, Private Bids views for
 submission/ownership/granted access, and Activity settlement recovery. The
-default `/` and `/flare` routes read finalized Coston2 contract state; `/room`
-remains the explicitly historical Sepolia/Nox baseline.
+default `/` and `/flare` routes read finalized Coston2 contract state, and
+`/docs` serves the current Flare judge runbook when the verified release is
+enabled. `/room` remains the explicitly historical Sepolia/Nox baseline, with
+its legacy documentation preserved separately.
 The Flare dossier also exposes sanitized FCC, FTestXRP, FAssets/FXRP, FTSO,
 FDC, Smart Account, and award-receipt addresses so a judge can follow each
 integration without wallet access or confidential payloads.

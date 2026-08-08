@@ -31,6 +31,7 @@ import {
   type BuyerSection,
 } from "../workspaces/CombinedWorkspaces";
 import { FlareRoom } from "../flare/FlareRoom";
+import { FlareDocsPage } from "../flare/FlareDocsPage";
 import { isFlareReleaseEnabled } from "../public-market/loadFlareMarket";
 
 type RoomRole =
@@ -883,7 +884,7 @@ export function App() {
     new URLSearchParams(location.search).has("tender");
   const page =
     location.pathname === "/docs" ? (
-      <DocsPage />
+      flareReleaseEnabled ? <FlareDocsPage /> : <DocsPage />
     ) : location.pathname === "/flare" ? (
       <FlareRoom wallet={flareWallet} />
     ) : location.pathname === "/" && flareReleaseEnabled ? (
