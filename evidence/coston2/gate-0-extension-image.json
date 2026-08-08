@@ -2,9 +2,10 @@
   "schemaVersion": 1,
   "gate": "0-extension-image",
   "status": "PASSED",
-  "recordedAt": "2026-08-08T08:51:13.512Z",
-  "sourceCommit": "f53b0b5bc531b83e569623314a4f779d12fb11b6",
+  "recordedAt": "2026-08-08T08:59:35.987Z",
+  "sourceCommit": "ed5e2f6f45e94e29ba7cf33b9cfbb91826b81ddc",
   "extensionVersion": "0.2.3",
+  "fccWireVersion": "0.2.2",
   "buildPolicy": {
     "dockerfile": "apps/fcc-extension/Dockerfile",
     "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
@@ -20,14 +21,14 @@
   },
   "publicIdentifiers": {
     "imageTag": "veilbid/fcc-extension:coston2-v0.2.3",
-    "imageDigest": "sha256:4bbafc3f626548dd4c0c4f4dd1cbff23839fd3630f56348d871db358ab519567",
+    "imageDigest": "sha256:96b89cc4604e4f392548d0aaa20beec1ccf6b88b4991cb2b67ee753bd70da378",
     "imageMediaType": "application/vnd.oci.image.manifest.v1+json",
     "platform": "linux/amd64",
     "runtimeUser": "0:0",
     "command": [
       "/app/extension-tee"
     ],
-    "binarySha256": "f77177d27b82ed57e93de5bcc6cdcc15a94a74b223bac7fb8489e813e9ff5eed",
+    "binarySha256": "a6394fabef7d492ba90c28d898c13c5c51dffea6568b67bc4fdafd81540a993e",
     "binaryBytes": 11128980,
     "binaryMode": "555",
     "defaultMode": "0",
