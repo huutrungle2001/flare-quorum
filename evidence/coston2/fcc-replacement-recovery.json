@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "gate": "FCC_REPLACEMENT_RECOVERY",
+  "status": "PASSED",
+  "recordedAt": "2026-08-08T09:17:56.756Z",
+  "sourceCommit": "b95e7495615c3fa4c1a073b78511252514280cfb",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "66011",
+    "currentMachines": [
+      {
+        "machine": 1,
+        "teeId": "0x403C88Ab59976dD5ed0513dEDfa003C99621cca3",
+        "publicUrl": "https://veilbid-flare-fcc-1-production.up.railway.app"
+      },
+      {
+        "machine": 2,
+        "teeId": "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
+        "publicUrl": "https://veilbid-flare-fcc-2-production.up.railway.app"
+      },
+      {
+        "machine": 3,
+        "teeId": "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40",
+        "publicUrl": "https://veilbid-flare-fcc-3-production.up.railway.app"
+      }
+    ],
+    "retiredMachines": [
+      {
+        "teeId": "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
+        "url": "https://veilbid-flare-fcc-1-production.up.railway.app",
+        "transactionHash": "0xfa1b3cd5a39d754487807b2e27237b2675a322c75f1b038972f3bb0764bb89f2",
+        "blockNumber": "33774105"
+      }
+    ]
+  },
+  "assertions": {
+    "threeCurrentMachinesVerified": true,
+    "noOpenTenderUsesRetiredIdentity": true,
+    "staleProductionIdentitiesRemoved": true
+  },
+  "notes": [
+    "This is the organizer-supported replacement plus re-registration recovery model; identity restoration is not claimed.",
+    "Retirement uses the verified FlareTeeManager owner pause path after checking every unfinished VeilBid tender.",
+    "No deployment key, TEE key, proxy credential, raw signature, attestation, ciphertext, or bid data is recorded."
+  ]
+}
