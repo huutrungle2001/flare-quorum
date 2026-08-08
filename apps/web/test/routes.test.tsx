@@ -130,6 +130,7 @@ describe("standalone public routes", () => {
       expect(screen.getByText(/Five primitives, one product path/i)).toBeInTheDocument();
       expect(screen.queryByText(/Use VeilBid from tender to settlement/i)).toBeNull();
       expect(screen.getByText(/supported recovery is replacement registration/i)).toBeInTheDocument();
+      expect(screen.getByText(/completed tender 23 on the new machine set/i)).toBeInTheDocument();
     } finally {
       vi.unstubAllEnvs();
     }

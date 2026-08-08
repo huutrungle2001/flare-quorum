@@ -160,7 +160,8 @@ export function FlareDocsPage() {
               <li>The public Activity ledger rereads finalized Coston2 state and is safe to reopen after a browser or relay interruption.</li>
               <li>The XRP funding panel stores only the public XRPL owner, transaction hash, wallet ID, and executor fee; it offers explicit resume and forget controls.</li>
               <li>A live three-vendor run finalized with one result endpoint unavailable; two frozen machines signed the same result.</li>
-              <li>Simulated tee-node startup generates a new identity after restart. Flare confirmed that supported recovery is replacement registration under the same extension and approved code, followed by removal of the stale identity—not restoration of its private key.</li>
+              <li>Same-identity restore is not claimed or supported. Simulated tee-node startup generates a new identity after restart, so Flare's supported recovery is replacement registration under the same extension and approved code, followed by removal of the stale identity.</li>
+              <li>The live rolling drill replaced and re-registered all three product identities, safely retired stale rotation, and completed tender 23 on the new machine set.</li>
               <li>A replacement restores capacity for new tenders only. It cannot replace a frozen key or decrypt ciphertext from an already-open tender.</li>
               <li>Two-machine loss, stale FTSO, split-result, replay, and credential cases fail closed in local/negative suites; those records are not relabeled as live fault-injection evidence.</li>
             </ul>
@@ -196,7 +197,7 @@ export function FlareDocsPage() {
               <li>The current machines use simulated FCC mode, not hardware-backed confidential-space attestation.</li>
               <li>The software is unaudited and does not verify off-chain service delivery or prevent collusion.</li>
               <li>Ordinary token settlement is public; an FAssets redemption request is not an instant native-XRP payout.</li>
-              <li>The live replacement-TEE fault drill, broader wallet coverage, and structured buyer/vendor validation remain open and are not presented as completed evidence or traction.</li>
+              <li>The supported replacement-TEE drill passes; broader wallet coverage, stateful adversarial breadth, and structured buyer/vendor validation remain open.</li>
             </ul>
             <div className="docs-actions">
               <Link className="primary-button" to="/">OPEN THE CURRENT APP →</Link>
