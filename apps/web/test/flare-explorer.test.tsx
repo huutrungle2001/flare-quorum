@@ -5,7 +5,7 @@ import { FlareEvidenceWorkspace, FlareExplorerView } from "../src/flare/FlareRoo
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
 import { FlareXrpFundingPanel } from "../src/flare/FlareXrpFundingPanel";
-import { readPublicFlareFundingCheckpoint } from "../src/flare/fundingCheckpoint";
+import { readPublicFlareFundingCheckpoint, savePublicFlareFundingCheckpoint } from "../src/flare/fundingCheckpoint";
 import { PrimaryNavigation } from "../src/shell/PrimaryNavigation";
 import type { WalletController } from "../src/wallet/WalletPanel";
 
@@ -208,6 +208,40 @@ describe("Coston2 public evidence boundary", () => {
       walletId: "0",
       executorFeeUBA: "",
     });
+    localStorage.clear();
+  });
+
+  it("offers an explicit public checkpoint resume after reload", async () => {
+    localStorage.clear();
+    savePublicFlareFundingCheckpoint({
+      xrplOwner: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p",
+      xrplTransactionId: `0x${"cd".repeat(32)}`,
+      walletId: "3",
+      executorFeeUBA: "",
+    });
+    const onPrepare = vi.fn(async (input) => ({
+      personalAccount: "0x1000000000000000000000000000000000000001" as const,
+      nonce: "5",
+      walletId: Number(input.walletId),
+      executorFeeUBA: "0",
+      xrplTransactionId: input.xrplTransactionId as `0x${string}`,
+      paymentDestination: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p",
+      paymentAmountUBA: "1100000",
+      mintingFeeUBA: "100000",
+      memoData: `0x${"fe".repeat(42)}` as `0x${string}`,
+      paymentDraftJson: '{"TransactionType":"Payment"}',
+      jobJson: '{"kind":"public-safe"}',
+    }));
+    render(<FlareXrpFundingPanel onPrepare={onPrepare} />);
+    expect(screen.getByRole("button", { name: "RESUME PUBLIC CHECKPOINT →" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "RESUME PUBLIC CHECKPOINT →" }));
+    await waitFor(() => expect(onPrepare).toHaveBeenCalledWith({
+      xrplOwner: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p",
+      xrplTransactionId: `0x${"cd".repeat(32)}`,
+      walletId: "3",
+      executorFeeUBA: "",
+    }));
+    expect(screen.getByText("PUBLIC-SAFE HANDOFF READY")).toBeInTheDocument();
     localStorage.clear();
   });
 });

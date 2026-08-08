@@ -69,6 +69,11 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
     setCheckpoint(null);
   }
 
+  async function resumeCheckpoint() {
+    if (!checkpoint) return;
+    await prepare();
+  }
+
   async function prepare() {
     setBusy(true);
     setError(null);
@@ -240,10 +245,11 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
         </section>
       )}
       {checkpoint && !preview && (
-        <p className="form-hint" role="status">
+        <div className="form-hint" role="status">
           Public payment checkpoint restored after reload. It contains only the XRPL owner and transaction hash; no wallet secret or bid material is stored.
+          <button className="secondary-button" type="button" onClick={() => void resumeCheckpoint()} disabled={busy || walletBusy}>RESUME PUBLIC CHECKPOINT →</button>
           <button className="text-button" type="button" onClick={forgetCheckpoint}>FORGET CHECKPOINT</button>
-        </p>
+        </div>
       )}
       <div className="readiness-strip" aria-live="polite">
         <span className="signal-dot" aria-hidden="true" />
