@@ -4,8 +4,8 @@
   "chainId": 114,
   "kind": "release",
   "verified": true,
-  "recordedAt": "2026-08-07T19:34:18.187Z",
-  "sourceCommit": "a482934fe600d1061a01691a852dd90f391daa98",
+  "recordedAt": "2026-08-08T09:38:01.953Z",
+  "sourceCommit": "44b64d543944d3b141bf48b65f45ef52a07f60da",
   "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
   "contracts": {
     "VeilBidFlareMarket": {
@@ -32,15 +32,20 @@
     "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
     "version": "v0.2.2",
     "platform": "0x544553545f504c4154464f524d00000000000000000000000000000000000000",
+    "applicationImage": {
+      "tag": "veilbid/fcc-extension:coston2-v0.2.3",
+      "digest": "sha256:96b89cc4604e4f392548d0aaa20beec1ccf6b88b4991cb2b67ee753bd70da378",
+      "binarySha256": "a6394fabef7d492ba90c28d898c13c5c51dffea6568b67bc4fdafd81540a993e"
+    },
     "teeIds": [
-      "0xFd3C204B11cD47EA7521D5beFfEa1b4E5419D28A",
-      "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
-      "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40"
+      "0x403C88Ab59976dD5ed0513dEDfa003C99621cca3",
+      "0x9cAE8bc688eE2a27Fa9ae6D45739569EE7c3b9fA",
+      "0xcBCcF4BBd4E2B2217e93e6260DB7905E04107bfc"
     ],
     "teeKeyFingerprints": [
-      "0xe2595ee89e3afc5f005be802fd3c204b11cd47ea7521d5beffea1b4e5419d28a",
-      "0xbd09962a41d295b6f2e230fb0c05e52c19348b8c30370fc936d26cbd8e2882ba",
-      "0xfe95fb421110f8af54a739c7874c3fcb0a988dbc6264723ee3f89dd56266bb40"
+      "0xaade678370b8b142b21c9311403c88ab59976dd5ed0513dedfa003c99621cca3",
+      "0x31845d866d40a9324cb5489f9cae8bc688ee2a27fa9ae6d45739569ee7c3b9fa",
+      "0x11ef7408ee9390461998cd65cbccf4bbd4e2b2217e93e6260db7905e04107bfc"
     ],
     "resultThreshold": 2,
     "governanceHash": "0xa3ff9bd94c8e0f9512e1e3ecc81caa16c94946e366974182da86dba03a5f9832"
@@ -62,10 +67,8 @@
     "evidence/coston2/fcc-market-extension-registration.json",
     "evidence/coston2/fcc-market-governance.json",
     "evidence/coston2/fcc-market-machines.json",
-    "evidence/coston2/gate-c-e-f-live-lifecycle.json",
-    "evidence/coston2/gate-c-e-f-two-vendor.json",
-    "evidence/coston2/gate-c-e-f-three-vendor.json",
-    "evidence/coston2/bid-ingress-benchmark.release.json",
+    "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json",
+    "evidence/coston2/fcc-replacement-recovery.json",
     "evidence/coston2/gate-g-smart-account.json",
     "evidence/coston2/deployment-consistency.json"
   ],
