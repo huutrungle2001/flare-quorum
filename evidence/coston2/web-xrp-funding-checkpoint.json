@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-frontend-xrp-funding-checkpoint",
+  "recordedAt": "2026-08-08T06:49:27.190Z",
+  "publicIdentifiers": {
+    "sourceCommit": "ab699920ddb95608ef46fa4005d3a33c0a5761f0",
+    "provider": "vercel",
+    "project": "veilbid-flare",
+    "canonicalUrl": "https://veilbid-flare.vercel.app",
+    "network": "flare-coston2",
+    "chainId": 114
+  },
+  "assertions": {
+    "initialCheckpointRestored": true,
+    "reloadCheckpointRestored": true,
+    "publicFieldsRestored": true,
+    "explicitForgetClearsState": true
+  },
+  "blockers": [],
+  "notes": [
+    "The production Buyer route restored a browser-safe public checkpoint after a real page reload.",
+    "The checkpoint test used only a public XRPL owner, transaction hash, wallet ID, and executor fee; it never entered a signing flow or touched a secret, bid, ciphertext, or FDC proof.",
+    "The explicit forget action removed the checkpoint from browser storage and the rendered recovery notice."
+  ]
+}
