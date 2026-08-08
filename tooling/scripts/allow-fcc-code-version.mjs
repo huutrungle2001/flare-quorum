@@ -17,6 +17,10 @@ const root = resolve(import.meta.dirname, "../..");
 const execute = process.argv.includes("--execute");
 const evidencePath = resolve(root, "evidence/coston2/fcc-code-version.json");
 const foundations = JSON.parse(readFileSync(resolve(root, "tooling/flare/coston2-foundations.json"), "utf8"));
+const extensionConfigSource = readFileSync(
+  resolve(root, "apps/fcc-extension/internal/config/config.go"),
+  "utf8",
+);
 const registration = JSON.parse(readFileSync(resolve(root, "evidence/coston2/fcc-extension-registration.json"), "utf8"));
 const rpcUrl = process.env.COSTON2_RPC_URL?.trim();
 const rawKey = process.env.FLARE_DEPLOYMENT_PRIVATE_KEY?.trim();
@@ -38,6 +42,7 @@ const codeHash = machineData.codeHash;
 const platform = machineData.platform;
 const versionText = `v${foundations.docker.fccExtensionReleaseRecipe.version}`;
 const version = stringToHex(versionText, { size: 32 });
+const sourceVersion = extensionConfigSource.match(/\bVersion\s*=\s*"([^"]+)"/)?.[1];
 if (!/^0x[0-9a-fA-F]{64}$/.test(codeHash ?? "") || /^0x0{64}$/i.test(codeHash)) {
   throw new Error("FCC_CODE_HASH_INVALID");
 }
@@ -76,7 +81,9 @@ const preflight = {
   extensionMatchesLiveInfo: machineData.extensionId.toLowerCase() === extensionIdHex,
   codeHashIsNonzero: !/^0x0{64}$/i.test(codeHash),
   platformIsSimulated: platform.toLowerCase() === bytes32Text("TEST_PLATFORM"),
-  versionMatchesRelease: versionText === "v0.2.2",
+  versionMatchesRelease:
+    /^v\d+\.\d+\.\d+$/.test(versionText) &&
+    sourceVersion === foundations.docker.fccExtensionReleaseRecipe.version,
 };
 if (!Object.values(preflight).every(Boolean)) throw new Error("FCC_CODE_VERSION_PREFLIGHT_FAILED");
 if (!execute) {

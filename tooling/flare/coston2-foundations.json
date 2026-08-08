@@ -220,12 +220,12 @@
       "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
       "context": "apps/fcc-extension",
       "platform": "linux/amd64",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
       "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
-      "releaseImageTag": "veilbid/fcc-extension:coston2-v0.2.2",
-      "releaseImageDigest": "sha256:f5ca282313917ce6f5f5a8167b1c10b61d17751d3a4c18f74da40984eba2d1f1",
-      "releaseBinarySha256": "e2e3c35ed485ccae883793f4ac3f14a0047481c211adcde45e177aec3e21b5af"
+      "releaseImageTag": "veilbid/fcc-extension:coston2-v0.2.3",
+      "releaseImageDigest": "sha256:4bbafc3f626548dd4c0c4f4dd1cbff23839fd3630f56348d871db358ab519567",
+      "releaseBinarySha256": "f77177d27b82ed57e93de5bcc6cdcc15a94a74b223bac7fb8489e813e9ff5eed"
     },
     "teeProxyReleaseRecipe": {
       "dockerfile": "apps/fcc-extension/proxy/Dockerfile",

@@ -48,7 +48,7 @@ x-proxy-ready: &proxy-ready
     - no-new-privileges:true
 
 x-extension: &extension
-  image: veilbid/fcc-extension:coston2-v0.2.2
+  image: veilbid/fcc-extension:coston2-v0.2.3
   pull_policy: never
   read_only: true
   tmpfs:

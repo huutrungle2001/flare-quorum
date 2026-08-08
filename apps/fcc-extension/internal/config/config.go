@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Version                 = "0.2.2"
+	Version                 = "0.2.3"
 	FoundationSchemaVersion = uint16(1)
 	Coston2ChainID          = int64(114)
 

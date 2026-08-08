@@ -7,9 +7,10 @@ const root = resolve(import.meta.dirname, "../..");
 const railwayRoot = resolve(root, "apps/fcc-extension/railway");
 
 test("Railway FCC image preserves the approved binary inputs", async () => {
-  const [dockerfile, manifestSource] = await Promise.all([
+  const [dockerfile, manifestSource, extensionConfig] = await Promise.all([
     readFile(resolve(railwayRoot, "Dockerfile"), "utf8"),
     readFile(resolve(root, "tooling/flare/coston2-foundations.json"), "utf8"),
+    readFile(resolve(root, "apps/fcc-extension/internal/config/config.go"), "utf8"),
   ]);
   const manifest = JSON.parse(manifestSource);
   const proxy = manifest.docker.teeProxyReleaseRecipe;
@@ -21,6 +22,10 @@ test("Railway FCC image preserves the approved binary inputs", async () => {
   assert.match(dockerfile, /go build -trimpath -ldflags="-buildid= -s -w"/);
   assert.match(dockerfile, new RegExp(extension.builderImage.split("@")[1]));
   assert.match(dockerfile, new RegExp(manifest.docker.redisImage.split("@")[1]));
+  assert.match(
+    extensionConfig,
+    new RegExp(`\\bVersion\\s*=\\s*"${manifest.docker.fccExtensionReleaseRecipe.version.replaceAll(".", "\\.")}"`),
+  );
   assert.doesNotMatch(dockerfile, /huutrungle2001\/Veilbid(?:\.git)?["'\s]/);
 });
 
