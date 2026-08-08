@@ -18,6 +18,8 @@ Summer Signal. Commit IDs refer to the Flare v2 repository's `main` branch.
 | Live hardening | Market-machine preflight now targets the hosted product extension separately from the local foundation extension | `evidence/coston2/fcc-market-machine-preflight.json`, commit `b3f519e` | Prevents a foundation/product ID mix-up from falsely blocking registered machines |
 | Release hardening | Market lifecycle preflight is repeatable after a prior evidence/state record, while execute mode still refuses overwrite | `tooling/flare/market-lifecycle-guards.mjs`, `tooling/test/market-lifecycle-guards.test.mjs` | Lets operators re-check live readiness without weakening immutable evidence safety |
 | Release hardening | Independent wall-clock measurement of direct FCC acknowledgment and signed bid-receipt retrieval across all three hosted machines | `tooling/flare/ingress-benchmarks.mjs`, `evidence/coston2/bid-ingress-benchmark.release.json`, commit `f53a034` | Gives judges an honest operational latency sample without exposing bid material |
+| Release hardening | Hosted ingress health rereads finalized tender 21 and fails closed on stale machine identity, code, URL, or key bindings | `apps/relay/src/flare-ingress.ts`, `evidence/coston2/flare-ingress-production.json`, commit `2a52447` | A public readiness check cannot silently outlive the frozen FCC trust boundary |
+| Privacy hardening | Browser checks the Coston2 vendor allowlist before fetching TEE keys or sending any encrypted bid, with a clear no-ingress error | `apps/web/src/flare/flareBidIngress.ts`, `evidence/coston2/web-production-smoke.json`, commit `b355ee5` | An unapproved wallet never causes private ciphertext to reach the FCC quorum |
 
 ## Not claimed as complete
 
