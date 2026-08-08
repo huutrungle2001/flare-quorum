@@ -1,13 +1,14 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-ciphertext-ingress-production",
-  "recordedAt": "2026-08-07T21:31:07.009Z",
+  "recordedAt": "2026-08-08T06:18:02.000Z",
   "publicIdentifiers": {
-    "sourceCommit": "53fcb1a12edcfcf394098aba18e5205626746d57",
+    "sourceCommit": "ce4b6275bad1e898585e4f2da9bf5a0917dd1cf7",
     "provider": "railway",
     "project": "veilbid-flare-fcc",
     "service": "veilbid-flare-ingress",
     "canonicalUrl": "https://veilbid-flare-ingress-production.up.railway.app",
+    "deploymentId": "4aa85253-b8c3-4a26-b197-7370e09926f0",
     "healthPath": "/health",
     "machineKeyPath": "/flare/ingress/tenders/:tenderId/machines",
     "resultPath": "/flare/ingress/tenders/:tenderId/machines/:machineIndex/results/:actionId",
@@ -21,10 +22,15 @@
     "status": "ok",
     "service": "veilbid-flare-ingress",
     "chainId": 114,
-    "schemaVersion": 1
+    "schemaVersion": 1,
+    "tenderId": "21",
+    "machineBindingsValid": true,
+    "tenderStatus": "Awarded"
   },
   "assertions": {
     "healthReturned200": true,
+    "healthTenderBound": true,
+    "threeFrozenMachineKeysPublished": true,
     "chainIdBoundToCoston2": true,
     "httpsCanonicalOrigin": true,
     "exactWebOriginConfigured": true,

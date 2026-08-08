@@ -441,8 +441,9 @@ The championship release provides:
   metadata;
 - a stateless relay that closes, requests, retrieves, groups exact digests, and
   submits threshold results without bid data or winner logic;
-- an ingress service whose health reports only public configuration and whose
-  logs contain no body, ciphertext, credential, or plaintext;
+- an ingress service whose health rereads one finalized public tender and
+  validates its three frozen machine bindings, while logs contain no body,
+  ciphertext, credential, or plaintext;
 - explicit unavailable/recovery states when RPC, proxy, FCC, FDC, FTSO,
   FAssets, or indexer dependencies fail.
 
@@ -450,10 +451,11 @@ The current v2 judge deployment is the separate Vercel project
 `veilbid-flare.vercel.app`; it is not the historical `veilbid-three` project.
 The ciphertext-only vendor ingress is the separate Railway v2 service at
 `https://veilbid-flare-ingress-production.up.railway.app`. Its `/health` route
-is public and returns only `{status, service, chainId, schemaVersion}`; browser
-builds receive this origin through `VITE_FLARE_INGRESS_URL`, while all direct
-proxy keys remain server-only. The service does not persist bid bodies or
-proxy envelopes. A successful ingress action is not by itself a settlement;
+is public and returns only the readiness envelope `{status, service, chainId,
+schemaVersion, tenderId, machineBindingsValid, tenderStatus}`; browser builds
+receive this origin through `VITE_FLARE_INGRESS_URL`, while all direct proxy
+keys remain server-only. The service does not persist bid bodies or proxy
+envelopes. A successful ingress action is not by itself a settlement;
 the receipt quorum still must be submitted to the frozen Coston2 market.
 The Flare relay includes a read-only `health-server` mode (`/live` and
 `/health`) that needs no signer. Settlement polling must be deployed only as a
