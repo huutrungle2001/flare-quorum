@@ -57,7 +57,11 @@ session plaintext on account, network, tender, key, or policy changes.
 
 The flagship buyer path relies on an XRPL payment memo committing the exact
 Smart Account user-operation hash. VeilBid never receives an XRPL secret or
-operates a hidden buyer signer.
+operates a hidden buyer signer. The user may sign in an external wallet or the
+optional GemWallet browser integration; the latter is network- and address-
+checked before it asks the wallet to submit, and VeilBid receives only the
+public transaction ID. The executor accepts only that public ID and the
+domain-bound job.
 
 ### Private ingress, proxy, and sealed storage
 

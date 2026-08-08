@@ -223,9 +223,10 @@ custodial VeilBid signer.
 - [x] Replace the Sepolia judge path with verified Coston2 bindings for `/` and
   `/flare`; `/room` remains explicitly historical.
 - [~] Build role workspaces: the wallet-free Public dossier, dedicated public
-  Evidence/Activity ledger, EVM Buyer/Vendor Coston2 paths, and a wallet-ready
-  public-safe XRP `0xFE` Payment/job/memo preview are implemented; XRPL signing/submission and
-  interactive recovery remain open.
+  Evidence/Activity ledger, EVM Buyer/Vendor Coston2 paths, wallet-ready
+  public-safe XRP `0xFE` Payment/job/memo preview, and optional GemWallet
+  Testnet signing/submission are implemented; browser-native recovery and
+  broader wallet coverage remain open.
 - [x] Show verified extension, code version, TEE identities/key fingerprints,
   quorum, rule version, FTSO snapshot, result digest, and sanitized FAssets/FDC/
   Smart Account bindings in the wallet-free Flare dossier.

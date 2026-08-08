@@ -460,8 +460,10 @@ The Flare relay includes a read-only `health-server` mode (`/live` and
 separate Coston2 service after a dedicated finalizer key and the three verified
 FCC proxy URLs are configured; it must never reuse a Sepolia service or key.
 
-The browser deployment gets no wallet, relay signer, TEE secret, proxy database,
-XRPL secret, or infrastructure credential.
+The browser deployment gets no relay signer, TEE secret, proxy database, XRPL
+secret, or infrastructure credential. An optional GemWallet integration runs
+only in the user's browser, checks XRPL Testnet and the entered owner, and
+receives the public payment hash rather than wallet material.
 
 ## 8. Rollback and incident recovery
 

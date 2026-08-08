@@ -4,9 +4,9 @@
 > G are recorded on Coston2. Two- and three-vendor encrypted lifecycles are now
 > also recorded, including a three-vendor one-result-outage recovery; the canonical release is verified, the hosted ciphertext
 > ingress is live, and the wallet-free Coston2 judge/role/accessibility smokes
-> pass. Gate B restart hardening, browser-native XRP signing/submission and
-> recovery, and user-validation work remain open; the wallet-ready browser XRPL
-> Payment/job preview and server-side XRP funding checkpoint/resume path have fail-closed
+> pass. Gate B restart hardening, browser-native XRP recovery, and user-validation
+> work remain open; the wallet-ready browser XRPL Payment/job preview, optional
+> GemWallet Testnet signing/submission path, and server-side XRP funding checkpoint/resume have fail-closed
 > coverage, and the hosted Railway runtime-log review found no forbidden-material
 > pattern matches. Historical Sepolia/Nox
 > artifacts are pre-hackathon baseline only. Local adversarial coverage is
@@ -38,7 +38,7 @@ in-memory and save only an allowlisted pass/fail code.
 | E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED (core + result-collection recovery) — two frozen machines finalized tender 21 while the third result endpoint was unavailable; split/replay and same-identity restart hardening remain open |
 | F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP and the award can enter the official redemption path | Feed snapshot, discovered asset IDs, balance conservation, redemption request | PASSED — live FTSO snapshot, conserved FTestXRP award, and amount-based AssetManager redemption request in `fassets-redemption.release.json` |
 | G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | PASSED — live evidence in `gate-g-smart-account.json`; delayed-mint checkpoint/resume is fail-closed and covered by relay tests |
-| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — wallet-free Coston2 judge path, public Activity/Evidence ledger, buyer/vendor role render, 320px/keyboard accessibility, hosted ingress smoke, public-safe XRP job preview, and interactive redemption request pass; browser-native XRP signing/submission, recovery, and user validation remain |
+| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — wallet-free Coston2 judge path, public Activity/Evidence ledger, buyer/vendor role render, 320px/keyboard accessibility, hosted ingress smoke, public-safe XRP job preview, optional GemWallet Testnet signing/submission, and interactive redemption request pass; browser-native recovery, broader wallet coverage, and user validation remain |
 
 No later gate converts an earlier failure into success. Private ingress, FCC
 selection, FTestXRP conservation, and the XRP-native flagship path are product
@@ -67,7 +67,7 @@ wallet/executor secrets are never persisted.
 | FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | PASSED (local stateful multi-tender harness plus live C-E-F lifecycle) |
 | FAssets redemption | Awarded vendor can request an official amount-based FTestXRP/FXRP redemption without VeilBid custody | PASSED — live Coston2 approval and `RedemptionRequested` evidence in `fassets-redemption.release.json` |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | PARTIAL — public binding, quote, nonce, proof-domain, and checkpoint-drift tests pass; full live fault-drill evidence remains |
-| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage is live; XRP funding checkpoint/resume and the public-safe browser job preview are implemented and tested; browser-native signing/recovery and full fault drills remain |
+| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage is live; XRP funding checkpoint/resume, public-safe browser job preview, and GemWallet hash handoff are implemented and tested; browser-native recovery and full fault drills remain |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json`, `evidence/coston2/web-role-workspaces.json`, `evidence/coston2/flare-ingress-production.json`; dedicated `/?role=evidence` ledger is covered by the role smoke |
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PARTIAL — 320px/keyboard/focus/reduced-motion/labels pass in `evidence/coston2/web-keyboard-accessibility.json`; browser-native signing/recovery remains |
 | Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; 602 latest hosted Railway JSON log records were inspected in memory with zero forbidden-material pattern matches; longer retention and stateful fault coverage remain |

@@ -21,11 +21,13 @@ path with a structured public Buyer Brief whose canonical hash is committed as
 tender metadata. An awarded vendor can use the same Coston2 role to approve the exact
 FTestXRP amount and submit an official `redeemAmount` request to AssetManagerFXRP;
 the later agent payment remains protocol-governed. The XRP-native Smart Account
-journey remains a separate server-side executor; its delayed-mint result now
+journey remains a separate server-side executor; the Buyer may optionally
+submit the exact XRPL Testnet Payment through GemWallet after network/address
+checks, while its delayed-mint result now
 emits a public-safe checkpoint that can be resumed with
 `pnpm flare:funding:resume` without sending another XRPL payment. Browser-native
 XRP wallet recovery remains intentionally separate because the web app never
-handles XRPL secrets.
+handles XRPL secrets or signed private material.
 
 It intentionally:
 

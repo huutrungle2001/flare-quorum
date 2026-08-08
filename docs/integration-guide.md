@@ -94,11 +94,14 @@ deployer key, browser private key, or arbitrary calldata endpoint.
 
 The Buyer workspace reads the current AssetManager payment destination and
 fee settings, then prepares a public wallet-ready XRPL Payment draft with the
-exact UBA amount and 42-byte `0xFE` memo. After the buyer signs that draft in
-an external XRPL testnet wallet, the public transaction ID can be entered to
-produce the strict job JSON. The browser never signs or submits an XRPL
-payment and never receives an XRPL secret; execution remains on the dedicated
-server-side boundary above.
+exact UBA amount and 42-byte `0xFE` memo. A buyer may either copy that draft to
+an external wallet or use the optional GemWallet browser integration. The
+integration first verifies XRPL Testnet and the wallet address, asks the wallet
+to show/sign/submit the exact public Payment, and returns only its public
+transaction ID. VeilBid never receives an XRPL secret or signed private
+material. If the follow-up Coston2 read is temporarily unavailable, the hash
+stays in the form so the buyer can retry preparation without sending a second
+payment. The dedicated server-side executor boundary above remains unchanged.
 
 ## Server deployment boundary
 

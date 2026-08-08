@@ -61,9 +61,10 @@ FCC is essential: the winner is computed from sealed bid state inside the
 4. Open the [Buyer workspace](https://veilbid-flare.vercel.app/?role=buyer) to
    read current AssetManager fee/address state and prepare the exact
    wallet-ready XRPL Payment draft, then preview the public-safe Smart Account
-   `0xFE` job and memo. This is a read-only handoff; XRPL signing/submission
-   stays with the buyer's external wallet and dedicated executor, and no XRPL
-   secret enters the browser. The live draft shape/memo smoke is recorded in
+   `0xFE` job and memo. The optional GemWallet Testnet action verifies the
+   network/address and asks the buyer's wallet to sign/submit the exact public
+   Payment; the fallback remains an external wallet handoff. No XRPL secret
+   enters the browser. The live draft shape/memo smoke is recorded in
    `evidence/coston2/web-xrp-funding-draft.json`.
 5. Open the awarded Coston2 tender and follow the public market and award
    receipt contracts in the explorer.
@@ -176,10 +177,11 @@ smoke/accessibility evidence, and the read-only hosted Railway runtime-log
 review recorded without retaining log bodies.
 
 Still open and deliberately not overstated: same-identity simulated-TEE
-restart recovery, browser-native XRP signing/submission and interactive
-recovery, adversarial/recovery breadth beyond the recorded drill, structured
+restart recovery, browser-native XRP interactive recovery and broader wallet
+coverage, adversarial/recovery breadth beyond the recorded drill, structured
 buyer/vendor interviews, and pilot evidence. The public-safe Buyer
-wallet-ready Payment/job/memo preview is shipped, but it does not sign or
-submit XRPL payments. The
+wallet-ready Payment/job/memo preview and optional GemWallet Testnet
+signing/submission are shipped; the browser does not receive a secret or
+signed private material. The
 redemption request is live; the underlying agent payout remains an external
 FAssets protocol obligation.

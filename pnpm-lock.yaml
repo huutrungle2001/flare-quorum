@@ -73,6 +73,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@gemwallet/api':
+        specifier: 3.8.0
+        version: 3.8.0
       '@iexec-nox/handle':
         specifier: 0.1.0-beta.13
         version: 0.1.0-beta.13(ethers@6.17.0)(graphql@16.14.2)(viem@2.47.6(typescript@5.9.3)(zod@4.4.3))
@@ -718,6 +721,9 @@ packages:
 
   '@flarenetwork/flare-wagmi-periphery-package@3.6.0':
     resolution: {integrity: sha512-sC4c79yLGpsWQwe3IC+Ln61YzwyaYAmdkQzz3qN6rBC+Z13Z1yeRZz3FjPBN6zELu3/oTjIXOc5rfEFrPNrqPw==}
+
+  '@gemwallet/api@3.8.0':
+    resolution: {integrity: sha512-hZ6XC0mVm3Q54cgonrzk6tHS/wUMjtPHyqsqbtlnNGPouCR7OIfEDo5Y802qLZ5ah6PskhsK0DouVnwUykEM8Q==}
 
   '@graphql-typed-document-node/core@3.2.0':
     resolution: {integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==}
@@ -3348,6 +3354,8 @@ snapshots:
       - solidity-bytes-utils
       - utf-8-validate
       - zod
+
+  '@gemwallet/api@3.8.0': {}
 
   '@graphql-typed-document-node/core@3.2.0(graphql@16.14.2)':
     dependencies:

@@ -78,8 +78,9 @@ placeholders are forbidden after that commit.
 - [x] Migrate web judge path to Coston2.
 - [x] Implement private vendor ingress and receipt UX.
 - [x] Implement XRP-native executor and EVM buyer paths; delayed XRP minting
-  now has public-safe checkpoint/resume, while browser XRPL signing remains
-  intentionally outside the app.
+  now has public-safe checkpoint/resume, and the optional GemWallet Testnet
+  signer returns only a public payment hash while browser-native recovery
+  remains outside the app.
 - [x] Implement Activity recovery and public Evidence workspace.
 - [x] Migrate relay and console to Flare bindings.
 

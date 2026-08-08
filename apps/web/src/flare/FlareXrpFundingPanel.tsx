@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Address, Hex } from "viem";
+import { sendXrplTestnetPaymentWithGemWallet } from "./xrplWallet";
 
 export interface XrpFundingPrepareInput {
   xrplOwner: string;
@@ -33,6 +34,8 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
   const [executorFeeUBA, setExecutorFeeUBA] = useState("");
   const [preview, setPreview] = useState<XrpFundingPreview | null>(null);
   const [busy, setBusy] = useState(false);
+  const [walletBusy, setWalletBusy] = useState(false);
+  const [walletSubmitted, setWalletSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [paymentCopied, setPaymentCopied] = useState(false);
@@ -42,6 +45,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
     setError(null);
     setCopied(false);
     setPaymentCopied(false);
+    setWalletSubmitted(false);
     try {
       setPreview(await onPrepare({ xrplOwner, xrplTransactionId, walletId, executorFeeUBA }));
     } catch (cause) {
@@ -49,6 +53,40 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
       setError(cause instanceof Error ? cause.message : "XRPL_FUNDING_PREVIEW_FAILED");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function submitWithGemWallet() {
+    if (!preview) return;
+    setWalletBusy(true);
+    setError(null);
+    try {
+      const transactionId = await sendXrplTestnetPaymentWithGemWallet({
+        owner: xrplOwner,
+        destination: preview.paymentDestination,
+        amountUBA: preview.paymentAmountUBA,
+        memoData: preview.memoData,
+      });
+      // Keep the public hash in the input immediately. If a subsequent RPC
+      // refresh is unavailable, the user can retry preparation without ever
+      // sending a second payment.
+      setXrplTransactionId(transactionId);
+      setWalletSubmitted(true);
+      try {
+        const refreshed = await onPrepare({
+          xrplOwner,
+          xrplTransactionId: transactionId,
+          walletId,
+          executorFeeUBA,
+        });
+        setPreview(refreshed);
+      } catch {
+        setError("XRPL_PAYMENT_SUBMITTED_PREPARE_RETRY");
+      }
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "XRPL_WALLET_PAYMENT_FAILED");
+    } finally {
+      setWalletBusy(false);
     }
   }
 
@@ -86,7 +124,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
         step reads only the XRPL owner, PersonalAccount, nonce, and public payment
         ID; it never asks for a seed, private key, FDC credential, or direct-mint signer.
         <br /><small><strong>DirectMintingDelayed is not success.</strong> Keep the public checkpoint and resume it with the same payment and nonce.</small>
-        <br /><small>The wallet-ready XRPL Payment draft reads the current AssetManager destination and fee; the transaction ID is optional until your external wallet signs.</small>
+        <br /><small>The wallet-ready XRPL Payment draft reads the current AssetManager destination and fee; the transaction ID is optional until your external wallet signs or GemWallet submits.</small>
       </p>
       <ol className="lifecycle" aria-label="XRP-native funding stages">
         <li className="complete"><span>1</span>XRPL TESTNET PAYMENT</li>
@@ -103,7 +141,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
         <label>
           XRPL payment transaction ID
           <input id="xrpl-payment-transaction-id" value={xrplTransactionId} onChange={(event) => setXrplTransactionId(event.target.value)} placeholder="64-hex transaction ID (after payment)" autoComplete="off" disabled={busy} />
-          <small>Leave blank to create the wallet-ready Payment draft. After signing, enter the public transaction ID and prepare again.</small>
+          <small>Leave blank to create the wallet-ready Payment draft. After external signing, enter the public transaction ID; GemWallet fills it after submission.</small>
         </label>
         <label>
           Smart Account wallet ID
@@ -117,7 +155,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
       </div>
       {error && <p className="inline-error" role="alert">{error}</p>}
       <div className="funding-actions">
-        <button className="primary-button" type="button" onClick={() => void prepare()} disabled={busy}>
+        <button className="primary-button" type="button" onClick={() => void prepare()} disabled={busy || walletBusy}>
           {busy ? "READING COSTON2…" : "PREPARE PUBLIC 0xFE JOB →"}
         </button>
         <a className="secondary-button" href="/docs#flare-coston2">READ FUNDING RUNBOOK ↗</a>
@@ -141,6 +179,10 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
             <p className="form-hint">Copy this public JSON into an XRPL testnet wallet or use it to fill a Payment form. The wallet signs it; VeilBid never receives the seed or private key.</p>
             <pre>{preview.paymentDraftJson}</pre>
             <button className="secondary-button" type="button" onClick={() => void copyPaymentDraft()}>{paymentCopied ? "COPIED PAYMENT DRAFT ✓" : "COPY PAYMENT DRAFT JSON"}</button>
+            <button className="secondary-button" type="button" onClick={() => void submitWithGemWallet()} disabled={busy || walletBusy || walletSubmitted || Boolean(preview.xrplTransactionId)}>
+              {walletBusy ? "WAITING FOR GEMWALLET…" : walletSubmitted || preview.xrplTransactionId ? "PUBLIC PAYMENT ALREADY PROVIDED ✓" : "SIGN & SUBMIT WITH GEMWALLET ↗"}
+            </button>
+            <p className="form-hint">Optional browser-native path: GemWallet must be on XRPL Testnet and will show the exact destination, amount, and memo for your approval. VeilBid receives only the public transaction ID.</p>
           </details>
           <label className="funding-code-field">
             0xFE memo data
@@ -159,8 +201,8 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
       <div className="readiness-strip" aria-live="polite">
         <span className="signal-dot" aria-hidden="true" />
         <div>
-          <strong>Browser writes use the labeled EVM recovery path below.</strong>
-          <span>Only the dedicated executor can submit the XRP-native job; VeilBid never receives the XRPL signing key.</span>
+          <strong>XRPL wallet signing stays outside VeilBid.</strong>
+          <span>GemWallet may submit the public Payment after your approval; the dedicated executor still handles FDC/minting and never receives an XRPL signing key.</span>
         </div>
       </div>
     </section>

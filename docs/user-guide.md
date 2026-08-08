@@ -8,8 +8,9 @@
 > workspace can also prepare a wallet-ready XRPL Payment draft and public-safe
 > `0xFE` executor job preview from read-only Coston2 state; the live
 > wallet-ready draft smoke is recorded in
-> `evidence/coston2/web-xrp-funding-draft.json`. XRPL signing, submission, and
-> recovery remain outside the browser custody boundary. `/room` remains the historical
+> `evidence/coston2/web-xrp-funding-draft.json`. Optional GemWallet Testnet
+> signing/submission is available without custody; browser-native recovery
+> remains outside the browser custody boundary. `/room` remains the historical
 > Sepolia baseline.
 
 ## 1. What the product will do
@@ -72,7 +73,8 @@ success. The Sepolia app remains a pre-hackathon baseline.
    Buyer workspace then shows the exact UBA amount, destination, and 42-byte
    `0xFE` memo in a wallet-ready Payment draft. It does not request an XRPL
    secret.
-3. Send that XRP testnet Payment from the buyer's own XRPL wallet, enter its
+3. Send that XRP testnet Payment from the buyer's own XRPL wallet (the optional
+   GemWallet button can verify Testnet and submit the exact draft), enter its
    public transaction ID, and prepare the strict `FlareFundingJob`; then run
    the dedicated `flare:funding:execute` executor with local
    credentials. The executor waits for XRPL finality, requests the official FDC
