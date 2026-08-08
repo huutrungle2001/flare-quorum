@@ -4,9 +4,11 @@
 > provide the fail-closed wallet-free evidence view and dedicated public
 > Activity/Evidence ledger, and explicit Coston2 EVM Buyer/Vendor role routes
 > are live. The XRP-native funding protocol and executor have live Gate G
-> evidence plus a public-safe delayed-mint checkpoint/resume path; browser
-> XRPL signing remains a separate recovery/UI hardening item. `/room` remains
-> the historical Sepolia baseline.
+> evidence plus a public-safe delayed-mint checkpoint/resume path. The Buyer
+> workspace can also prepare a public-safe `0xFE` executor job preview from
+> read-only Coston2 state; XRPL signing, submission, and recovery remain
+> outside the browser custody boundary. `/room` remains the historical
+> Sepolia baseline.
 
 ## 1. What the product will do
 
@@ -66,7 +68,9 @@ success. The Sepolia app remains a pre-hackathon baseline.
 2. Build a public-safe `FlareFundingJob` containing the tender terms, exact
    FTestXRP ceiling, approved vendors, three frozen TEE identities, and the
    XRPL transaction ID. The checked-in adapter builds the `PackedUserOperation`
-   and 42-byte `0xFE` memo; it does not request an XRPL secret.
+   and 42-byte `0xFE` memo; the Buyer workspace can display this preview after
+   read-only PersonalAccount/nonce reads, and it does not request an XRPL
+   secret.
 3. Send the XRP testnet payment with that memo from the buyer's own XRPL
    wallet, then run the dedicated `flare:funding:execute` executor with local
    credentials. The executor waits for XRPL finality, requests the official FDC

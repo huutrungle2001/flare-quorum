@@ -58,9 +58,13 @@ FCC is essential: the winner is computed from sealed bid state inside the
    and inspect the finalized checkpoint ledger. It exposes rules hash, receipt
    quorum, ordered root, FTSO snapshot, FCC binding, and award/refund state; it
    never fetches bid payloads.
-4. Open the awarded Coston2 tender and follow the public market and award
+4. Open the [Buyer workspace](https://veilbid-flare.vercel.app/?role=buyer) to
+   preview the public-safe Smart Account `0xFE` job and memo. This is a
+   read-only handoff; XRPL signing/submission stays with the dedicated
+   executor and no XRPL secret enters the browser.
+5. Open the awarded Coston2 tender and follow the public market and award
    receipt contracts in the explorer.
-5. Use the [Flare docs](https://veilbid-flare.vercel.app/docs#flare-coston2) to
+6. Use the [Flare docs](https://veilbid-flare.vercel.app/docs#flare-coston2) to
    distinguish the current release from the historical `/room` Sepolia app.
 
 ## Verified public deployment
@@ -168,7 +172,9 @@ executor, hosted ingress health/result API, public Evidence workspace, and
 Vercel smoke/accessibility evidence.
 
 Still open and deliberately not overstated: same-identity simulated-TEE
-restart recovery, browser-native XRP funding/recovery UI, adversarial/recovery
-breadth beyond the recorded drill, structured buyer/vendor interviews, and
-pilot evidence. The redemption request is live; the underlying agent payout
-remains an external FAssets protocol obligation.
+restart recovery, browser-native XRP signing/submission and interactive
+recovery, adversarial/recovery breadth beyond the recorded drill, structured
+buyer/vendor interviews, and pilot evidence. The public-safe Buyer job/memo
+preview is shipped, but it does not sign or submit XRPL payments. The
+redemption request is live; the underlying agent payout remains an external
+FAssets protocol obligation.

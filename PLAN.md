@@ -10,8 +10,9 @@
 > Same-identity restart recovery remains open under the supported simulated
 > runtime; a one-result-endpoint outage recovery, verified release, hosted
 > ingress, public Evidence workspace, wallet-free Coston2 judge smoke, and
-> read-only live negative guards are live, while XRP browser recovery, full
-> stateful fault drills, user validation, and final video remain open.
+> read-only live negative guards are live. The public-safe XRP job preview and
+> captioned judge video are shipped; browser signing/recovery, full stateful
+> fault drills, and user validation remain open.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -222,8 +223,9 @@ custodial VeilBid signer.
 - [x] Replace the Sepolia judge path with verified Coston2 bindings for `/` and
   `/flare`; `/room` remains explicitly historical.
 - [~] Build role workspaces: the wallet-free Public dossier, dedicated public
-  Evidence/Activity ledger, and EVM Buyer/Vendor Coston2 paths are implemented;
-  XRP-native Buyer and interactive recovery remain open.
+  Evidence/Activity ledger, EVM Buyer/Vendor Coston2 paths, and a public-safe
+  XRP `0xFE` job/memo preview are implemented; XRPL signing/submission and
+  interactive recovery remain open.
 - [x] Show verified extension, code version, TEE identities/key fingerprints,
   quorum, rule version, FTSO snapshot, result digest, and sanitized FAssets/FDC/
   Smart Account bindings in the wallet-free Flare dossier.
@@ -247,8 +249,9 @@ custodial VeilBid signer.
 - [x] Complete the responsive, keyboard, reduced-motion, privacy-copy, and
   role-workspace review; production desktop/mobile smoke and the 320px keyboard
   evidence pass in `evidence/coston2/web-production-smoke.json` and
-  `evidence/coston2/web-keyboard-accessibility.json`. Browser-native XRP
-  signing remains explicitly outside the app custody boundary.
+  `evidence/coston2/web-keyboard-accessibility.json`. The public-safe XRP job
+  preview is live, while browser-native XRPL signing/submission remains
+  explicitly outside the app custody boundary.
 
 Exit: every core role can complete its journey and judges can verify a finalized
 tender without a wallet.
@@ -409,7 +412,7 @@ the championship product and requires Product Plan approval.
 | Flare contracts | LIVE VERIFIED — Coston2 market, FTestXRP escrow, FTSO snapshot, award receipt, and recovery wiring agree with the verified release manifest |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, official amount-based FTestXRP redemption request, and fail-closed delayed-mint checkpoint/resume are implemented; evidence is recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
-| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke and hosted ciphertext-ingress health pass; Gate-B restart, adversarial suites, final UI-role hardening, and Gate H user validation remain open |
+| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke, public role/accessibility smoke, and hosted ciphertext-ingress health pass; Gate-B restart, adversarial suites, browser XRPL signing/recovery, and Gate H user validation remain open |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported
