@@ -207,6 +207,9 @@ Operational rules:
 
 The file-backed sealed-store test is still useful for handler state, but it is
 not proof that the whole TEE machine can restart under the same identity.
+The local restart boundary observation is kept in
+`evidence/local/fcc-local-tee-restart-boundary.json`; it is deliberately not
+promoted to Coston2 production evidence.
 
 ## 8. Gate 0 pass record
 

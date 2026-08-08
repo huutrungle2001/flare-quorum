@@ -660,6 +660,10 @@ This boundary was rechecked against Flare's pinned upstream source: the
 official `tee-node v0.0.23` `node.Initialize` implementation generates a fresh
 key with `crypto.GenerateKey()` and derives `teeID` from that key on every
 process start; it does not load an identity key from `SEALED_STORE_DIR`.
+The local Docker restart boundary is recorded in
+`evidence/local/fcc-local-tee-restart-boundary.json`: the public fingerprint
+changed after one TEE restart, and a post-refresh three-machine local smoke
+still passed without treating the replacement identity as registered.
 The official Coston2 guide also treats `rRap` as the supported registration
 operation and documents re-running registration after environment changes.
 VeilBid therefore does not fork or patch the framework to restore an identity

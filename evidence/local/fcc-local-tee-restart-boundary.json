@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "suite": "local-simulated-tee-restart-boundary",
+  "recordedAt": "2026-08-08T05:00:00.552Z",
+  "sourceCommit": "17c94f792c592c1651cfd0237898e73d28cd0c4e",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "mode": "simulated-local"
+  },
+  "scope": "local Docker Compose stack only; no Railway service or Coston2 state was changed",
+  "publicIdentifiers": {
+    "machine": 1,
+    "fingerprintBeforeRestartSha256": "3a96e1e0b151408542c03cac281b0b30c14f974776b29373047ffdb53c42c04",
+    "fingerprintAfterRestartAndProxyRefreshSha256": "c23a8a6edda57330d8486604731998710c1da6cf7a4806587e760b7b39b0a17d"
+  },
+  "assertions": {
+    "teeContainerRestartCompleted": true,
+    "identityChangedAfterRestart": true,
+    "proxyRefreshWasRequiredToObserveNewIdentity": true,
+    "postRefreshLocalDirectSmokePassed": true,
+    "threeMachineLocalStackStillPassed": true,
+    "productionServicesUntouched": true,
+    "sameIdentityRecoveryNotClaimed": true,
+    "rawIdentityKeyNotReadOrRecorded": true,
+    "bidMaterialNotReadOrRecorded": true
+  },
+  "blockers": [
+    "SAME_IDENTITY_TEE_RESTART_NOT_SUPPORTED_BY_CURRENT_SIMULATED_RUNTIME"
+  ],
+  "notes": [
+    "The TEE process was restarted once, then its co-located local proxy was restarted so the public info envelope refreshed. The public key fingerprint changed, matching the pinned tee-node initialization semantics.",
+    "The post-refresh local smoke still passed transport, malformed-input rejection, result binding, and redaction checks, but this is not evidence that the old registered identity or sealed state can be restored.",
+    "No production service, on-chain registration, Coston2 tender, credential, private key, ciphertext, or bid payload was accessed or modified."
+  ]
+}

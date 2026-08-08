@@ -124,6 +124,11 @@ It proves local authenticated transport, malformed-input rejection, result
 binding, and public redaction only; it is explicitly not production Coston2
 evidence.
 
+The local identity-rotation boundary is recorded in
+[`evidence/local/fcc-local-tee-restart-boundary.json`](../evidence/local/fcc-local-tee-restart-boundary.json).
+It confirms the supported runtime's replacement-identity behavior and keeps
+same-identity restart recovery explicitly open.
+
 The read-only live negative observations are recorded in
 [`evidence/coston2/live-negative-calls.release.json`](../evidence/coston2/live-negative-calls.release.json).
 They exercise terminal-state and zero-term guards through `eth_call` only;
