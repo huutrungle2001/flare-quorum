@@ -182,6 +182,22 @@ export function machineRegistrationEnvironment(environment = process.env) {
   };
 }
 
+/**
+ * Resolve the extension whose machines are being inspected. Foundation and
+ * product extensions intentionally have separate IDs; hosted machine URLs
+ * normally belong to the product extension, while the local Compose stack
+ * still uses the foundation ID. An explicit override remains available for
+ * operators running a different machine set.
+ */
+export function registeredMachineExtensionId(environment = process.env) {
+  return String(
+    environment.FCC_MACHINES_EXTENSION_ID?.trim() ||
+      environment.FCC_MARKET_EXTENSION_ID?.trim() ||
+      environment.FCC_EXTENSION_ID?.trim() ||
+      "",
+  );
+}
+
 export function requiredMachineRouteUpdate(record, machine) {
   const teeId = getAddress(record.teeId);
   if (teeId === "0x0000000000000000000000000000000000000000") return null;

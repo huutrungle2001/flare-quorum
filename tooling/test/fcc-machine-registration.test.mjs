@@ -9,6 +9,7 @@ import {
   machineRegistrationEnvironment,
   normalizeMachineOrigin,
   parseMachineInfo,
+  registeredMachineExtensionId,
   registrationAddresses,
   requiredMachineRouteUpdate,
 } from "../flare/fcc-machine-registration.mjs";
@@ -78,6 +79,28 @@ test("uses three loopback proxy defaults without exposing configuration values",
   const result = machineRegistrationEnvironment({});
   assert.equal(result.controlUrls.length, 3);
   assert.equal(result.publicUrls.length, 0);
+});
+
+test("resolves hosted product machines without changing the local foundation ID", () => {
+  assert.equal(
+    registeredMachineExtensionId({
+      FCC_EXTENSION_ID: `0x${"00".repeat(29)}0101d7`,
+      FCC_MARKET_EXTENSION_ID: `0x${"00".repeat(29)}0101db`,
+    }),
+    `0x${"00".repeat(29)}0101db`,
+  );
+  assert.equal(
+    registeredMachineExtensionId({
+      FCC_MACHINES_EXTENSION_ID: `0x${"00".repeat(29)}0101d9`,
+      FCC_EXTENSION_ID: `0x${"00".repeat(29)}0101d7`,
+      FCC_MARKET_EXTENSION_ID: `0x${"00".repeat(29)}0101db`,
+    }),
+    `0x${"00".repeat(29)}0101d9`,
+  );
+  assert.equal(
+    registeredMachineExtensionId({ FCC_EXTENSION_ID: `0x${"00".repeat(29)}0101d7` }),
+    `0x${"00".repeat(29)}0101d7`,
+  );
 });
 
 test("removes the root slash that would redirect FCC instruction POSTs", () => {

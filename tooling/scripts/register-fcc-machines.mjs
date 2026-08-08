@@ -24,6 +24,7 @@ import {
   machineRegistrationEnvironment,
   registrationAddresses,
   requiredMachineRouteUpdate,
+  registeredMachineExtensionId,
   isTeeNotFoundError,
 } from "../flare/fcc-machine-registration.mjs";
 import { normalizePrivateKey, readFoundationManifest } from "../flare/foundations.mjs";
@@ -203,7 +204,7 @@ try {
     resolve(repositoryRoot, "evidence/coston2/fcc-code-version.json"),
     "utf8",
   ));
-  const extensionIdHex = process.env.FCC_EXTENSION_ID?.trim();
+  const extensionIdHex = registeredMachineExtensionId(process.env);
   const rpcUrl = process.env.COSTON2_RPC_URL?.trim();
   const deploymentKey = normalizePrivateKey(process.env.FLARE_DEPLOYMENT_PRIVATE_KEY);
   const extraBlockers = [];

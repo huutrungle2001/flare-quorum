@@ -198,6 +198,10 @@ Configure exactly three comma-separated stable origins in
 matching loopback port in order. For remotely hosted machines, also configure
 the same three origins in `FCC_PROXY_CONTROL_URLS`; the registration client then
 uses the remote HTTPS control endpoint instead of assuming a local process.
+Hosted product-machine checks resolve `FCC_MACHINES_EXTENSION_ID` first, then
+`FCC_MARKET_EXTENSION_ID`, and only fall back to the foundation
+`FCC_EXTENSION_ID`. This keeps the foundation extension used by local Compose
+separate from the market extension frozen by the hosted Railway machines.
 `pnpm flare:machines:preflight` compares every public `/info` response with its
 control endpoint, rejects credential-bearing/path/quick-tunnel URLs, and prints
 only TEE IDs and public-key fingerprints. Before machine registration, bind the
