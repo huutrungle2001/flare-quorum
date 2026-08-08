@@ -15,6 +15,7 @@ const token = "0x3000000000000000000000000000000000000003" as Address;
 const manager = "0x4000000000000000000000000000000000000004" as Address;
 const ftso = "0x5000000000000000000000000000000000000005" as Address;
 const receipt = "0x6000000000000000000000000000000000000006" as Address;
+const vendor = "0x7000000000000000000000000000000000000007" as Address;
 const hash = `0x${"11".repeat(32)}` as Hex;
 const zeroHash = `0x${"00".repeat(32)}` as Hex;
 
@@ -69,6 +70,9 @@ function mockReader(options: { rulesHash?: Hex; status?: number; award?: unknown
     teeIds: [manager, ftso, receipt],
     teeKeyFingerprints: [hash, hash, hash],
   } as const;
+  const awardValue = options.award && typeof options.award === "object"
+    ? { ...(options.award as Record<string, unknown>), rulesHash: record.rulesHash }
+    : options.award;
   const values: Record<string, unknown> = {
     tenderCount: 1n,
     paymentToken: token,
@@ -79,7 +83,15 @@ function mockReader(options: { rulesHash?: Hex; status?: number; award?: unknown
     TEE_COUNT: 3n,
     BID_RECEIPT_THRESHOLD: 3,
     RESULT_THRESHOLD: 2,
-    getAward: options.award,
+    getAward: awardValue,
+    getBidReference: {
+      vendor,
+      submissionNonce: 1n,
+      plaintextCommitment: hash,
+      receiptBitmap: 7,
+      receiptExpiry: 1_100n,
+      acceptedBlock: 84n,
+    },
   };
   const reader: Coston2PublicReader = {
     async getChainId() {
@@ -117,18 +129,35 @@ test("reads market state and award logs only through the finalized Coston2 block
   assert.equal(result.tenders[0]?.status, "ComputePending");
   assert.equal(result.tenders[0]?.scoringPolicy.priceWeightBps, 6_000);
   assert.equal(result.tenders[0]?.winner, null);
+  assert.equal(result.tenders[0]?.bidReferences.length, 2);
+  assert.equal(result.tenders[0]?.bidReferences[0]?.vendor, vendor);
+  assert.equal(result.tenders[0]?.bidReferences[0]?.receiptBitmap, 7);
 });
 
 test("reads an awarded tender from the public receipt contract", async () => {
   const { reader } = mockReader({
     status: 4,
-    award: { winnerBidId: 2n, winner: buyer, amount: 500_000n },
+    award: {
+      tenderId: 1n,
+      winnerBidId: 2n,
+      buyer,
+      winner: vendor,
+      paymentToken: token,
+      amount: 500_000n,
+      rulesHash: hash,
+      orderedBidRoot: hash,
+      resultDigest: hash,
+      finalizedAt: 950n,
+      finalizedBlock: 87n,
+    },
   });
   const result = await loadCoston2PublicMarket(config, reader);
   assert.equal(result.tenders[0]?.status, "Awarded");
   assert.equal(result.tenders[0]?.winnerBidId, 2n);
-  assert.equal(result.tenders[0]?.winner, buyer);
+  assert.equal(result.tenders[0]?.winner, vendor);
   assert.equal(result.tenders[0]?.winningAmountXrp, 500_000n);
+  assert.equal(result.tenders[0]?.award?.resultDigest, hash);
+  assert.equal(result.tenders[0]?.award?.finalizedBlock, 87n);
   assert.equal(result.tenders[0]?.awardTransactionHash, null);
 });
 

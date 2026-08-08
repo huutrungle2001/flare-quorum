@@ -66,6 +66,32 @@ export interface Coston2PublicTender {
   winner: Address | null;
   winningAmountXrp: bigint | null;
   awardTransactionHash: Hex | null;
+  bidReferences: readonly Coston2PublicBidReference[];
+  award: Coston2PublicAward | null;
+}
+
+export interface Coston2PublicBidReference {
+  bidId: bigint;
+  vendor: Address;
+  submissionNonce: bigint;
+  plaintextCommitment: Hex;
+  receiptBitmap: number;
+  receiptExpiry: bigint;
+  acceptedBlock: bigint;
+}
+
+export interface Coston2PublicAward {
+  tenderId: bigint;
+  winnerBidId: bigint;
+  buyer: Address;
+  winner: Address;
+  paymentToken: Address;
+  amount: bigint;
+  rulesHash: Hex;
+  orderedBidRoot: Hex;
+  resultDigest: Hex;
+  finalizedAt: bigint;
+  finalizedBlock: bigint;
 }
 
 export interface Coston2MarketConfig {
@@ -155,9 +181,7 @@ interface Coston2TenderRecord {
 }
 
 interface AwardFact {
-  winnerBidId: bigint;
-  winner: Address;
-  winningAmountXrp: bigint;
+  award: Coston2PublicAward;
   transactionHash: Hex | null;
 }
 
@@ -194,6 +218,7 @@ function mapTender(
   record: Coston2TenderRecord,
   scoringPolicy: FlareScoringPolicy,
   award: AwardFact | undefined,
+  bidReferences: readonly Coston2PublicBidReference[],
 ): Coston2PublicTender {
   assertFlareScoringPolicy(scoringPolicy);
   if (calculateFlareRulesHash(scoringPolicy).toLowerCase() !== record.rulesHash.toLowerCase()) {
@@ -204,10 +229,12 @@ function mapTender(
     tenderId,
     scoringPolicy,
     status: tenderStatus(record.status),
-    winnerBidId: award?.winnerBidId ?? null,
-    winner: award?.winner ?? null,
-    winningAmountXrp: award?.winningAmountXrp ?? null,
+    winnerBidId: award?.award.winnerBidId ?? null,
+    winner: award?.award.winner ?? null,
+    winningAmountXrp: award?.award.amount ?? null,
     awardTransactionHash: award?.transactionHash ?? null,
+    bidReferences,
+    award: award?.award ?? null,
   };
 }
 
@@ -251,25 +278,104 @@ async function readAwardFact(
   });
   if (!value || typeof value !== "object") throw new Error("COSTON2_AWARD_MALFORMED");
   const award = value as Partial<{
+    tenderId: bigint;
     winnerBidId: bigint;
+    buyer: Address;
     winner: Address;
+    paymentToken: Address;
     amount: bigint;
+    rulesHash: Hex;
+    orderedBidRoot: Hex;
+    resultDigest: Hex;
+    finalizedAt: bigint;
+    finalizedBlock: bigint;
   }>;
   if (
+    typeof award.tenderId !== "bigint" ||
     typeof award.winnerBidId !== "bigint" ||
+    typeof award.buyer !== "string" ||
     typeof award.winner !== "string" ||
-    typeof award.amount !== "bigint"
+    typeof award.paymentToken !== "string" ||
+    typeof award.amount !== "bigint" ||
+    typeof award.rulesHash !== "string" ||
+    typeof award.orderedBidRoot !== "string" ||
+    typeof award.resultDigest !== "string" ||
+    typeof award.finalizedAt !== "bigint" ||
+    typeof award.finalizedBlock !== "bigint"
   ) {
     throw new Error("COSTON2_AWARD_MALFORMED");
   }
+  const parsedAward: Coston2PublicAward = {
+      tenderId: award.tenderId,
+      winnerBidId: award.winnerBidId,
+      buyer: addressResult(award.buyer, "AWARD_BUYER"),
+      winner: addressResult(award.winner, "AWARD_WINNER"),
+      paymentToken: addressResult(award.paymentToken, "AWARD_PAYMENT_TOKEN"),
+      amount: award.amount,
+      rulesHash: hexResult(award.rulesHash, "AWARD_RULES_HASH"),
+      orderedBidRoot: hexResult(award.orderedBidRoot, "AWARD_BID_ROOT"),
+      resultDigest: hexResult(award.resultDigest, "AWARD_RESULT_DIGEST"),
+      finalizedAt: award.finalizedAt,
+      finalizedBlock: award.finalizedBlock,
+  };
+  if (
+    parsedAward.tenderId !== tenderId ||
+    parsedAward.buyer.toLowerCase() !== record.buyer.toLowerCase() ||
+    parsedAward.rulesHash.toLowerCase() !== record.rulesHash.toLowerCase() ||
+    parsedAward.orderedBidRoot.toLowerCase() !== record.orderedBidRoot.toLowerCase() ||
+    parsedAward.winnerBidId < 1n ||
+    parsedAward.winnerBidId > record.bidCount ||
+    parsedAward.amount < 1n ||
+    parsedAward.amount > record.publicCeilingXrp ||
+    parsedAward.finalizedBlock > blockNumber
+  ) {
+    throw new Error("COSTON2_AWARD_BINDING_MISMATCH");
+  }
   return {
-    winnerBidId: award.winnerBidId,
-    winner: addressResult(award.winner, "AWARD_WINNER"),
-    winningAmountXrp: award.amount,
+    award: parsedAward,
     // The receipt stores the public proof, not its mint transaction. This is
     // deliberate: the wallet-free view can inspect the receipt without a
     // provider-wide event scan.
     transactionHash: null,
+  };
+}
+
+function hexResult(value: unknown, field: string): Hex {
+  if (typeof value !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(value)) {
+    throw new Error(`COSTON2_${field}_MALFORMED`);
+  }
+  return value as Hex;
+}
+
+function bidReferenceResult(
+  bidId: bigint,
+  value: unknown,
+): Coston2PublicBidReference {
+  if (!value || typeof value !== "object") {
+    throw new Error("COSTON2_BID_REFERENCE_MALFORMED");
+  }
+  const reference = value as Partial<Omit<Coston2PublicBidReference, "bidId">>;
+  if (
+    typeof reference.vendor !== "string" ||
+    typeof reference.submissionNonce !== "bigint" ||
+    typeof reference.plaintextCommitment !== "string" ||
+    typeof reference.receiptBitmap !== "number" ||
+    typeof reference.receiptExpiry !== "bigint" ||
+    typeof reference.acceptedBlock !== "bigint"
+  ) {
+    throw new Error("COSTON2_BID_REFERENCE_MALFORMED");
+  }
+  if (reference.receiptBitmap !== 0b111) {
+    throw new Error("COSTON2_BID_REFERENCE_QUORUM_MISMATCH");
+  }
+  return {
+    bidId,
+    vendor: addressResult(reference.vendor, "BID_VENDOR"),
+    submissionNonce: reference.submissionNonce,
+    plaintextCommitment: hexResult(reference.plaintextCommitment, "BID_COMMITMENT"),
+    receiptBitmap: reference.receiptBitmap,
+    receiptExpiry: reference.receiptExpiry,
+    acceptedBlock: reference.acceptedBlock,
   };
 }
 
@@ -314,12 +420,28 @@ export async function loadCoston2PublicMarket(
         }),
       ]);
       const typedRecord = record as Coston2TenderRecord;
-      const award = await readAwardFact(reader, awardReceipt, tenderId, typedRecord, safeBlock);
+      if (typedRecord.bidCount < 0n || typedRecord.bidCount > 8n) {
+        throw new Error("COSTON2_BID_COUNT_OUT_OF_RANGE");
+      }
+      const [award, bidReferences] = await Promise.all([
+        readAwardFact(reader, awardReceipt, tenderId, typedRecord, safeBlock),
+        Promise.all(
+          Array.from({ length: Number(typedRecord.bidCount) }, (_, index) => BigInt(index + 1))
+            .map(async (bidId) => bidReferenceResult(bidId, await reader.readContract({
+              address: config.marketAddress,
+              abi: marketAbi,
+              functionName: "getBidReference",
+              args: [tenderId, bidId],
+              blockNumber: safeBlock,
+            }))),
+        ),
+      ]);
       return mapTender(
         tenderId,
         typedRecord,
         scoringPolicy as FlareScoringPolicy,
         award,
+        bidReferences,
       );
     }),
   );
