@@ -17,7 +17,7 @@ Summer Signal. Commit IDs refer to the Flare v2 repository's `main` branch.
 ## Not claimed as complete
 
 Same-identity simulated-TEE restart recovery, browser-native XRP
-signing/submission and interactive recovery, interactive FXRP redemption, broad adversarial live drills, user interviews,
+signing/submission and interactive recovery, instant FXRP/XRP payout, broad adversarial live drills, user interviews,
 and pilot evidence remain explicit follow-up work. The checked-in four-minute
 captioned demo is a public smoke-capture walkthrough; it is not evidence of
 those remaining items. The submission must not present them as shipped
