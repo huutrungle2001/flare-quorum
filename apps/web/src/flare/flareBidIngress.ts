@@ -224,6 +224,10 @@ function tenderMarket(env: Record<string, string | undefined>): Address {
   return getAddress(value);
 }
 
+export function assertFlareVendorApproved(approved: boolean): void {
+  if (approved !== true) throw new Error("FLARE_VENDOR_NOT_APPROVED");
+}
+
 async function waitForReceipt(
   tenderId: bigint,
   machineIndex: number,
@@ -273,6 +277,14 @@ export async function submitFlareBid(input: {
   if (input.priceMicros <= 0n || input.priceMicros > input.tender.scoringPolicy.ceilingXrpMicros) throw new Error("FLARE_BID_PRICE_INVALID");
   if (!Number.isInteger(input.deliveryDays) || input.deliveryDays < 0 || input.deliveryDays > input.tender.scoringPolicy.maxDeliveryDays) throw new Error("FLARE_BID_DELIVERY_INVALID");
   if (!Number.isInteger(input.warrantyDays) || input.warrantyDays < input.tender.scoringPolicy.minWarrantyDays || input.warrantyDays > input.tender.scoringPolicy.maxWarrantyDays) throw new Error("FLARE_BID_WARRANTY_INVALID");
+  const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl(env)) });
+  const approved = await publicClient.readContract({
+    address: market,
+    abi: veilBidFlareMarketAbi,
+    functionName: "isApprovedVendor",
+    args: [input.tender.tenderId, input.vendor],
+  });
+  assertFlareVendorApproved(approved === true);
   const machines = await loadFlareIngressMachines(input.tender.tenderId, env);
   input.onStage?.("encrypting");
   const submissionNonce = BigInt(randomHex(8));
@@ -318,7 +330,6 @@ export async function submitFlareBid(input: {
     teeIds: machines.map((machine) => machine.teeId) as [Address, Address, Address],
   });
   input.onStage?.("signing");
-  const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl(env)) });
   const simulation = await publicClient.simulateContract({
     account: input.vendor,
     address: market,

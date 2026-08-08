@@ -20,6 +20,20 @@ function short(value: string) {
   return `${value.slice(0, 10)}…${value.slice(-8)}`;
 }
 
+export function flareVendorBidErrorMessage(cause: unknown): string {
+  const code = cause instanceof Error ? cause.message : "FLARE_BID_FAILED";
+  if (code === "FLARE_VENDOR_NOT_APPROVED") {
+    return "This wallet is not on the buyer's approved vendor list. No encrypted bid was sent.";
+  }
+  if (code === "FLARE_INGRESS_UNAVAILABLE" || code === "FLARE_RECEIPT_PENDING") {
+    return "The confidential ingress is unavailable or still pending. No bid was submitted; retry when the three-machine quorum is reachable.";
+  }
+  if (code === "FLARE_CREDENTIALS_REQUIRED") {
+    return "This tender requires credentials that this browser composer cannot collect. No bid was attempted.";
+  }
+  return code;
+}
+
 function parsePrice(value: string, ceiling: bigint): bigint {
   const normalized = value.trim();
   if (!/^(0|[1-9][0-9]*)(\.[0-9]{1,6})?$/.test(normalized)) {
@@ -79,8 +93,7 @@ export function FlareVendorWorkspace({
       toasts.succeed(toastId, "Three receipts accepted; bid committed on Coston2.");
       onRefresh();
     } catch (cause) {
-      const message = cause instanceof Error ? cause.message : "FLARE_BID_FAILED";
-      setError(message);
+      setError(flareVendorBidErrorMessage(cause));
       toasts.fail(toastId, "Bid stopped. No plaintext or ciphertext was saved.");
     } finally {
       setBusy(false);
