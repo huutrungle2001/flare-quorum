@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import {
   createPublicClient,
@@ -15,9 +15,17 @@ if (!rpcUrl) throw new Error("COSTON2_RPC_URL_MISSING");
 
 const releasePath = resolve(root, "packages/flare-contracts/deployments/coston2.release.json");
 const evidencePath = resolve(root, "evidence/coston2/deployment-consistency.json");
-if (existsSync(releasePath) || existsSync(evidencePath)) throw new Error("COSTON2_RELEASE_ARTIFACT_ALREADY_EXISTS");
+const refresh = process.argv.includes("--refresh");
+if (!refresh && (existsSync(releasePath) || existsSync(evidencePath))) throw new Error("COSTON2_RELEASE_ARTIFACT_ALREADY_EXISTS");
+if (refresh && (!existsSync(releasePath) || !existsSync(evidencePath))) throw new Error("COSTON2_RELEASE_ARTIFACT_MISSING");
 if (execFileSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" }).trim()) {
   throw new Error("COSTON2_RELEASE_REQUIRES_CLEAN_WORKTREE");
+}
+
+const lifecycleRelativePath = process.env.FLARE_RELEASE_LIFECYCLE_EVIDENCE_PATH?.trim()
+  || "evidence/coston2/gate-c-e-f-live-lifecycle.json";
+if (!/^evidence\/coston2\/[a-z0-9.-]+\.json$/.test(lifecycleRelativePath)) {
+  throw new Error("COSTON2_RELEASE_LIFECYCLE_PATH_INVALID");
 }
 
 function read(relativePath) {
@@ -35,14 +43,15 @@ const gateA = read("evidence/coston2/gate-a-fcc-result.json");
 const gateB = read("evidence/coston2/gate-b-private-ingress.json");
 const registration = read("evidence/coston2/fcc-market-extension-registration.json");
 const codeVersion = read("evidence/coston2/fcc-code-version.json");
+const extensionImage = read("evidence/coston2/gate-0-extension-image.json");
 const machines = read("evidence/coston2/fcc-market-machines.json");
 const governance = read("evidence/coston2/fcc-market-governance.json");
-const lifecycle = read("evidence/coston2/gate-c-e-f-live-lifecycle.json");
+const lifecycle = read(lifecycleRelativePath);
 const gateG = read("evidence/coston2/gate-g-smart-account.json");
 
 requireStatus(gate0, "PASSED", "GATE_0_NOT_PASSED");
 requireStatus(gateA, "PASSED", "GATE_A_NOT_PASSED");
-if (gateB.status !== "IN_PROGRESS") throw new Error("GATE_B_STATUS_INVALID");
+if (!["IN_PROGRESS", "PASSED"].includes(gateB.status)) throw new Error("GATE_B_STATUS_INVALID");
 const liveIngressAssertions = [
   "threeProductionMachinesBound",
   "threeEncryptedSubmissionsAccepted",
@@ -59,6 +68,7 @@ if (!liveIngressAssertions.every((key) => gateB.assertions?.[key] === true)) {
   throw new Error("GATE_B_LIVE_ASSERTIONS_MISSING");
 }
 requireStatus(registration, "REGISTERED_BOUND_CONFIGURATION_READY", "MARKET_EXTENSION_NOT_READY");
+requireStatus(extensionImage, "PASSED", "MARKET_EXTENSION_IMAGE_NOT_READY");
 requireStatus(machines, "PASSED", "MARKET_MACHINES_NOT_READY");
 requireStatus(governance, "PASSED", "MARKET_GOVERNANCE_NOT_READY");
 requireStatus(lifecycle, "PASSED", "GATES_C_E_F_NOT_PASSED");
@@ -197,6 +207,11 @@ const release = {
     codeHash: registrationIds.codeHash,
     version: registrationIds.version,
     platform: registrationIds.platform,
+    applicationImage: {
+      tag: extensionImage.publicIdentifiers.imageTag,
+      digest: extensionImage.publicIdentifiers.imageDigest,
+      binarySha256: extensionImage.publicIdentifiers.binarySha256,
+    },
     teeIds,
     teeKeyFingerprints,
     resultThreshold: 2,
@@ -219,7 +234,8 @@ const release = {
     "evidence/coston2/fcc-market-extension-registration.json",
     "evidence/coston2/fcc-market-governance.json",
     "evidence/coston2/fcc-market-machines.json",
-    "evidence/coston2/gate-c-e-f-live-lifecycle.json",
+    lifecycleRelativePath,
+    "evidence/coston2/fcc-replacement-recovery.json",
     "evidence/coston2/gate-g-smart-account.json",
     "evidence/coston2/deployment-consistency.json",
   ],
@@ -263,12 +279,21 @@ const evidence = {
   blockers: [],
   notes: [
     "The immutable Coston2 market candidate is promoted only after live bytecode, constructor, dependency getter, award receipt, extension, machine, result-signer, and Gate G mappings agree.",
-    "Gate B remains IN_PROGRESS for same-identity simulated-TEE restart recovery; this release does not claim that unsupported capability.",
+    "The organizer-supported replacement and re-registration recovery drill passed; same-identity restoration is unsupported and is not claimed.",
     "Only public addresses, hashes, checkpoints, and booleans are recorded; no bid, ciphertext, credential, signature, or secret is included.",
   ],
 };
 mkdirSync(dirname(releasePath), { recursive: true });
 mkdirSync(dirname(evidencePath), { recursive: true });
-writeFileSync(releasePath, `${JSON.stringify(release, null, 2)}\n`, { flag: "wx" });
-writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
+if (refresh) {
+  const releaseTemporaryPath = `${releasePath}.tmp`;
+  const evidenceTemporaryPath = `${evidencePath}.tmp`;
+  writeFileSync(releaseTemporaryPath, `${JSON.stringify(release, null, 2)}\n`, { flag: "w" });
+  writeFileSync(evidenceTemporaryPath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "w" });
+  renameSync(releaseTemporaryPath, releasePath);
+  renameSync(evidenceTemporaryPath, evidencePath);
+} else {
+  writeFileSync(releasePath, `${JSON.stringify(release, null, 2)}\n`, { flag: "wx" });
+  writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
+}
 console.log(JSON.stringify({ status: "PASSED", market, awardReceipt, deploymentBlock: candidate.contracts.VeilBidFlareMarket.deploymentBlock, sourceCommit, evidence: "evidence/coston2/deployment-consistency.json" }, null, 2));

@@ -699,7 +699,10 @@ async function main() {
       commonBidQuorumIsThree: context.quorumBitmap === 7,
       ftsSnapshotCapturedOnClose: context.ftsoValue > 0n && context.ftsoTimestamp > 0n,
       selectionResultSignedByTwoDistinctFrozenTees: quorum.signers.length === 2,
-      oneSelectionResultUnavailableStillFinalized: selectionOutageIndex === null || quorum.signers.length === 2,
+      selectionResultThresholdSatisfied: quorum.signers.length === 2,
+      ...(selectionOutageIndex === null
+        ? {}
+        : { oneSelectionResultUnavailableStillFinalized: quorum.signers.length === 2 }),
       selectionResultMatchesCommonRoot: equalHex(quorum.result.orderedBidRoot, context.orderedBidRoot),
       ftestXrpWinnerPayoutConserved: buyerDelta === winningAmount && vendorDeltas[0] === winningAmount && vendorDeltas.slice(1).every((delta) => delta === 0n) && marketTokenAfter === marketTokenBefore,
       awardReceiptMintedToWinner: awardOwner === winner,

@@ -107,6 +107,7 @@
   "flare:deploy:market": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/deploy-flare-market.mjs",
   "flare:deploy:market:candidate": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/deploy-flare-market-candidate.mjs",
   "flare:release:promote": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/promote-flare-market-release.mjs",
+  "flare:release:refresh": "pnpm --filter @veilbid/flare-contracts build && node --env-file-if-exists=.env.local tooling/scripts/promote-flare-market-release.mjs --refresh",
   "flare:register:market-extension": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-market-extension.mjs",
     "flare:market:lifecycle:preflight": "pnpm --filter @veilbid/flare-bindings build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-market-lifecycle.mjs",
     "flare:market:lifecycle": "pnpm --filter @veilbid/flare-bindings build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-market-lifecycle.mjs --execute",

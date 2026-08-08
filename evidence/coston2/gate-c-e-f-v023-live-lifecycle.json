@@ -306,7 +306,7 @@
     "commonBidQuorumIsThree": true,
     "ftsSnapshotCapturedOnClose": true,
     "selectionResultSignedByTwoDistinctFrozenTees": true,
-    "oneSelectionResultUnavailableStillFinalized": true,
+    "selectionResultThresholdSatisfied": true,
     "selectionResultMatchesCommonRoot": true,
     "ftestXrpWinnerPayoutConserved": true,
     "awardReceiptMintedToWinner": true,
