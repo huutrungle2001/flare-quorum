@@ -19,7 +19,8 @@
     "poll": "node dist/cli.js poll",
     "flare-once": "node dist/flare-cli.js once",
     "flare-poll": "node dist/flare-cli.js poll",
-    "test": "pnpm build && node --test test/*.test.mjs"
+    "test": "pnpm build && node --test test/*.test.mjs",
+    "test:coverage": "pnpm build && node --experimental-test-coverage --test-coverage-include=dist/flare-funding-chain.js --test-coverage-lines=80 --test-coverage-branches=80 --test-coverage-functions=90 --test test/*.test.mjs"
   },
   "dependencies": {
     "@iexec-nox/handle": "0.1.0-beta.13",

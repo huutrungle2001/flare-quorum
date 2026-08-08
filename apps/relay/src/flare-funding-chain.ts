@@ -229,14 +229,17 @@ function directMintFailureCode(error: unknown): string {
 
 export class LiveFlareFundingChain implements FlareFundingChain {
   readonly config: FlareFundingConfig;
-  readonly publicClient;
-  readonly walletClient;
-  readonly account;
+  readonly publicClient: ReturnType<typeof createPublicClient>;
+  readonly walletClient: ReturnType<typeof createWalletClient> | null;
+  readonly account: ReturnType<typeof privateKeyToAccount> | null;
   readonly executorAddress: Address | null;
 
-  constructor(config: FlareFundingConfig) {
+  constructor(config: FlareFundingConfig, clients?: {
+    publicClient: ReturnType<typeof createPublicClient>;
+    walletClient?: ReturnType<typeof createWalletClient> | null;
+  }) {
     this.config = config;
-    this.publicClient = createPublicClient({
+    this.publicClient = clients?.publicClient ?? createPublicClient({
       chain: coston2Chain,
       transport: http(config.rpcUrl, { retryCount: 2, timeout: 20_000 }),
     });
@@ -244,13 +247,13 @@ export class LiveFlareFundingChain implements FlareFundingChain {
       ? privateKeyToAccount(config.executorPrivateKey)
       : null;
     this.executorAddress = this.account?.address ?? null;
-    this.walletClient = this.account
+    this.walletClient = clients?.walletClient ?? (this.account
       ? createWalletClient({
           account: this.account,
           chain: coston2Chain,
           transport: http(config.rpcUrl, { retryCount: 1, timeout: 20_000 }),
         })
-      : null;
+      : null);
   }
 
   private async registryAddress(name: string, blockNumber: bigint): Promise<Address> {
@@ -485,6 +488,7 @@ export class LiveFlareFundingChain implements FlareFundingChain {
     });
     const hash = await writer.walletClient.writeContract({
       account: writer.account,
+      chain: coston2Chain,
       address: fdcHub,
       abi: fdcHubAbi,
       functionName: "requestAttestation",
@@ -563,6 +567,7 @@ export class LiveFlareFundingChain implements FlareFundingChain {
     try {
       hash = await writer.walletClient.writeContract({
         account: writer.account,
+        chain: coston2Chain,
         address: assetManager,
         abi: assetManagerFAssetsAbi,
         functionName: "executeDirectMintingWithData",

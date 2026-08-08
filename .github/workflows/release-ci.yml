@@ -57,6 +57,11 @@ jobs:
       - name: Run workspace tests
         run: pnpm test
 
+      - name: Run critical coverage gates
+        run: |
+          pnpm --filter @veilbid/settlement-relay test:coverage
+          pnpm --filter @veilbid/tender-room test:coverage
+
       - name: Run typed lint
         run: pnpm lint
 
