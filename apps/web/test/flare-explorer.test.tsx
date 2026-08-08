@@ -172,7 +172,11 @@ describe("Coston2 public evidence boundary", () => {
       walletId: 0,
       executorFeeUBA: "0",
       xrplTransactionId: `0x${"ab".repeat(32)}` as `0x${string}`,
+      paymentDestination: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p",
+      paymentAmountUBA: "1100000",
+      mintingFeeUBA: "100000",
       memoData: `0x${"fe".repeat(42)}` as `0x${string}`,
+      paymentDraftJson: '{"TransactionType":"Payment"}',
       jobJson: "{\"version\":1}",
     }));
     render(<FlareXrpFundingPanel onPrepare={onPrepare} />);
@@ -182,5 +186,7 @@ describe("Coston2 public evidence boundary", () => {
     await waitFor(() => expect(onPrepare).toHaveBeenCalledTimes(1));
     expect(screen.getByText("PUBLIC-SAFE HANDOFF READY")).toBeInTheDocument();
     expect(screen.getByText("PersonalAccount", { exact: true })).toBeInTheDocument();
+    expect(screen.getByText("WALLET-READY XRPL PAYMENT DRAFT")).toBeInTheDocument();
+    expect(screen.getByText("Payment destination", { exact: true })).toBeInTheDocument();
   });
 });

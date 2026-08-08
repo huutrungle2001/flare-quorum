@@ -5,8 +5,8 @@
 > also recorded, including a three-vendor one-result-outage recovery; the canonical release is verified, the hosted ciphertext
 > ingress is live, and the wallet-free Coston2 judge/role/accessibility smokes
 > pass. Gate B restart hardening, browser-native XRP signing/submission and
-> recovery, and user-validation work remain open; the public-safe browser job
-> preview and server-side XRP funding checkpoint/resume path have fail-closed
+> recovery, and user-validation work remain open; the wallet-ready browser XRPL
+> Payment/job preview and server-side XRP funding checkpoint/resume path have fail-closed
 > coverage. Historical Sepolia/Nox
 > artifacts are pre-hackathon baseline only. Local adversarial coverage is
 > recorded separately and is not promoted to live Coston2 evidence.

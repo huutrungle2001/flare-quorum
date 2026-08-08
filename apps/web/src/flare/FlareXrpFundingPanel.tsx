@@ -13,9 +13,13 @@ export interface XrpFundingPreview {
   nonce: string;
   walletId: number;
   executorFeeUBA: string;
-  xrplTransactionId: Hex;
+  xrplTransactionId: Hex | null;
+  paymentDestination: string;
+  paymentAmountUBA: string;
+  mintingFeeUBA: string;
   memoData: Hex;
-  jobJson: string;
+  paymentDraftJson: string;
+  jobJson: string | null;
 }
 
 interface FlareXrpFundingPanelProps {
@@ -26,16 +30,18 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
   const [xrplOwner, setXrplOwner] = useState("");
   const [xrplTransactionId, setXrplTransactionId] = useState("");
   const [walletId, setWalletId] = useState("0");
-  const [executorFeeUBA, setExecutorFeeUBA] = useState("0");
+  const [executorFeeUBA, setExecutorFeeUBA] = useState("");
   const [preview, setPreview] = useState<XrpFundingPreview | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [paymentCopied, setPaymentCopied] = useState(false);
 
   async function prepare() {
     setBusy(true);
     setError(null);
     setCopied(false);
+    setPaymentCopied(false);
     try {
       setPreview(await onPrepare({ xrplOwner, xrplTransactionId, walletId, executorFeeUBA }));
     } catch (cause) {
@@ -47,12 +53,22 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
   }
 
   async function copyJob() {
-    if (!preview) return;
+    if (!preview?.jobJson) return;
     try {
       await navigator.clipboard.writeText(preview.jobJson);
       setCopied(true);
     } catch {
       setError("PUBLIC_JOB_COPY_UNAVAILABLE");
+    }
+  }
+
+  async function copyPaymentDraft() {
+    if (!preview) return;
+    try {
+      await navigator.clipboard.writeText(preview.paymentDraftJson);
+      setPaymentCopied(true);
+    } catch {
+      setError("PUBLIC_PAYMENT_DRAFT_COPY_UNAVAILABLE");
     }
   }
 
@@ -85,17 +101,17 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
         </label>
         <label>
           XRPL payment transaction ID
-          <input id="xrpl-payment-transaction-id" value={xrplTransactionId} onChange={(event) => setXrplTransactionId(event.target.value)} placeholder="64-hex transaction ID" autoComplete="off" disabled={busy} />
-          <small>Send the public 0xFE payment first, then enter its transaction ID.</small>
+          <input id="xrpl-payment-transaction-id" value={xrplTransactionId} onChange={(event) => setXrplTransactionId(event.target.value)} placeholder="64-hex transaction ID (after payment)" autoComplete="off" disabled={busy} />
+          <small>Leave blank to create the wallet-ready Payment draft. After signing, enter the public transaction ID and prepare again.</small>
         </label>
         <label>
           Smart Account wallet ID
           <input id="smart-account-wallet-id" inputMode="numeric" value={walletId} onChange={(event) => setWalletId(event.target.value)} placeholder="0" autoComplete="off" disabled={busy} />
         </label>
         <label>
-          Executor fee (UBA)
-          <input id="executor-fee-uba" inputMode="numeric" value={executorFeeUBA} onChange={(event) => setExecutorFeeUBA(event.target.value)} placeholder="0" autoComplete="off" disabled={busy} />
-          <small>Public memo field; the dedicated executor still uses its own server-side key.</small>
+          Executor fee (UBA, optional)
+          <input id="executor-fee-uba" inputMode="numeric" value={executorFeeUBA} onChange={(event) => setExecutorFeeUBA(event.target.value)} placeholder="official Coston2 fee" autoComplete="off" disabled={busy} />
+          <small>Leave blank to use the current official Coston2 fee; a custom value must match it. The dedicated executor still uses its own server-side key.</small>
         </label>
       </div>
       {error && <p className="inline-error" role="alert">{error}</p>}
@@ -115,17 +131,27 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
             <div><dt>PersonalAccount</dt><dd>{preview.personalAccount}</dd></div>
             <div><dt>Smart Account nonce</dt><dd>{preview.nonce}</dd></div>
             <div><dt>Wallet ID / fee</dt><dd>{preview.walletId} / {preview.executorFeeUBA} UBA</dd></div>
-            <div><dt>XRPL transaction</dt><dd><a className="text-link" href={`https://testnet.xrpl.org/transactions/${preview.xrplTransactionId.slice(2)}`} target="_blank" rel="noreferrer">{preview.xrplTransactionId.slice(0, 10)}… ↗</a></dd></div>
+            <div><dt>XRPL payment</dt><dd>{preview.paymentAmountUBA} UBA · mint fee {preview.mintingFeeUBA} UBA</dd></div>
+            <div><dt>Payment destination</dt><dd>{preview.paymentDestination}</dd></div>
+            <div><dt>XRPL transaction</dt><dd>{preview.xrplTransactionId ? <a className="text-link" href={`https://testnet.xrpl.org/transactions/${preview.xrplTransactionId.slice(2)}`} target="_blank" rel="noreferrer">{preview.xrplTransactionId.slice(0, 10)}… ↗</a> : <span>Not submitted yet</span>}</dd></div>
           </dl>
+          <details className="funding-job-details" open>
+            <summary>WALLET-READY XRPL PAYMENT DRAFT</summary>
+            <p className="form-hint">Copy this public JSON into an XRPL testnet wallet or use it to fill a Payment form. The wallet signs it; VeilBid never receives the seed or private key.</p>
+            <pre>{preview.paymentDraftJson}</pre>
+            <button className="secondary-button" type="button" onClick={() => void copyPaymentDraft()}>{paymentCopied ? "COPIED PAYMENT DRAFT ✓" : "COPY PAYMENT DRAFT JSON"}</button>
+          </details>
           <label className="funding-code-field">
             0xFE memo data
             <textarea readOnly value={preview.memoData} rows={3} aria-label="0xFE memo data" />
           </label>
-          <details className="funding-job-details">
-            <summary>SHOW PUBLIC EXECUTOR JOB JSON</summary>
-            <pre>{preview.jobJson}</pre>
-          </details>
-          <button className="secondary-button" type="button" onClick={() => void copyJob()}>{copied ? "COPIED PUBLIC JOB ✓" : "COPY PUBLIC JOB JSON"}</button>
+          {preview.jobJson ? <>
+            <details className="funding-job-details">
+              <summary>SHOW PUBLIC EXECUTOR JOB JSON</summary>
+              <pre>{preview.jobJson}</pre>
+            </details>
+            <button className="secondary-button" type="button" onClick={() => void copyJob()}>{copied ? "COPIED PUBLIC JOB ✓" : "COPY PUBLIC JOB JSON"}</button>
+          </> : <p className="form-hint"><strong>Payment draft only.</strong> After your XRPL wallet confirms the payment, enter its transaction ID above and prepare again to produce the executor job.</p>}
           <p className="form-hint"><strong>Delayed is not success.</strong> If AssetManager returns <code>DirectMintingDelayed</code>, preserve this public-safe checkpoint and run <code>pnpm flare:funding:resume</code>. The executor reuses the same payment, FDC request, and nonce; it never requests a second XRPL payment.</p>
         </section>
       )}

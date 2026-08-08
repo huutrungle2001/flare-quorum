@@ -92,11 +92,13 @@ The executor is not a generic relayer. It accepts a strict public-safe job and
 uses a dedicated disposable Coston2 key. It must not be replaced with a
 deployer key, browser private key, or arbitrary calldata endpoint.
 
-The Buyer workspace may prepare the same public-safe job and 42-byte `0xFE`
-memo in the browser after read-only Coston2 PersonalAccount/nonce reads. It
-shows the job JSON and memo for the operator, but never signs or submits an
-XRPL payment and never receives an XRPL secret; execution remains on the
-dedicated server-side boundary above.
+The Buyer workspace reads the current AssetManager payment destination and
+fee settings, then prepares a public wallet-ready XRPL Payment draft with the
+exact UBA amount and 42-byte `0xFE` memo. After the buyer signs that draft in
+an external XRPL testnet wallet, the public transaction ID can be entered to
+produce the strict job JSON. The browser never signs or submits an XRPL
+payment and never receives an XRPL secret; execution remains on the dedicated
+server-side boundary above.
 
 ## Server deployment boundary
 

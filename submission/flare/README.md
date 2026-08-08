@@ -59,9 +59,11 @@ FCC is essential: the winner is computed from sealed bid state inside the
    quorum, ordered root, FTSO snapshot, FCC binding, and award/refund state; it
    never fetches bid payloads.
 4. Open the [Buyer workspace](https://veilbid-flare.vercel.app/?role=buyer) to
-   preview the public-safe Smart Account `0xFE` job and memo. This is a
-   read-only handoff; XRPL signing/submission stays with the dedicated
-   executor and no XRPL secret enters the browser.
+   read current AssetManager fee/address state and prepare the exact
+   wallet-ready XRPL Payment draft, then preview the public-safe Smart Account
+   `0xFE` job and memo. This is a read-only handoff; XRPL signing/submission
+   stays with the buyer's external wallet and dedicated executor, and no XRPL
+   secret enters the browser.
 5. Open the awarded Coston2 tender and follow the public market and award
    receipt contracts in the explorer.
 6. Use the [Flare docs](https://veilbid-flare.vercel.app/docs#flare-coston2) to
@@ -174,7 +176,8 @@ Vercel smoke/accessibility evidence.
 Still open and deliberately not overstated: same-identity simulated-TEE
 restart recovery, browser-native XRP signing/submission and interactive
 recovery, adversarial/recovery breadth beyond the recorded drill, structured
-buyer/vendor interviews, and pilot evidence. The public-safe Buyer job/memo
-preview is shipped, but it does not sign or submit XRPL payments. The
+buyer/vendor interviews, and pilot evidence. The public-safe Buyer
+wallet-ready Payment/job/memo preview is shipped, but it does not sign or
+submit XRPL payments. The
 redemption request is live; the underlying agent payout remains an external
 FAssets protocol obligation.

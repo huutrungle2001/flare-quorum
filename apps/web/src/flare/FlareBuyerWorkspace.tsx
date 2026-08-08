@@ -2,6 +2,8 @@ import {
   buildMintAndFundPlan,
   calculateFlareRulesHash,
   coston2FlarePublicRelease,
+  assetManagerFAssetsAbi,
+  quoteSmartAccountDirectMinting,
   smartAccountReaderAbi,
   veilBidFlareMarketAbi,
   type FlareTenderTerms,
@@ -165,8 +167,9 @@ function parseXrplOwner(value: string): string {
   return owner;
 }
 
-function parseXrplTransactionId(value: string): Hex {
+function parseXrplTransactionId(value: string): Hex | null {
   const normalized = value.trim().replace(/^0x/i, "");
+  if (normalized === "") return null;
   if (!/^[0-9a-fA-F]{64}$/.test(normalized)) throw new Error("XRPL_TRANSACTION_ID_INVALID");
   return `0x${normalized.toLowerCase()}` as Hex;
 }
@@ -183,6 +186,14 @@ function parseExecutorFee(value: string): bigint {
   const parsed = BigInt(value);
   if (parsed > 0xffff_ffff_ffff_ffffn) throw new Error("EXECUTOR_FEE_UBA_INVALID");
   return parsed;
+}
+
+function assertXrplPaymentDestination(value: string): string {
+  const destination = value.trim();
+  if (!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(destination)) {
+    throw new Error("XRPL_PAYMENT_DESTINATION_INVALID");
+  }
+  return destination;
 }
 
 export function FlareBuyerWorkspace({
@@ -299,7 +310,6 @@ export function FlareBuyerWorkspace({
     const xrplOwner = parseXrplOwner(input.xrplOwner);
     const xrplTransactionId = parseXrplTransactionId(input.xrplTransactionId);
     const walletId = parseWalletId(input.walletId);
-    const executorFeeUBA = parseExecutorFee(input.executorFeeUBA);
     const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl) });
     const block = await publicClient.getBlock({ blockTag: "latest" });
     const terms = buildFlareTenderTerms({
@@ -330,6 +340,36 @@ export function FlareBuyerWorkspace({
       functionName: "getNonce",
       args: [personalAccount],
     });
+    const assetManager = coston2FlarePublicRelease.protocols.assetManagerFXRP;
+    const [paymentDestinationRaw, feeBips, minimumFeeUBA, officialExecutorFeeUBA] = await Promise.all([
+      publicClient.readContract({
+        address: assetManager,
+        abi: assetManagerFAssetsAbi,
+        functionName: "directMintingPaymentAddress",
+      }),
+      publicClient.readContract({
+        address: assetManager,
+        abi: assetManagerFAssetsAbi,
+        functionName: "getDirectMintingFeeBIPS",
+      }),
+      publicClient.readContract({
+        address: assetManager,
+        abi: assetManagerFAssetsAbi,
+        functionName: "getDirectMintingMinimumFeeUBA",
+      }),
+      publicClient.readContract({
+        address: assetManager,
+        abi: assetManagerFAssetsAbi,
+        functionName: "getDirectMintingExecutorFeeUBA",
+      }),
+    ]);
+    if (typeof paymentDestinationRaw !== "string") throw new Error("XRPL_PAYMENT_DESTINATION_UNAVAILABLE");
+    const paymentDestination = assertXrplPaymentDestination(paymentDestinationRaw);
+    const officialExecutorFee = BigInt(officialExecutorFeeUBA);
+    const executorFeeUBA = input.executorFeeUBA.trim() === ""
+      ? officialExecutorFee
+      : parseExecutorFee(input.executorFeeUBA);
+    if (executorFeeUBA !== officialExecutorFee) throw new Error("EXECUTOR_FEE_MISMATCH");
     const plan = buildMintAndFundPlan({
       personalAccount,
       nonce,
@@ -339,7 +379,19 @@ export function FlareBuyerWorkspace({
       walletId,
       executorFee: executorFeeUBA,
     });
-    const job = {
+    const quote = quoteSmartAccountDirectMinting(
+      terms.scoringPolicy.ceilingXrpMicros + executorFeeUBA,
+      BigInt(feeBips),
+      BigInt(minimumFeeUBA),
+    );
+    const paymentDraft = {
+      TransactionType: "Payment",
+      Account: xrplOwner,
+      Destination: paymentDestination,
+      Amount: quote.paymentAmountUBA.toString(),
+      Memos: [{ Memo: { MemoData: plan.memoData.slice(2).toUpperCase(), MemoType: "VEILBID_0XFE" } }],
+    };
+    const job = xrplTransactionId === null ? null : {
       version: 1,
       xrplTransactionId,
       personalAccount,
@@ -355,7 +407,11 @@ export function FlareBuyerWorkspace({
       executorFeeUBA: executorFeeUBA.toString(),
       xrplTransactionId,
       memoData: plan.memoData,
-      jobJson: JSON.stringify(job, (_key, value) => typeof value === "bigint" ? value.toString() : value, 2),
+      paymentDestination,
+      paymentAmountUBA: quote.paymentAmountUBA.toString(),
+      mintingFeeUBA: quote.mintingFeeUBA.toString(),
+      paymentDraftJson: JSON.stringify(paymentDraft, null, 2),
+      jobJson: job === null ? null : JSON.stringify(job, (_key, value) => typeof value === "bigint" ? value.toString() : value, 2),
     };
   }
 
