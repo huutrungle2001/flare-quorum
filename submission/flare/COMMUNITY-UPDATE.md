@@ -15,8 +15,9 @@ that Flare or a user has endorsed the project.
 >
 > Current limits are explicit: Coston2/test assets, simulated TEE runtime,
 > unaudited hackathon software, no instant native-XRP payout claim, and
-> browser-native XRPL interactive recovery plus same-identity TEE restart are
-> not claimed as complete. The Buyer page can optionally submit the exact
+> browser-native XRPL interactive recovery is not claimed as complete.
+> Same-identity restoration is unsupported; the organizer-supported rolling
+> replacement and re-registration drill passes for all three machines. The Buyer page can optionally submit the exact
 > Testnet Payment through GemWallet, or prepare a public-safe `0xFE` memo/job
 > preview without custody. I would value
 > feedback on the procurement brief, failure-state UX, and the supported FCC

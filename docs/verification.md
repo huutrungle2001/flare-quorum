@@ -4,8 +4,8 @@
 > G are recorded on Coston2. Two- and three-vendor encrypted lifecycles are now
 > also recorded, including a three-vendor one-result-outage recovery; the canonical release is verified, the hosted ciphertext
 > ingress is live with a fail-closed finalized-tender health check, and the wallet-free Coston2 judge/role/accessibility smokes
-> pass. The supported replacement-TEE fault drill, browser-native XRP recovery, and user-validation
-> work remain open; the wallet-ready browser XRPL Payment/job preview, optional
+> pass. The supported three-machine replacement-TEE fault drill also passes;
+> browser-native XRP recovery and user-validation work remain open. The wallet-ready browser XRPL Payment/job preview, optional
 > GemWallet Testnet signing/submission path, and server-side XRP funding checkpoint/resume have fail-closed
 > coverage, and the hosted Railway runtime-log review found no forbidden-material
 > pattern matches. Historical Sepolia/Nox
@@ -32,7 +32,7 @@ in-memory and save only an allowlisted pass/fail code.
 |---|---|---|---|
 | 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | PASSED — block `33745484`; extension `66007` has three distinct simulated TEE machines in `PRODUCTION` with exact URL/code/platform/key bindings |
 | A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | PASSED — block `33745987`; `PING_V1` binding, TEE signature domain, production signer mapping, wrong-binding rejection, and fresh-process recovery all pass |
-| B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext; rotated runtime fails closed and supported replacement restores capacity for new tenders | Commitment/receipt IDs, redaction assertions, identity-drift and replacement checkpoint | IN PROGRESS — live three-machine ingress, receipt binding, idempotent retry, and changed-ciphertext rejection pass; organizer-approved replacement registration is documented and its live fault drill remains open |
+| B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext; rotated runtime fails closed and supported replacement restores capacity for new tenders | Commitment/receipt IDs, redaction assertions, identity-drift and replacement checkpoint | PASSED (aggregate) — live ingress/replay evidence plus `fcc-replacement-recovery.json` prove identity rotation, three replacement registrations, safe stale-identity retirement, and a new tender on the replacement set |
 | C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | PASSED (core + result-collection recovery) — live two- and three-vendor lifecycles plus `three-vendor-recovery.release.json`; replacement recovery must not mutate an existing frozen set |
 | D — Private scoring | Real TEEs match shared `SCORING_V1` vectors and select the deterministic eligible winner | Vector hashes, public inputs, result digest, Boolean expectations | PASSED — live FCC selection bound to XRP/USD terms and the common root |
 | E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED (core + result-collection recovery) — two frozen machines finalized tender 21 while the third result endpoint was unavailable; split/replay hardening remains open |
@@ -57,7 +57,7 @@ wallet/executor secrets are never persisted.
 | Deployment truth | Source, runtime, constructor, manifest, registry wiring, extension image, machines, and bindings agree | PASSED — `evidence/coston2/deployment-consistency.json` and verified release manifest |
 | Bid privacy | No plaintext/ciphertext in chain, logs, analytics, evidence, or durable browser/proxy state | PARTIAL — live three-machine ciphertext ingress, browser no-persistence path, bounded HTTP/proxy tests, repository/history/evidence scans, and a read-only review of 602 hosted JSON log records pass; broader stateful fault coverage remains |
 | Receipt binding | Wrong chain/market/extension/code/tender/vendor/rules/nonce/commitment/expiry fails | PASSED — live receipts and domain-binding tests pass; restart recovery is tracked separately from receipt cryptography |
-| Quorum continuity | Every accepted bid preserves a common 2-of-3 machine set; weaker receipt sets fail | PASSED for result collection — live `three-vendor-recovery.release.json` finalizes with one unavailable result endpoint; sealed restart and two-machine loss remain open |
+| Quorum continuity | Every accepted bid preserves a common 2-of-3 machine set; weaker receipt sets fail | PASSED for result collection and supported replacement — live `three-vendor-recovery.release.json` finalizes with one unavailable result endpoint, and all three identities were safely replaced for new tenders; simultaneous two-machine loss remains fail-closed |
 | State integrity | TEE rebuilds ordered root; omitted, duplicated, reordered, and rolled-back state fails | PARTIAL — Go sealed-store/selection, Solidity fuzz/invariant, and TypeScript root tests pass; live rollback/restart evidence remains |
 | Eligibility | Missing/forged/duplicate/unsupported credential and every public bound fails closed | PARTIAL — FCC/contract invalid-credential and public-bound tests pass; live invalid-credential policy/zero-term `eth_call` guards are recorded, while a live sealed-bid credential drill remains |
 | Scoring | XRP/USD conversion, price/delivery/warranty penalties, rounding, bounds, tie, and no-valid cases match golden vectors | PARTIAL — shared Go/Solidity/TypeScript vectors and live multi-criteria selection pass; full live boundary drill remains |
@@ -67,7 +67,7 @@ wallet/executor secrets are never persisted.
 | FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | PASSED (local stateful multi-tender harness plus live C-E-F lifecycle) |
 | FAssets redemption | Awarded vendor can request an official amount-based FTestXRP/FXRP redemption without VeilBid custody | PASSED — live Coston2 approval and `RedemptionRequested` evidence in `fassets-redemption.release.json` |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | PARTIAL — public binding, quote, nonce, proof-domain, and checkpoint-drift tests pass; full live fault-drill evidence remains |
-| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage is live; XRP funding checkpoint/resume, public-safe browser job preview, reload-safe public checkpoint with an explicit resume control, and GemWallet hash handoff are implemented and tested (`evidence/coston2/web-xrp-funding-checkpoint.json`); browser-native executor recovery and full fault drills remain |
+| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage and organizer-supported three-machine replacement recovery are live; XRP funding checkpoint/resume, public-safe browser job preview, reload-safe public checkpoint with an explicit resume control, and GemWallet hash handoff are implemented and tested (`evidence/coston2/web-xrp-funding-checkpoint.json`); browser-native executor recovery and broader stateful fault drills remain |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json`, `evidence/coston2/web-role-workspaces.json`, `evidence/coston2/flare-ingress-production.json`; dedicated `/?role=evidence` ledger is covered by the role smoke |
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PARTIAL — 320px/keyboard/focus/reduced-motion/labels pass in `evidence/coston2/web-keyboard-accessibility.json`; browser-native signing/recovery remains |
 | Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; 602 latest hosted Railway JSON log records were inspected in memory with zero forbidden-material pattern matches; longer retention and stateful fault coverage remain |
@@ -83,7 +83,7 @@ evidence/coston2/gate-0-proxy-image.json
 evidence/coston2/gate-a-fcc-result.json
 evidence/coston2/foundations.release.json
 evidence/coston2/fcc-registered-result.release.json
-evidence/coston2/private-ingress-sealed-restart.release.json
+evidence/coston2/fcc-replacement-recovery.json
 evidence/coston2/common-quorum-three-machine.release.json
 evidence/coston2/scoring-golden-vectors.release.json
 evidence/coston2/threshold-result-adversarial.release.json
@@ -117,8 +117,8 @@ live identifiers.
 The current local rejection/continuity coverage is recorded in
 [`evidence/local/flare-adversarial-coverage.json`](../evidence/local/flare-adversarial-coverage.json).
 It proves the checked-in Go, Forge, and relay suites without performing live
-writes; its blocker list deliberately keeps live fault-drill and simulated-TEE
-identity-restart claims open.
+writes; it does not claim unsupported same-identity restoration or replace the
+separate live replacement evidence.
 
 The pinned three-machine Docker smoke is recorded separately in
 [`evidence/local/fcc-local-stack-smoke.json`](../evidence/local/fcc-local-stack-smoke.json).
@@ -128,9 +128,10 @@ evidence.
 
 The local identity-rotation boundary is recorded in
 [`evidence/local/fcc-local-tee-restart-boundary.json`](../evidence/local/fcc-local-tee-restart-boundary.json).
-It confirms the expected identity rotation. Organizer guidance now defines
-replacement registration as the supported recovery model; the local record is
-not a substitute for its pending live Coston2 fault drill.
+It confirms the expected identity rotation. Organizer guidance defines
+replacement registration as the supported recovery model; the corresponding
+live Coston2 drill is recorded separately in
+[`evidence/coston2/fcc-replacement-recovery.json`](../evidence/coston2/fcc-replacement-recovery.json).
 
 The local two-machine-loss fail-closed drill is recorded in
 [`evidence/local/fcc-local-two-machine-loss.json`](../evidence/local/fcc-local-two-machine-loss.json).
@@ -141,7 +142,7 @@ Coston2 outage claim.
 The read-only live negative observations are recorded in
 [`evidence/coston2/live-negative-calls.release.json`](../evidence/coston2/live-negative-calls.release.json).
 They exercise terminal-state and zero-term guards through `eth_call` only;
-they do not replace stateful credential, stale-FTSO, process-restart, or
+they do not replace stateful credential, stale-FTSO, or simultaneous
 two-machine-loss drills.
 
 ## 5. Required adversarial suites

@@ -22,8 +22,9 @@ The project targets **Flare Summer Signal** with:
 > the registered FCC market, three-machine private bid lifecycle, FTSO-bound
 > scoring, FTestXRP settlement, and XRPL/FDC/Smart Account funding are recorded
 > in public-safe evidence. Same-identity restoration is unsupported by design;
-> the organizer-approved replacement registration model is documented, while
-> its live Coston2 fault drill and the final user-validation gate remain open.
+> the organizer-approved replacement registration model has passed a full
+> three-machine rolling Coston2 drill, while the final user-validation gate
+> remains open.
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
@@ -97,13 +98,13 @@ accounting layer is research scope and must not be described as shipped.
 
 | Flare capability | Product role | Delivery status |
 |---|---|---|
-| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Live core lifecycle passed; supported replacement recovery is documented and its live fault drill remains open |
+| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Live core lifecycle and supported three-machine replacement recovery passed |
 | Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Verified release manifest and live deployment consistency evidence |
 | FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Live FTestXRP escrow/direct mint and official redemption-request boundary passed; the underlying agent payout remains an external FAssets obligation |
 | Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Live `XRPPayment` proof recorded in Gate G evidence |
 | FTSOv2 | Freeze XRP/USD close snapshot for XRP/USD bid normalization | Live close snapshot is bound to the FCC result and settlement |
 | Flare Smart Accounts | Atomically mint FXRP and create/fund tender from an XRPL instruction | Live `0xFE` direct-mint-and-fund lifecycle passed |
-| Multi-TEE threshold | Fixed three-machine bid custody and two matching selection results | Live three-bid common quorum and two-signature result passed; outage hardening remains |
+| Multi-TEE threshold | Fixed three-machine bid custody and two matching selection results | Live three-bid common quorum, two-signature result, one-result outage, and rolling replacement passed; simultaneous two-machine loss remains fail-closed |
 
 Every integration must be exercised by the single flagship product journey and
 recorded in evidence.

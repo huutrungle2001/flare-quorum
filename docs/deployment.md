@@ -1,8 +1,8 @@
 # VeilBid Flare Championship Deployment Guide
 
 > Status: the canonical Coston2 market release, release smoke, UI, and judge
-> package are live and verified. Remaining release work is the organizer-approved
-> replacement-TEE fault drill, broader browser recovery, and user validation;
+> package are live and verified. The organizer-approved rolling replacement-TEE
+> drill passes; remaining release work is broader browser recovery and user validation;
 > the historical Sepolia/Nox baseline remains separate.
 
 FCC registration and proxy operations must also satisfy the current

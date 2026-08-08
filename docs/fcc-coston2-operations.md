@@ -216,7 +216,9 @@ Operational rules:
   ciphertext;
 - never persist a raw identity key in `.env`, a Docker secret, or a host file;
 - record a live replacement fault drill before marking production recovery
-  passed; same-identity restoration is not a supported acceptance criterion.
+  passed; the three-machine drill is now preserved in
+  `evidence/coston2/fcc-replacement-recovery.json`, and same-identity
+  restoration is not a supported acceptance criterion.
 
 The file-backed sealed-store test is still useful for handler state, but it is
 not proof that the whole TEE machine can restart under the same identity.
@@ -245,8 +247,8 @@ Gate 0 cannot pass without all of:
 - explicit simulated-versus-hardware mode;
 - sanitized evidence containing public identifiers only.
 
-Three-machine availability, private ingress, and sealed recovery remain
-separate feasibility gates. A one-machine `PRODUCTION` result does not satisfy
+Three-machine availability, private ingress, and supported replacement recovery
+are separately evidenced. A one-machine `PRODUCTION` result does not satisfy
 the championship quorum requirement.
 
 The current live records are `evidence/coston2/gate-0-foundations.json`,
@@ -256,5 +258,6 @@ The current live records are `evidence/coston2/gate-0-foundations.json`,
 hashes, toolchains, manager interface, registry discovery, FTestXRP binding,
 XRP/USD feed, indexer configuration, extension registration, code-version
 allowlisting, governance, stable proxy reachability, and all three production
-machines. Same-identity simulated-TEE restart remains the explicit Gate-B
-limitation.
+machines. Same-identity simulated-TEE restart is an unsupported runtime
+boundary, not a remaining Gate-B requirement; replacement and re-registration
+is the verified recovery path.

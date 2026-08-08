@@ -9,8 +9,8 @@
 > funding path are recorded in public-safe evidence. A three-vendor recovery
 > run also finalized with one result endpoint unavailable. The organizer has
 > confirmed that restart recovery uses replacement registration rather than
-> same-identity restoration; its live fault drill remains open. Gate H remains
-> mandatory.
+> same-identity restoration; the full rolling replacement drill now passes on
+> Coston2. Gate H remains mandatory.
 
 ## 1. Rules
 
@@ -74,9 +74,10 @@ production-status Coston2 simulated TEEs accepting independently encrypted
 XRP bids, binding signed receipts to the same market/tender/vendor/rules
 commitment, an exact-ciphertext idempotent retry, and rejection of a changed
 ciphertext for the occupied sealed slot. It intentionally remains
-`IN_PROGRESS` until the supported replacement-machine recovery drill is
-recorded on Coston2. Same-identity restoration is neither supported nor a gate
-requirement.
+the immutable ingress record for that run; combined with
+`evidence/coston2/fcc-replacement-recovery.json` and the post-replacement tender
+`23` lifecycle, Gate B now passes. Same-identity restoration is neither
+supported nor a gate requirement.
 
 Prove:
 
@@ -259,5 +260,6 @@ evidence/coston2/gate-h-product.json
 ```
 
 Until an artifact passes its schema and live assertions, its capability remains
-`NOT RUN` in `docs/verification.md` and `PLAN.md`. Gate B remains `IN PROGRESS`
-until the organizer-approved replacement recovery drill has live evidence.
+`NOT RUN` in `docs/verification.md` and `PLAN.md`. Gate B is an aggregate pass
+from the live ingress/replay record plus the organizer-approved replacement
+recovery and post-replacement lifecycle evidence.

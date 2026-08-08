@@ -3,8 +3,8 @@
 > Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
 > lifecycle, and Gate G pass with three registered Coston2 FCC machines and a verified XRP-native
 > lifecycle. The public release hardening and product UX are recorded; the
-> supported replacement-TEE drill, broader stateful fault drills, and Gate H
-> user validation remain open.
+> supported replacement-TEE drill passes, while broader stateful fault drills
+> and Gate H user validation remain open.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.
@@ -51,9 +51,8 @@ placeholders are forbidden after that commit.
 - [x] Pin official scaffold and toolchain.
 - [x] Add `apps/fcc-extension`.
 - [x] Add `packages/flare-contracts` feasibility sender/verifier.
-- [~] Pass Gates 0–B: Gate 0/A and live three-machine private ingress/replay
-  pass; organizer-approved replacement registration is documented and its live
-  Coston2 fault drill remains open.
+- [x] Pass Gates 0–B: Gate 0/A, live three-machine private ingress/replay, and
+  organizer-approved rolling replacement registration pass on Coston2.
 
 ### Milestone 2 — confidential procurement engine
 
@@ -89,7 +88,7 @@ placeholders are forbidden after that commit.
 
 - [x] Deploy and verify canonical Coston2 contracts/extension/machine policy.
 - [~] Run full live/adversarial/recovery suites; core live lifecycles and one-
-  endpoint recovery pass, while the replacement-TEE drill and complete fault
+  endpoint recovery plus the replacement-TEE drill pass, while complete fault
   drills remain open. Local rejection coverage, the Docker identity-rotation boundary,
   and read-only Coston2 terminal/invalid-terms calls are recorded without
   promoting them to stateful live evidence.

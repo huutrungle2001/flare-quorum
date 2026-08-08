@@ -99,7 +99,13 @@ remaining tender-frozen machines signed the same result and finalization passed.
 This is result-collection recovery evidence, not a claim that a simulated TEE
 identity survives a container restart.
 
+The separate organizer-supported recovery drill replaced and re-registered
+all three product identities, retired the stale identities only after frozen
+tenders were resolved, and then completed tender `23` on the new set. It does
+not claim unsupported same-identity restoration.
+
 - Evidence: [`three-vendor-recovery.release.json`](../../evidence/coston2/three-vendor-recovery.release.json)
+- Replacement evidence: [`fcc-replacement-recovery.json`](../../evidence/coston2/fcc-replacement-recovery.json) and [`gate-c-e-f-v023-live-lifecycle.json`](../../evidence/coston2/gate-c-e-f-v023-live-lifecycle.json)
 - Public gas, lifecycle, and independent bid-ingress timing: [`performance-benchmarks.release.json`](../../evidence/coston2/performance-benchmarks.release.json) and [`bid-ingress-benchmark.release.json`](../../evidence/coston2/bid-ingress-benchmark.release.json)
 - The independent ingress sample is a fresh one-vendor Coston2 lifecycle (tender `22`) finalized by the same verified market and three-machine FCC binding; it is supplementary benchmark evidence, not a new judge path.
 - Finalization: [`0x9b9003…47403`](https://coston2-explorer.flare.network/tx/0x9b9003a5597deb8e5396a48f5962bfab2cc4dd518188b4bff58ce0dee8c47403)
@@ -148,7 +154,7 @@ contains no wallet, bid, credential, or private-key material.
 | `2:10–2:55` | Follow close, FTSO snapshot, FCC scoring, two matching result signatures, and finalization. | Tender `21` transactions and recovery evidence |
 | `2:55–3:25` | Open the award receipt and explain public winner/amount versus private losing bids. | Coston2 explorer and receipt contract |
 | `3:25–3:50` | Show the XRPL/FDC/Smart Account evidence and the live amount-based FAssets redemption request boundary. | Gate G + `fassets-redemption.release.json`; no custody or instant-payout claim |
-| `3:50–4:00` | State limitations: simulated TEE, testnet, unaudited, restart recovery and user validation remain open. | Honest threat-model boundary |
+| `3:50–4:00` | State limitations: simulated TEE, testnet, unaudited, same-identity restoration unsupported, and user validation open. | Honest threat-model boundary |
 
 ## Reproduction and validation
 
@@ -178,10 +184,10 @@ binding, threshold finalization, FTestXRP conservation, Gate G XRP/FDC/Smart
 Account funding, fail-closed delayed-mint checkpoint/resume in the funding
 executor, hosted ingress health/result API, public Evidence workspace, Vercel
 smoke/accessibility evidence, and the read-only hosted Railway runtime-log
-review recorded without retaining log bodies.
+review recorded without retaining log bodies. Supported rolling replacement
+recovery also passes for all three product TEE identities.
 
-Still open and deliberately not overstated: same-identity simulated-TEE
-restart recovery, browser-native XRP interactive recovery and broader wallet
+Still open and deliberately not overstated: browser-native XRP interactive recovery and broader wallet
 coverage, adversarial/recovery breadth beyond the recorded drill, structured
 buyer/vendor interviews, and pilot evidence. The explicit
 `evidence/coston2/user-validation.release.json` record is `NOT_RUN`; it is not

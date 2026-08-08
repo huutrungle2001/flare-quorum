@@ -8,7 +8,8 @@
 > exact FTestXRP settlement. The XRP-native run also proves an XRPL `0xFE`
 > payment, FDC proof, Smart Account direct mint, and atomic tender funding.
 > The organizer-confirmed restart model is replacement registration, not
-> same-identity restoration; its live fault drill remains open. A one-result-endpoint outage recovery, verified release, hosted
+> same-identity restoration; a full three-machine rolling replacement drill now
+> passes on Coston2. A one-result-endpoint outage recovery, verified release, hosted
 > ingress, public Evidence workspace, wallet-free Coston2 judge smoke, and
 > read-only live negative guards are live. The wallet-ready XRP Payment/job
 > preview and captioned judge video are shipped; browser-native signing and
@@ -137,12 +138,13 @@ product code depends on it.
 - [x] Send and verify a domain-correct Coston2 result.
 - [x] Implement private bid ingress through the supported proxy/TEE path and
   verify live three-machine authenticated ciphertext-only receipts; replacement
-  registration is the supported restart model and its live drill remains open.
+  registration is the supported restart model and its rolling live drill passes.
 - [x] Return and verify TEE-signed `BidReceipt` values in the local extension
-  harness and live registered-TEE ingress; body-log and restart evidence remain
-  open.
+  harness and live registered-TEE ingress; the public-safe hosted-log review and
+  supported replacement evidence are recorded.
 - [x] Prove sealed persistence across process restart in the local sealed-store
-  tests; live three-machine recovery remains open.
+  tests; live recovery replaces and re-registers all three identities without
+  claiming unsupported same-identity restoration.
 - [x] Prove three-machine selection and two matching signatures in the live
   Coston2 lifecycle; an existing tender remains fail-closed if two frozen
   identities are lost.
@@ -303,7 +305,8 @@ confidential bid or settlement boundary:
   identity-rotation boundary and fail-closed two-machine-loss drill are
   recorded in `evidence/local/fcc-local-tee-restart-boundary.json` and
   `evidence/local/fcc-local-two-machine-loss.json`. Stateful Coston2 fault
-  injection, replacement-process recovery, and live two-machine-loss drills remain open.
+  injection and live two-machine-loss drills remain open; replacement-process
+  recovery passes in `evidence/coston2/fcc-replacement-recovery.json`.
 - [x] Record public gas, block-latency, close-to-result, recovery, and
   independently measured bid-ingress benchmarks from live Coston2 lifecycles in
   `evidence/coston2/performance-benchmarks.release.json` and
@@ -315,7 +318,7 @@ confidential bid or settlement boundary:
   the separate Coston2 write-relay deployment remains gated on its dedicated
   finalizer environment, and the browser ingress is a separate hosted Railway
   service with server-only FCC credentials. Its live `/health` route rereads
-  finalized tender 21 and fails closed unless all three frozen machine
+  finalized tender 23 and fails closed unless all three frozen machine
   identities, code version, URLs, and key fingerprints still match.
 
 Exit: canonical manifest, bindings, source, runtime, extension, UI, and evidence
@@ -419,12 +422,12 @@ the championship product and requires Product Plan approval.
 | Documentation transition | COMPLETE |
 | Official version pinning | PASSED for Gate 0 — core source/toolchain/discovery, pinned proxy/extension images, stable public origins, and live TEE stack are recorded |
 | FCC foundation operation | LIVE PASSED — deterministic `PING_V1` result verified on Coston2 with registered signer/domain |
-| FCC private ingress | LIVE PARTIAL — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, and changed-ciphertext rejection pass; supported replacement recovery is documented and its live fault drill remains open |
+| FCC private ingress | LIVE PASSED — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, changed-ciphertext rejection, and supported rolling replacement recovery pass |
 | Multi-TEE quorum | LIVE PASSED for one three-bid lifecycle — atomic 3-of-3 receipts, common root, two matching frozen-TEE signatures, and one-machine resilience assertions recorded; replacements never mutate an existing frozen set |
 | Flare contracts | LIVE VERIFIED — Coston2 market, FTestXRP escrow, FTSO snapshot, award receipt, and recovery wiring agree with the verified release manifest |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, official amount-based FTestXRP redemption request, and fail-closed delayed-mint checkpoint/resume are implemented; evidence is recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
-| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke, public role/accessibility smoke, fail-closed hosted ciphertext-ingress health, market-machine preflight, and a read-only hosted runtime-log review pass; Gate-B replacement drill, adversarial suites, browser XRPL signing/recovery, and Gate H user validation remain open |
+| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke, public role/accessibility smoke, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; broader adversarial suites, browser XRPL signing/recovery, and Gate H user validation remain open |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported

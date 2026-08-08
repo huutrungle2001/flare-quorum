@@ -79,10 +79,11 @@ of chain/market/extension/tender/vendor/submission nonce. Exact ciphertext
 retry is idempotent; a different ciphertext for the same nonce fails, while a
 new nonce cannot be blocked by an orphaned partial delivery. Live evidence covers
 authenticated ciphertext-only ingress, three signed receipts, exact-retry
-idempotence, and changed-ciphertext slot rejection on the three registered
-Coston2 simulated TEEs for the prior code version. The nonce-addressed revision
-requires a fresh image/code-version deployment before it becomes a live claim;
-the supported replacement-machine fault drill also remains open.
+idempotence, and changed-ciphertext slot rejection on registered Coston2
+simulated TEEs. The nonce-addressed revision is live in application image
+`0.2.3`: tender `23` accepted three vendors through the replacement machine
+set, and the supported three-machine replacement drill passed without
+relabeling the unchanged simulated FCC wire measurement.
 
 The local consumer binding now reproduces tee-node's go-ethereum ECIES scheme
 byte-for-byte and verifies a shared Go/TypeScript decryption vector. The relay
