@@ -179,7 +179,7 @@ func (e *Extension) processSelection(action teetypes.Action, dataFixed *instruct
 	bindings := make([]protocol.CredentialDomainBinding, 0, len(request.BidReferences))
 	var rules protocol.ScoringRules
 	for index, reference := range request.BidReferences {
-		slot, slotErr := protocol.BidSlotFor(request.ChainID, request.Market, request.ExtensionID, request.TenderID, reference.Vendor)
+		slot, slotErr := protocol.BidSlotFor(request.ChainID, request.Market, request.ExtensionID, request.TenderID, reference.Vendor, reference.SubmissionNonce)
 		if slotErr != nil {
 			return buildResult(action, dataFixed, nil, 0, errorSelectionRejected)
 		}

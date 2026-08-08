@@ -17,9 +17,12 @@ ordered-root and bid-receipt vectors, canonical ABI encoding for
 credentials, XRP/USD conversion, penalties, and tie-breaking. That model is
 connected locally to the official direct-action envelope. The handler accepts
 only opaque ECIES, decrypts and signs through tee-node's loopback API, persists
-only the original ciphertext in a replay-safe sealed slot, and returns a public
-receipt. Unit/race/restart tests pass, but this is not a live FCC claim until a
-registered Coston2 machine and proxy exercise the same path.
+only the original ciphertext in a nonce-bound replay-safe sealed slot, and
+returns a public receipt. A partially delivered three-machine attempt cannot
+occupy the slot of a later submission nonce; selection decrypts only the nonce
+referenced by the accepted on-chain receipt. Unit/race/restart tests pass, but
+this is not a live FCC claim until a registered Coston2 machine and proxy
+exercise the same path.
 
 ```bash
 go test ./...

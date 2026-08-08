@@ -61,16 +61,33 @@ func TestSelectionWireRoundTripAndDigest(t *testing.T) {
 func TestBidSlotBindsTypedMarket(t *testing.T) {
 	chainID, extensionID, tenderID := big.NewInt(114), big.NewInt(0x10001), big.NewInt(42)
 	vendor := common.HexToAddress("0x2000000000000000000000000000000000000002")
-	first, err := BidSlotFor(chainID, common.HexToAddress("0x1000000000000000000000000000000000000001"), extensionID, tenderID, vendor)
+	first, err := BidSlotFor(chainID, common.HexToAddress("0x1000000000000000000000000000000000000001"), extensionID, tenderID, vendor, big.NewInt(7))
 	if err != nil {
 		t.Fatal(err)
 	}
-	second, err := BidSlotFor(chainID, common.HexToAddress("0x1000000000000000000000000000000000000003"), extensionID, tenderID, vendor)
+	second, err := BidSlotFor(chainID, common.HexToAddress("0x1000000000000000000000000000000000000003"), extensionID, tenderID, vendor, big.NewInt(7))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if first == second {
 		t.Fatal("bid slot did not bind market address")
+	}
+}
+
+func TestBidSlotBindsSubmissionNonce(t *testing.T) {
+	chainID, extensionID, tenderID := big.NewInt(114), big.NewInt(0x10001), big.NewInt(42)
+	market := common.HexToAddress("0x1000000000000000000000000000000000000001")
+	vendor := common.HexToAddress("0x2000000000000000000000000000000000000002")
+	first, err := BidSlotFor(chainID, market, extensionID, tenderID, vendor, big.NewInt(7))
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := BidSlotFor(chainID, market, extensionID, tenderID, vendor, big.NewInt(8))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first == second {
+		t.Fatal("bid slot did not bind submission nonce")
 	}
 }
 

@@ -37,7 +37,7 @@ func TestSelectionInstructionDecryptsSealedBidAndReturnsOnlyWinner(t *testing.T)
 	if err != nil {
 		t.Fatal(err)
 	}
-	slot, err := protocol.BidSlotFor(submission.ChainID, submission.Market, submission.ExtensionID, submission.TenderID, submission.Vendor)
+	slot, err := protocol.BidSlotFor(submission.ChainID, submission.Market, submission.ExtensionID, submission.TenderID, submission.Vendor, submission.SubmissionNonce)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,6 +70,17 @@ func TestSelectionInstructionDecryptsSealedBidAndReturnsOnlyWinner(t *testing.T)
 	}
 	if len(result.Data) == 0 || decoded.RulesHash != rulesHash {
 		t.Fatal("selection result omitted required public binding")
+	}
+
+	request.BidReferences[0].SubmissionNonce = big.NewInt(8)
+	wrongNonceBytes, err := protocol.EncodeSelectionRequest(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dataFixed.OriginalMessage = wrongNonceBytes
+	wrongNonceResult := extension.processSelection(teetypes.Action{Data: teetypes.ActionData{ID: common.HexToHash("0x56"), SubmissionTag: teetypes.Threshold}}, dataFixed)
+	if wrongNonceResult.Status != 0 || !strings.Contains(wrongNonceResult.Log, errorSelectionRejected) {
+		t.Fatalf("selection opened a slot for an unaccepted nonce: status=%d log=%s", wrongNonceResult.Status, wrongNonceResult.Log)
 	}
 }
 

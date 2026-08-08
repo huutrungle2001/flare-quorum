@@ -12,7 +12,7 @@ import (
 const Coston2ChainID = int64(114)
 
 var (
-	BidSlotDomain = crypto.Keccak256Hash([]byte("VEILBID_BID_SLOT_V1"))
+	BidSlotDomain = crypto.Keccak256Hash([]byte("VEILBID_BID_SLOT_V2"))
 	bidSlotArgs   = abi.Arguments{
 		{Type: mustWireABIType("bytes32")},
 		{Type: mustWireABIType("uint256")},
@@ -20,6 +20,7 @@ var (
 		{Type: mustWireABIType("uint256")},
 		{Type: mustWireABIType("uint256")},
 		{Type: mustWireABIType("address")},
+		{Type: mustWireABIType("uint256")},
 	}
 )
 
@@ -105,7 +106,7 @@ func validateSubmission(submission BidSubmission, now uint64, enforceIntakeClock
 	if err != nil {
 		return ValidatedSubmission{}, errors.New("INVALID_BID_ENCODING")
 	}
-	sealedSlot, err := BidSlotFor(submission.ChainID, submission.Market, submission.ExtensionID, submission.TenderID, submission.Vendor)
+	sealedSlot, err := BidSlotFor(submission.ChainID, submission.Market, submission.ExtensionID, submission.TenderID, submission.Vendor, submission.SubmissionNonce)
 	if err != nil {
 		return ValidatedSubmission{}, errors.New("INVALID_BID_DOMAIN")
 	}
@@ -116,11 +117,11 @@ func validateSubmission(submission BidSubmission, now uint64, enforceIntakeClock
 	}, nil
 }
 
-func BidSlotFor(chainID *big.Int, market common.Address, extensionID, tenderID *big.Int, vendor common.Address) (common.Hash, error) {
-	if chainID == nil || chainID.Sign() <= 0 || market == (common.Address{}) || extensionID == nil || extensionID.Sign() <= 0 || tenderID == nil || tenderID.Sign() <= 0 || vendor == (common.Address{}) {
+func BidSlotFor(chainID *big.Int, market common.Address, extensionID, tenderID *big.Int, vendor common.Address, submissionNonce *big.Int) (common.Hash, error) {
+	if chainID == nil || chainID.Sign() <= 0 || market == (common.Address{}) || extensionID == nil || extensionID.Sign() <= 0 || tenderID == nil || tenderID.Sign() <= 0 || vendor == (common.Address{}) || submissionNonce == nil || submissionNonce.Sign() <= 0 {
 		return common.Hash{}, errors.New("INVALID_BID_SLOT_DOMAIN")
 	}
-	slotEncoded, err := bidSlotArgs.Pack(BidSlotDomain, chainID, market, extensionID, tenderID, vendor)
+	slotEncoded, err := bidSlotArgs.Pack(BidSlotDomain, chainID, market, extensionID, tenderID, vendor, submissionNonce)
 	if err != nil {
 		return common.Hash{}, err
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func TestValidateSubmissionBindsOneCanonicalSealedSlot(t *testing.T) {
+func TestValidateSubmissionBindsNonceAddressedSealedSlot(t *testing.T) {
 	submission := validSubmissionFixture(t)
 	validated, err := ValidateSubmission(submission, 100)
 	if err != nil {
@@ -27,8 +27,8 @@ func TestValidateSubmissionBindsOneCanonicalSealedSlot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if retryValidated.SealedSlot != validated.SealedSlot || retryValidated.PlaintextCommitment == validated.PlaintextCommitment {
-		t.Fatal("slot must bind vendor/tender while commitment binds nonce and salt")
+	if retryValidated.SealedSlot == validated.SealedSlot || retryValidated.PlaintextCommitment == validated.PlaintextCommitment {
+		t.Fatal("slot and commitment must bind the one-time submission nonce")
 	}
 }
 

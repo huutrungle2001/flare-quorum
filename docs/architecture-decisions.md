@@ -674,6 +674,29 @@ VeilBid therefore does not fork or patch the framework to restore an identity
 key, because that would be an unsupported runtime/code path and would require a
 new extension image/code-version registration.
 
+## ADR-026 — Nonce-addressed sealed bid slots
+
+**Decision:** A sealed bid slot is keyed by chain, market, extension, tender,
+vendor, and `submissionNonce`. Selection derives the same slot from the
+on-chain accepted bid reference and decrypts only that ciphertext. Exact
+ciphertext delivery retries remain idempotent for one nonce, while a partially
+delivered attempt cannot block a fresh nonce after the browser loses its
+ephemeral session state.
+
+Ciphertext from an attempt that never obtains three receipts remains sealed on
+only the machines that accepted it. It is not referenced by the ordered root,
+cannot participate in winner selection, and is never returned through a public
+API. Storage retention and operator cleanup may remove such unreferenced slots
+after the tender lifecycle; cleanup must not delete a nonce referenced by an
+accepted on-chain bid.
+
+**Reason:** Browser persistence of bid ciphertext or recovery secrets is
+forbidden. A vendor+tender-only slot made a one-machine partial delivery
+permanently conflict with a new encrypted attempt, even though no bid entered
+the canonical root. Binding the existing one-time submission nonce into the
+slot preserves privacy and replay protection while making delivery failures
+recoverable without a plaintext shadow ledger or public ciphertext.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:
