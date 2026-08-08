@@ -118,6 +118,12 @@ It proves the checked-in Go, Forge, and relay suites without performing live
 writes; its blocker list deliberately keeps live fault-drill and simulated-TEE
 identity-restart claims open.
 
+The pinned three-machine Docker smoke is recorded separately in
+[`evidence/local/fcc-local-stack-smoke.json`](../evidence/local/fcc-local-stack-smoke.json).
+It proves local authenticated transport, malformed-input rejection, result
+binding, and public redaction only; it is explicitly not production Coston2
+evidence.
+
 The read-only live negative observations are recorded in
 [`evidence/coston2/live-negative-calls.release.json`](../evidence/coston2/live-negative-calls.release.json).
 They exercise terminal-state and zero-term guards through `eth_call` only;
