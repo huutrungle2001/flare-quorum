@@ -12,6 +12,8 @@ const requiredText = [
   "https://veilbid-flare.vercel.app",
   "https://github.com/huutrungle2001/veilbid-flare",
   "evidence/coston2/three-vendor-recovery.release.json",
+  "evidence/coston2/fcc-replacement-recovery.json",
+  "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json",
   "evidence/coston2/fassets-redemption.release.json",
   "RedemptionRequested",
   "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
@@ -51,7 +53,15 @@ for (const pattern of forbiddenPatterns) {
 
 const release = readJson(resolve(root, "packages/flare-contracts/deployments/coston2.release.json"), "JUDGE_PACKAGE_RELEASE_INVALID");
 const recovery = readJson(resolve(root, "evidence/coston2/three-vendor-recovery.release.json"), "JUDGE_PACKAGE_RECOVERY_EVIDENCE_INVALID");
+const replacement = readJson(resolve(root, "evidence/coston2/fcc-replacement-recovery.json"), "JUDGE_PACKAGE_REPLACEMENT_EVIDENCE_INVALID");
+const currentLifecycle = readJson(resolve(root, "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json"), "JUDGE_PACKAGE_CURRENT_LIFECYCLE_INVALID");
+const ingress = readJson(resolve(root, "evidence/coston2/flare-ingress-production.json"), "JUDGE_PACKAGE_INGRESS_EVIDENCE_INVALID");
 const recoveryAssertions = recovery.assertions ?? {};
+const normalizeSet = (values) => [...(values ?? [])].map((value) => String(value).toLowerCase()).sort();
+const releaseTeeIds = normalizeSet(release.fcc?.teeIds);
+const replacementTeeIds = normalizeSet(replacement.publicIdentifiers?.currentMachines?.map(({ teeId }) => teeId));
+const lifecycleTeeIds = normalizeSet(currentLifecycle.publicIdentifiers?.teeIds);
+const ingressTeeIds = normalizeSet(ingress.publicIdentifiers?.machineIds);
 const assertions = {
   packageFilesPresent: requiredFiles.every((file) => existsSync(resolve(packageRoot, file))),
   currentV2LinksPresent: requiredText.every((text) => packageText.includes(text)),
@@ -59,6 +69,18 @@ const assertions = {
   verifiedCoston2Release: release.chainId === 114 && release.verified === true,
   recoveryEvidencePassed: recovery.status === "PASSED" && recovery.gate === "C-E-F-RECOVERY",
   recoveryThresholdProof: recoveryAssertions.oneSelectionResultUnavailableStillFinalized === true && recoveryAssertions.selectionResultSignedByTwoDistinctFrozenTees === true,
+  replacementRecoveryPassed: replacement.status === "PASSED" && replacement.gate === "FCC_REPLACEMENT_RECOVERY"
+    && Object.values(replacement.assertions ?? {}).every(Boolean),
+  currentMachineSetConsistent: releaseTeeIds.length === 3
+    && JSON.stringify(releaseTeeIds) === JSON.stringify(replacementTeeIds)
+    && JSON.stringify(releaseTeeIds) === JSON.stringify(lifecycleTeeIds)
+    && JSON.stringify(releaseTeeIds) === JSON.stringify(ingressTeeIds),
+  currentLifecyclePassed: currentLifecycle.status === "PASSED"
+    && currentLifecycle.publicIdentifiers?.tenderId === "23"
+    && currentLifecycle.assertions?.selectionResultThresholdSatisfied === true,
+  hostedIngressBoundToCurrentTender: ingress.assertions?.healthTenderBound === true
+    && ingress.publicIdentifiers?.healthTenderId === currentLifecycle.publicIdentifiers?.tenderId
+    && ingress.publicIdentifiers?.healthTenderStatus === "Awarded",
 };
 for (const [name, passed] of Object.entries(assertions)) {
   if (!passed && !blockers.includes(`JUDGE_PACKAGE_${name.toUpperCase()}`)) blockers.push(`JUDGE_PACKAGE_${name.toUpperCase()}`);
@@ -73,6 +95,7 @@ const result = {
     chainId: 114,
     market: release.contracts?.VeilBidFlareMarket?.address ?? null,
     recoveryTenderId: recovery.publicIdentifiers?.tenderId ?? null,
+    flagshipTenderId: currentLifecycle.publicIdentifiers?.tenderId ?? null,
   },
   assertions,
   blockers,
