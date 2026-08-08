@@ -1,9 +1,11 @@
 # VeilBid Flare Championship User Guide
 
 > Status: verified Coston2 experience. The checked-in `/` and `/flare` routes
-> provide the fail-closed wallet-free evidence view and dedicated public
-> Activity/Evidence ledger, and explicit Coston2 EVM Buyer/Vendor role routes
-> are live. The XRP-native funding protocol and executor have live Gate G
+> provide the fail-closed wallet-free evidence view and explicit Coston2 role
+> routes. The source now separates Public, XRP Treasury, EVM Buyer, Vendor,
+> Public Finalizer, and Auditor/Evidence; production validation of this expanded
+> role shell remains pending the next hosted deployment. The XRP-native funding
+> protocol and executor have live Gate G
 > evidence plus a public-safe delayed-mint checkpoint/resume path. The Buyer
 > workspace can also prepare a wallet-ready XRPL Payment draft and public-safe
 > `0xFE` executor job preview from read-only Coston2 state; the live
@@ -43,10 +45,21 @@ The wallet-free judge path must let a reviewer:
 7. Compare the page with sanitized release evidence without seeing a bid or
    encrypted payload.
 
-Use `/?role=evidence` for the dedicated public Activity/Evidence ledger. It
-re-reads the same finalized market snapshot and presents each tender's public
-rules hash, receipt quorum, ordered root, FTSO checkpoint, FCC binding, and
-award/refund state. It never unlocks bid data or requires a wallet.
+Use `/?role=evidence` (or the `/?role=auditor` alias) for the dedicated Auditor
+workspace. It re-reads the same finalized market snapshot and presents each
+tender's public rules hash, per-bid receipt quorum, ordered root, machine
+binding, result digest, award payout/remainder, and refund state. It never
+unlocks bid data or requires a wallet. Use `/?role=finalizer` for the separate
+public lifecycle queue: permissionless close is available in-browser, while
+FCC dispatch/result grouping stays in the dedicated relay. Buyer-only empty
+cancellation and failed-compute recovery require an explicit confirmation.
+
+The other source routes are `/?role=treasury` for the XRPL/FDC/Smart Account
+funding journey, `/?role=buyer` for direct EVM funding/recovery, and
+`/?role=vendor` for sealed submission and awarded-vendor redemption. The
+header wallet selector follows the active release: Coston2 on Flare routes and
+Sepolia only on the historical `/room` route. Public browsing never requires a
+wallet.
 
 The public path is live and release-labeled. Any missing dependency keeps its
 own operation unavailable; the UI never substitutes Sepolia data or mock
@@ -142,6 +155,11 @@ receipt set, or a common 2-machine quorum is unavailable.
 8. If no threshold result is retrievable within 24 hours of the first request,
    the buyer may recover only the original escrow. This records failed-compute
    `Refunded`, creates no award, and is never displayed as FCC success.
+
+The Public Finalizer browser intentionally does not request selection or submit
+TEE results itself. Those operations require the relay's public FCC endpoints,
+live instruction fee, exact-result grouping, and canonical rereads; moving them
+into an ordinary client would add authority without adding safety.
 
 ## 7. Evidence and privacy labels
 

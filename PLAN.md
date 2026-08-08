@@ -228,18 +228,23 @@ custodial VeilBid signer.
   the browser route is now backed by the verified Coston2 release.
 - [x] Replace the Sepolia judge path with verified Coston2 bindings for `/` and
   `/flare`; `/room` remains explicitly historical.
-- [~] Build role workspaces: the wallet-free Public dossier, dedicated public
-  Evidence/Activity ledger, EVM Buyer/Vendor Coston2 paths, wallet-ready
+- [~] Build role workspaces: the wallet-free Public dossier, separate XRP
+  Treasury, EVM Buyer, Vendor, Public Finalizer, and Auditor/Evidence paths,
+  wallet-ready
   public-safe XRP `0xFE` Payment/job/memo preview, and optional GemWallet
   Testnet signing/submission are implemented; reload-safe public checkpoint
   resume is now explicit; browser-native executor recovery and broader wallet
-  coverage remain open.
+  coverage remain open. The expanded source shell and award/receipt dossier are
+  implemented; hosted redeployment and replacement smoke evidence remain open.
 - [x] Show verified extension, code version, TEE identities/key fingerprints,
   quorum, rule version, FTSO snapshot, result digest, and sanitized FAssets/FDC/
   Smart Account bindings in the wallet-free Flare dossier.
-- [x] Add a dedicated public Coston2 Evidence/Activity ledger that rereads
-  finalized checkpoints and exposes rules hash, receipt quorum, ordered root,
-  FTSO snapshot, FCC binding, and award/refund state without bid payloads.
+- [x] Add dedicated Public Finalizer and Auditor/Evidence workspaces that reread
+  finalized checkpoints and expose rules hash, per-bid receipt quorum, ordered
+  root, FTSO snapshot, FCC binding, result digest, payout/remainder, and
+  award/refund state without bid payloads. Browser writes are limited to
+  canonical close/cancel/refund calls; FCC dispatch and result grouping remain
+  relay-only.
 - [x] Build the Coston2 sealed bid composer with browser-only ECIES encryption,
   three authenticated ingress requests, three signed receipt checks, and an
   atomic on-chain receipt submission; browser storage and public payloads never

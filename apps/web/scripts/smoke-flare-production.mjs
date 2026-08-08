@@ -89,7 +89,17 @@ async function fetchRoute(path) {
 mkdirSync(dirname(evidencePath), { recursive: true });
 mkdirSync(screenshotDirectory, { recursive: true });
 
-const routes = await Promise.all(["/", "/flare", "/?role=evidence", "/?role=buyer", "/?role=vendor", "/room", "/docs"].map(fetchRoute));
+const routes = await Promise.all([
+  "/",
+  "/flare",
+  "/?role=treasury",
+  "/?role=buyer",
+  "/?role=vendor",
+  "/?role=finalizer",
+  "/?role=evidence",
+  "/room",
+  "/docs",
+].map(fetchRoute));
 const rootHtml = routes.find((route) => route.path === "/")?.body ?? "";
 const assetPaths = [...rootHtml.matchAll(/<script[^>]+src="([^"]+)"/g)].map((match) => match[1]);
 const assetSources = await Promise.all(assetPaths.map(async (path) => {
@@ -102,8 +112,10 @@ const chrome = findChrome();
 const desktop = browserCapture(chrome, "/", { width: 1440, height: 1000 }, "flare-production-desktop.png");
 const mobile = browserCapture(chrome, "/flare", { width: 390, height: 844 }, "flare-production-mobile.png");
 const evidenceRoute = browserCapture(chrome, "/?role=evidence", { width: 1440, height: 1000 }, "flare-production-evidence.png");
+const treasuryRoute = browserCapture(chrome, "/?role=treasury", { width: 1440, height: 1000 }, "flare-production-treasury.png");
 const buyerRoute = browserCapture(chrome, "/?role=buyer", { width: 1440, height: 1000 }, "flare-production-buyer.png");
 const vendorRoute = browserCapture(chrome, "/?role=vendor", { width: 1440, height: 1000 }, "flare-production-vendor.png");
+const finalizerRoute = browserCapture(chrome, "/?role=finalizer", { width: 1440, height: 1000 }, "flare-production-finalizer.png");
 const docsMobile = browserCapture(chrome, "/docs", { width: 390, height: 844 }, "flare-production-docs-mobile.png");
 
 const market = release.contracts.VeilBidFlareMarket.address;
@@ -113,12 +125,16 @@ const assertions = {
   coston2NetworkRendered: desktop.dom.includes('aria-label="Network: Flare Coston2"') && mobile.dom.includes("COSTON2"),
   verifiedReleaseRendered: desktop.dom.includes("VERIFIED COSTON2 RELEASE") && mobile.dom.includes("VERIFIED COSTON2 RELEASE"),
   walletFreeTenderListLoaded: desktop.dom.includes("COSTON2 DOSSIERS") && mobile.dom.includes("COSTON2 DOSSIERS"),
+  productStoryRendered: desktop.dom.includes("Private bids.") && desktop.dom.includes("Public awards.") && desktop.dom.includes("THRESHOLD COMPUTE"),
+  roleTaxonomyRendered: treasuryRoute.dom.includes("XRP TREASURY") && treasuryRoute.dom.includes("EVM BUYER") && finalizerRoute.dom.includes("PUBLIC FINALIZER") && evidenceRoute.dom.includes("AUDITOR / EVIDENCE"),
   awardedTenderVisible: desktop.dom.includes("AWARDED") && desktop.dom.includes("FTestXRP"),
   privacyBoundaryVisible: desktop.dom.includes("PRIVATE LOSING BIDS") && desktop.dom.includes("Bid payloads are never fetched"),
-  publicEvidenceLedgerRendered: evidenceRoute.dom.includes("FINALIZED CHECKPOINT LEDGER") && evidenceRoute.dom.includes("Rules hash") && evidenceRoute.dom.includes("Ordered bid root"),
-  publicEvidenceNoWalletGate: evidenceRoute.dom.includes("Trace every public checkpoint") && !evidenceRoute.dom.includes("CONNECT WALLET"),
+  publicEvidenceLedgerRendered: evidenceRoute.dom.includes("Inspect the binding, not the bids.") && evidenceRoute.dom.includes("TRUST BINDING") && evidenceRoute.dom.includes("PUBLIC BID RECEIPTS") && evidenceRoute.dom.includes("Ordered bid root"),
+  publicEvidenceNoWalletGate: evidenceRoute.dom.includes("PUBLIC VERIFICATION ONLY") && evidenceRoute.dom.includes("NO BID DECRYPTION") && !evidenceRoute.dom.includes("Wallet providers are unavailable"),
+  publicFinalizerRendered: finalizerRoute.dom.includes("Advance public checkpoints.") && finalizerRoute.dom.includes("CANONICAL ACTION QUEUE") && finalizerRoute.dom.includes("no bid-decryption capability"),
   buyerBriefRendered: buyerRoute.dom.includes("Public objective") && buyerRoute.dom.includes("Acceptance criteria") && buyerRoute.dom.includes("Optional vendor questions"),
-  xrpFundingBoundaryRendered: buyerRoute.dom.includes("Keep the XRPL signature outside VeilBid") && buyerRoute.dom.includes("DirectMintingDelayed") && buyerRoute.dom.includes("NON-CUSTODIAL") && buyerRoute.dom.includes("PREPARE PUBLIC 0xFE JOB") && buyerRoute.dom.includes("XRPL owner address") && buyerRoute.dom.includes("wallet-ready XRPL Payment draft") && buyerRoute.dom.includes("AssetManager destination and fee"),
+  xrpFundingBoundaryRendered: treasuryRoute.dom.includes("XRP TREASURY / XRPL") && treasuryRoute.dom.includes("Keep the XRPL signature outside VeilBid") && treasuryRoute.dom.includes("DirectMintingDelayed") && treasuryRoute.dom.includes("NON-CUSTODIAL") && treasuryRoute.dom.includes("PREPARE PUBLIC 0xFE JOB") && treasuryRoute.dom.includes("XRPL owner address") && treasuryRoute.dom.includes("wallet-ready XRPL Payment draft") && treasuryRoute.dom.includes("AssetManager destination and fee"),
+  evmBuyerSeparatedFromXrpTreasury: buyerRoute.dom.includes("COSTON2 BUYER / EVM RECOVERY PATH") && !buyerRoute.dom.includes("Keep the XRPL signature outside VeilBid"),
   vendorRedemptionBoundaryRendered: vendorRoute.dom.includes("Request XRP redemption") && vendorRoute.dom.includes("Connect the winning Coston2 wallet"),
   noPublicStateFailureRendered: !desktop.dom.includes("Flare state unavailable") && !mobile.dom.includes("Flare state unavailable"),
   mobileTenderNavigationActive: mobile.dom.includes('class="primary-nav-link active"') && mobile.dom.includes('aria-current="page"'),
@@ -150,18 +166,21 @@ const evidence = {
     desktop: desktop.screenshot,
     mobile: mobile.screenshot,
     evidence: evidenceRoute.screenshot,
+    treasury: treasuryRoute.screenshot,
     buyer: buyerRoute.screenshot,
     vendor: vendorRoute.screenshot,
+    finalizer: finalizerRoute.screenshot,
     docsMobile: docsMobile.screenshot,
   },
   assertions,
   blockers,
   notes: [
     "The deployed v2 Vercel project loaded the verified Coston2 public market without a wallet.",
-    "The dedicated Activity/Evidence route reread the same finalized market snapshot without a wallet or bid payload.",
+    "The Auditor route reread the same finalized market snapshot without a wallet, bid payload, signer, or decryption capability.",
+    "The Public Finalizer route exposes only canonical lifecycle actions; FCC dispatch and threshold grouping remain dedicated relay operations.",
     "The Vendor route exposes the official redemption request boundary but keeps approval and redemption behind the winning Coston2 wallet.",
-    "The Buyer route exposes the structured public brief and commits its canonical hash without collecting bid plaintext.",
-    "The Buyer route exposes a public-safe XRPL 0xFE wallet-ready payment draft and optional GemWallet Testnet submit action; this wallet-free smoke does not click it and no XRPL secret is accepted.",
+    "The EVM Buyer route exposes the structured public brief and commits its canonical hash without collecting bid plaintext.",
+    "The separate XRP Treasury route exposes a public-safe XRPL 0xFE wallet-ready payment draft and optional GemWallet Testnet submit action; this wallet-free smoke does not click it and no XRPL secret is accepted.",
     "The /docs route serves current Flare documentation when the verified release is enabled; the historical Sepolia/Nox guide remains on /room and is linked as a separate baseline.",
     "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
     "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed.",

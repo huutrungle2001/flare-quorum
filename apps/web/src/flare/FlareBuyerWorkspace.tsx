@@ -199,9 +199,11 @@ function assertXrplPaymentDestination(value: string): string {
 export function FlareBuyerWorkspace({
   wallet,
   onRefresh,
+  journey = "combined",
 }: {
   wallet: WalletController;
   onRefresh: () => void;
+  journey?: "combined" | "evm" | "xrp";
 }) {
   const toasts = useToasts();
   const [title, setTitle] = useState("");
@@ -418,14 +420,15 @@ export function FlareBuyerWorkspace({
   return (
     <main id="main-content" className="role-workspace flare-buyer-workspace">
       <section className="workspace-intro">
-        <p className="eyebrow">COSTON2 BUYER / EVM RECOVERY PATH</p>
-        <h1>Fund transparent rules.</h1>
-        <p>Approve the exact public FTestXRP ceiling, then create a tender frozen to the verified FCC extension and three production-status identities. Bid values remain outside the contract.</p>
+        <p className="eyebrow">{journey === "xrp" ? "XRP TREASURY / XRPL → FDC → SMART ACCOUNT" : "COSTON2 BUYER / EVM RECOVERY PATH"}</p>
+        <h1>{journey === "xrp" ? "Fund from XRP." : "Fund transparent rules."}</h1>
+        <p>{journey === "xrp"
+          ? "Build a wallet-ready XRPL Payment whose 0xFE memo commits to the exact Smart Account operation. VeilBid receives only public identifiers and never an XRPL secret."
+          : "Approve the exact public FTestXRP ceiling, then create a tender frozen to the verified FCC extension and three production-status identities. Bid values remain outside the contract."}</p>
       </section>
-      <WalletPanel wallet={wallet} network="coston2" />
-      <FlareXrpFundingPanel onPrepare={prepareXrpFunding} />
+      {journey !== "xrp" && <WalletPanel wallet={wallet} network="coston2" />}
       <section id="buyer-brief" className="evidence-panel flare-buyer-form" aria-label="Coston2 buyer tender composer">
-        <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>Open a Coston2 tender</h2></div><span className="privacy-badge verified">FTestXRP / TESTNET</span></header>
+        <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>{journey === "xrp" ? "Prepare the XRP-funded tender" : "Open a Coston2 tender"}</h2></div><span className="privacy-badge verified">FTestXRP / TESTNET</span></header>
         <label>Public title<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small>The public brief is hashed into immutable metadata; bids remain outside the contract.</small></label>
         <div className="form-grid-two">
           <label>Category<select value={category} onChange={(event) => setCategory(event.target.value as FlareBuyerBriefCategory)} disabled={busy}><option value="software">Software</option><option value="design">Design</option><option value="marketing">Marketing</option><option value="operations">Operations</option><option value="research">Research</option></select></label>
@@ -443,9 +446,10 @@ export function FlareBuyerWorkspace({
           <label>Warranty weight (bps)<input inputMode="numeric" value={warrantyWeight} onChange={(event) => setWarrantyWeight(event.target.value)} disabled={busy} /></label>
         </div>
         {error && <p className="inline-error" role="alert">{error}</p>}
-        <button className="primary-button" type="button" onClick={() => void createTender()} disabled={busy || !connected}>{busy ? "WAITING FOR C2FLR…" : "APPROVE &amp; OPEN TENDER →"}</button>
+        {journey !== "xrp" && <button className="primary-button" type="button" onClick={() => void createTender()} disabled={busy || !connected}>{busy ? "WAITING FOR C2FLR…" : "APPROVE &amp; OPEN TENDER →"}</button>}
         {last && <p className="form-hint" aria-live="polite">Tender #{last.tenderId} created · <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">inspect transaction ↗</a></p>}
       </section>
+      {journey !== "evm" && <FlareXrpFundingPanel onPrepare={prepareXrpFunding} />}
     </main>
   );
 }

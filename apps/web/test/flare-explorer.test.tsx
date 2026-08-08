@@ -1,8 +1,10 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { FlareEvidenceWorkspace, FlareExplorerView } from "../src/flare/FlareRoom";
+import { FlareEvidenceWorkspace, FlareExplorerView, FlareRoleBar } from "../src/flare/FlareRoom";
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
+import { FlareAuditorWorkspace } from "../src/flare/FlareAuditorWorkspace";
+import { FlareFinalizerWorkspace } from "../src/flare/FlareFinalizerWorkspace";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
 import { FlareXrpFundingPanel } from "../src/flare/FlareXrpFundingPanel";
 import { readPublicFlareFundingCheckpoint, savePublicFlareFundingCheckpoint } from "../src/flare/fundingCheckpoint";
@@ -68,6 +70,8 @@ const publicTender = {
   winner: null,
   winningAmountXrp: null,
   awardTransactionHash: null,
+  bidReferences: [],
+  award: null,
 };
 
 describe("Coston2 public evidence boundary", () => {
@@ -80,14 +84,14 @@ describe("Coston2 public evidence boundary", () => {
 
   it("labels an empty planned market honestly", () => {
     render(<MemoryRouter><FlareExplorerView state={{ status: "ready", error: null, data: { chainId: 114, tenders: [], indexedBlock: 10n, finalizedBlock: 0n, latestBlock: 10n, deploymentStatus: "planned" } }} onRetry={() => undefined} /></MemoryRouter>);
-    expect(screen.getByText("PLANNED / NOT YET VERIFIED")).toBeInTheDocument();
+    expect(screen.getByText(/PLANNED \/ NOT YET VERIFIED/)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No Coston2 tenders yet" })).toBeInTheDocument();
   });
 
-  it("does not offer the Sepolia wallet on the read-only Flare route", () => {
+  it("offers an optional Coston2 wallet without gating the read-only Flare route", () => {
     render(<MemoryRouter initialEntries={["/flare"]}><PrimaryNavigation wallet={wallet} /></MemoryRouter>);
     expect(screen.getByText("COSTON2")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "CONNECT WALLET" })).toBeNull();
+    expect(screen.getByRole("button", { name: "CONNECT WALLET" })).toBeInTheDocument();
   });
 
   it("renders the contract-canonical public scoring policy", () => {
@@ -108,17 +112,26 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("≤ 30d delivery / 12–36d warranty")).toBeInTheDocument();
   });
 
-  it("keeps the public workspace actions stacked and individually reachable", () => {
+  it("restores the Flare product story and keeps signing optional", () => {
     render(<MemoryRouter><FlareExplorerView state={{
       status: "ready",
       error: null,
       data: { chainId: 114, tenders: [], indexedBlock: 100n, finalizedBlock: 100n, latestBlock: 112n, deploymentStatus: "verified" },
     }} onRetry={() => undefined} /></MemoryRouter>);
-    const actions = screen.getByRole("group", { name: "Open Flare workspaces" });
-    expect(actions.querySelectorAll("a.secondary-button")).toHaveLength(3);
-    expect(screen.getByRole("link", { name: "OPEN BUYER WORKSPACE →" })).toHaveAttribute("href", "?role=buyer");
-    expect(screen.getByRole("link", { name: "OPEN VENDOR WORKSPACE →" })).toHaveAttribute("href", "?role=vendor");
-    expect(screen.getByRole("link", { name: "OPEN ACTIVITY LEDGER →" })).toHaveAttribute("href", "?role=evidence");
+    expect(screen.getByRole("heading", { name: /Private bids.*Public awards/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "START XRP TREASURY FLOW" })).toHaveAttribute("href", "?role=treasury");
+    expect(screen.getByText(/THE TREASURY OWNS THE FUNDS/i)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Private bids produce a threshold-signed award/i })).toBeInTheDocument();
+  });
+
+  it("exposes the complete Flare role taxonomy without private-audit authority", () => {
+    render(<FlareRoleBar activeRole="public" onRoleChange={() => undefined} />);
+    expect(screen.getByRole("button", { name: "PUBLIC" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "XRP TREASURY" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "EVM BUYER" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "VENDOR" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "PUBLIC FINALIZER" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "AUDITOR / EVIDENCE" })).toBeInTheDocument();
   });
 
   it("renders the dedicated public activity ledger without exposing bid data", () => {
@@ -138,6 +151,26 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("Threshold result pending")).toBeInTheDocument();
     expect(screen.getByText(/Only public commitments, finalized checkpoints/)).toBeInTheDocument();
     expect(screen.queryByText(/plaintext bid|ciphertext/i)).toBeNull();
+  });
+
+  it("renders a read-only auditor binding with no reveal or signing control", () => {
+    render(<FlareAuditorWorkspace tenders={[publicTender]} finalizedBlock={100n} />);
+    expect(screen.getByRole("heading", { name: "Inspect the binding, not the bids." })).toBeInTheDocument();
+    expect(screen.getByText(/NO BID DECRYPTION/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/TEE [123]/)).toHaveLength(3);
+    expect(screen.queryByRole("button", { name: /reveal|decrypt|finalize/i })).toBeNull();
+  });
+
+  it("shows permissionless close readiness without computing a winner", () => {
+    render(<FlareFinalizerWorkspace wallet={wallet} tenders={[{
+      ...publicTender,
+      bidCount: 1n,
+      approvedVendorCount: 1,
+    }]} onRefresh={() => undefined} />);
+    expect(screen.getByRole("heading", { name: "Advance public checkpoints." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "CLOSE & FREEZE FTSO →" })).toBeDisabled();
+    expect(screen.getByText(/no bid-decryption capability/i)).toBeInTheDocument();
+    expect(screen.queryByText(/client-provided winner accepted/i)).toBeNull();
   });
 
   it("keeps FXRP redemption behind the winning wallet and never asks for an XRPL secret", () => {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import type { WalletController } from "../wallet/WalletPanel";
+import type { WalletNetwork } from "../wallet/useWallet";
 import { scrollToPageTop } from "./navigationScroll";
 import { isFlareReleaseEnabled } from "../public-market/loadFlareMarket";
 
@@ -14,13 +15,21 @@ function shortAddress(value: string) {
   return `${value.slice(0, 6)}…${value.slice(-4)}`;
 }
 
-function HeaderWalletMenu({ wallet }: { wallet: WalletController }) {
+function HeaderWalletMenu({
+  wallet,
+  network = "sepolia",
+}: {
+  wallet: WalletController;
+  network?: WalletNetwork;
+}) {
   const [open, setOpen] = useState(false);
   const container = useRef<HTMLDivElement>(null);
   const { state } = wallet;
   const connected =
     state.status === "connected" && state.account ? state.account : null;
   const wrongChain = state.status === "wrong-chain";
+  const coston2 = network === "coston2";
+  const networkLabel = coston2 ? "Flare Coston2" : "Ethereum Sepolia";
   const buttonLabel = connected
     ? shortAddress(connected)
     : wrongChain
@@ -82,7 +91,7 @@ function HeaderWalletMenu({ wallet }: { wallet: WalletController }) {
               <span className="wallet-account" title={connected}>
                 {connected}
               </span>
-              <p>Connected to Ethereum Sepolia. Signing remains inside your wallet.</p>
+              <p>Connected to {networkLabel}. Signing remains inside your wallet.</p>
               <button
                 className="secondary-button"
                 type="button"
@@ -96,7 +105,7 @@ function HeaderWalletMenu({ wallet }: { wallet: WalletController }) {
             </>
           ) : wrongChain ? (
             <>
-              <strong>Sepolia confirmation needed</strong>
+              <strong>{coston2 ? "Coston2" : "Sepolia"} confirmation needed</strong>
               <p>
                 The wallet connected, but the automatic network switch did not
                 complete. Confirm the next wallet request to enable signing.
@@ -104,9 +113,9 @@ function HeaderWalletMenu({ wallet }: { wallet: WalletController }) {
               <button
                 className="primary-button"
                 type="button"
-                onClick={() => void wallet.switchToSepolia()}
+                onClick={() => void (coston2 ? wallet.switchToCoston2() : wallet.switchToSepolia())}
               >
-                RETRY SEPOLIA CONNECTION →
+                RETRY {coston2 ? "COSTON2" : "SEPOLIA"} CONNECTION →
               </button>
               <button
                 className="secondary-button"
@@ -120,7 +129,7 @@ function HeaderWalletMenu({ wallet }: { wallet: WalletController }) {
             <>
               <p>
                 Choose an EIP-6963 provider once. VeilBid connects it and asks
-                for the Sepolia switch automatically when needed. Private keys
+                for the {networkLabel} switch automatically when needed. Private keys
                 never leave your wallet.
               </p>
               <div className="header-provider-list">
@@ -154,7 +163,13 @@ function HeaderWalletMenu({ wallet }: { wallet: WalletController }) {
   );
 }
 
-export function PrimaryNavigation({ wallet }: { wallet: WalletController }) {
+export function PrimaryNavigation({
+  wallet,
+  flareWallet,
+}: {
+  wallet: WalletController;
+  flareWallet?: WalletController;
+}) {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const legacyTenderRoute =
@@ -234,7 +249,7 @@ export function PrimaryNavigation({ wallet }: { wallet: WalletController }) {
           <span aria-hidden="true" />
           <span className="network-label">{isFlare ? "COSTON2" : "SEPOLIA"}</span>
         </div>
-        {!isFlare && <HeaderWalletMenu wallet={wallet} />}
+        <HeaderWalletMenu wallet={isFlare && flareWallet ? flareWallet : wallet} network={isFlare ? "coston2" : "sepolia"} />
       </div>
     </header>
   );

@@ -51,7 +51,7 @@ export function App() {
     );
   return (
     <>
-      <PrimaryNavigation wallet={wallet} />
+      <PrimaryNavigation wallet={wallet} flareWallet={flareWallet} />
       {page}
     </>
   );

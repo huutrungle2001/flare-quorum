@@ -4,10 +4,11 @@
 > its public `VITE_*` configuration is supplied. The `/room` route remains the
 > explicitly historical Sepolia/Nox baseline.
 
-VeilBid's browser product. It includes the wallet-free Flare Coston2 explorer,
-the dedicated public Activity/Evidence ledger at `/?role=evidence`,
-the historical EOA/Safe Buyer flows, Private Bids views for
-submission/ownership/granted access, and Activity settlement recovery. The
+VeilBid's browser product. Its Flare shell includes the wallet-free Coston2
+explorer plus distinct `/?role=treasury`, `/?role=buyer`, `/?role=vendor`,
+`/?role=finalizer`, and `/?role=evidence` workspaces. The historical EOA/Safe
+Buyer flows, Private Bids views, and Nox Activity recovery exist only under the
+separate `/room` baseline. The
 default `/` and `/flare` routes read finalized Coston2 contract state, and
 `/docs` serves the current Flare judge runbook when the verified release is
 enabled. `/room` remains the explicitly historical Sepolia/Nox baseline, with
@@ -20,7 +21,12 @@ Coston2 browser composer: each bid is encrypted separately to the three
 tender-frozen TEE keys, authorized with EIP-712, receipt-checked, and submitted
 as one atomic receipt set. `/?role=buyer` is the direct EVM funding/recovery
 path with a structured public Buyer Brief whose canonical hash is committed as
-tender metadata. An awarded vendor can use the same Coston2 role to approve the exact
+tender metadata; `/?role=treasury` is the XRP-native XRPL/FDC/Smart Account
+journey. `/?role=finalizer` exposes canonical close and buyer-only recovery
+readiness without moving FCC dispatch or result grouping into the browser.
+`/?role=evidence` is a wallet-free Auditor dossier with public bid commitments,
+machine bindings, result digest, payout/remainder, and no signer or decryption
+path. An awarded vendor can use the same Coston2 role to approve the exact
 FTestXRP amount and submit an official `redeemAmount` request to AssetManagerFXRP;
 the later agent payment remains protocol-governed. The XRP-native Smart Account
 journey remains a separate server-side executor; the Buyer may optionally
@@ -52,11 +58,12 @@ pnpm test:flare:production https://veilbid-flare.vercel.app
 pnpm test:flare:accessibility https://veilbid-flare.vercel.app
 ```
 
-`VITE_SEPOLIA_RPC_URL` may override the public read-only RPC. The Coston2 role
+`VITE_SEPOLIA_RPC_URL` may override the historical public read-only RPC. The Coston2 role
 composer additionally requires the public `VITE_FLARE_INGRESS_URL` origin; it
-does not accept API keys or credentials. Buyer, Vendor,
-review, Activity, and Safe writes always require an explicitly connected
-wallet. Tender Room does not determine winners or own canonical lifecycle
+does not accept API keys or credentials. Coston2 Buyer, Vendor, and Finalizer
+writes require an explicitly connected wallet; Public and Auditor remain
+wallet-free. Historical Buyer, Activity, and Safe writes likewise require their
+Sepolia wallet. Tender Room does not determine winners or own canonical lifecycle
 state.
 
 ## Coston2 migration boundary

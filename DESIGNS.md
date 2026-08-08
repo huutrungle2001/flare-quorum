@@ -229,18 +229,35 @@ Social links belong in the footer, not the primary product navigation.
 Role pills:
 
 - `PUBLIC`
-- `BUYER`
-- `VENDOR`
-- `AUDITOR`
 - `XRP TREASURY`
+- `EVM BUYER`
+- `VENDOR`
+- `PUBLIC FINALIZER`
+- `AUDITOR / EVIDENCE`
 
 The active role uses Veil Green with black text and a black border. Role changes
 must not imply wallet permission. Unauthorized roles remain browsable where
 public data exists, with writes hidden or disabled and explained.
 
-`PUBLIC` includes permissionless close/finalize readiness and actions; it is the
-Public Finalizer context from the Product Plan, not a separate privileged role.
-Recoverable proof operations also appear in Activity.
+`PUBLIC` is strictly wallet-free discovery and tender inspection. `PUBLIC
+FINALIZER` is a separate navigation context so transaction readiness and
+buyer-only recovery never crowd or gate the judge path. It is not a privileged
+role: permissionless close remains permissionless, buyer cancellation/refund
+still require the canonical buyer, and FCC dispatch/result grouping remain
+relay-only. `AUDITOR / EVIDENCE` is wallet-free and has no signer or bid access.
+
+### Historical UI parity decisions
+
+The pre-Flare interface is a read-only visual and journey reference, not a
+source of Coston2 deployment truth. The Flare shell restores its useful product
+communication patterns: editorial landing hero, procurement lifecycle,
+workspace navigation, public filters/deadlines, contextual help, activity
+readiness, and detailed award proof. Safe Buyer, Nox Private Reveal, My Bid,
+and Granted Access are not ported because their custody/decryption model is not
+the FCC championship boundary. Their product purposes map to XRP Treasury/EVM
+Buyer recovery, private TEE ingress, Public Finalizer, and wallet-free Auditor
+evidence instead. No historical address, test, screenshot, or Nox artifact may
+be presented as Flare implementation evidence.
 
 ## 7. Core components
 
