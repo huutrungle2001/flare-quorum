@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "suite": "coston2-live-negative-eth-calls",
   "status": "PARTIAL",
-  "recordedAt": "2026-08-08T07:05:52.527Z",
-  "sourceCommit": "3fee0f99e5f8ee8548e591cad3e1138e65a65474",
+  "recordedAt": "2026-08-08T07:43:12.170Z",
+  "sourceCommit": "98a582a821ff0b8dbbeb093e8d3dd516a798dd87",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "observedBlock": "33770568",
+    "observedBlock": "33771461",
     "rpcSource": "official-public-coston2-rpc"
   },
   "publicIdentifiers": {
