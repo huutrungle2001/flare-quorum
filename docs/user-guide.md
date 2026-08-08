@@ -45,18 +45,18 @@ The wallet-free judge path must let a reviewer:
 7. Compare the page with sanitized release evidence without seeing a bid or
    encrypted payload.
 
-Use `/?role=evidence` (or the `/?role=auditor` alias) for the dedicated Auditor
+Use `/flare?role=evidence` (or the `/flare?role=auditor` alias) for the dedicated Auditor
 workspace. It re-reads the same finalized market snapshot and presents each
 tender's public rules hash, per-bid receipt quorum, ordered root, machine
 binding, result digest, award payout/remainder, and refund state. It never
-unlocks bid data or requires a wallet. Use `/?role=finalizer` for the separate
+unlocks bid data or requires a wallet. Use `/flare?role=finalizer` for the separate
 public lifecycle queue: permissionless close is available in-browser, while
 FCC dispatch/result grouping stays in the dedicated relay. Buyer-only empty
 cancellation and failed-compute recovery require an explicit confirmation.
 
-The other source routes are `/?role=treasury` for the XRPL/FDC/Smart Account
-funding journey, `/?role=buyer` for direct EVM funding/recovery, and
-`/?role=vendor` for sealed submission and awarded-vendor redemption. The
+The other source routes are `/flare?role=treasury` for the XRPL/FDC/Smart Account
+funding journey, `/flare?role=buyer` for direct EVM funding/recovery, and
+`/flare?role=vendor` for sealed submission and awarded-vendor redemption. The
 header wallet selector follows the active release: Coston2 on Flare routes and
 Sepolia only on the historical `/room` route. Public browsing never requires a
 wallet.
@@ -65,11 +65,11 @@ The current Flare application is intentionally split into two shells. Clicking
 the `VEILBID` wordmark returns to the standalone product landing page. Clicking
 `TENDERS` enters `/flare`, where the old VeilBid-style left rail remains visible
 while the right side renders the selected workspace: `PUBLIC`, `BUYER`,
-`PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public finalizer), `BALANCES` (XRP
-Treasury), and `AUDITOR`. The rail also provides refresh, help/boundaries,
-wallet access, the Coston2 faucet, and explicitly disabled Sepolia-only
-`vcUSDC` wrap/unwrap controls so users do not mistake historical token UX for
-Flare capability.
+`PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public finalizer), `XRP TREASURY`,
+and `AUDITOR`. The rail keeps one shared refresh action, help/boundaries, and
+the Coston2 faucet. Wallet connection stays in the global header, while FXRP
+redemption controls appear inside `PRIVATE BIDS` only for the connected public
+winner. Sepolia-only `vcUSDC` wrap/unwrap controls are omitted from Flare.
 
 The public path is live and release-labeled. Any missing dependency keeps its
 own operation unavailable; the UI never substitutes Sepolia data or mock

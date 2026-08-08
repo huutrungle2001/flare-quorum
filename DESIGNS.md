@@ -182,12 +182,13 @@ Fixed white top navigation over a full-bleed black hero:
 
 ### Application
 
-VeilBid does not use a permanent dashboard sidebar.
+The Flare tender room uses a permanent laptop sidebar; the standalone landing
+page and documentation do not.
 
 Desktop:
 
 - Fixed horizontal product bar.
-- Role switcher directly beneath the bar.
+- Fixed left workspace rail beneath the product bar.
 - Public explorer: four-column tender list plus eight-column detail canvas.
 - Buyer/Vendor task view: seven-column primary workflow plus five-column
   privacy/evidence rail.
@@ -232,7 +233,7 @@ Role pills:
 - `BUYER`
 - `PRIVATE BIDS`
 - `ACTIVITY`
-- `BALANCES`
+- `XRP TREASURY`
 - `AUDITOR`
 
 The active role uses Veil Green with black text and a black border. Role changes
@@ -241,7 +242,7 @@ public data exists, with writes hidden or disabled and explained.
 
 `PUBLIC` is strictly wallet-free discovery and tender inspection. `BUYER` is
 the EVM recovery path, `PRIVATE BIDS` is the vendor/FCC ingress path, `ACTIVITY`
-is the separate public-finalizer context, and `BALANCES` is the XRP Treasury
+is the separate public-finalizer context, and `XRP TREASURY` is the XRP Treasury
 mapping (XRPL → FDC → Smart Account). `ACTIVITY` is not a privileged role:
 permissionless close remains permissionless, buyer cancellation/refund still
 require the canonical buyer, and FCC dispatch/result grouping remain relay-only.

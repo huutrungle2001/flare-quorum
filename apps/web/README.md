@@ -6,7 +6,7 @@
 
 VeilBid's browser product. Its Flare shell has a standalone landing page at `/`
 and a separate tender application at `/flare`. The app's left rail includes
-`PUBLIC`, `BUYER`, `PRIVATE BIDS`, `ACTIVITY`, `BALANCES`, and `AUDITOR`; these
+`PUBLIC`, `BUYER`, `PRIVATE BIDS`, `ACTIVITY`, `XRP TREASURY`, and `AUDITOR`; these
 map to the distinct `?role=treasury`, `?role=buyer`, `?role=vendor`,
 `?role=finalizer`, and `?role=evidence` workspaces. The historical EOA/Safe
 Buyer flows, Private Bids views, and Nox Activity recovery exist only under the
@@ -18,15 +18,15 @@ its legacy documentation preserved separately.
 The Flare dossier also exposes sanitized FCC, FTestXRP, FAssets/FXRP, FTSO,
 FDC, Smart Account, and award-receipt addresses so a judge can follow each
 integration without wallet access or confidential payloads.
-When the hosted ingress origin is configured, `/?role=vendor` opens the
+When the hosted ingress origin is configured, `/flare?role=vendor` opens the
 Coston2 browser composer: each bid is encrypted separately to the three
 tender-frozen TEE keys, authorized with EIP-712, receipt-checked, and submitted
-as one atomic receipt set. `/?role=buyer` is the direct EVM funding/recovery
+as one atomic receipt set. `/flare?role=buyer` is the direct EVM funding/recovery
 path with a structured public Buyer Brief whose canonical hash is committed as
-tender metadata; `/?role=treasury` is the XRP-native XRPL/FDC/Smart Account
-journey. `/?role=finalizer` exposes canonical close and buyer-only recovery
+tender metadata; `/flare?role=treasury` is the XRP-native XRPL/FDC/Smart Account
+journey. `/flare?role=finalizer` exposes canonical close and buyer-only recovery
 readiness without moving FCC dispatch or result grouping into the browser.
-`/?role=evidence` is a wallet-free Auditor dossier with public bid commitments,
+`/flare?role=evidence` is a wallet-free Auditor dossier with public bid commitments,
 machine bindings, result digest, payout/remainder, and no signer or decryption
 path. An awarded vendor can use the same Coston2 role to approve the exact
 FTestXRP amount and submit an official `redeemAmount` request to AssetManagerFXRP;

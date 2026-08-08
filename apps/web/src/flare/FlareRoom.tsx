@@ -63,7 +63,7 @@ function filterTenders(
   return tenders.filter((tender) => tender.status.toLowerCase() === filter);
 }
 
-function ProtocolFacts() {
+function ProtocolFacts({ compact = false }: { compact?: boolean }) {
   const release = coston2FlarePublicRelease;
   const fact = (label: string, address: string, description: string) => (
     <div key={label}>
@@ -76,15 +76,8 @@ function ProtocolFacts() {
       </dd>
     </div>
   );
-  return (
-    <section className="evidence-panel protocol-facts" aria-label="Verified Flare integrations">
-      <header className="detail-header">
-        <div>
-          <p className="eyebrow">VERIFIED FLARE INTEGRATIONS</p>
-          <h2>One procurement path, five Flare primitives</h2>
-        </div>
-        <span className="privacy-badge verified">COSTON2 / 114</span>
-      </header>
+  const facts = (
+    <>
       <p>
         The public page exposes only deployment facts and finalized state. FCC
         keeps bids private; FTSO supplies the bound XRP/USD snapshot; FAssets,
@@ -101,6 +94,32 @@ function ProtocolFacts() {
         {fact("Award receipt", release.awardReceipt, "non-transferable public settlement proof")}
       </dl>
       <p className="form-hint">FCC code hash: <code>{short(release.fcc.codeHash)}</code> · result threshold: {release.fcc.resultThreshold}/3</p>
+    </>
+  );
+  if (compact) {
+    return (
+      <details className="evidence-panel protocol-facts protocol-facts-compact">
+        <summary>
+          <span>
+            <span className="eyebrow">VERIFIED FLARE INTEGRATIONS</span>
+            <strong>Inspect protocol deployment facts</strong>
+          </span>
+          <span className="privacy-badge verified">COSTON2 / 114</span>
+        </summary>
+        <div className="protocol-facts-body">{facts}</div>
+      </details>
+    );
+  }
+  return (
+    <section className="evidence-panel protocol-facts" aria-label="Verified Flare integrations">
+      <header className="detail-header">
+        <div>
+          <p className="eyebrow">VERIFIED FLARE INTEGRATIONS</p>
+          <h2>One procurement path, five Flare primitives</h2>
+        </div>
+        <span className="privacy-badge verified">COSTON2 / 114</span>
+      </header>
+      {facts}
     </section>
   );
 }
@@ -266,7 +285,6 @@ export function FlareEvidenceWorkspace({
         <section className="evidence-panel" aria-label="Coston2 public evidence ledger">
           <header className="detail-header">
             <div><p className="eyebrow">FINALIZED CHECKPOINT LEDGER</p><h2>{tenders.length} tender{tenders.length === 1 ? "" : "s"} in public state</h2></div>
-            <button className="icon-button" onClick={onRetry} aria-label="Refresh Coston2 evidence">↻</button>
           </header>
           <div className="flare-evidence-ledger">
             {tenders.map((tender) => (
@@ -322,7 +340,7 @@ export function FlareRoleBar({
     ["buyer", "BUYER"],
     ["vendor", "PRIVATE BIDS"],
     ["finalizer", "ACTIVITY"],
-    ["treasury", "BALANCES"],
+    ["treasury", "XRP TREASURY"],
     ["evidence", "AUDITOR"],
   ];
   return (
@@ -348,14 +366,11 @@ function FlareAppSidebar({
   activeRole,
   onRoleChange,
   onRefresh,
-  wallet,
 }: {
   activeRole: FlareRole;
   onRoleChange: (role: FlareRole) => void;
   onRefresh: () => void;
-  wallet?: WalletController;
 }) {
-  const connected = wallet?.state.status === "connected" && wallet.state.account;
   return (
     <aside className="flare-app-sidebar" aria-label="Tender application sidebar">
       <div className="flare-sidebar-heading">
@@ -372,55 +387,37 @@ function FlareAppSidebar({
           title="HOW TO USE THIS TENDER ROOM"
           steps={[
             "PUBLIC is wallet-free inspection of finalized Coston2 dossiers.",
-            "BUYER and BALANCES open separate EVM and XRP-native funding journeys.",
+            "BUYER and XRP TREASURY open separate EVM and XRP-native funding journeys.",
             "PRIVATE BIDS and ACTIVITY expose vendor and canonical lifecycle operations without moving winner logic into the browser.",
             "AUDITOR checks commitments and result binding without a signer or decryption path.",
           ]}
           note="No Flare route falls back to Sepolia data or mock success."
         />
-        <button
-          className="sidebar-wallet-button"
-          type="button"
-          onClick={() => document.querySelector<HTMLButtonElement>(".wallet-trigger")?.click()}
-        >
-          <span aria-hidden="true">{connected ? "✓" : "◇"}</span>
-          {connected ? "WALLET CONNECTED" : "CONNECT WALLET"}
-        </button>
       </div>
       <section className="flare-sidebar-assets" aria-label="Coston2 asset actions">
-        <p className="eyebrow">ASSET ACTIONS</p>
+        <p className="eyebrow">COSTON2 ASSETS</p>
         <a className="sidebar-asset-button" href="https://faucet.flare.network/coston2" target="_blank" rel="noreferrer">GET TEST C2FLR ↗</a>
-        <button className="sidebar-asset-button disabled" type="button" disabled title="Sepolia baseline only; no private token wrapper is claimed on Flare">WRAP TO vcUSDC</button>
-        <button className="sidebar-asset-button disabled" type="button" disabled title="Sepolia baseline only; no private token wrapper is claimed on Flare">UNWRAP vcUSDC</button>
-        <LinkLikeSidebar to="?role=treasury">OPEN XRP TREASURY</LinkLikeSidebar>
-        <LinkLikeSidebar to="?role=vendor">FXRP REDEMPTION</LinkLikeSidebar>
-        <p className="sidebar-asset-note">FTestXRP settlement amounts are public. Private token settlement and Sepolia vcUSDC wrapping are not claimed on this Flare path.</p>
+        <p className="sidebar-asset-note">Funding belongs in XRP TREASURY. FXRP redemption controls appear in PRIVATE BIDS only for a connected winning vendor. FTestXRP settlement amounts are public.</p>
       </section>
       <p className="flare-sidebar-footnote">PUBLIC READS · 12-BLOCK FINALITY · NO BID PAYLOADS</p>
     </aside>
   );
 }
 
-function LinkLikeSidebar({ to, children }: { to: string; children: ReactNode }) {
-  return <a className="sidebar-asset-button" href={to}>{children}</a>;
-}
-
 function FlareRoleWorkspace({
   activeRole,
   onRoleChange,
   onRefresh,
-  wallet,
   children,
 }: {
   activeRole: FlareRole;
   onRoleChange: (role: FlareRole) => void;
   onRefresh: () => void;
-  wallet?: WalletController;
   children: ReactNode;
 }) {
   return (
     <div className="tender-layout flare-tender-layout">
-      <FlareAppSidebar activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={onRefresh} wallet={wallet} />
+      <FlareAppSidebar activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={onRefresh} />
       <div className="flare-app-main">{children}</div>
     </div>
   );
@@ -470,7 +467,7 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
         <div><p className="eyebrow">CONFIDENTIAL PROCUREMENT / LIVE COSTON2 STATE</p><h1>Public rules.<br /><em>Private bids.</em></h1></div>
         <div className="intro-copy"><p>Browse finalized tender coordination without connecting a wallet. Commercial terms remain sealed while public award and settlement evidence stay inspectable.</p><span className="deployment-label">COSTON2 DEPLOYMENT · {state.data?.deploymentStatus === "verified" ? "SOURCE/DEPLOYMENT VERIFIED" : "NOT YET VERIFIED"}</span></div>
       </section>
-      <ProtocolFacts />
+      <ProtocolFacts compact />
       {state.status === "loading" && <section className="state-panel"><span className="loading-mark" /><div><h2>Reading Coston2 state</h2><p>No placeholder tender is inserted.</p></div></section>}
       {state.status === "error" && <section className="state-panel error" role="alert"><span>!</span><div><h2>Flare state unavailable</h2><p>{state.error}</p><button className="secondary-button" onClick={onRetry}>RETRY COSTON2 →</button></div></section>}
       {state.status === "ready" && tenders.length === 0 && <section className="state-panel"><span>0</span><div><h2>No Coston2 tenders yet</h2><p>The configured market has no public tender records.</p></div></section>}
@@ -493,7 +490,7 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
         <section className="explorer-grid">
           <aside className="dossier-list">
             <div className="dossier-list-controls">
-              <header><div><p className="eyebrow">COSTON2 DOSSIERS</p><h2>{visibleTenders.length} tenders</h2></div><button className="icon-button" onClick={onRetry} aria-label="Refresh Coston2 state">↻</button></header>
+              <header><div><p className="eyebrow">COSTON2 DOSSIERS</p><h2>{visibleTenders.length} tenders</h2></div></header>
               <label className="public-filter-control"><span>Show</span><select aria-label="Filter Coston2 tenders" value={filter} onChange={(event) => setFilter(event.target.value as FlareTenderFilter)}>{flareTenderFilters.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
             </div>
             {visibleTenders.map((tender) => <div className="tender-card-shell" key={tender.tenderId.toString()}><button type="button" onClick={() => selectTender(tender.tenderId)} aria-pressed={selected?.tenderId === tender.tenderId} className={`tender-card ${selected?.tenderId === tender.tenderId ? "selected" : ""}`}><span className="card-kicker">TENDER / {tender.tenderId.toString()}</span><span className="card-title">Flare confidential procurement</span><span className="card-facts"><span><strong>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</strong>Public ceiling</span><span><strong>{tender.bidCount.toString()}/{tender.approvedVendorCount}</strong>TEE receipts</span></span><span className="card-deadline">Deadline · {formatDeadline(tender.bidDeadline)}</span><span className="card-footer"><span className={`privacy-badge ${statusClass(tender.status)}`}>{tender.status.toUpperCase()}</span><span className="card-arrow" aria-hidden="true">→</span></span></button></div>)}
@@ -542,7 +539,7 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   };
   if (activeRole === "evidence") {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()} wallet={wallet}>
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()}>
         {state.status === "ready" && state.data ? (
           <FlareAuditorWorkspace tenders={state.data.tenders} finalizedBlock={state.data.finalizedBlock} />
         ) : (
@@ -553,14 +550,14 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   }
   if ((activeRole === "treasury" || activeRole === "buyer") && wallet) {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()} wallet={wallet}>
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()}>
         <FlareBuyerWorkspace wallet={wallet} onRefresh={() => void refresh()} journey={activeRole === "treasury" ? "xrp" : "evm"} />
       </FlareRoleWorkspace>
     );
   }
   if ((activeRole === "vendor" || activeRole === "finalizer") && wallet) {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()} wallet={wallet}>
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()}>
         {state.status === "ready" && state.data ? (
           activeRole === "vendor"
             ? <FlareVendorWorkspace wallet={wallet} tenders={state.data.tenders} onRefresh={() => void refresh()} />
@@ -577,7 +574,7 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
     );
   }
   return (
-    <FlareRoleWorkspace activeRole="public" onRoleChange={onRoleChange} onRefresh={() => void refresh()} wallet={wallet}>
+    <FlareRoleWorkspace activeRole="public" onRoleChange={onRoleChange} onRefresh={() => void refresh()}>
       <FlareExplorerView state={state} onRetry={() => void refresh()} />
     </FlareRoleWorkspace>
   );

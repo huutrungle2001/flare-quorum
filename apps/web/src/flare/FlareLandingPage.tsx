@@ -7,7 +7,7 @@ const workspaces = [
   ["02", "BUYER", "Open an EVM recovery tender from a connected Coston2 wallet with the public brief hashed into the market.", "/flare?role=buyer", "OPEN BUYER"],
   ["03", "PRIVATE BIDS", "Submit a sealed vendor bid through the three-machine FCC ingress and keep commercial terms outside chain state.", "/flare?role=vendor", "OPEN PRIVATE BIDS"],
   ["04", "ACTIVITY", "Advance permissionless close and inspect relay-ready FCC checkpoints without choosing a winner in the browser.", "/flare?role=finalizer", "OPEN ACTIVITY"],
-  ["05", "BALANCES", "Prepare the XRP-native XRPL, FDC, and Smart Account funding handoff without placing an XRPL secret in VeilBid.", "/flare?role=treasury", "OPEN XRP TREASURY"],
+  ["05", "XRP TREASURY", "Prepare the XRP-native XRPL, FDC, and Smart Account funding handoff without placing an XRPL secret in VeilBid.", "/flare?role=treasury", "OPEN XRP TREASURY"],
   ["06", "AUDITOR", "Verify the public binding, commitments, result digest, payout, and remainder with no signer or reveal path.", "/flare?role=auditor", "OPEN AUDITOR"],
 ] as const;
 

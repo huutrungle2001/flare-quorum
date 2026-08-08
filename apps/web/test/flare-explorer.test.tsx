@@ -111,6 +111,7 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("XRP + USD")).toBeInTheDocument();
     expect(screen.getByText("60% price / 25% delivery / 15% warranty")).toBeInTheDocument();
     expect(screen.getByText("≤ 30d delivery / 12–36d warranty")).toBeInTheDocument();
+    expect(screen.getByText("Inspect protocol deployment facts").closest("details")).not.toHaveAttribute("open");
   });
 
   it("restores the Flare product story and keeps signing optional", () => {
@@ -127,7 +128,7 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByRole("button", { name: "BUYER" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "PRIVATE BIDS" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "ACTIVITY" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "BALANCES" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "XRP TREASURY" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "AUDITOR" })).toBeInTheDocument();
   });
 

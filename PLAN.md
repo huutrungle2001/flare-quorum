@@ -226,9 +226,10 @@ custodial VeilBid signer.
 
 - [x] Build the two-shell Flare UI: a standalone landing page and a separate
   VeilBid-style tender room with a fixed left workspace/asset rail. The rail
-  exposes Public, Buyer, Private Bids, Activity, Balances, Auditor, refresh,
-  help, Coston2 faucet, wallet access, and explicitly disabled Sepolia-only
-  vcUSDC controls.
+  exposes Public, Buyer, Private Bids, Activity, XRP Treasury, Auditor, one
+  shared refresh action, help, and the Coston2 faucet. Wallet access remains in
+  the global header; Sepolia-only vcUSDC controls are omitted and FXRP
+  redemption stays contextual to the winning vendor workspace.
 
 - [x] Add fail-closed Coston2 public-market and XRP funding consumer adapters;
   the browser route is now backed by the verified Coston2 release.

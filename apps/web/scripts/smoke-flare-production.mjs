@@ -92,11 +92,11 @@ mkdirSync(screenshotDirectory, { recursive: true });
 const routes = await Promise.all([
   "/",
   "/flare",
-  "/?role=treasury",
-  "/?role=buyer",
-  "/?role=vendor",
-  "/?role=finalizer",
-  "/?role=evidence",
+  "/flare?role=treasury",
+  "/flare?role=buyer",
+  "/flare?role=vendor",
+  "/flare?role=finalizer",
+  "/flare?role=evidence",
   "/room",
   "/docs",
 ].map(fetchRoute));
@@ -112,11 +112,11 @@ const chrome = findChrome();
 const desktop = browserCapture(chrome, "/", { width: 1440, height: 1000 }, "flare-production-desktop.png");
 const tenderRoom = browserCapture(chrome, "/flare", { width: 1440, height: 1000 }, "flare-production-tenders.png");
 const mobile = browserCapture(chrome, "/flare", { width: 390, height: 844 }, "flare-production-mobile.png");
-const evidenceRoute = browserCapture(chrome, "/?role=evidence", { width: 1440, height: 1000 }, "flare-production-evidence.png");
-const treasuryRoute = browserCapture(chrome, "/?role=treasury", { width: 1440, height: 1000 }, "flare-production-treasury.png");
-const buyerRoute = browserCapture(chrome, "/?role=buyer", { width: 1440, height: 1000 }, "flare-production-buyer.png");
-const vendorRoute = browserCapture(chrome, "/?role=vendor", { width: 1440, height: 1000 }, "flare-production-vendor.png");
-const finalizerRoute = browserCapture(chrome, "/?role=finalizer", { width: 1440, height: 1000 }, "flare-production-finalizer.png");
+const evidenceRoute = browserCapture(chrome, "/flare?role=evidence", { width: 1440, height: 1000 }, "flare-production-evidence.png");
+const treasuryRoute = browserCapture(chrome, "/flare?role=treasury", { width: 1440, height: 1000 }, "flare-production-treasury.png");
+const buyerRoute = browserCapture(chrome, "/flare?role=buyer", { width: 1440, height: 1000 }, "flare-production-buyer.png");
+const vendorRoute = browserCapture(chrome, "/flare?role=vendor", { width: 1440, height: 1000 }, "flare-production-vendor.png");
+const finalizerRoute = browserCapture(chrome, "/flare?role=finalizer", { width: 1440, height: 1000 }, "flare-production-finalizer.png");
 const docsMobile = browserCapture(chrome, "/docs", { width: 390, height: 844 }, "flare-production-docs-mobile.png");
 
 const market = release.contracts.VeilBidFlareMarket.address;
@@ -127,7 +127,9 @@ const assertions = {
   verifiedReleaseRendered: desktop.dom.includes("VERIFIED COSTON2 RELEASE") && mobile.dom.includes("VERIFIED COSTON2 RELEASE"),
   walletFreeTenderListLoaded: tenderRoom.dom.includes("COSTON2 DOSSIERS") && mobile.dom.includes("COSTON2 DOSSIERS"),
   productStoryRendered: desktop.dom.includes("Private bids.") && desktop.dom.includes("Public awards.") && desktop.dom.includes("THRESHOLD COMPUTE"),
-  roleTaxonomyRendered: treasuryRoute.dom.includes("PUBLIC") && treasuryRoute.dom.includes("BUYER") && treasuryRoute.dom.includes("PRIVATE BIDS") && finalizerRoute.dom.includes("ACTIVITY") && treasuryRoute.dom.includes("BALANCES") && evidenceRoute.dom.includes("AUDITOR"),
+  roleTaxonomyRendered: treasuryRoute.dom.includes("PUBLIC") && treasuryRoute.dom.includes("BUYER") && treasuryRoute.dom.includes("PRIVATE BIDS") && finalizerRoute.dom.includes("ACTIVITY") && treasuryRoute.dom.includes("XRP TREASURY") && evidenceRoute.dom.includes("AUDITOR"),
+  redundantRailControlsRemoved: !treasuryRoute.dom.includes("sidebar-wallet-button") && !treasuryRoute.dom.includes("WRAP TO vcUSDC") && !treasuryRoute.dom.includes("UNWRAP vcUSDC") && !treasuryRoute.dom.includes("OPEN XRP TREASURY") && !vendorRoute.dom.includes(">FXRP REDEMPTION<"),
+  publicProtocolFactsCollapsed: tenderRoom.dom.includes("protocol-facts-compact") && tenderRoom.dom.includes("Inspect protocol deployment facts"),
   awardedTenderVisible: tenderRoom.dom.includes("AWARDED") && tenderRoom.dom.includes("FTestXRP"),
   privacyBoundaryVisible: tenderRoom.dom.includes("PRIVATE LOSING BIDS") && tenderRoom.dom.includes("Bid payloads are never fetched"),
   publicEvidenceLedgerRendered: evidenceRoute.dom.includes("Inspect the binding, not the bids.") && evidenceRoute.dom.includes("TRUST BINDING") && evidenceRoute.dom.includes("PUBLIC BID RECEIPTS") && evidenceRoute.dom.includes("Ordered bid root"),
