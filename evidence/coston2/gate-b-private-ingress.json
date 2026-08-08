@@ -121,6 +121,7 @@
       "noPlaintextResult": true
     }
   ],
+  "blockers": [],
   "notes": [
     "This evidence records live authenticated ciphertext ingress and TEE-signed receipt binding on three Coston2 production-status simulated TEEs.",
     "A duplicate sealed slot was rejected as PRIVATE_BID_CONFLICT; this is replay protection, not a claim that a Railway process restart was performed.",
