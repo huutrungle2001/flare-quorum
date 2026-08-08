@@ -1,7 +1,8 @@
 # VeilBid Flare Repository Layout
 
-> Status: Transition target. Historical workspaces exist; Flare workspaces are
-> created only after their feasibility gate begins.
+> Status: Current release layout. Historical workspaces remain isolated; new
+> Flare workspaces and release-facing additions are gated by feasibility and
+> verification evidence.
 
 ## 1. Target structure
 
@@ -32,9 +33,10 @@ VeilBid/
 └── SECURITY.md
 ```
 
-`apps/fcc-extension`, `packages/flare-contracts`,
-`packages/flare-bindings`, and `evidence/coston2` are planned paths and may not
-exist yet. Documentation must not imply otherwise.
+`apps/fcc-extension`, `packages/flare-contracts`, `packages/flare-bindings`,
+and `evidence/coston2` are implemented in the current Flare release. Future
+paths or extensions must still wait for the corresponding feasibility gate;
+historical Sepolia/Nox artifacts remain separate authorities.
 
 ## 2. Workspace responsibilities
 
