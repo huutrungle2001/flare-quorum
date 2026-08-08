@@ -93,8 +93,10 @@ The app never asks for the buyer's XRPL secret and never holds an autonomous
 buyer signer. Direct EVM funding is a clearly labeled recovery/developer route.
 After a public payment hash is known, the browser may retain only the owner,
 transaction hash, Smart Account wallet ID, and executor fee as a reload-safe
-checkpoint. It never stores signing material, a bid, ciphertext, an FDC proof,
-or a wallet secret; users can explicitly forget the checkpoint.
+checkpoint. On reload, the Buyer route offers an explicit public-checkpoint
+resume control that rebuilds the same handoff; it never stores signing material,
+a bid, ciphertext, an FDC proof, or a wallet secret. Users can explicitly
+forget the checkpoint.
 
 ## 5. Vendor flow
 

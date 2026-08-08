@@ -66,7 +66,7 @@ FCC is essential: the winner is computed from sealed bid state inside the
    Payment; the fallback remains an external wallet handoff. No XRPL secret
    enters the browser. The live draft shape/memo smoke is recorded in
    `evidence/coston2/web-xrp-funding-draft.json`; the reload-safe public
-   checkpoint/forget flow is verified in
+   checkpoint resume/forget flow is verified in
    `evidence/coston2/web-xrp-funding-checkpoint.json`.
 5. Open the awarded Coston2 tender and follow the public market and award
    receipt contracts in the explorer.
