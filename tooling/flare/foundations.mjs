@@ -165,6 +165,7 @@ export function verifyFccExtensionReleaseRecipe(source, recipe) {
   return (
     recipe.context === "apps/fcc-extension" &&
     /^\d+\.\d+\.\d+$/.test(recipe.version ?? "") &&
+    /^\d+\.\d+\.\d+$/.test(recipe.wireVersion ?? "") &&
     isSha256Digest(recipe.builderImage?.split("@")[1]) &&
     isSha256Digest(recipe.runtimeImage?.split("@")[1]) &&
     isSha256Digest(recipe.dockerfileFrontend?.split("@")[1]) &&
@@ -702,6 +703,7 @@ export async function inspectFoundations({
         context: fccExtensionRecipe.context,
         platform: fccExtensionRecipe.platform,
         version: fccExtensionRecipe.version,
+        wireVersion: fccExtensionRecipe.wireVersion,
         builderImage: fccExtensionRecipe.builderImage,
         runtimeImage: fccExtensionRecipe.runtimeImage,
         releaseImageTag: fccExtensionRecipe.releaseImageTag,

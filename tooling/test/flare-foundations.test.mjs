@@ -138,6 +138,7 @@ test("requires exact pinned inputs and safe defaults for the FCC extension image
     context: "apps/fcc-extension",
     platform: "linux/amd64",
     version: "0.2.0",
+    wireVersion: "0.2.0",
     dockerfileFrontend: `frontend@sha256:${"5".repeat(64)}`,
     builderImage: `builder@sha256:${"3".repeat(64)}`,
     runtimeImage: `runtime@sha256:${"4".repeat(64)}`,

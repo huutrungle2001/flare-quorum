@@ -40,7 +40,7 @@ const extensionId = BigInt(registration.publicIdentifiers.extensionId);
 const extensionIdHex = registration.publicIdentifiers.extensionIdHex.toLowerCase();
 const codeHash = machineData.codeHash;
 const platform = machineData.platform;
-const versionText = `v${foundations.docker.fccExtensionReleaseRecipe.version}`;
+const versionText = `v${foundations.docker.fccExtensionReleaseRecipe.wireVersion}`;
 const version = stringToHex(versionText, { size: 32 });
 const sourceVersion = extensionConfigSource.match(/\bVersion\s*=\s*"([^"]+)"/)?.[1];
 if (!/^0x[0-9a-fA-F]{64}$/.test(codeHash ?? "") || /^0x0{64}$/i.test(codeHash)) {
@@ -83,7 +83,7 @@ const preflight = {
   platformIsSimulated: platform.toLowerCase() === bytes32Text("TEST_PLATFORM"),
   versionMatchesRelease:
     /^v\d+\.\d+\.\d+$/.test(versionText) &&
-    sourceVersion === foundations.docker.fccExtensionReleaseRecipe.version,
+    sourceVersion === foundations.docker.fccExtensionReleaseRecipe.wireVersion,
 };
 if (!Object.values(preflight).every(Boolean)) throw new Error("FCC_CODE_VERSION_PREFLIGHT_FAILED");
 if (!execute) {

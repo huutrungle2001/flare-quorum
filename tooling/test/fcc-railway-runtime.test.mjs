@@ -24,7 +24,7 @@ test("Railway FCC image preserves the approved binary inputs", async () => {
   assert.match(dockerfile, new RegExp(manifest.docker.redisImage.split("@")[1]));
   assert.match(
     extensionConfig,
-    new RegExp(`\\bVersion\\s*=\\s*"${manifest.docker.fccExtensionReleaseRecipe.version.replaceAll(".", "\\.")}"`),
+    new RegExp(`\\bVersion\\s*=\\s*"${manifest.docker.fccExtensionReleaseRecipe.wireVersion.replaceAll(".", "\\.")}"`),
   );
   assert.doesNotMatch(dockerfile, /huutrungle2001\/Veilbid(?:\.git)?["'\s]/);
 });

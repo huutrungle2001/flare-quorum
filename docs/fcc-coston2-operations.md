@@ -105,9 +105,16 @@ The foundation sender evidence remains under
 `evidence/coston2/fcc-extension-registration.json`. The product sender
 `0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05` is explicitly bound to extension
 `66011` in `evidence/coston2/fcc-market-extension-registration.json`. The
-allowed `v0.2.2` code/platform record is in `evidence/coston2/fcc-code-version.json`;
-the three product machines share that binding and image while retaining
-distinct identities and stable public origins.
+allowed FCC wire/code version `v0.2.2` and simulated code/platform record is in
+`evidence/coston2/fcc-code-version.json`. The current reproducible VeilBid
+application image is versioned independently in
+`evidence/coston2/gate-0-extension-image.json`. In simulated mode the live
+measurement remains the already registered code hash when the application
+binary changes, and the manager rejects adding a second version for the same
+hash. Do not relabel that on-chain record: compare the exact image digest and
+binary SHA-256 as separate release evidence. The three product machines share
+the approved wire/code binding and byte-identical application image while
+retaining distinct identities and stable public origins.
 
 VeilBid performs the missing governance step explicitly with
 `pnpm flare:governance:preflight` followed by `pnpm flare:governance:set`. The

@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	Version                 = "0.2.3"
+	// Version is the FCC manager wire/code version. The independently pinned
+	// application image release is recorded in coston2-foundations.json.
+	Version                 = "0.2.2"
 	FoundationSchemaVersion = uint16(1)
 	Coston2ChainID          = int64(114)
 

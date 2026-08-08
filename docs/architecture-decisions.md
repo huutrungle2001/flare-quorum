@@ -707,6 +707,30 @@ the canonical root. Binding the existing one-time submission nonce into the
 slot preserves privacy and replay protection while making delivery failures
 recoverable without a plaintext shadow ledger or public ciphertext.
 
+## ADR-027 — Separate application-image and simulated FCC wire versions
+
+**Decision:** Version the reproducible VeilBid application image independently
+from the FCC manager wire/code version. The nonce-addressed bid-slot release is
+application image `0.2.3`, while its Coston2 simulated runtime continues to emit
+the already registered FCC wire version `0.2.2`. The foundation manifest records
+both values and validation requires the Go response constant to equal
+`wireVersion`, not the image tag.
+
+This separation is required because the live simulated `/info` measurement did
+not change when the VeilBid application binary changed. The verified
+`ExtensionManagerFacet.addTeeVersion` implementation keys versions by code hash
+and rejects an existing hash with `VersionAlreadyExists`; the same simulated
+measurement therefore cannot be relabeled from `v0.2.2` to `v0.2.3`. Production
+hardware rollout must instead register the real measured code hash and its
+matching version before use.
+
+**Reason:** Treating an application tag as though it were a new manager-attested
+measurement would either revert or create misleading evidence. Keeping the two
+version domains explicit preserves the real on-chain binding while the image
+digest and binary SHA-256 independently prove which VeilBid code was deployed.
+This is a limitation of the accepted simulated Coston2 topology and must not be
+described as hardware-backed application measurement.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:
@@ -726,6 +750,9 @@ These decisions must be revalidated against the pinned versions in Gate 0:
 - [Current tee-node main source](https://github.com/flare-foundation/tee-node/blob/main/internal/node/node.go)
   checked 2026-08-08; it still generates the identity key during `Initialize`
   and does not expose a supported restore setting
+- [Verified Coston2 FlareTeeManager diamond](https://coston2-explorer.flare.network/address/0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE)
+  and its `ExtensionManagerFacet` source checked 2026-08-08 for the immutable
+  code-hash-to-version insertion rule described in ADR-027
 - [Flare Smart Accounts overview](https://dev.flare.network/smart-accounts/overview)
   and [custom instruction flow](https://dev.flare.network/smart-accounts/custom-instruction)
 - [FAssets reference](https://dev.flare.network/fassets/reference) and

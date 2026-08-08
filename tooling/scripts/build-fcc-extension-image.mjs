@@ -31,6 +31,7 @@ try {
       encoding: "utf8",
     }).trim(),
     extensionVersion: recipe.version,
+    fccWireVersion: recipe.wireVersion,
     buildPolicy: {
       dockerfile: recipe.dockerfile,
       dockerfileFrontend: recipe.dockerfileFrontend,
