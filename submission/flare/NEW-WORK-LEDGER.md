@@ -17,11 +17,12 @@ Summer Signal. Commit IDs refer to the Flare v2 repository's `main` branch.
 | Live hardening | Read-only hosted runtime-log review across the three FCC services and ingress; forbidden-material scan runs in memory only | `evidence/coston2/hosted-runtime-log-review.json`, commit `5c743ab` | Adds an auditable privacy check without publishing runtime bodies or credentials |
 | Live hardening | Market-machine preflight now targets the hosted product extension separately from the local foundation extension | `evidence/coston2/fcc-market-machine-preflight.json`, commit `b3f519e` | Prevents a foundation/product ID mix-up from falsely blocking registered machines |
 | Release hardening | Market lifecycle preflight is repeatable after a prior evidence/state record, while execute mode still refuses overwrite | `tooling/flare/market-lifecycle-guards.mjs`, `tooling/test/market-lifecycle-guards.test.mjs` | Lets operators re-check live readiness without weakening immutable evidence safety |
+| Release hardening | Independent wall-clock measurement of direct FCC acknowledgment and signed bid-receipt retrieval across all three hosted machines | `tooling/flare/ingress-benchmarks.mjs`, `evidence/coston2/bid-ingress-benchmark.release.json`, commit `f53a034` | Gives judges an honest operational latency sample without exposing bid material |
 
 ## Not claimed as complete
 
-Same-identity simulated-TEE restart recovery, browser-native XRP
-signing/submission and interactive recovery, instant FXRP/XRP payout, broad adversarial live drills, user interviews,
+Same-identity simulated-TEE restart recovery, browser-native XRPL
+interactive recovery and broader wallet coverage, instant FXRP/XRP payout, broad adversarial live drills, user interviews,
 and pilot evidence remain explicit follow-up work. The checked-in four-minute
 captioned demo is a public smoke-capture walkthrough; it is not evidence of
 those remaining items. The submission must not present them as shipped
