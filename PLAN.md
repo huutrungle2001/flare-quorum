@@ -307,7 +307,9 @@ confidential bid or settlement boundary:
 - [x] Deploy the v2 web judge and record desktop/mobile/keyboard smoke evidence;
   the separate Coston2 write-relay deployment remains gated on its dedicated
   finalizer environment, and the browser ingress is a separate hosted Railway
-  service with server-only FCC credentials.
+  service with server-only FCC credentials. Its live `/health` route rereads
+  finalized tender 21 and fails closed unless all three frozen machine
+  identities, code version, URLs, and key fingerprints still match.
 
 Exit: canonical manifest, bindings, source, runtime, extension, UI, and evidence
 all agree and contain no confidential material.
@@ -415,7 +417,7 @@ the championship product and requires Product Plan approval.
 | Flare contracts | LIVE VERIFIED — Coston2 market, FTestXRP escrow, FTSO snapshot, award receipt, and recovery wiring agree with the verified release manifest |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, official amount-based FTestXRP redemption request, and fail-closed delayed-mint checkpoint/resume are implemented; evidence is recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
-| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke, public role/accessibility smoke, hosted ciphertext-ingress health, market-machine preflight, and a read-only hosted runtime-log review pass; Gate-B restart, adversarial suites, browser XRPL signing/recovery, and Gate H user validation remain open |
+| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke, public role/accessibility smoke, fail-closed hosted ciphertext-ingress health, market-machine preflight, and a read-only hosted runtime-log review pass; Gate-B restart, adversarial suites, browser XRPL signing/recovery, and Gate H user validation remain open |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported

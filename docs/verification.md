@@ -3,7 +3,7 @@
 > Status: Gates 0–A, the live Gate-B ingress/replay portion, Gates C–F, and Gate
 > G are recorded on Coston2. Two- and three-vendor encrypted lifecycles are now
 > also recorded, including a three-vendor one-result-outage recovery; the canonical release is verified, the hosted ciphertext
-> ingress is live, and the wallet-free Coston2 judge/role/accessibility smokes
+> ingress is live with a fail-closed finalized-tender health check, and the wallet-free Coston2 judge/role/accessibility smokes
 > pass. Gate B restart hardening, browser-native XRP recovery, and user-validation
 > work remain open; the wallet-ready browser XRPL Payment/job preview, optional
 > GemWallet Testnet signing/submission path, and server-side XRP funding checkpoint/resume have fail-closed
