@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-xrp-funding-draft",
-  "recordedAt": "2026-08-08T04:43:23.632Z",
+  "recordedAt": "2026-08-08T04:55:23.571Z",
   "publicIdentifiers": {
     "sourceCommit": "ef9312a69ab74465134749e111c8b0cef5a789cc",
     "provider": "vercel",
