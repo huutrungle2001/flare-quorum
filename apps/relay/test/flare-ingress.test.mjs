@@ -137,6 +137,22 @@ test("gateway publishes only chain-matched TEE encryption keys", async () => {
   );
 });
 
+test("gateway health validates the configured public tender without exposing machine payloads", async () => {
+  const gateway = new FlareBidIngressGateway(
+    { async inspect(tenderId) { assert.equal(tenderId, 21n); return tender({ status: "Awarded" }); } },
+    { async submit() { throw new Error("not called"); } },
+  );
+  assert.deepEqual(await gateway.health(21n), {
+    status: "ok",
+    service: "veilbid-flare-ingress",
+    chainId: 114,
+    schemaVersion: 1,
+    tenderId: "21",
+    machineBindingsValid: true,
+    tenderStatus: "Awarded",
+  });
+});
+
 test("gateway fails closed on replay, wrong signature, state, and plaintext-shaped fields", async () => {
   const request = await signedRequest();
   assert.throws(

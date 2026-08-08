@@ -51,6 +51,17 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
     async result() {
       return { actionId: `0x${"66".repeat(32)}`, teeId, data: `0x${"77".repeat(32)}`, expiresAt: 1_200n };
     },
+    async health() {
+      return {
+        status: "ok",
+        service: "veilbid-flare-ingress",
+        chainId: 114,
+        schemaVersion: 1,
+        tenderId: "7",
+        machineBindingsValid: true,
+        tenderStatus: "Open",
+      };
+    },
   });
   try {
     const health = await fetch(`${app.baseUrl}/health`, {
@@ -63,6 +74,9 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
       service: "veilbid-flare-ingress",
       chainId: 114,
       schemaVersion: 1,
+      tenderId: "7",
+      machineBindingsValid: true,
+      tenderStatus: "Open",
     });
 
     const keys = await fetch(`${app.baseUrl}/flare/ingress/tenders/7/machines`, {

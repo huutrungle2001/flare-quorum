@@ -49,7 +49,9 @@ envelope and returns only the public action ID, target TEE ID, and expiry.
 `GET /flare/ingress/tenders/:tenderId/machines/:machineIndex/results/:actionId`
 polls one action and returns only a verified, TEE-signed bid receipt payload;
 pending proxy results remain HTTP 202. `GET /health` is a public readiness
-response containing only the service name, schema version, and chain ID. The
+probe that rereads a configured finalized public tender and validates all three
+frozen machine identities, code hash, registered URLs, and key fingerprints
+before returning only tender status and Boolean readiness fields. The
 hosted v2 judge ingress is
 `https://veilbid-flare-ingress-production.up.railway.app`; its browser origin
 allowlist is the separate v2 Vercel deployment.
@@ -112,6 +114,7 @@ FLARE_FCC_DIRECT_API_KEYS               # three comma-separated values; never VI
 FLARE_INGRESS_WEB_ORIGIN                # exact HTTPS web origin
 FLARE_INGRESS_HOST                      # loopback by default
 FLARE_INGRESS_PORT                      # 8788 by default; PORT is fallback
+FLARE_INGRESS_HEALTH_TENDER_ID          # finalized public tender for fail-closed health checks
 ```
 
 The browser receives only the public `VITE_FLARE_INGRESS_URL` origin. It never

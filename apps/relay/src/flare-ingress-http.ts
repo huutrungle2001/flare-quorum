@@ -18,6 +18,7 @@ interface PublicIngressGateway {
   machineKeys(tenderId: bigint): ReturnType<FlareBidIngressGateway["machineKeys"]>;
   submit(request: ReturnType<typeof parseFlareBidIngressRequest>): Promise<FlareBidIngressAccepted>;
   result(tenderId: bigint, machineIndex: number, actionId: `0x${string}`): ReturnType<FlareBidIngressGateway["result"]>;
+  health?(): Promise<Record<string, unknown>>;
 }
 
 class HttpIngressError extends Error {
@@ -186,12 +187,15 @@ export function createFlareIngressHandler(
         return;
       }
       if (request.method === "GET" && path === healthRoute) {
-        json(response, 200, {
-          status: "ok",
-          service: "veilbid-flare-ingress",
-          chainId: 114,
-          schemaVersion: 1,
-        });
+        const health = gateway.health
+          ? await gateway.health()
+          : {
+            status: "ok",
+            service: "veilbid-flare-ingress",
+            chainId: 114,
+            schemaVersion: 1,
+          };
+        json(response, 200, health);
         return;
       }
       if (request.method === "POST" && path === "/flare/ingress/bids") {

@@ -12,6 +12,7 @@ const baseEnv = {
   FLARE_DEPLOYMENT_STATUS: "verified",
   FLARE_FCC_PROXY_URLS: "https://tee-1.example/,https://tee-2.example,https://tee-3.example",
   FLARE_FCC_DIRECT_API_KEYS: "test-only-key-one,test-only-key-two,test-only-key-three",
+  FLARE_INGRESS_HEALTH_TENDER_ID: "21",
   FLARE_INGRESS_WEB_ORIGIN: "https://app.example/",
 };
 
@@ -26,6 +27,7 @@ test("ingress config requires an explicit verified three-machine deployment", ()
     "https://tee-3.example",
   ]);
   assert.equal(config.directApiKeys.length, 3);
+  assert.equal(config.healthTenderId, 21n);
   assert.equal(config.webOrigin, "https://app.example");
   assert.equal(config.host, "127.0.0.1");
   assert.equal(config.port, 8788);
@@ -37,6 +39,7 @@ test("ingress config fails closed on unverified or incomplete chain bindings", (
     ["FLARE_TEE_MANAGER", "missing-flare-tee-manager-address"],
     ["FLARE_FCC_PROXY_URLS", "invalid-flare-ingress-proxy-set"],
     ["FLARE_FCC_DIRECT_API_KEYS", "invalid-flare-ingress-api-key-set"],
+    ["FLARE_INGRESS_HEALTH_TENDER_ID", "missing-flare-ingress-health-tender-id"],
   ]) {
     const env = { ...baseEnv };
     delete env[field];
@@ -63,6 +66,7 @@ test("ingress config rejects insecure, duplicate, credential-bearing, and malfor
     ["FLARE_INGRESS_WEB_ORIGIN", "https://app.example/path", "invalid-flare-ingress-web-origin"],
     ["FLARE_INGRESS_HOST", "public.example", "invalid-flare-ingress-host"],
     ["FLARE_INGRESS_PORT", "70000", "invalid-flare-ingress-port"],
+    ["FLARE_INGRESS_HEALTH_TENDER_ID", "0", "invalid-flare-ingress-health-tender-id"],
   ]) {
     assert.throws(
       () => loadFlareIngressConfig({ ...baseEnv, [field]: value }),

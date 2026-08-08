@@ -15,7 +15,12 @@ async function main(): Promise<void> {
     new LiveFlareBidIngressChain(config),
     new LiveFlareBidIngressProxy(config),
   );
-  const server = createFlareIngressServer(gateway, config.webOrigin);
+  const server = createFlareIngressServer({
+    machineKeys: (tenderId) => gateway.machineKeys(tenderId),
+    submit: (request) => gateway.submit(request),
+    result: (tenderId, machineIndex, actionId) => gateway.result(tenderId, machineIndex, actionId),
+    health: () => gateway.health(config.healthTenderId),
+  }, config.webOrigin);
   server.listen(config.port, config.host);
   await once(server, "listening");
   output({

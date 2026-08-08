@@ -7,6 +7,7 @@ export interface FlareIngressConfig {
   deploymentStatus: "verified";
   proxyUrls: readonly [string, string, string];
   directApiKeys: readonly [string, string, string];
+  healthTenderId: bigint;
   webOrigin: string;
   host: string;
   port: number;
@@ -58,6 +59,15 @@ function port(value: string | undefined): number {
   return parsed;
 }
 
+function healthTenderId(value: string | undefined): bigint {
+  if (value === undefined || !/^[1-9][0-9]*$/.test(value.trim())) {
+    throw new FlareIngressConfigError("invalid-flare-ingress-health-tender-id");
+  }
+  const parsed = BigInt(value.trim());
+  if (parsed <= 0n) throw new FlareIngressConfigError("invalid-flare-ingress-health-tender-id");
+  return parsed;
+}
+
 export function loadFlareIngressConfig(env: NodeJS.ProcessEnv): FlareIngressConfig {
   const rawRpcUrl = env.COSTON2_RPC_URL?.trim();
   if (!rawRpcUrl) throw new FlareIngressConfigError("missing-coston2-rpc-url");
@@ -78,6 +88,8 @@ export function loadFlareIngressConfig(env: NodeJS.ProcessEnv): FlareIngressConf
     .map((value) => secureUrl(value, "invalid-flare-ingress-proxy-url")) as [string, string, string];
   if (new Set(proxyUrls).size !== 3) throw new FlareIngressConfigError("invalid-flare-ingress-proxy-set");
   const directApiKeys = tuple(env.FLARE_FCC_DIRECT_API_KEYS, "invalid-flare-ingress-api-key-set", true);
+  const configuredHealthTenderId = env.FLARE_INGRESS_HEALTH_TENDER_ID?.trim();
+  if (!configuredHealthTenderId) throw new FlareIngressConfigError("missing-flare-ingress-health-tender-id");
   const webOrigin = secureUrl(env.FLARE_INGRESS_WEB_ORIGIN?.trim() ?? "", "invalid-flare-ingress-web-origin");
   if (new URL(webOrigin).pathname !== "/") throw new FlareIngressConfigError("invalid-flare-ingress-web-origin");
   const host = env.FLARE_INGRESS_HOST?.trim() || "127.0.0.1";
@@ -91,6 +103,7 @@ export function loadFlareIngressConfig(env: NodeJS.ProcessEnv): FlareIngressConf
     deploymentStatus,
     proxyUrls,
     directApiKeys,
+    healthTenderId: healthTenderId(configuredHealthTenderId),
     webOrigin,
     host,
     port: port(env.FLARE_INGRESS_PORT ?? env.PORT),

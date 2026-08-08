@@ -135,6 +135,27 @@ export class FlareBidIngressGateway {
     this.proxy = proxy;
   }
 
+  async health(tenderId: bigint): Promise<{
+    status: "ok";
+    service: "veilbid-flare-ingress";
+    chainId: 114;
+    schemaVersion: 1;
+    tenderId: string;
+    machineBindingsValid: true;
+    tenderStatus: FlareBidIngressTender["status"];
+  }> {
+    const tender = await this.chain.inspect(tenderId);
+    return {
+      status: "ok",
+      service: "veilbid-flare-ingress",
+      chainId: 114,
+      schemaVersion: 1,
+      tenderId: tenderId.toString(),
+      machineBindingsValid: true,
+      tenderStatus: tender.status,
+    };
+  }
+
   async machineKeys(tenderId: bigint): Promise<readonly {
     teeId: Address;
     fingerprint: Hex;
