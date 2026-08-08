@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "suite": "coston2-user-validation",
   "status": "NOT_RUN",
-  "recordedAt": "2026-08-08T07:30:00.000Z",
-  "sourceCommit": "4980ce6e1ceedc7e07c042579b6462050631a469",
+  "recordedAt": "2026-08-08T07:48:00.000Z",
+  "sourceCommit": "f095f7eb7b67e04926e5a18455e709ef4f5368a0",
   "network": {
     "name": "flare-coston2",
     "chainId": 114
