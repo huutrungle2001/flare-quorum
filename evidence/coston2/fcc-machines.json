@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "gate": "0-fcc-machines",
   "status": "PASSED",
-  "recordedAt": "2026-08-08T09:03:42.616Z",
-  "sourceCommit": "204e6676a6ce2409f9c5415e01633dfa116bec31",
+  "recordedAt": "2026-08-08T09:20:19.347Z",
+  "sourceCommit": "550c80164897db5a610e14bd3102e5e41d474397",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "blockNumber": "33773566"
+    "blockNumber": "33774209"
   },
   "publicIdentifiers": {
     "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
@@ -33,10 +33,10 @@
       },
       {
         "machine": 2,
-        "teeId": "0x0C05e52C19348B8c30370Fc936d26CBD8e2882ba",
+        "teeId": "0x9cAE8bc688eE2a27Fa9ae6D45739569EE7c3b9fA",
         "url": "https://veilbid-flare-fcc-2-production.up.railway.app",
         "status": 2,
-        "publicKeyFingerprintSha256": "8a659d02b1e9f043075e1fef412cb9e5537e7e438f4aa97bb81ffbbe4db6e4a1",
+        "publicKeyFingerprintSha256": "b3ed7509def1bb50154d670830e90017be7e00a2345f6daead0f1489b4486dce",
         "assertions": {
           "productionStatus": true,
           "extensionMatches": true,
