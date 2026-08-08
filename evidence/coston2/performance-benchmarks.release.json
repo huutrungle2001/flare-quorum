@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-flare-performance-benchmarks",
-  "recordedAt": "2026-08-07T22:56:11.606Z",
-  "sourceCommit": "b53a8f141f3521c7dfa9feaee019a7480036108f",
+  "recordedAt": "2026-08-08T05:56:22.730Z",
+  "sourceCommit": "f53a034289250387b08f61ff92faf60ffee991c8",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "observedBlock": "33757983",
+    "observedBlock": "33768386",
     "rpcSource": "official-public-coston2-rpc"
   },
   "samples": [
@@ -159,12 +159,98 @@
       }
     }
   ],
+  "ingress": {
+    "sourceEvidence": "evidence/coston2/bid-ingress-benchmark.release.json",
+    "tenderId": "22",
+    "finalizationTransaction": "0xab70426eb91e612db283cb7cdde9ab3673631140d851525dc527ec0c56d99e68",
+    "vendorCount": 1,
+    "perVendor": [
+      {
+        "vendorIndex": 1,
+        "sampleCount": 3,
+        "samples": [
+          {
+            "machine": 1,
+            "directResponseMs": 464.482,
+            "resultResponseMs": 359.599,
+            "endToEndMs": 824.081
+          },
+          {
+            "machine": 2,
+            "directResponseMs": 434.339,
+            "resultResponseMs": 368.354,
+            "endToEndMs": 802.693
+          },
+          {
+            "machine": 3,
+            "directResponseMs": 453.821,
+            "resultResponseMs": 374.418,
+            "endToEndMs": 828.239
+          }
+        ],
+        "directResponse": {
+          "minMs": 434.339,
+          "maxMs": 464.482,
+          "averageMs": 450.881
+        },
+        "resultResponse": {
+          "minMs": 359.599,
+          "maxMs": 374.418,
+          "averageMs": 367.457
+        },
+        "endToEnd": {
+          "minMs": 802.693,
+          "maxMs": 828.239,
+          "averageMs": 818.338
+        }
+      }
+    ],
+    "allSamples": {
+      "sampleCount": 3,
+      "samples": [
+        {
+          "machine": 1,
+          "directResponseMs": 464.482,
+          "resultResponseMs": 359.599,
+          "endToEndMs": 824.081
+        },
+        {
+          "machine": 2,
+          "directResponseMs": 434.339,
+          "resultResponseMs": 368.354,
+          "endToEndMs": 802.693
+        },
+        {
+          "machine": 3,
+          "directResponseMs": 453.821,
+          "resultResponseMs": 374.418,
+          "endToEndMs": 828.239
+        }
+      ],
+      "directResponse": {
+        "minMs": 434.339,
+        "maxMs": 464.482,
+        "averageMs": 450.881
+      },
+      "resultResponse": {
+        "minMs": 359.599,
+        "maxMs": 374.418,
+        "averageMs": 367.457
+      },
+      "endToEnd": {
+        "minMs": 802.693,
+        "maxMs": 828.239,
+        "averageMs": 818.338
+      }
+    }
+  },
   "assertions": {
     "publicReceiptsRead": true,
     "publicBlockTimestampsRead": true,
     "gasUsageRecorded": true,
     "closeRequestFinalizeDeltasRecorded": true,
     "oneResultEndpointOutageStillFinalized": true,
+    "independentBidIngressLatencyRecorded": true,
     "noBidPayloadsRead": true,
     "noProviderSecretsRead": true
   },

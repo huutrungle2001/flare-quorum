@@ -92,9 +92,9 @@ placeholders are forbidden after that commit.
   remain open. Local rejection coverage, the Docker identity-rotation boundary,
   and read-only Coston2 terminal/invalid-terms calls are recorded without
   promoting them to stateful live evidence.
-- [~] Publish sanitized evidence and performance benchmarks; release evidence and
-  public receipt/block timing are current, while independent bid-ingress timing
-  and broader fault-drill evidence remain open.
+- [~] Publish sanitized evidence and performance benchmarks; release evidence,
+  public receipt/block timing, and independent bid-ingress timing are current,
+  while broader fault-drill evidence remains open.
 - [x] Deploy web and relay; verify desktop/mobile/keyboard behavior.
 - [ ] Complete user research, vendor tests, and pilot outreach.
 - [ ] Pass Gate H.

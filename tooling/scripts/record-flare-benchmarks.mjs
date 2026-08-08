@@ -19,6 +19,19 @@ function read(relativePath) {
   return JSON.parse(readFileSync(resolve(root, relativePath), "utf8"));
 }
 
+function readIngressBenchmark() {
+  const evidence = read("evidence/coston2/bid-ingress-benchmark.release.json");
+  if (
+    evidence.status !== "PASSED" ||
+    evidence.assertions?.independentBidIngressLatencyRecorded !== true ||
+    evidence.assertions?.noPlaintextOrCiphertextRecorded !== true ||
+    evidence.ingressBenchmarks?.allSamples?.sampleCount < 1
+  ) {
+    throw new Error("FCC_BENCHMARK_INGRESS_EVIDENCE_INVALID");
+  }
+  return evidence;
+}
+
 function txHashes(evidence) {
   const identifiers = evidence.publicIdentifiers;
   return [
@@ -80,6 +93,7 @@ const [threeVendor, recovery] = await Promise.all([
   inspectSample("three-vendor-finalization", "evidence/coston2/gate-c-e-f-three-vendor.json", false),
   inspectSample("three-vendor-one-result-outage", "evidence/coston2/three-vendor-recovery.release.json", true),
 ]);
+const ingress = readIngressBenchmark();
 const observedBlock = await client.getBlockNumber();
 const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
 const output = {
@@ -94,12 +108,19 @@ const output = {
     rpcSource: "official-public-coston2-rpc",
   },
   samples: [threeVendor, recovery],
+  ingress: {
+    sourceEvidence: "evidence/coston2/bid-ingress-benchmark.release.json",
+    tenderId: ingress.publicIdentifiers.tenderId,
+    finalizationTransaction: ingress.publicIdentifiers.finalizationTransaction,
+    ...ingress.ingressBenchmarks,
+  },
   assertions: {
     publicReceiptsRead: true,
     publicBlockTimestampsRead: true,
     gasUsageRecorded: true,
     closeRequestFinalizeDeltasRecorded: true,
     oneResultEndpointOutageStillFinalized: true,
+    independentBidIngressLatencyRecorded: true,
     noBidPayloadsRead: true,
     noProviderSecretsRead: true,
   },

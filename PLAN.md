@@ -297,11 +297,11 @@ confidential bid or settlement boundary:
   identity-rotation boundary is recorded in
   `evidence/local/fcc-local-tee-restart-boundary.json`. Stateful Coston2 fault
   injection, process restart, and two-machine-loss drills remain open.
-- [x] Record public gas, block-latency, close-to-result, and recovery benchmarks
-  from the live Coston2 lifecycles in
-  `evidence/coston2/performance-benchmarks.release.json`; bid-ingress latency is
-  not independently instrumented in the public release and remains an open
-  measurement gap.
+- [x] Record public gas, block-latency, close-to-result, recovery, and
+  independently measured bid-ingress benchmarks from live Coston2 lifecycles in
+  `evidence/coston2/performance-benchmarks.release.json` and
+  `evidence/coston2/bid-ingress-benchmark.release.json`; the timings are
+  operational measurements, not an SLA.
 - [x] Run current/full-history secret and privacy-output scans.
 - [x] Generate Flare bindings and reject all drift.
 - [x] Deploy the v2 web judge and record desktop/mobile/keyboard smoke evidence;

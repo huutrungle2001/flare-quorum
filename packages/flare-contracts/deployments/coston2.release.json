@@ -65,6 +65,7 @@
     "evidence/coston2/gate-c-e-f-live-lifecycle.json",
     "evidence/coston2/gate-c-e-f-two-vendor.json",
     "evidence/coston2/gate-c-e-f-three-vendor.json",
+    "evidence/coston2/bid-ingress-benchmark.release.json",
     "evidence/coston2/gate-g-smart-account.json",
     "evidence/coston2/deployment-consistency.json"
   ],

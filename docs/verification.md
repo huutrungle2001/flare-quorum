@@ -94,6 +94,7 @@ evidence/coston2/gate-c-e-f-two-vendor.json
 evidence/coston2/gate-c-e-f-three-vendor.json
 evidence/coston2/three-vendor-recovery.release.json
 evidence/coston2/performance-benchmarks.release.json
+evidence/coston2/bid-ingress-benchmark.release.json
 evidence/coston2/live-negative-calls.release.json
 evidence/coston2/web-desktop-mobile-keyboard.release.json
 evidence/coston2/production-smoke.release.json
