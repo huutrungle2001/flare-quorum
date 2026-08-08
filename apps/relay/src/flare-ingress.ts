@@ -58,6 +58,13 @@ export interface FlareBidIngressChain {
 }
 
 export interface FlareBidIngressProxy {
+  runtime(machineIndex: number): Promise<{
+    teeId: Address;
+    extensionId: bigint;
+    codeVersion: Hex;
+    fingerprint: Hex;
+    publicKey: FlareTeePublicKey;
+  }>;
   submit(
     machineIndex: number,
     instruction: ReturnType<typeof directBidInstruction>,
@@ -135,6 +142,18 @@ export class FlareBidIngressGateway {
     this.proxy = proxy;
   }
 
+  async #assertRuntimeBinding(tender: FlareBidIngressTender, machineIndex: number): Promise<void> {
+    const runtime = await this.proxy.runtime(machineIndex);
+    if (
+      !isAddressEqual(runtime.teeId, tender.teeIds[machineIndex]) ||
+      runtime.extensionId !== tender.extensionId ||
+      runtime.codeVersion.toLowerCase() !== tender.codeVersion.toLowerCase() ||
+      runtime.fingerprint.toLowerCase() !== tender.teeKeyFingerprints[machineIndex].toLowerCase() ||
+      !isAddressEqual(teeIdentityFromPublicKey(runtime.publicKey), tender.teeIds[machineIndex]) ||
+      teePublicKeyFingerprint(runtime.publicKey).toLowerCase() !== tender.teeKeyFingerprints[machineIndex].toLowerCase()
+    ) throw new Error("FCC_TEE_RUNTIME_BINDING_MISMATCH");
+  }
+
   async health(tenderId: bigint): Promise<{
     status: "ok";
     service: "veilbid-flare-ingress";
@@ -145,6 +164,7 @@ export class FlareBidIngressGateway {
     tenderStatus: FlareBidIngressTender["status"];
   }> {
     const tender = await this.chain.inspect(tenderId);
+    await Promise.all(tender.teeIds.map((_, index) => this.#assertRuntimeBinding(tender, index)));
     return {
       status: "ok",
       service: "veilbid-flare-ingress",
@@ -162,7 +182,7 @@ export class FlareBidIngressGateway {
     publicKey: FlareTeePublicKey;
   }[]> {
     const tender = await this.chain.inspect(tenderId);
-    return tender.teeIds.map((teeId, index) => {
+    const keys = tender.teeIds.map((teeId, index) => {
       const publicKey = tender.teePublicKeys[index];
       if (
         !isAddressEqual(teeIdentityFromPublicKey(publicKey), teeId) ||
@@ -170,6 +190,8 @@ export class FlareBidIngressGateway {
       ) throw new Error("FCC_TEE_IDENTITY_MISMATCH");
       return { teeId, fingerprint: tender.teeKeyFingerprints[index], publicKey };
     });
+    await Promise.all(tender.teeIds.map((_, index) => this.#assertRuntimeBinding(tender, index)));
+    return keys;
   }
 
   async submit(request: FlareBidIngressRequest): Promise<FlareBidIngressAccepted> {
@@ -193,6 +215,7 @@ export class FlareBidIngressGateway {
       !isAddressEqual(teeIdentityFromPublicKey(publicKey), request.teeId) ||
       teePublicKeyFingerprint(publicKey).toLowerCase() !== tender.teeKeyFingerprints[machineIndex].toLowerCase()
     ) throw new Error("FCC_TEE_IDENTITY_MISMATCH");
+    await this.#assertRuntimeBinding(tender, machineIndex);
     const accepted = await this.proxy.submit(machineIndex, directBidInstruction(request.ciphertext));
     if (!/^0x[0-9a-fA-F]{64}$/.test(accepted.actionId)) throw new Error("FCC_PROXY_ACTION_INVALID");
     return { actionId: accepted.actionId, teeId: request.teeId, expiresAt: request.expiresAt };

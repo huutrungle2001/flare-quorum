@@ -155,6 +155,15 @@ function extensionId(value: unknown): bigint {
   return value;
 }
 
+function runtimeExtensionId(value: unknown): bigint {
+  if (typeof value !== "string" || !/^(?:0x[0-9a-fA-F]+|[1-9][0-9]*)$/.test(value)) {
+    throw new Error("FCC_PROXY_INFO_INVALID");
+  }
+  const parsed = BigInt(value);
+  if (parsed <= 0n) throw new Error("FCC_PROXY_INFO_INVALID");
+  return parsed;
+}
+
 function registeredProxyUrl(value: unknown): string {
   if (typeof value !== "string") throw new Error("MALFORMED_FCC_MACHINE_URL");
   let parsed: URL;
@@ -386,6 +395,56 @@ export class LiveFlareBidIngressProxy implements FlareBidIngressProxy {
     this.#urls = config.proxyUrls;
     this.#apiKeys = config.directApiKeys;
     this.#fetch = fetchImplementation;
+  }
+
+  async runtime(machineIndex: number): Promise<{
+    teeId: Address;
+    extensionId: bigint;
+    codeVersion: Hex;
+    fingerprint: Hex;
+    publicKey: FlareTeePublicKey;
+  }> {
+    if (!Number.isInteger(machineIndex) || machineIndex < 0 || machineIndex >= 3) {
+      throw new Error("FCC_PROXY_MACHINE_INDEX_INVALID");
+    }
+    let response: Response;
+    try {
+      response = await this.#fetch(`${this.#urls[machineIndex]}/info`, {
+        method: "GET",
+        headers: { accept: "application/json" },
+        cache: "no-store",
+        credentials: "omit",
+        redirect: "manual",
+        referrerPolicy: "no-referrer",
+        signal: AbortSignal.timeout(12_000),
+      });
+    } catch {
+      throw new Error("FCC_PROXY_UNAVAILABLE");
+    }
+    if (!response.ok) throw new Error("FCC_PROXY_REJECTED");
+    if (response.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() !== "application/json") {
+      throw new Error("FCC_PROXY_INFO_INVALID");
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(await boundedBody(response));
+    } catch (error) {
+      if (error instanceof Error && error.message === "FCC_PROXY_RESPONSE_INVALID") {
+        throw new Error("FCC_PROXY_INFO_INVALID");
+      }
+      throw new Error("FCC_PROXY_INFO_INVALID");
+    }
+    const info = object(parsed, "FCC_PROXY_INFO_INVALID");
+    const machine = object(info.machineData, "FCC_PROXY_INFO_INVALID");
+    const publicKey = machinePublicKey(machine.publicKey);
+    const teeId = teeIdentityFromPublicKey(publicKey);
+    return {
+      teeId,
+      extensionId: runtimeExtensionId(machine.extensionId),
+      codeVersion: bytes32(machine.codeHash, "FCC_PROXY_INFO_INVALID"),
+      fingerprint: teePublicKeyFingerprint(publicKey),
+      publicKey,
+    };
   }
 
   async submit(

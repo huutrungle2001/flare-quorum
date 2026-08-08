@@ -187,6 +187,46 @@ test("live proxy authenticates /direct and returns only the bound action id", as
   assert.equal(JSON.stringify(result).includes(instruction.message), false);
 });
 
+test("live proxy reads and normalizes the current runtime identity from /info", async () => {
+  const observed = [];
+  const proxy = new LiveFlareBidIngressProxy({
+    proxyUrls,
+    directApiKeys: ["test-only-key-one", "test-only-key-two", "test-only-key-three"],
+  }, async (url, init) => {
+    observed.push({ url: url.toString(), init });
+    return new Response(JSON.stringify({
+      machineData: {
+        extensionId: "0x010001",
+        codeHash: codeVersion,
+        publicKey: publicKeys[1],
+      },
+    }), { status: 200, headers: { "content-type": "application/json" } });
+  });
+  assert.deepEqual(await proxy.runtime(1), {
+    teeId: teeIds[1],
+    extensionId: 65_537n,
+    codeVersion,
+    fingerprint: fingerprints[1],
+    publicKey: publicKeys[1],
+  });
+  assert.equal(observed[0].url, "https://tee-2.example/info");
+  assert.equal(Object.hasOwn(observed[0].init.headers, "X-API-Key"), false);
+});
+
+test("live proxy rejects malformed runtime info without returning upstream fields", async () => {
+  const proxy = new LiveFlareBidIngressProxy({
+    proxyUrls,
+    directApiKeys: ["test-only-key-one", "test-only-key-two", "test-only-key-three"],
+  }, async () => new Response(JSON.stringify({
+    machineData: {
+      extensionId: "65537",
+      codeHash: codeVersion,
+      publicKey: { x: publicKeys[0].x, y: "secret-shaped-invalid-value" },
+    },
+  }), { status: 200, headers: { "content-type": "application/json" } }));
+  await assert.rejects(proxy.runtime(0), /MALFORMED_FCC_PUBLIC_KEY|FCC_PROXY_INFO_INVALID/);
+});
+
 test("live proxy reads only a parsed bid result and keeps the request ciphertext out", async () => {
   const instruction = directBidInstruction(`0x${"aa".repeat(114)}`);
   const observed = [];

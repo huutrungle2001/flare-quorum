@@ -32,6 +32,17 @@ function teeKey(byte) {
 const machines = [teeKey("11"), teeKey("22"), teeKey("44")];
 const teeIds = machines.map(({ publicKey }) => teeIdentityFromPublicKey(publicKey));
 const fingerprints = machines.map(({ publicKey }) => teePublicKeyFingerprint(publicKey));
+
+function runtime(machineIndex, overrides = {}) {
+  return {
+    teeId: teeIds[machineIndex],
+    extensionId: 65_537n,
+    codeVersion: `0x${"33".repeat(32)}`,
+    fingerprint: fingerprints[machineIndex],
+    publicKey: machines[machineIndex].publicKey,
+    ...overrides,
+  };
+}
 const receiptParameter = {
   type: "tuple",
   components: [
@@ -100,10 +111,13 @@ test("gateway forwards only an authorized opaque ECIES instruction", async () =>
       assert.equal(account, vendor.address);
       return tender();
     } },
-    { async submit(machineIndex, instruction) {
+    {
+      async runtime(machineIndex) { return runtime(machineIndex); },
+      async submit(machineIndex, instruction) {
       observed.push({ machineIndex, instruction });
       return { actionId: `0x${"99".repeat(32)}` };
-    } },
+      },
+    },
   );
   const accepted = await gateway.submit(parseFlareBidIngressRequest(await signedRequest()));
   assert.deepEqual(accepted, {
@@ -123,7 +137,7 @@ test("gateway publishes only chain-matched TEE encryption keys", async () => {
       assert.equal(account, undefined);
       return tender();
     } },
-    { async submit() { throw new Error("not called"); } },
+    { async runtime(machineIndex) { return runtime(machineIndex); }, async submit() { throw new Error("not called"); } },
   );
   const keys = await gateway.machineKeys(7n);
   assert.deepEqual(keys.map((value) => value.teeId), teeIds);
@@ -131,7 +145,7 @@ test("gateway publishes only chain-matched TEE encryption keys", async () => {
   await assert.rejects(
     new FlareBidIngressGateway(
       { async inspect() { return tender({ teeKeyFingerprints: [`0x${"00".repeat(32)}`, fingerprints[1], fingerprints[2]] }); } },
-      { async submit() { throw new Error("not called"); } },
+      { async runtime(machineIndex) { return runtime(machineIndex); }, async submit() { throw new Error("not called"); } },
     ).machineKeys(7n),
     /FCC_TEE_IDENTITY_MISMATCH/,
   );
@@ -140,7 +154,7 @@ test("gateway publishes only chain-matched TEE encryption keys", async () => {
 test("gateway health validates the configured public tender without exposing machine payloads", async () => {
   const gateway = new FlareBidIngressGateway(
     { async inspect(tenderId) { assert.equal(tenderId, 21n); return tender({ status: "Awarded" }); } },
-    { async submit() { throw new Error("not called"); } },
+    { async runtime(machineIndex) { return runtime(machineIndex); }, async submit() { throw new Error("not called"); } },
   );
   assert.deepEqual(await gateway.health(21n), {
     status: "ok",
@@ -151,6 +165,19 @@ test("gateway health validates the configured public tender without exposing mac
     machineBindingsValid: true,
     tenderStatus: "Awarded",
   });
+
+  await assert.rejects(
+    new FlareBidIngressGateway(
+      { async inspect() { return tender({ status: "Awarded" }); } },
+      {
+        async runtime(machineIndex) {
+          return runtime(machineIndex, machineIndex === 1 ? { teeId: teeIds[0] } : {});
+        },
+        async submit() { throw new Error("not called"); },
+      },
+    ).health(21n),
+    /FCC_TEE_RUNTIME_BINDING_MISMATCH/,
+  );
 });
 
 test("gateway fails closed on replay, wrong signature, state, and plaintext-shaped fields", async () => {
