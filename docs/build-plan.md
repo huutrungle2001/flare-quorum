@@ -99,12 +99,14 @@ placeholders are forbidden after that commit.
 
 ### Milestone 6 — submission
 
-- [ ] Publish live app, demo video, technical materials, Coston2 addresses,
+- [x] Publish live app, demo video, technical materials, Coston2 addresses,
   extension/code/machine identifiers, work ledger, and roadmap.
 - [ ] Select Confidential Compute Apps.
 - [ ] Select Interoperable Asset Products only after the exact XRP-native
   lifecycle evidence passes.
-- [ ] Complete claim/privacy/secret review.
+- [x] Complete the repository/evidence/hosted-runtime claim, privacy, and
+  secret review; user-validation and organizer submission decisions remain
+  external.
 
 ## 4. Production packages
 

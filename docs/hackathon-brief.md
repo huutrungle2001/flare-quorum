@@ -115,13 +115,13 @@ claiming those outcomes already exist.
 
 ## 7. Submission readiness checklist
 
-- [ ] Project name and bounty selection are consistent.
-- [ ] Product description and target users are understandable without protocol
+- [x] Project name and bounty selection are consistent in the Flare judge package.
+- [x] Product description and target users are understandable without protocol
   knowledge.
 - [x] Live app, wallet-free demo, public evidence links, and the checked-in
   captioned demo video work; remaining user-validation evidence is tracked in
   `PLAN.md` Phase 8.
-- [ ] GitHub repository and technical materials are accessible to judges.
+- [x] GitHub repository and technical materials are accessible to judges.
 - [x] Every Flare integration is explained by user value and live evidence.
 - [x] Existing/new/ported/integrated/improved work is separated in
   `submission/flare/NEW-WORK-LEDGER.md`.
@@ -129,7 +129,7 @@ claiming those outcomes already exist.
   transactions, and deployment network are included.
 - [ ] User testing, community interest, pilots, and traction are reported
   honestly.
-- [ ] Roadmap and next steps do not exceed the threat model or evidence.
+- [x] Roadmap and next steps do not exceed the threat model or evidence.
 
 The checklist remains incomplete until the corresponding rows in
 [`verification.md`](verification.md) pass.
