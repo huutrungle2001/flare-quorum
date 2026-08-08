@@ -26,7 +26,7 @@ export function flareVendorBidErrorMessage(cause: unknown): string {
     return "This wallet is not on the buyer's approved vendor list. No encrypted bid was sent.";
   }
   if (code === "FLARE_INGRESS_UNAVAILABLE" || code === "FLARE_RECEIPT_PENDING") {
-    return "The confidential ingress is unavailable or still pending. No bid was submitted; retry when the three-machine quorum is reachable.";
+    return "The confidential ingress is unavailable or still pending. No on-chain bid was committed. A TEE may retain only this attempt's encrypted payload; retrying uses a new one-time nonce.";
   }
   if (code === "FLARE_CREDENTIALS_REQUIRED") {
     return "This tender requires credentials that this browser composer cannot collect. No bid was attempted.";
@@ -94,7 +94,7 @@ export function FlareVendorWorkspace({
       onRefresh();
     } catch (cause) {
       setError(flareVendorBidErrorMessage(cause));
-      toasts.fail(toastId, "Bid stopped. No plaintext or ciphertext was saved.");
+      toasts.fail(toastId, "Bid stopped before an on-chain commitment. Plaintext was not persisted.");
     } finally {
       setBusy(false);
       setStage(null);

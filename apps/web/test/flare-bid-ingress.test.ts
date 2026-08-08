@@ -31,6 +31,13 @@ describe("Coston2 vendor admission preflight", () => {
       .toMatch(/not on the buyer's approved vendor list/i);
   });
 
+  it("describes a partial ingress failure without claiming ciphertext was discarded", () => {
+    const message = flareVendorBidErrorMessage(new Error("FLARE_INGRESS_UNAVAILABLE"));
+    expect(message).toMatch(/no on-chain bid was committed/i);
+    expect(message).toMatch(/encrypted payload/i);
+    expect(message).not.toMatch(/no plaintext or ciphertext was saved/i);
+  });
+
   it("checks the mapping before loading TEE keys or sending ciphertext", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     await expect(submitFlareBid({
