@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "gate": "0-fcc-machines",
   "status": "PASSED",
-  "recordedAt": "2026-08-08T09:23:53.680Z",
-  "sourceCommit": "8ed22125fb7c26fa8454e36f167a38320aaabd6c",
+  "recordedAt": "2026-08-07T15:14:38.428Z",
+  "sourceCommit": "5d596c7b4b37146c6f08514df4d395e0a6d1dd65",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "blockNumber": "33774354"
+    "blockNumber": "33745456"
   },
   "publicIdentifiers": {
     "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
-    "extensionId": "0x00000000000000000000000000000000000000000000000000000000000101db",
+    "extensionId": "0x00000000000000000000000000000000000000000000000000000000000101d7",
     "command": "rRap",
     "simulatedTee": true,
     "machines": [
       {
         "machine": 1,
-        "teeId": "0x403C88Ab59976dD5ed0513dEDfa003C99621cca3",
+        "teeId": "0x6940f1Da741362E3605B9AD7083de30fFd251334",
         "url": "https://veilbid-flare-fcc-1-production.up.railway.app",
         "status": 2,
-        "publicKeyFingerprintSha256": "cf60a5d844c0dd19da97457881a3776eca601b4a61f367a56152c790723e2863",
+        "publicKeyFingerprintSha256": "6f7ae86a920127cb09f04e2f5d68f441ce32f694b0ce61ef01c921664c63bfcb",
         "assertions": {
           "productionStatus": true,
           "extensionMatches": true,
@@ -33,10 +33,10 @@
       },
       {
         "machine": 2,
-        "teeId": "0x9cAE8bc688eE2a27Fa9ae6D45739569EE7c3b9fA",
+        "teeId": "0x4bFf0cc88768a04e4137125A84c14EbE63C86312",
         "url": "https://veilbid-flare-fcc-2-production.up.railway.app",
         "status": 2,
-        "publicKeyFingerprintSha256": "b3ed7509def1bb50154d670830e90017be7e00a2345f6daead0f1489b4486dce",
+        "publicKeyFingerprintSha256": "9ce723dba948cf52a215c2a60df6209690ab0ce21401fc11719918038918df48",
         "assertions": {
           "productionStatus": true,
           "extensionMatches": true,
@@ -49,10 +49,10 @@
       },
       {
         "machine": 3,
-        "teeId": "0xcBCcF4BBd4E2B2217e93e6260DB7905E04107bfc",
+        "teeId": "0x5ccEA9ac3CD8fBFC8E01522402d46B06cd6C3423",
         "url": "https://veilbid-flare-fcc-3-production.up.railway.app",
         "status": 2,
-        "publicKeyFingerprintSha256": "6177f5a6ac6ddb12092d39c8d87556ea46232f1a7d535def298324da1d12e63d",
+        "publicKeyFingerprintSha256": "6071e07d48aa4d49a25f31c896d66dd74d725af74b3199c8a70d8ba86ebe6f4e",
         "assertions": {
           "productionStatus": true,
           "extensionMatches": true,
