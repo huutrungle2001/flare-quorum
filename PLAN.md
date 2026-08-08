@@ -370,6 +370,93 @@ Exit: the submission contains real user evidence, not only technical claims.
 Exit: a judge can understand usefulness in 30 seconds, verify Flare depth in
 two minutes, and reproduce the public path from the repository.
 
+### Phase 9 — post-Summer Signal product expansion: Flare Treasury Exchange
+
+This phase is a post-competition roadmap. It is not part of the current VeilBid
+Flare championship claim and must not be presented as implemented until its own
+contracts, Coston2 evidence, and user validation exist.
+
+**Product direction:** evolve the private procurement engine into **Flare
+Treasury Exchange**, a treasury execution network for intents that require a
+private offer, objective completion proof, and cross-chain settlement. A buyer
+intent describes the outcome, budget, deadline, and public acceptance policy;
+approved vendors, solvers, or executors submit private offers; escrow releases
+only against a frozen milestone proof.
+
+The existing VeilBid Flare market remains the championship vertical slice. Its
+FCC ingress, receipt quorum, deterministic selection, FTSO binding, Smart
+Account funding, FDC proof adapters, settlement, and public evidence are the
+technical foundation. The historical VeilBid repository remains read-only and
+is never changed as part of this roadmap.
+
+#### 9.1 — product discovery and boundary
+
+- [ ] Interview treasury operators, DAO operations teams, and service
+  providers to select one narrow pilot (for example, an on-chain deployment
+  or XRPL payment operation) rather than a generic task marketplace.
+- [ ] Define the public `INTENT_SCHEMA_V1`: objective, budget, asset, deadline,
+  approved participants, milestone amounts, and deterministic acceptance
+  predicates.
+- [ ] Define the private `OFFER_SCHEMA_V1`: price, execution route, delivery
+  estimate, credentials, and one-time nonce; preserve the same ciphertext,
+  plaintext, and browser-persistence prohibitions as the championship path.
+- [ ] Keep the product vocabulary explicit: `Intent`, `Offer`, `Milestone`,
+  `Attestation`, `Release`, and `Refund`; do not silently relabel the current
+  tender ABI or its historical evidence.
+
+#### 9.2 — milestone escrow vertical slice
+
+- [ ] Implement a separate non-upgradeable `MilestoneEscrow` or equivalent
+  module whose public state contains only the intent, milestone amounts,
+  deadlines, proof type, proof commitment, and release/refund state.
+- [ ] Start with one objectively verifiable proof type (`EVMTransaction` or
+  `XRPPayment`) and a two- or three-milestone flow. Add `Web2Json` only after
+  an allowlisted source, transformation, freshness bound, and outage behavior
+  are documented.
+- [ ] Bind every release proof to chain, escrow, intent, milestone, recipient,
+  amount, rules hash, attestation round, and one-time release nonce.
+- [ ] Make timeout, failed proof, duplicate proof, replay, partial payout, and
+  buyer cancellation/refund fail closed; conserve escrow exactly once.
+- [ ] Keep milestone amounts public. Do not claim private token settlement or
+  private payout amounts without a separately verified mechanism.
+
+#### 9.3 — private offer and executor workflow
+
+- [ ] Reuse the FCC private-ingress pattern, but create a new intent/offer
+  domain and result schema instead of extending the championship tender
+  winner ABI in place.
+- [ ] Let FCC evaluate deterministic cost, route, credential, and deadline
+  predicates; no browser, buyer, relay, or AI model may choose the executor.
+- [ ] Preserve a common frozen machine quorum and threshold-signed result for
+  executor selection, with fresh nonce/expiry recovery after proxy or machine
+  failure.
+- [ ] Add an executor workspace that can prepare a public-safe XRPL `0xFE`
+  operation or an EVM action without receiving an XRPL secret or private bid.
+- [ ] Use FTSO only for a fresh, explicitly bound conversion/risk input and FDC
+  only for a verifiable external fact; every dependency must have an unavailable
+  and recovery state.
+
+#### 9.4 — XRP-native settlement and pilot
+
+- [ ] Run the complete Coston2 path: XRPL Payment → FDC proof → Smart Account
+  funding → private FCC offer selection → milestone attestation → FTestXRP or
+  FXRP release → official redemption where supported.
+- [ ] Add a public evidence view for intent hash, milestone proof, attestation
+  round, release/refund conservation, result digest, and recovery checkpoints;
+  never expose offer plaintext, ciphertext, or private credentials.
+- [ ] Conduct at least five treasury interviews, five provider usability tests,
+  and one honest design-partner pilot before claiming product usefulness.
+- [ ] Publish a new-work ledger that separates the current VeilBid foundation,
+  ported Flare components, and newly built Treasury Exchange contracts,
+  extension commands, bindings, UI, and evidence.
+- [ ] Treat mainnet FXRP, production custody, formal audit, SLA, and legal
+  delivery arbitration as later roadmap items, not MVP claims.
+
+**Phase 9 exit:** one real Coston2 intent with at least two private offers and
+two objective milestones completes selection, proof verification, release or
+refund, and public-safe recovery without weakening any championship privacy or
+threshold invariant.
+
 ## 5. Quality bars
 
 ### Product

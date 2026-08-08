@@ -208,3 +208,51 @@ All formerly open choices are accepted in
 > bids, FTSO normalization, threshold TEE result verification, and Coston2
 > evidence. The winning payout is public; losing commercial offers remain inside
 > the selected attested TEEs.
+
+## 13. Post-Summer Signal expansion — Flare Treasury Exchange
+
+The post-competition product direction is **Flare Treasury Exchange**. This is
+an intentional expansion of the VeilBid Flare foundation, not a claim that the
+current championship release already implements an intent marketplace or
+milestone execution network.
+
+### Product promise
+
+Treasury teams publish an outcome-oriented intent, receive private offers from
+approved vendors/solvers/executors, and fund an objective milestone workflow.
+The selected executor is determined by registered FCC machines; FDC verifies
+external completion facts; Smart Accounts and FAssets move the public escrow;
+FTSO fixes any required currency/risk snapshot.
+
+### Product vocabulary
+
+| Treasury Exchange | Current VeilBid foundation |
+|---|---|
+| `Intent` | public tender rules and Buyer Brief |
+| `Offer` | private encrypted bid and TEE receipt quorum |
+| `Milestone` | new objective release checkpoint |
+| `Attestation` | FDC proof of XRPL/EVM/Web2Json completion |
+| `Release` / `Refund` | public escrow conservation and settlement |
+| `Executor` | selected vendor/solver under a threshold result |
+
+The new intent/offer schemas and escrow module must be versioned separately from
+the championship tender ABI. Historical Sepolia/Nox assets and the old VeilBid
+repository remain read-only references.
+
+### First vertical slice
+
+The first pilot should use one narrow, objectively verifiable operation, such
+as an EVM deployment or an XRPL payment milestone. It should include two or
+three milestones, public amounts and deadlines, private offer terms, a
+two-of-three FCC result, an FDC proof, a timeout/refund path, and a public-safe
+recovery checkpoint. Web2Json sources are a later extension after source
+allowlisting, transformation, freshness, and outage semantics are proven.
+
+### Explicit boundaries
+
+- No AI or subjective buyer override selects an executor.
+- No private token settlement or hidden payout amounts are claimed.
+- No ciphertext, plaintext offer, credential, XRPL secret, or wallet key is
+  persisted in browser, public calldata, logs, or evidence.
+- No legal delivery guarantee, KYC, dispute arbitration, or production custody
+  claim is implied by an attested milestone.
