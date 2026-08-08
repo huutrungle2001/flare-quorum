@@ -96,6 +96,8 @@
     "flare:registration:image:verify": "node tooling/scripts/build-fcc-registration-image.mjs --write",
     "flare:machines:preflight": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs",
     "flare:machines:register": "node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs --execute",
+    "flare:machines:retirement:preflight": "node --env-file-if-exists=.env.local tooling/scripts/retire-stale-fcc-machines.mjs",
+    "flare:machines:retire-stale": "node --env-file-if-exists=.env.local tooling/scripts/retire-stale-fcc-machines.mjs --execute",
     "flare:gate:a": "pnpm --filter @veilbid/flare-bindings build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-foundation-action.mjs --execute",
     "flare:gate:b:ingress": "pnpm --filter @veilbid/flare-bindings build && node --env-file-if-exists=.env.local tooling/scripts/run-fcc-private-ingress.mjs --execute",
     "flare:tunnel:install": "node tooling/scripts/ensure-cloudflared.mjs --install",
