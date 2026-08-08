@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-xrp-funding-checkpoint",
-  "recordedAt": "2026-08-08T06:49:27.190Z",
+  "recordedAt": "2026-08-08T07:00:42.736Z",
   "publicIdentifiers": {
-    "sourceCommit": "ab699920ddb95608ef46fa4005d3a33c0a5761f0",
+    "sourceCommit": "ef6223a61cae68748de03e6d0edb9f8ed0bdd320",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",

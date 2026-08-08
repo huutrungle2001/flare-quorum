@@ -20,7 +20,7 @@ const checkpoint = {
   xrplOwner: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p",
   xrplTransactionId: `0x${"ab".repeat(32)}`,
   walletId: "0",
-  executorFeeUBA: "1000000",
+  executorFeeUBA: "",
 };
 
 if (baseUrl.protocol !== "https:") throw new Error("Flare funding checkpoint smoke requires an HTTPS URL");
