@@ -4,8 +4,8 @@
   "chainId": 114,
   "kind": "release",
   "verified": true,
-  "recordedAt": "2026-08-08T09:38:01.953Z",
-  "sourceCommit": "44b64d543944d3b141bf48b65f45ef52a07f60da",
+  "recordedAt": "2026-08-08T09:53:42.240Z",
+  "sourceCommit": "ed8add1dda1fc11703b4962584dfb030d93e8f48",
   "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
   "contracts": {
     "VeilBidFlareMarket": {

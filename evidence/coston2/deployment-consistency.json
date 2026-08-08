@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "gate": "DEPLOYMENT_CONSISTENCY",
   "status": "PASSED",
-  "recordedAt": "2026-08-08T09:38:01.953Z",
-  "sourceCommit": "44b64d543944d3b141bf48b65f45ef52a07f60da",
+  "recordedAt": "2026-08-08T09:53:42.240Z",
+  "sourceCommit": "ed8add1dda1fc11703b4962584dfb030d93e8f48",
   "network": {
     "name": "flare-coston2",
     "chainId": 114,
-    "blockNumber": "33774908"
+    "blockNumber": "33775480"
   },
   "publicIdentifiers": {
     "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
