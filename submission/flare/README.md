@@ -171,8 +171,9 @@ Complete and live: Coston2 market/runtime verification, three production-status
 FCC machines, encrypted ingress, receipt quorum, FCC private scoring, FTSO
 binding, threshold finalization, FTestXRP conservation, Gate G XRP/FDC/Smart
 Account funding, fail-closed delayed-mint checkpoint/resume in the funding
-executor, hosted ingress health/result API, public Evidence workspace, and
-Vercel smoke/accessibility evidence.
+executor, hosted ingress health/result API, public Evidence workspace, Vercel
+smoke/accessibility evidence, and the read-only hosted Railway runtime-log
+review recorded without retaining log bodies.
 
 Still open and deliberately not overstated: same-identity simulated-TEE
 restart recovery, browser-native XRP signing/submission and interactive

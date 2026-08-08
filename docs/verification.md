@@ -7,7 +7,8 @@
 > pass. Gate B restart hardening, browser-native XRP signing/submission and
 > recovery, and user-validation work remain open; the wallet-ready browser XRPL
 > Payment/job preview and server-side XRP funding checkpoint/resume path have fail-closed
-> coverage. Historical Sepolia/Nox
+> coverage, and the hosted Railway runtime-log review found no forbidden-material
+> pattern matches. Historical Sepolia/Nox
 > artifacts are pre-hackathon baseline only. Local adversarial coverage is
 > recorded separately and is not promoted to live Coston2 evidence.
 
@@ -54,7 +55,7 @@ wallet/executor secrets are never persisted.
 | Area | Passing condition | Status |
 |---|---|---|
 | Deployment truth | Source, runtime, constructor, manifest, registry wiring, extension image, machines, and bindings agree | PASSED — `evidence/coston2/deployment-consistency.json` and verified release manifest |
-| Bid privacy | No plaintext/ciphertext in chain, logs, analytics, evidence, or durable browser/proxy state | PARTIAL — live three-machine ciphertext ingress, browser no-persistence path, bounded HTTP/proxy tests, and secret/evidence scans pass; hosted runtime-log review remains |
+| Bid privacy | No plaintext/ciphertext in chain, logs, analytics, evidence, or durable browser/proxy state | PARTIAL — live three-machine ciphertext ingress, browser no-persistence path, bounded HTTP/proxy tests, repository/history/evidence scans, and a read-only review of 602 hosted JSON log records pass; broader stateful fault coverage remains |
 | Receipt binding | Wrong chain/market/extension/code/tender/vendor/rules/nonce/commitment/expiry fails | PARTIAL — live receipts and domain-binding tests pass; same-identity restart evidence remains |
 | Quorum continuity | Every accepted bid preserves a common 2-of-3 machine set; weaker receipt sets fail | PASSED for result collection — live `three-vendor-recovery.release.json` finalizes with one unavailable result endpoint; sealed restart and two-machine loss remain open |
 | State integrity | TEE rebuilds ordered root; omitted, duplicated, reordered, and rolled-back state fails | PARTIAL — Go sealed-store/selection, Solidity fuzz/invariant, and TypeScript root tests pass; live rollback/restart evidence remains |
@@ -69,7 +70,7 @@ wallet/executor secrets are never persisted.
 | Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage is live; XRP funding checkpoint/resume and the public-safe browser job preview are implemented and tested; browser-native signing/recovery and full fault drills remain |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED — `evidence/coston2/web-production-smoke.json`, `evidence/coston2/web-role-workspaces.json`, `evidence/coston2/flare-ingress-production.json`; dedicated `/?role=evidence` ledger is covered by the role smoke |
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PARTIAL — 320px/keyboard/focus/reduced-motion/labels pass in `evidence/coston2/web-keyboard-accessibility.json`; browser-native signing/recovery remains |
-| Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; hosted runtime log review remains |
+| Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; 602 latest hosted Railway JSON log records were inspected in memory with zero forbidden-material pattern matches; longer retention and stateful fault coverage remain |
 | New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | PASSED for the current Flare package — `submission/flare/NEW-WORK-LEDGER.md` and judge-package validation agree; historical parent pack remains isolated |
 | User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN |
 
@@ -99,6 +100,7 @@ evidence/coston2/production-smoke.release.json
 evidence/coston2/web-production-smoke.json
 evidence/coston2/web-keyboard-accessibility.json
 evidence/coston2/web-xrp-funding-draft.json
+evidence/coston2/hosted-runtime-log-review.json
 evidence/coston2/web-role-workspaces.json
 evidence/coston2/flare-ingress-production.json
 evidence/coston2/user-validation.release.json

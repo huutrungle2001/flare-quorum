@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-hosted-runtime-log-review",
+  "recordedAt": "2026-08-08T04:50:39.693Z",
+  "publicIdentifiers": {
+    "sourceCommit": "5c743abab8107d0df9d8f8f6d0ceba5baa56c7cf",
+    "provider": "railway",
+    "project": "veilbid-flare-fcc",
+    "environment": "production",
+    "services": [
+      "veilbid-flare-fcc-1",
+      "veilbid-flare-fcc-2",
+      "veilbid-flare-fcc-3",
+      "veilbid-flare-ingress"
+    ],
+    "sampleLimitPerService": 200
+  },
+  "assertions": {
+    "allServicesReachableForLogRead": true,
+    "fccMachineOneSampled": true,
+    "fccMachineTwoSampled": true,
+    "fccMachineThreeSampled": true,
+    "ingressSampled": true,
+    "forbiddenMaterialPatternMatches": 0,
+    "rawLogLinesNotRecorded": true,
+    "credentialsNotRecorded": true,
+    "bidMaterialNotRecorded": true
+  },
+  "blockers": [],
+  "notes": [
+    "This is a read-only review of the latest available Railway JSON log records: 200 records for each FCC service and 2 records for ingress.",
+    "The scanner inspected complete JSON records in memory for secret, key, seed, credential, ciphertext, plaintext, bid, decryption, and raw-signature terms; only counts and Boolean assertions are committed.",
+    "The log body, request payloads, headers, credentials, TEE material, and bid data are deliberately not written to evidence."
+  ]
+}
