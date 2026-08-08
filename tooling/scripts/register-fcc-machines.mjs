@@ -22,6 +22,7 @@ import {
   evaluateRegisteredMachine,
   inspectMachineRegistrationEndpoints,
   machineRegistrationEnvironment,
+  machineEvidenceRelativePath,
   registrationAddresses,
   requiredMachineRouteUpdate,
   registeredMachineExtensionId,
@@ -43,7 +44,7 @@ const repositoryRoot = resolve(import.meta.dirname, "../..");
 const environmentPath = resolve(repositoryRoot, ".env.local");
 const runtimeDirectory = resolve(repositoryRoot, ".local/fcc/registration");
 const binaryDirectory = resolve(repositoryRoot, ".local/fcc/bin");
-const evidenceRelativePath = process.env.FCC_MACHINE_EVIDENCE_PATH?.trim() || "evidence/coston2/fcc-machines.json";
+const evidenceRelativePath = machineEvidenceRelativePath(process.env);
 if (evidenceRelativePath.startsWith("/") || evidenceRelativePath.split("/").includes("..")) {
   throw new Error("FCC_MACHINE_EVIDENCE_PATH_INVALID");
 }

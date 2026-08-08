@@ -198,6 +198,16 @@ export function registeredMachineExtensionId(environment = process.env) {
   );
 }
 
+export function machineEvidenceRelativePath(environment = process.env) {
+  const configured = environment.FCC_MACHINE_EVIDENCE_PATH?.trim();
+  if (configured) return configured;
+  const selected = registeredMachineExtensionId(environment).toLowerCase();
+  const product = String(environment.FCC_MARKET_EXTENSION_ID ?? "").trim().toLowerCase();
+  return product !== "" && selected === product
+    ? "evidence/coston2/fcc-market-machines.json"
+    : "evidence/coston2/fcc-machines.json";
+}
+
 export function requiredMachineRouteUpdate(record, machine) {
   const teeId = getAddress(record.teeId);
   if (teeId === "0x0000000000000000000000000000000000000000") return null;

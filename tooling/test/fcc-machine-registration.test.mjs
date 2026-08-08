@@ -7,12 +7,23 @@ import {
   inspectMachineRegistrationEndpoints,
   isTeeNotFoundError,
   machineRegistrationEnvironment,
+  machineEvidenceRelativePath,
   normalizeMachineOrigin,
   parseMachineInfo,
   registeredMachineExtensionId,
   registrationAddresses,
   requiredMachineRouteUpdate,
 } from "../flare/fcc-machine-registration.mjs";
+
+test("routes product and foundation machine evidence to separate canonical files", () => {
+  const productId = `0x${"0".repeat(59)}101db`;
+  assert.equal(machineEvidenceRelativePath({ FCC_MARKET_EXTENSION_ID: productId }), "evidence/coston2/fcc-market-machines.json");
+  assert.equal(machineEvidenceRelativePath({ FCC_EXTENSION_ID: `0x${"0".repeat(59)}101d7` }), "evidence/coston2/fcc-machines.json");
+  assert.equal(machineEvidenceRelativePath({
+    FCC_MARKET_EXTENSION_ID: productId,
+    FCC_MACHINE_EVIDENCE_PATH: "evidence/coston2/custom.json",
+  }), "evidence/coston2/custom.json");
+});
 
 const expected = {
   extensionId: `0x${"00".repeat(29)}0101d7`,
