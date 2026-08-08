@@ -2,8 +2,9 @@
 
 > Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
 > lifecycle, and Gate G pass with three registered Coston2 FCC machines and a verified XRP-native
-> lifecycle. Same-identity simulated-TEE restart, release hardening, product
-> UX, and Gate H remain open.
+> lifecycle. The public release hardening and product UX are recorded; same-
+> identity simulated-TEE restart, broader stateful fault drills, and Gate H
+> user validation remain open.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.
