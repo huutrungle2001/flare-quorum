@@ -31,6 +31,11 @@ function git(...args) {
   return execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
 }
 
+const sourceCommitOverride = process.env.VEILBID_FLARE_SMOKE_SOURCE_COMMIT?.trim() ?? "";
+if (sourceCommitOverride !== "" && !/^[0-9a-f]{40}$/i.test(sourceCommitOverride)) {
+  throw new Error("VEILBID_FLARE_SMOKE_SOURCE_COMMIT_INVALID");
+}
+
 function sha256(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
@@ -113,7 +118,7 @@ const assertions = {
   publicEvidenceLedgerRendered: evidenceRoute.dom.includes("FINALIZED CHECKPOINT LEDGER") && evidenceRoute.dom.includes("Rules hash") && evidenceRoute.dom.includes("Ordered bid root"),
   publicEvidenceNoWalletGate: evidenceRoute.dom.includes("Trace every public checkpoint") && !evidenceRoute.dom.includes("CONNECT WALLET"),
   buyerBriefRendered: buyerRoute.dom.includes("Public objective") && buyerRoute.dom.includes("Acceptance criteria") && buyerRoute.dom.includes("Optional vendor questions"),
-  xrpFundingBoundaryRendered: buyerRoute.dom.includes("Keep the XRPL signature outside VeilBid") && buyerRoute.dom.includes("DirectMintingDelayed") && buyerRoute.dom.includes("NON-CUSTODIAL"),
+  xrpFundingBoundaryRendered: buyerRoute.dom.includes("Keep the XRPL signature outside VeilBid") && buyerRoute.dom.includes("DirectMintingDelayed") && buyerRoute.dom.includes("NON-CUSTODIAL") && buyerRoute.dom.includes("PREPARE PUBLIC 0xFE JOB") && buyerRoute.dom.includes("XRPL owner address"),
   vendorRedemptionBoundaryRendered: vendorRoute.dom.includes("Request XRP redemption") && vendorRoute.dom.includes("Connect the winning Coston2 wallet"),
   noPublicStateFailureRendered: !desktop.dom.includes("Flare state unavailable") && !mobile.dom.includes("Flare state unavailable"),
   mobileTenderNavigationActive: mobile.dom.includes('class="primary-nav-link active"') && mobile.dom.includes('aria-current="page"'),
@@ -128,7 +133,7 @@ const evidence = {
   suite: "coston2-frontend-smoke",
   recordedAt: new Date().toISOString(),
   publicIdentifiers: {
-    sourceCommit: git("rev-parse", "HEAD"),
+    sourceCommit: sourceCommitOverride || git("rev-parse", "HEAD"),
     provider: "vercel",
     project: "veilbid-flare",
     canonicalUrl: baseUrl.origin,
@@ -155,6 +160,7 @@ const evidence = {
     "The dedicated Activity/Evidence route reread the same finalized market snapshot without a wallet or bid payload.",
     "The Vendor route exposes the official redemption request boundary but keeps approval and redemption behind the winning Coston2 wallet.",
     "The Buyer route exposes the structured public brief and commits its canonical hash without collecting bid plaintext.",
+    "The Buyer route exposes a public-safe XRPL 0xFE job/memo preview; it does not sign or submit an XRPL payment and does not accept an XRPL secret.",
     "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
     "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed.",
   ],
