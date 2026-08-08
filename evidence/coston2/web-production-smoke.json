@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-07T23:38:59.257Z",
+  "recordedAt": "2026-08-08T00:00:47.975Z",
   "publicIdentifiers": {
-    "sourceCommit": "6859897c116d6931be9f0b97b63cfb62c58b762e",
+    "sourceCommit": "74ac873669605048abd3fdcad286d2792b78388c",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
