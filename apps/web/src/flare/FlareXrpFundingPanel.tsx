@@ -86,6 +86,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
         step reads only the XRPL owner, PersonalAccount, nonce, and public payment
         ID; it never asks for a seed, private key, FDC credential, or direct-mint signer.
         <br /><small><strong>DirectMintingDelayed is not success.</strong> Keep the public checkpoint and resume it with the same payment and nonce.</small>
+        <br /><small>The wallet-ready XRPL Payment draft reads the current AssetManager destination and fee; the transaction ID is optional until your external wallet signs.</small>
       </p>
       <ol className="lifecycle" aria-label="XRP-native funding stages">
         <li className="complete"><span>1</span>XRPL TESTNET PAYMENT</li>
