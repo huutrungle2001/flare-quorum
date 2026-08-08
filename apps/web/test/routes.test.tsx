@@ -51,6 +51,25 @@ function announceWallet(uuid: string, name: string) {
 afterEach(cleanup);
 
 describe("standalone public routes", () => {
+  it("keeps the verified Flare landing page separate from the tender app shell", () => {
+    vi.stubEnv("VITE_FLARE_DEPLOYMENT_STATUS", "verified");
+    vi.stubEnv("VITE_COSTON2_RPC_URL", "https://coston2.example/rpc");
+    vi.stubEnv("VITE_FLARE_MARKET_ADDRESS", "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05");
+    vi.stubEnv("VITE_FLARE_MARKET_DEPLOYMENT_BLOCK", "33746695");
+    try {
+      render(
+        <MemoryRouter initialEntries={["/"]}>
+          <App />
+        </MemoryRouter>,
+      );
+      expect(screen.getByRole("heading", { name: /Private bids.*Public awards/i })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "TENDERS" })).toHaveAttribute("href", "/flare");
+      expect(screen.queryByRole("button", { name: "PUBLIC" })).toBeNull();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("renders the landing page without entering the chain runtime", () => {
     const { container } = render(
       <MemoryRouter initialEntries={["/"]}>

@@ -229,22 +229,23 @@ Social links belong in the footer, not the primary product navigation.
 Role pills:
 
 - `PUBLIC`
-- `XRP TREASURY`
-- `EVM BUYER`
-- `VENDOR`
-- `PUBLIC FINALIZER`
-- `AUDITOR / EVIDENCE`
+- `BUYER`
+- `PRIVATE BIDS`
+- `ACTIVITY`
+- `BALANCES`
+- `AUDITOR`
 
 The active role uses Veil Green with black text and a black border. Role changes
 must not imply wallet permission. Unauthorized roles remain browsable where
 public data exists, with writes hidden or disabled and explained.
 
-`PUBLIC` is strictly wallet-free discovery and tender inspection. `PUBLIC
-FINALIZER` is a separate navigation context so transaction readiness and
-buyer-only recovery never crowd or gate the judge path. It is not a privileged
-role: permissionless close remains permissionless, buyer cancellation/refund
-still require the canonical buyer, and FCC dispatch/result grouping remain
-relay-only. `AUDITOR / EVIDENCE` is wallet-free and has no signer or bid access.
+`PUBLIC` is strictly wallet-free discovery and tender inspection. `BUYER` is
+the EVM recovery path, `PRIVATE BIDS` is the vendor/FCC ingress path, `ACTIVITY`
+is the separate public-finalizer context, and `BALANCES` is the XRP Treasury
+mapping (XRPL → FDC → Smart Account). `ACTIVITY` is not a privileged role:
+permissionless close remains permissionless, buyer cancellation/refund still
+require the canonical buyer, and FCC dispatch/result grouping remain relay-only.
+`AUDITOR` is wallet-free and has no signer or bid access.
 
 ### Historical UI parity decisions
 

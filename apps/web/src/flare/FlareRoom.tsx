@@ -10,7 +10,6 @@ import { FlareVendorWorkspace } from "./FlareVendorWorkspace";
 import { FlareBuyerWorkspace } from "./FlareBuyerWorkspace";
 import { FlareAuditorWorkspace } from "./FlareAuditorWorkspace";
 import { FlareFinalizerWorkspace } from "./FlareFinalizerWorkspace";
-import { FlareLifecycleMarquee, FlareProcurementSignal } from "./FlareLandingVisuals";
 import { ContextHelp } from "../shell/ContextHelp";
 
 type FlareTenderFilter = "current" | "all" | "open" | "compute" | "awarded" | "refunded";
@@ -62,47 +61,6 @@ function filterTenders(
     return tenders.filter((tender) => ["Closed", "ComputePending"].includes(tender.status));
   }
   return tenders.filter((tender) => tender.status.toLowerCase() === filter);
-}
-
-function FlareLandingHero({ deploymentStatus }: { deploymentStatus?: "planned" | "verified" }) {
-  return (
-    <>
-      <section className="flare-landing-hero">
-        <div className="flare-hero-statement">
-          <p className="eyebrow">CONFIDENTIAL PROCUREMENT / FLARE COSTON2</p>
-          <h1>Private bids.<br /><em>Public awards.</em></h1>
-          <p className="flare-hero-summary">
-            XRP treasuries fund transparent rules. Vendors seal commercial terms
-            to three fixed TEEs. Two matching FCC results unlock one public
-            FTestXRP settlement.
-          </p>
-          <div className="hero-actions">
-            <a className="primary-button" href="#tenders">EXPLORE LIVE TENDERS →</a>
-            <a className="secondary-button" href="?role=treasury">START XRP TREASURY FLOW</a>
-          </div>
-          <p className="release-note">{deploymentStatus === "verified" ? "VERIFIED COSTON2 RELEASE" : "PLANNED / NOT YET VERIFIED"} · SIMULATED TEE · TEST ASSETS · UNAUDITED</p>
-        </div>
-        <div className="flare-hero-visual">
-          <FlareProcurementSignal />
-          <div className="flare-hero-trust-note">
-            <strong>THE TREASURY OWNS THE FUNDS.</strong>
-            <span>THE TEE SELECTS; THE CONTRACT SETTLES.</span>
-          </div>
-        </div>
-      </section>
-      <FlareLifecycleMarquee />
-      <section className="flare-product-pillars" aria-label="VeilBid Flare product pillars">
-        {[
-          ["01", "PUBLIC RULES", "Ceiling, vendors, deadline, scoring weights, machine policy, and lifecycle are inspectable."],
-          ["02", "SEALED OFFERS", "Price, delivery, warranty, credentials, and ciphertext never enter public chain state."],
-          ["03", "THRESHOLD COMPUTE", "All three TEEs acknowledge each bid; two exact FCC results are required to settle."],
-          ["04", "XRP-NATIVE AWARD", "XRPL/FDC/Smart Account funding and FTestXRP payout form one verifiable testnet path."],
-        ].map(([number, title, copy]) => (
-          <article key={number}><span>{number}</span><h2>{title}</h2><p>{copy}</p></article>
-        ))}
-      </section>
-    </>
-  );
 }
 
 function ProtocolFacts() {
@@ -361,11 +319,11 @@ export function FlareRoleBar({
 }) {
   const items: readonly [FlareRole, string][] = [
     ["public", "PUBLIC"],
-    ["treasury", "XRP TREASURY"],
-    ["buyer", "EVM BUYER"],
-    ["vendor", "VENDOR"],
-    ["finalizer", "PUBLIC FINALIZER"],
-    ["evidence", "AUDITOR / EVIDENCE"],
+    ["buyer", "BUYER"],
+    ["vendor", "PRIVATE BIDS"],
+    ["finalizer", "ACTIVITY"],
+    ["treasury", "BALANCES"],
+    ["evidence", "AUDITOR"],
   ];
   return (
     <nav className="rolebar flare-rolebar" aria-label="Coston2 workspaces">
@@ -386,19 +344,84 @@ export function FlareRoleBar({
   );
 }
 
+function FlareAppSidebar({
+  activeRole,
+  onRoleChange,
+  onRefresh,
+  wallet,
+}: {
+  activeRole: FlareRole;
+  onRoleChange: (role: FlareRole) => void;
+  onRefresh: () => void;
+  wallet?: WalletController;
+}) {
+  const connected = wallet?.state.status === "connected" && wallet.state.account;
+  return (
+    <aside className="flare-app-sidebar" aria-label="Tender application sidebar">
+      <div className="flare-sidebar-heading">
+        <p className="eyebrow">TENDER ROOM</p>
+        <strong>FLARE / COSTON2</strong>
+      </div>
+      <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
+      <div className="flare-sidebar-tools">
+        <button className="sidebar-tool-button" type="button" onClick={onRefresh}>
+          <span aria-hidden="true">↻</span> REFRESH STATE
+        </button>
+        <ContextHelp
+          label="Help for the Flare tender room"
+          title="HOW TO USE THIS TENDER ROOM"
+          steps={[
+            "PUBLIC is wallet-free inspection of finalized Coston2 dossiers.",
+            "BUYER and BALANCES open separate EVM and XRP-native funding journeys.",
+            "PRIVATE BIDS and ACTIVITY expose vendor and canonical lifecycle operations without moving winner logic into the browser.",
+            "AUDITOR checks commitments and result binding without a signer or decryption path.",
+          ]}
+          note="No Flare route falls back to Sepolia data or mock success."
+        />
+        <button
+          className="sidebar-wallet-button"
+          type="button"
+          onClick={() => document.querySelector<HTMLButtonElement>(".wallet-trigger")?.click()}
+        >
+          <span aria-hidden="true">{connected ? "✓" : "◇"}</span>
+          {connected ? "WALLET CONNECTED" : "CONNECT WALLET"}
+        </button>
+      </div>
+      <section className="flare-sidebar-assets" aria-label="Coston2 asset actions">
+        <p className="eyebrow">ASSET ACTIONS</p>
+        <a className="sidebar-asset-button" href="https://faucet.flare.network/coston2" target="_blank" rel="noreferrer">GET TEST C2FLR ↗</a>
+        <button className="sidebar-asset-button disabled" type="button" disabled title="Sepolia baseline only; no private token wrapper is claimed on Flare">WRAP TO vcUSDC</button>
+        <button className="sidebar-asset-button disabled" type="button" disabled title="Sepolia baseline only; no private token wrapper is claimed on Flare">UNWRAP vcUSDC</button>
+        <LinkLikeSidebar to="?role=treasury">OPEN XRP TREASURY</LinkLikeSidebar>
+        <LinkLikeSidebar to="?role=vendor">FXRP REDEMPTION</LinkLikeSidebar>
+        <p className="sidebar-asset-note">FTestXRP settlement amounts are public. Private token settlement and Sepolia vcUSDC wrapping are not claimed on this Flare path.</p>
+      </section>
+      <p className="flare-sidebar-footnote">PUBLIC READS · 12-BLOCK FINALITY · NO BID PAYLOADS</p>
+    </aside>
+  );
+}
+
+function LinkLikeSidebar({ to, children }: { to: string; children: ReactNode }) {
+  return <a className="sidebar-asset-button" href={to}>{children}</a>;
+}
+
 function FlareRoleWorkspace({
   activeRole,
   onRoleChange,
+  onRefresh,
+  wallet,
   children,
 }: {
   activeRole: FlareRole;
   onRoleChange: (role: FlareRole) => void;
+  onRefresh: () => void;
+  wallet?: WalletController;
   children: ReactNode;
 }) {
   return (
     <div className="tender-layout flare-tender-layout">
-      <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
-      {children}
+      <FlareAppSidebar activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={onRefresh} wallet={wallet} />
+      <div className="flare-app-main">{children}</div>
     </div>
   );
 }
@@ -433,7 +456,20 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
 
   return (
     <main id="main-content" className="tender-surface">
-      <FlareLandingHero deploymentStatus={state.data?.deploymentStatus} />
+      <section className="explorer-intro flare-explorer-intro">
+        <ContextHelp
+          label="Help for Public workspace"
+          title="HOW TO USE PUBLIC"
+          steps={[
+            "Choose a finalized Coston2 tender from the dossier list.",
+            "Review the public ceiling, deadline, lifecycle, rules, bid receipts, and award state.",
+            "Use Auditor for a checkpoint proof view; losing prices and TEE plaintext never appear here.",
+          ]}
+          note="Public reads never require a wallet and never substitute Sepolia or mock chain state."
+        />
+        <div><p className="eyebrow">CONFIDENTIAL PROCUREMENT / LIVE COSTON2 STATE</p><h1>Public rules.<br /><em>Private bids.</em></h1></div>
+        <div className="intro-copy"><p>Browse finalized tender coordination without connecting a wallet. Commercial terms remain sealed while public award and settlement evidence stay inspectable.</p><span className="deployment-label">COSTON2 DEPLOYMENT · {state.data?.deploymentStatus === "verified" ? "SOURCE/DEPLOYMENT VERIFIED" : "NOT YET VERIFIED"}</span></div>
+      </section>
       <ProtocolFacts />
       {state.status === "loading" && <section className="state-panel"><span className="loading-mark" /><div><h2>Reading Coston2 state</h2><p>No placeholder tender is inserted.</p></div></section>}
       {state.status === "error" && <section className="state-panel error" role="alert"><span>!</span><div><h2>Flare state unavailable</h2><p>{state.error}</p><button className="secondary-button" onClick={onRetry}>RETRY COSTON2 →</button></div></section>}
@@ -506,7 +542,7 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   };
   if (activeRole === "evidence") {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange}>
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()} wallet={wallet}>
         {state.status === "ready" && state.data ? (
           <FlareAuditorWorkspace tenders={state.data.tenders} finalizedBlock={state.data.finalizedBlock} />
         ) : (
@@ -517,14 +553,14 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   }
   if ((activeRole === "treasury" || activeRole === "buyer") && wallet) {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange}>
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()} wallet={wallet}>
         <FlareBuyerWorkspace wallet={wallet} onRefresh={() => void refresh()} journey={activeRole === "treasury" ? "xrp" : "evm"} />
       </FlareRoleWorkspace>
     );
   }
   if ((activeRole === "vendor" || activeRole === "finalizer") && wallet) {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange}>
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()} wallet={wallet}>
         {state.status === "ready" && state.data ? (
           activeRole === "vendor"
             ? <FlareVendorWorkspace wallet={wallet} tenders={state.data.tenders} onRefresh={() => void refresh()} />
@@ -540,5 +576,9 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
       </FlareRoleWorkspace>
     );
   }
-  return <FlareExplorerView state={state} onRetry={() => void refresh()} />;
+  return (
+    <FlareRoleWorkspace activeRole="public" onRoleChange={onRoleChange} onRefresh={() => void refresh()} wallet={wallet}>
+      <FlareExplorerView state={state} onRetry={() => void refresh()} />
+    </FlareRoleWorkspace>
+  );
 }

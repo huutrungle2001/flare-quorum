@@ -4,9 +4,11 @@
 > its public `VITE_*` configuration is supplied. The `/room` route remains the
 > explicitly historical Sepolia/Nox baseline.
 
-VeilBid's browser product. Its Flare shell includes the wallet-free Coston2
-explorer plus distinct `/?role=treasury`, `/?role=buyer`, `/?role=vendor`,
-`/?role=finalizer`, and `/?role=evidence` workspaces. The historical EOA/Safe
+VeilBid's browser product. Its Flare shell has a standalone landing page at `/`
+and a separate tender application at `/flare`. The app's left rail includes
+`PUBLIC`, `BUYER`, `PRIVATE BIDS`, `ACTIVITY`, `BALANCES`, and `AUDITOR`; these
+map to the distinct `?role=treasury`, `?role=buyer`, `?role=vendor`,
+`?role=finalizer`, and `?role=evidence` workspaces. The historical EOA/Safe
 Buyer flows, Private Bids views, and Nox Activity recovery exist only under the
 separate `/room` baseline. The
 default `/` and `/flare` routes read finalized Coston2 contract state, and

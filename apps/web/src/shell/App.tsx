@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { useLocation } from "react-router";
 import { FlareDocsPage } from "../flare/FlareDocsPage";
+import { FlareLandingPage } from "../flare/FlareLandingPage";
 import { FlareRoom } from "../flare/FlareRoom";
 import { DocsPage } from "../landing/DocsPage";
 import { LandingPage } from "../landing/LandingPage";
@@ -38,10 +39,10 @@ export function App() {
   const page =
     location.pathname === "/docs" ? (
       flareReleaseEnabled ? <FlareDocsPage /> : <DocsPage />
-    ) : location.pathname === "/flare" ? (
+    ) : location.pathname === "/flare" || (location.pathname === "/" && flareReleaseEnabled && legacyRoomLink) ? (
       <FlareRoom wallet={flareWallet} />
     ) : location.pathname === "/" && flareReleaseEnabled ? (
-      <FlareRoom wallet={flareWallet} />
+      <FlareLandingPage />
     ) : location.pathname === "/room" || legacyRoomLink ? (
       <Suspense fallback={<LoadingWorkspace />}>
         <LegacyTenderRoom wallet={wallet} />

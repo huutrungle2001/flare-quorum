@@ -110,6 +110,7 @@ const assetSources = await Promise.all(assetPaths.map(async (path) => {
 
 const chrome = findChrome();
 const desktop = browserCapture(chrome, "/", { width: 1440, height: 1000 }, "flare-production-desktop.png");
+const tenderRoom = browserCapture(chrome, "/flare", { width: 1440, height: 1000 }, "flare-production-tenders.png");
 const mobile = browserCapture(chrome, "/flare", { width: 390, height: 844 }, "flare-production-mobile.png");
 const evidenceRoute = browserCapture(chrome, "/?role=evidence", { width: 1440, height: 1000 }, "flare-production-evidence.png");
 const treasuryRoute = browserCapture(chrome, "/?role=treasury", { width: 1440, height: 1000 }, "flare-production-treasury.png");
@@ -124,11 +125,11 @@ const assertions = {
   canonicalMarketBundled: assetSources.some((source) => source.toLowerCase().includes(market.toLowerCase())),
   coston2NetworkRendered: desktop.dom.includes('aria-label="Network: Flare Coston2"') && mobile.dom.includes("COSTON2"),
   verifiedReleaseRendered: desktop.dom.includes("VERIFIED COSTON2 RELEASE") && mobile.dom.includes("VERIFIED COSTON2 RELEASE"),
-  walletFreeTenderListLoaded: desktop.dom.includes("COSTON2 DOSSIERS") && mobile.dom.includes("COSTON2 DOSSIERS"),
+  walletFreeTenderListLoaded: tenderRoom.dom.includes("COSTON2 DOSSIERS") && mobile.dom.includes("COSTON2 DOSSIERS"),
   productStoryRendered: desktop.dom.includes("Private bids.") && desktop.dom.includes("Public awards.") && desktop.dom.includes("THRESHOLD COMPUTE"),
-  roleTaxonomyRendered: treasuryRoute.dom.includes("XRP TREASURY") && treasuryRoute.dom.includes("EVM BUYER") && finalizerRoute.dom.includes("PUBLIC FINALIZER") && evidenceRoute.dom.includes("AUDITOR / EVIDENCE"),
-  awardedTenderVisible: desktop.dom.includes("AWARDED") && desktop.dom.includes("FTestXRP"),
-  privacyBoundaryVisible: desktop.dom.includes("PRIVATE LOSING BIDS") && desktop.dom.includes("Bid payloads are never fetched"),
+  roleTaxonomyRendered: treasuryRoute.dom.includes("PUBLIC") && treasuryRoute.dom.includes("BUYER") && treasuryRoute.dom.includes("PRIVATE BIDS") && finalizerRoute.dom.includes("ACTIVITY") && treasuryRoute.dom.includes("BALANCES") && evidenceRoute.dom.includes("AUDITOR"),
+  awardedTenderVisible: tenderRoom.dom.includes("AWARDED") && tenderRoom.dom.includes("FTestXRP"),
+  privacyBoundaryVisible: tenderRoom.dom.includes("PRIVATE LOSING BIDS") && tenderRoom.dom.includes("Bid payloads are never fetched"),
   publicEvidenceLedgerRendered: evidenceRoute.dom.includes("Inspect the binding, not the bids.") && evidenceRoute.dom.includes("TRUST BINDING") && evidenceRoute.dom.includes("PUBLIC BID RECEIPTS") && evidenceRoute.dom.includes("Ordered bid root"),
   publicEvidenceNoWalletGate: evidenceRoute.dom.includes("PUBLIC VERIFICATION ONLY") && evidenceRoute.dom.includes("NO BID DECRYPTION") && !evidenceRoute.dom.includes("Wallet providers are unavailable"),
   publicFinalizerRendered: finalizerRoute.dom.includes("Advance public checkpoints.") && finalizerRoute.dom.includes("CANONICAL ACTION QUEUE") && finalizerRoute.dom.includes("no bid-decryption capability"),
@@ -164,6 +165,7 @@ const evidence = {
   routeStatuses: Object.fromEntries(routes.map((route) => [route.path, route.status])),
   visualChecks: {
     desktop: desktop.screenshot,
+    tenders: tenderRoom.screenshot,
     mobile: mobile.screenshot,
     evidence: evidenceRoute.screenshot,
     treasury: treasuryRoute.screenshot,

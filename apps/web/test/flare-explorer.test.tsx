@@ -5,6 +5,7 @@ import { FlareEvidenceWorkspace, FlareExplorerView, FlareRoleBar } from "../src/
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareAuditorWorkspace } from "../src/flare/FlareAuditorWorkspace";
 import { FlareFinalizerWorkspace } from "../src/flare/FlareFinalizerWorkspace";
+import { FlareLandingPage } from "../src/flare/FlareLandingPage";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
 import { FlareXrpFundingPanel } from "../src/flare/FlareXrpFundingPanel";
 import { readPublicFlareFundingCheckpoint, savePublicFlareFundingCheckpoint } from "../src/flare/fundingCheckpoint";
@@ -84,7 +85,7 @@ describe("Coston2 public evidence boundary", () => {
 
   it("labels an empty planned market honestly", () => {
     render(<MemoryRouter><FlareExplorerView state={{ status: "ready", error: null, data: { chainId: 114, tenders: [], indexedBlock: 10n, finalizedBlock: 0n, latestBlock: 10n, deploymentStatus: "planned" } }} onRetry={() => undefined} /></MemoryRouter>);
-    expect(screen.getByText(/PLANNED \/ NOT YET VERIFIED/)).toBeInTheDocument();
+    expect(screen.getByText(/NOT YET VERIFIED/)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No Coston2 tenders yet" })).toBeInTheDocument();
   });
 
@@ -113,25 +114,21 @@ describe("Coston2 public evidence boundary", () => {
   });
 
   it("restores the Flare product story and keeps signing optional", () => {
-    render(<MemoryRouter><FlareExplorerView state={{
-      status: "ready",
-      error: null,
-      data: { chainId: 114, tenders: [], indexedBlock: 100n, finalizedBlock: 100n, latestBlock: 112n, deploymentStatus: "verified" },
-    }} onRetry={() => undefined} /></MemoryRouter>);
+    render(<MemoryRouter><FlareLandingPage /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: /Private bids.*Public awards/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "START XRP TREASURY FLOW" })).toHaveAttribute("href", "?role=treasury");
-    expect(screen.getByText(/THE TREASURY OWNS THE FUNDS/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "EXPLORE TENDERS →" })).toHaveAttribute("href", "/flare");
+    expect(screen.getByText(/SIX WORKSPACES \/ ONE APP SHELL/i)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Private bids produce a threshold-signed award/i })).toBeInTheDocument();
   });
 
   it("exposes the complete Flare role taxonomy without private-audit authority", () => {
     render(<FlareRoleBar activeRole="public" onRoleChange={() => undefined} />);
     expect(screen.getByRole("button", { name: "PUBLIC" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "XRP TREASURY" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "EVM BUYER" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "VENDOR" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "PUBLIC FINALIZER" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "AUDITOR / EVIDENCE" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "BUYER" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "PRIVATE BIDS" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "ACTIVITY" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "BALANCES" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "AUDITOR" })).toBeInTheDocument();
   });
 
   it("renders the dedicated public activity ledger without exposing bid data", () => {

@@ -81,10 +81,10 @@ export function FlareDocsPage() {
               </p>
             </div>
             <div className="docs-actions">
-              <Link className="primary-button" to="/">OPEN COSTON2 DOSSIERS →</Link>
-              <a className="secondary-button" href="/?role=evidence">OPEN ACTIVITY LEDGER →</a>
-              <a className="secondary-button" href="/?role=buyer">OPEN BUYER →</a>
-              <a className="secondary-button" href="/?role=vendor">OPEN VENDOR →</a>
+              <Link className="primary-button" to="/flare">OPEN COSTON2 DOSSIERS →</Link>
+              <a className="secondary-button" href="/flare?role=evidence">OPEN AUDITOR LEDGER →</a>
+              <a className="secondary-button" href="/flare?role=buyer">OPEN BUYER →</a>
+              <a className="secondary-button" href="/flare?role=vendor">OPEN PRIVATE BIDS →</a>
             </div>
           </section>
 
@@ -182,7 +182,7 @@ export function FlareDocsPage() {
             <h2>Reproduce the public proof.</h2>
             <p>The judge package, release manifest, generated bindings, and sanitized evidence are the authorities for the current release.</p>
             <ul className="docs-checklist">
-              <li><a className="text-link" href="/?role=evidence">Open the finalized Activity/Evidence ledger ↗</a></li>
+              <li><a className="text-link" href="/flare?role=evidence">Open the finalized Auditor evidence ↗</a></li>
               <li><a className="text-link" href="https://github.com/huutrungle2001/veilbid-flare/blob/main/submission/flare/README.md" target="_blank" rel="noreferrer">Read the judge package ↗</a></li>
               <li><a className="text-link" href="https://github.com/huutrungle2001/veilbid-flare/blob/main/docs/verification.md" target="_blank" rel="noreferrer">Read the verification matrix ↗</a></li>
               <li>Run <code>pnpm lint</code>, <code>pnpm test</code>, <code>pnpm build</code>, <code>pnpm evidence:validate</code>, and <code>pnpm flare:judge:check</code> from the repository.</li>
@@ -200,7 +200,7 @@ export function FlareDocsPage() {
               <li>The supported replacement-TEE drill passes; broader wallet coverage, stateful adversarial breadth, and structured buyer/vendor validation remain open.</li>
             </ul>
             <div className="docs-actions">
-              <Link className="primary-button" to="/">OPEN THE CURRENT APP →</Link>
+              <Link className="primary-button" to="/flare">OPEN THE CURRENT APP →</Link>
               <Link className="secondary-button" to="/room">OPEN HISTORICAL SEPOLIA BASELINE →</Link>
             </div>
           </section>

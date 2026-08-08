@@ -61,6 +61,16 @@ header wallet selector follows the active release: Coston2 on Flare routes and
 Sepolia only on the historical `/room` route. Public browsing never requires a
 wallet.
 
+The current Flare application is intentionally split into two shells. Clicking
+the `VEILBID` wordmark returns to the standalone product landing page. Clicking
+`TENDERS` enters `/flare`, where the old VeilBid-style left rail remains visible
+while the right side renders the selected workspace: `PUBLIC`, `BUYER`,
+`PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public finalizer), `BALANCES` (XRP
+Treasury), and `AUDITOR`. The rail also provides refresh, help/boundaries,
+wallet access, the Coston2 faucet, and explicitly disabled Sepolia-only
+`vcUSDC` wrap/unwrap controls so users do not mistake historical token UX for
+Flare capability.
+
 The public path is live and release-labeled. Any missing dependency keeps its
 own operation unavailable; the UI never substitutes Sepolia data or mock
 success. The Sepolia app remains a pre-hackathon baseline.
