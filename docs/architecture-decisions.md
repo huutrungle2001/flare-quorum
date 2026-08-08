@@ -660,6 +660,10 @@ This boundary was rechecked against Flare's pinned upstream source: the
 official `tee-node v0.0.23` `node.Initialize` implementation generates a fresh
 key with `crypto.GenerateKey()` and derives `teeID` from that key on every
 process start; it does not load an identity key from `SEALED_STORE_DIR`.
+The upstream `main` implementation was checked again on 2026-08-08 and still
+uses the same `crypto.GenerateKey()` initialization in
+[`internal/node/node.go`](https://github.com/flare-foundation/tee-node/blob/main/internal/node/node.go);
+no supported identity-restore configuration was found.
 The local Docker restart boundary is recorded in
 `evidence/local/fcc-local-tee-restart-boundary.json`: the public fingerprint
 changed after one TEE restart, and a post-refresh three-machine local smoke
@@ -686,6 +690,9 @@ These decisions must be revalidated against the pinned versions in Gate 0:
   for the current identity initialization boundary; it still generates the
   node key during `Initialize` rather than restoring it from the sealed-store
   directory
+- [Current tee-node main source](https://github.com/flare-foundation/tee-node/blob/main/internal/node/node.go)
+  checked 2026-08-08; it still generates the identity key during `Initialize`
+  and does not expose a supported restore setting
 - [Flare Smart Accounts overview](https://dev.flare.network/smart-accounts/overview)
   and [custom instruction flow](https://dev.flare.network/smart-accounts/custom-instruction)
 - [FAssets reference](https://dev.flare.network/fassets/reference) and
