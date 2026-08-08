@@ -2,7 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "RAILPACK",
-    "buildCommand": "pnpm bindings:build && pnpm --filter @veilbid/settlement-relay build",
+    "buildCommand": "pnpm install --frozen-lockfile && pnpm bindings:build && pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build",
     "watchPatterns": [
       ".nvmrc",
       "apps/relay/**",
@@ -14,8 +14,8 @@
     ]
   },
   "deploy": {
-    "startCommand": "node apps/relay/dist/cli.js poll",
-    "healthcheckPath": "/live",
+    "startCommand": "node apps/relay/dist/flare-ingress-cli.js",
+    "healthcheckPath": "/health",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ALWAYS",
     "restartPolicyMaxRetries": 10
