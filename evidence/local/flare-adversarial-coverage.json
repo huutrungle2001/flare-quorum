@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "suite": "flare-adversarial-local-coverage",
   "status": "PARTIAL",
-  "recordedAt": "2026-08-08T00:36:45.302Z",
-  "sourceCommit": "53c44111206103ba77259d3f7dccc3b984ad1a83",
+  "recordedAt": "2026-08-08T07:05:55.808Z",
+  "sourceCommit": "3fee0f99e5f8ee8548e591cad3e1138e65a65474",
   "scope": {
     "environment": "local-unit-and-integration-tests",
     "targetNetwork": "flare-coston2",
