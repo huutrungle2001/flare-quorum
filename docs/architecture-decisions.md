@@ -682,6 +682,10 @@ These decisions must be revalidated against the pinned versions in Gate 0:
   for domain-separated TEE result verification
 - [Pinned tee-node v0.0.23 source](https://github.com/flare-foundation/tee-node/blob/v0.0.23/internal/node/node.go)
   for the identity initialization boundary described in ADR-025
+- [Inspected tee-node v0.0.25 source](https://github.com/flare-foundation/tee-node/blob/v0.0.25/internal/node/node.go)
+  for the current identity initialization boundary; it still generates the
+  node key during `Initialize` rather than restoring it from the sealed-store
+  directory
 - [Flare Smart Accounts overview](https://dev.flare.network/smart-accounts/overview)
   and [custom instruction flow](https://dev.flare.network/smart-accounts/custom-instruction)
 - [FAssets reference](https://dev.flare.network/fassets/reference) and
