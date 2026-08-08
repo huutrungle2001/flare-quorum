@@ -7,9 +7,10 @@
 > three distinct simulated TEE identities in `PRODUCTION`, private receipts,
 > FTSO-bound scoring, exact FTestXRP settlement, and the XRPL/FDC/Smart Account
 > funding path are recorded in public-safe evidence. A three-vendor recovery
-> run also finalized with one result endpoint unavailable, while same-identity
-> TEE restart recovery remains open because the supported simulated runtime
-> rotates identity on restart. Gate H and release hardening remain mandatory.
+> run also finalized with one result endpoint unavailable. The organizer has
+> confirmed that restart recovery uses replacement registration rather than
+> same-identity restoration; its live fault drill remains open. Gate H remains
+> mandatory.
 
 ## 1. Rules
 
@@ -73,8 +74,9 @@ production-status Coston2 simulated TEEs accepting independently encrypted
 XRP bids, binding signed receipts to the same market/tender/vendor/rules
 commitment, an exact-ciphertext idempotent retry, and rejection of a changed
 ciphertext for the occupied sealed slot. It intentionally remains
-`IN_PROGRESS`: a same-identity restart/restore proof is not claimed because the
-supported tee-node runtime generates a new identity after restart.
+`IN_PROGRESS` until the supported replacement-machine recovery drill is
+recorded on Coston2. Same-identity restoration is neither supported nor a gate
+requirement.
 
 Prove:
 
@@ -85,7 +87,9 @@ Prove:
    returns a signed `BID_RECEIPT_V1`.
 5. Plaintext and ciphertext remain absent from chain, public proxy logs,
    analytics, browser persistence, and evidence.
-6. TEE restarts and restores sealed state whose receipt root matches chain.
+6. A restart rotates identity, health fails closed, a replacement completes
+   normal registration/attestation, stale rotation is removed, and new tenders
+   use the replacement without mutating any existing frozen machine set.
 7. Wrong key, tender, vendor, rule, nonce, schema, commitment, and replay fail.
 
 Kill condition: the supported FCC environment cannot provide private ingress
@@ -147,8 +151,9 @@ Live core pass: two distinct frozen TEE identities signed the exact same result
 digest and the market finalized the result on Coston2. The evidence includes
 the request and finalization transactions and the public binding assertions;
 the recovery run also proves that one unavailable result endpoint does not
-prevent threshold finalization. Same-identity restart and two-machine loss
-remain part of release hardening.
+prevent threshold finalization. Replacement registration and live two-machine
+loss remain part of release hardening; an active tender never swaps its frozen
+identities.
 
 Prove:
 
@@ -254,5 +259,5 @@ evidence/coston2/gate-h-product.json
 ```
 
 Until an artifact passes its schema and live assertions, its capability remains
-`NOT RUN` in `docs/verification.md` and `PLAN.md`. Gate B is intentionally still
-`IN PROGRESS` because live same-identity restart recovery is not claimed.
+`NOT RUN` in `docs/verification.md` and `PLAN.md`. Gate B remains `IN PROGRESS`
+until the organizer-approved replacement recovery drill has live evidence.

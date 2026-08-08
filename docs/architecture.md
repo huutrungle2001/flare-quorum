@@ -1,8 +1,8 @@
 # VeilBid Flare Championship Architecture
 
 > Status: Accepted architecture implemented by the verified Coston2 release;
-> same-identity TEE restart/recovery, full stateful fault drills, and user
-> validation remain open. Public role-workspace and accessibility hardening
+> replacement-TEE recovery is the organizer-confirmed model, while its live
+> fault drill, broader stateful drills, and user validation remain open. Public role-workspace and accessibility hardening
 > passes are recorded in Coston2 smoke evidence. Detailed rationale is in
 > [`architecture-decisions.md`](architecture-decisions.md).
 

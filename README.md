@@ -21,8 +21,9 @@ The project targets **Flare Summer Signal** with:
 > Phase 0 feasibility validation is complete for the live Coston2 core path:
 > the registered FCC market, three-machine private bid lifecycle, FTSO-bound
 > scoring, FTestXRP settlement, and XRPL/FDC/Smart Account funding are recorded
-> in public-safe evidence. Same-identity restart recovery is still unsupported
-> by the simulated runtime, and the product/UI release gate remains open.
+> in public-safe evidence. Same-identity restoration is unsupported by design;
+> the organizer-approved replacement registration model is documented, while
+> its live Coston2 fault drill and the final user-validation gate remain open.
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
@@ -96,7 +97,7 @@ accounting layer is research scope and must not be described as shipped.
 
 | Flare capability | Product role | Delivery status |
 |---|---|---|
-| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Live core lifecycle passed; simulated same-identity restart remains open |
+| Flare Confidential Compute | Private bid intake, sealed state, multi-criteria scoring, and threshold-signed result | Live core lifecycle passed; supported replacement recovery is documented and its live fault drill remains open |
 | Coston2 smart contracts | Canonical tender, escrow, result verification, and settlement state | Verified release manifest and live deployment consistency evidence |
 | FAssets / FTestXRP / FXRP | XRP-backed mint, tender escrow, vendor payout, and redemption | Live FTestXRP escrow/direct mint and official redemption-request boundary passed; the underlying agent payout remains an external FAssets obligation |
 | Flare Data Connector | Prove the XRPL payment that authorizes Smart Account mint-and-fund | Live `XRPPayment` proof recorded in Gate G evidence |

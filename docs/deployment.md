@@ -1,8 +1,9 @@
 # VeilBid Flare Championship Deployment Guide
 
-> Status: the canonical Coston2 market release is live and verified. The
-> remaining work is Gate-B identity-restart hardening, release smoke, UI, and
-> judge-package validation; the historical Sepolia/Nox baseline remains separate.
+> Status: the canonical Coston2 market release, release smoke, UI, and judge
+> package are live and verified. Remaining release work is the organizer-approved
+> replacement-TEE fault drill, broader browser recovery, and user validation;
+> the historical Sepolia/Nox baseline remains separate.
 
 FCC registration and proxy operations must also satisfy the current
 [`FCC Coston2 Operational Baseline`](fcc-coston2-operations.md), derived from

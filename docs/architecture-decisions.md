@@ -75,12 +75,14 @@ queue only for opaque ECIES. The API key remains server-side; a vendor-facing
 gateway authenticates the vendor request without learning the plaintext. The
 extension calls only tee-node's loopback `/decrypt` and `/sign` endpoints and
 stores the original ECIES bytes in a private persistent volume keyed by a hash
-of chain/market/extension/tender/vendor. Exact ciphertext retry is idempotent;
-a different ciphertext for the same slot fails. Live evidence now covers
+of chain/market/extension/tender/vendor/submission nonce. Exact ciphertext
+retry is idempotent; a different ciphertext for the same nonce fails, while a
+new nonce cannot be blocked by an orphaned partial delivery. Live evidence covers
 authenticated ciphertext-only ingress, three signed receipts, exact-retry
 idempotence, and changed-ciphertext slot rejection on the three registered
-Coston2 simulated TEEs. The mapping remains partial until proxy body-log
-inspection and a supported same-identity machine restart pass Gate B.
+Coston2 simulated TEEs for the prior code version. The nonce-addressed revision
+requires a fresh image/code-version deployment before it becomes a live claim;
+the supported replacement-machine fault drill also remains open.
 
 The local consumer binding now reproduces tee-node's go-ethereum ECIES scheme
 byte-for-byte and verifies a shared Go/TypeScript decryption vector. The relay
@@ -645,13 +647,21 @@ the two surviving registered identities to produce the exact same selection.
 A replacement identity may be registered only for new tenders; it cannot be
 substituted into a tender that already froze its machine set.
 
+The hackathon organizer confirmed on 2026-08-08 that this is the supported
+production model: a replacement may keep the same extension, approved code
+configuration, and public endpoint, but receives a new identity and must pass
+the normal registration, attestation, and availability flow before returning
+to production. The stale identity is then removed from rotation. Supported
+fault drills use this replacement procedure and do not patch or export the
+runtime identity key.
+
 The existing file-backed sealed-store test proves extension state persistence
 only. It is not live TEE restart evidence because the regenerated node identity
 cannot decrypt ciphertext addressed to the former key. Gate B restart evidence
 therefore remains open. A raw Docker secret, host file, embedded key, or
 deployment-wallet-derived identity is not an acceptable workaround.
 
-**Reason:** Silent identity rotation explains production machines that remain
+**Reason:** Identity rotation explains production machines that remain
 registered but no longer answer for the running container. Preserving two
 survivors is compatible with the threshold design and safer than weakening the
 TEE trust boundary to manufacture same-identity restart evidence.

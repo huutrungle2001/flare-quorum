@@ -129,7 +129,7 @@ describe("standalone public routes", () => {
       expect(screen.getByRole("heading", { name: /Public evidence/i })).toBeInTheDocument();
       expect(screen.getByText(/Five primitives, one product path/i)).toBeInTheDocument();
       expect(screen.queryByText(/Use VeilBid from tender to settlement/i)).toBeNull();
-      expect(screen.getByText(/same-identity restore is not claimed/i)).toBeInTheDocument();
+      expect(screen.getByText(/supported recovery is replacement registration/i)).toBeInTheDocument();
     } finally {
       vi.unstubAllEnvs();
     }

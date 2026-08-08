@@ -3,9 +3,10 @@
 > Cel-shaded confidential procurement terminal — sealed-envelope anime rendered
 > as an institutional bidding interface.
 >
-> Status: Canonical target visual, interaction, responsive, and
-> privacy-language specification for the planned Coston2/FCC application. The
-> implemented UI remains the historical Sepolia baseline until migrated.
+> Status: Canonical visual, interaction, responsive, and privacy-language
+> specification. The implemented app now defaults to the verified Coston2/FCC
+> product; the historical Sepolia baseline remains available only as a clearly
+> labeled, lazy-loaded comparison route.
 
 **Theme:** mixed
 

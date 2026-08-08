@@ -4,8 +4,8 @@
 > policy, receipt quorum, conditional close-time FTSO, canonical FCC
 > action-result verification, and public-token escrow conservation. Private
 > ingress, live FCC deployment, and Smart Account/FDC execution are now
-> recorded on Coston2; restart/recovery and release-hardening limitations remain
-> explicit.
+> recorded on Coston2; restart/recovery limitations remain explicit, including
+> the immutable frozen set of an already-open tender.
 
 ## 1. Core types
 
@@ -294,7 +294,6 @@ verification provide implementation evidence, not a zero-knowledge proof.
 ## 13. Events
 
 - `TenderCreated`
-- `TenderFunded`
 - `BidReceiptAccepted`
 - `TenderClosed`
 - `SelectionRequested`

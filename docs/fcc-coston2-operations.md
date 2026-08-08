@@ -200,16 +200,28 @@ Operational rules:
 - monitor the live `/info` identity and fail closed on any on-chain mismatch;
 - treat one rotated identity as an unavailable member while the two surviving
   frozen identities remain usable for selection;
-- re-run the supported `rRap` flow only for a replacement used by new tenders;
+- bring up a replacement under the same extension and approved code, complete
+  the normal registration/attestation/availability flow, and remove the stale
+  identity from production rotation;
+- reusing the public endpoint is supported when it resolves to the replacement;
+- use replacement identities only for new tenders; an open tender's frozen
+  identity/key set remains immutable and a replacement cannot decrypt its old
+  ciphertext;
 - never persist a raw identity key in `.env`, a Docker secret, or a host file;
-- do not mark Gate B restart recovery passed until Flare supplies a supported
-  sealed identity/state restore mechanism and live evidence verifies it.
+- record a live replacement fault drill before marking production recovery
+  passed; same-identity restoration is not a supported acceptance criterion.
 
 The file-backed sealed-store test is still useful for handler state, but it is
 not proof that the whole TEE machine can restart under the same identity.
 The local restart boundary observation is kept in
 `evidence/local/fcc-local-tee-restart-boundary.json`; it is deliberately not
 promoted to Coston2 production evidence.
+
+This policy was confirmed by the hackathon organizer on 2026-08-08: identity
+rotation after restart is expected; recovery is replacement plus normal
+registration, not identity restoration. The public-safe source note is
+preserved in
+[`docs/original/fcc-tee-recovery-response-2026-08-08.md`](original/fcc-tee-recovery-response-2026-08-08.md).
 
 ## 8. Gate 0 pass record
 
