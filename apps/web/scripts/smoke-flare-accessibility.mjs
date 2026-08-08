@@ -18,6 +18,11 @@ const release = JSON.parse(
 if (baseUrl.protocol !== "https:") throw new Error("Flare accessibility smoke requires an HTTPS URL");
 if (release.chainId !== 114 || release.verified !== true) throw new Error("COSTON2_RELEASE_NOT_VERIFIED");
 
+const sourceCommitOverride = process.env.VEILBID_FLARE_SMOKE_SOURCE_COMMIT?.trim() ?? "";
+if (sourceCommitOverride !== "" && !/^[0-9a-f]{40}$/i.test(sourceCommitOverride)) {
+  throw new Error("VEILBID_FLARE_SMOKE_SOURCE_COMMIT_INVALID");
+}
+
 function git(...args) {
   return execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
 }
@@ -237,7 +242,7 @@ try {
     suite: "coston2-frontend-keyboard-accessibility",
     recordedAt: new Date().toISOString(),
     publicIdentifiers: {
-      sourceCommit: git("rev-parse", "HEAD"),
+      sourceCommit: sourceCommitOverride || git("rev-parse", "HEAD"),
       provider: "vercel",
       project: "veilbid-flare",
       canonicalUrl: baseUrl.origin,
