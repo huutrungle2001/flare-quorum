@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-keyboard-accessibility",
-  "recordedAt": "2026-08-08T07:44:57.408Z",
+  "recordedAt": "2026-08-08T09:49:46.992Z",
   "publicIdentifiers": {
-    "sourceCommit": "5084c837c9191e2028c632a4183ca4bdd9f5cebf",
+    "sourceCommit": "e490d3831f58e282ee4717803666a844571e7c84",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -12,7 +12,7 @@
     "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05"
   },
   "measurements": {
-    "desktopInteractiveCount": 38,
+    "desktopInteractiveCount": 39,
     "mobileViewportWidth": 320,
     "focusSequence": [
       {
