@@ -29,7 +29,8 @@ function parseCheckpoint(value: unknown): PublicFlareFundingCheckpoint | null {
     typeof record.xrplOwner !== "string" || !xrplAddressPattern.test(record.xrplOwner) ||
     typeof record.xrplTransactionId !== "string" || !transactionPattern.test(record.xrplTransactionId) ||
     typeof record.walletId !== "string" || !/^\d+$/.test(record.walletId) ||
-    typeof record.executorFeeUBA !== "string" || !/^\d+$/.test(record.executorFeeUBA)
+    typeof record.executorFeeUBA !== "string" ||
+    (record.executorFeeUBA !== "" && !/^\d+$/.test(record.executorFeeUBA))
   ) return null;
   return {
     schemaVersion: 1,

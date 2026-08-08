@@ -49,6 +49,16 @@ describe("public Flare funding checkpoint", () => {
     expect(readPublicFlareFundingCheckpoint(storage)).toBeNull();
   });
 
+  it("allows the optional executor fee to be re-read after reload", () => {
+    const storage = memoryStorage();
+    savePublicFlareFundingCheckpoint({ ...checkpoint, executorFeeUBA: "" }, storage);
+    expect(readPublicFlareFundingCheckpoint(storage)).toEqual({
+      schemaVersion: 1,
+      ...checkpoint,
+      executorFeeUBA: "",
+    });
+  });
+
   it("does not fail the UI when storage writes are denied", () => {
     const storage = {
       getItem: vi.fn(() => null),
@@ -58,4 +68,3 @@ describe("public Flare funding checkpoint", () => {
     expect(() => savePublicFlareFundingCheckpoint(checkpoint, storage)).not.toThrow();
   });
 });
-

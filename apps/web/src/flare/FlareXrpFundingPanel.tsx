@@ -48,10 +48,11 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
   const [paymentCopied, setPaymentCopied] = useState(false);
 
   function saveCheckpoint(input: { xrplOwner: string; xrplTransactionId: string; walletId: string; executorFeeUBA: string }) {
-    if (!/^0x[0-9a-f]{64}$/i.test(input.xrplTransactionId)) return;
+    const transactionBody = input.xrplTransactionId.trim().replace(/^0x/i, "");
+    if (!/^[0-9a-f]{64}$/i.test(transactionBody)) return;
     const next = {
       xrplOwner: input.xrplOwner.trim(),
-      xrplTransactionId: input.xrplTransactionId.toLowerCase() as `0x${string}`,
+      xrplTransactionId: `0x${transactionBody.toLowerCase()}` as `0x${string}`,
       walletId: input.walletId.trim(),
       executorFeeUBA: input.executorFeeUBA.trim(),
     };
@@ -78,7 +79,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
       const nextPreview = await onPrepare({ xrplOwner, xrplTransactionId, walletId, executorFeeUBA });
       setPreview(nextPreview);
       if (nextPreview.xrplTransactionId) {
-        saveCheckpoint({ xrplOwner, xrplTransactionId: nextPreview.xrplTransactionId, walletId, executorFeeUBA });
+        saveCheckpoint({ xrplOwner, xrplTransactionId: nextPreview.xrplTransactionId, walletId, executorFeeUBA: nextPreview.executorFeeUBA });
       }
     } catch (cause) {
       setPreview(null);
@@ -103,7 +104,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
       // refresh is unavailable, the user can retry preparation without ever
       // sending a second payment.
       setXrplTransactionId(transactionId);
-      saveCheckpoint({ xrplOwner, xrplTransactionId: transactionId, walletId, executorFeeUBA });
+      saveCheckpoint({ xrplOwner, xrplTransactionId: transactionId, walletId, executorFeeUBA: preview.executorFeeUBA });
       setWalletSubmitted(true);
       try {
         const refreshed = await onPrepare({
@@ -114,7 +115,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
         });
         setPreview(refreshed);
         if (refreshed.xrplTransactionId) {
-          saveCheckpoint({ xrplOwner, xrplTransactionId: refreshed.xrplTransactionId, walletId, executorFeeUBA });
+          saveCheckpoint({ xrplOwner, xrplTransactionId: refreshed.xrplTransactionId, walletId, executorFeeUBA: refreshed.executorFeeUBA });
         }
       } catch {
         setError("XRPL_PAYMENT_SUBMITTED_PREPARE_RETRY");
@@ -176,7 +177,11 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
         </label>
         <label>
           XRPL payment transaction ID
-          <input id="xrpl-payment-transaction-id" value={xrplTransactionId} onChange={(event) => setXrplTransactionId(event.target.value)} placeholder="64-hex transaction ID (after payment)" autoComplete="off" disabled={busy} />
+          <input id="xrpl-payment-transaction-id" value={xrplTransactionId} onChange={(event) => {
+            const value = event.target.value;
+            setXrplTransactionId(value);
+            saveCheckpoint({ xrplOwner, xrplTransactionId: value, walletId, executorFeeUBA });
+          }} placeholder="64-hex transaction ID (after payment)" autoComplete="off" disabled={busy} />
           <small>Leave blank to create the wallet-ready Payment draft. After external signing, enter the public transaction ID; GemWallet fills it after submission.</small>
         </label>
         <label>

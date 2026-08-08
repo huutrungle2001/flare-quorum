@@ -5,6 +5,7 @@ import { FlareEvidenceWorkspace, FlareExplorerView } from "../src/flare/FlareRoo
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
 import { FlareXrpFundingPanel } from "../src/flare/FlareXrpFundingPanel";
+import { readPublicFlareFundingCheckpoint } from "../src/flare/fundingCheckpoint";
 import { PrimaryNavigation } from "../src/shell/PrimaryNavigation";
 import type { WalletController } from "../src/wallet/WalletPanel";
 
@@ -189,5 +190,24 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("WALLET-READY XRPL PAYMENT DRAFT")).toBeInTheDocument();
     expect(screen.getByText("Payment destination", { exact: true })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /SIGN & SUBMIT WITH GEMWALLET/i })).toBeInTheDocument();
+  });
+
+  it("checkpoints an externally entered payment before RPC preparation", () => {
+    localStorage.clear();
+    render(<FlareXrpFundingPanel onPrepare={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText(/XRPL owner address/), {
+      target: { value: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p" },
+    });
+    fireEvent.change(screen.getByLabelText(/XRPL payment transaction ID/), {
+      target: { value: "ab".repeat(32) },
+    });
+    expect(readPublicFlareFundingCheckpoint()).toEqual({
+      schemaVersion: 1,
+      xrplOwner: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p",
+      xrplTransactionId: `0x${"ab".repeat(32)}`,
+      walletId: "0",
+      executorFeeUBA: "",
+    });
+    localStorage.clear();
   });
 });
