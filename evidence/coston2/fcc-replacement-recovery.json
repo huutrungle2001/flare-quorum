@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "gate": "FCC_REPLACEMENT_RECOVERY",
   "status": "PASSED",
-  "recordedAt": "2026-08-08T09:21:18.762Z",
-  "sourceCommit": "29868380d96ecc76ff3fcb10e43c899691c7cb2e",
+  "recordedAt": "2026-08-08T09:24:55.216Z",
+  "sourceCommit": "ba5b520f1444bb62b725d41c31d19c4c65a5672a",
   "network": {
     "name": "flare-coston2",
     "chainId": 114
@@ -24,7 +24,7 @@
       },
       {
         "machine": 3,
-        "teeId": "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40",
+        "teeId": "0xcBCcF4BBd4E2B2217e93e6260DB7905E04107bfc",
         "publicUrl": "https://veilbid-flare-fcc-3-production.up.railway.app"
       }
     ],
@@ -40,6 +40,12 @@
         "url": "https://veilbid-flare-fcc-2-production.up.railway.app",
         "transactionHash": "0x0e653961ad3b10edf18277e2833a17813e18054cda691fcb2007f8c3fe2f74bc",
         "blockNumber": "33774253"
+      },
+      {
+        "teeId": "0x874c3fcB0a988dbc6264723eE3f89dd56266BB40",
+        "url": "https://veilbid-flare-fcc-3-production.up.railway.app",
+        "transactionHash": "0x1d9f720c88d59c6f98d295958858e9a828bdd1b44abfc3a634d7d95fa654667e",
+        "blockNumber": "33774402"
       }
     ]
   },
