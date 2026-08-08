@@ -175,6 +175,7 @@ try {
   await waitFor(cdp, `document.readyState === "complete" && document.body.innerText.includes("Public payment checkpoint restored after reload")`, "the reload-safe checkpoint");
   const reload = await cdp.evaluate(`(() => ({
     restoredNotice: document.body.innerText.includes("Public payment checkpoint restored after reload"),
+    resumeControl: Array.from(document.querySelectorAll("button")).some((button) => button.textContent?.includes("RESUME PUBLIC CHECKPOINT")),
     owner: document.querySelector("#xrpl-owner-address")?.value,
     transaction: document.querySelector("#xrpl-payment-transaction-id")?.value,
     walletId: document.querySelector("#smart-account-wallet-id")?.value,
@@ -189,6 +190,7 @@ try {
   const assertions = {
     initialCheckpointRestored: firstLoad.restoredNotice,
     reloadCheckpointRestored: reload.restoredNotice,
+    resumeControlRendered: reload.resumeControl,
     publicFieldsRestored: [firstLoad, reload].every((value) =>
       value.owner === checkpoint.xrplOwner &&
       value.transaction === checkpoint.xrplTransactionId &&
@@ -213,6 +215,7 @@ try {
     blockers,
     notes: [
       "The production Buyer route restored a browser-safe public checkpoint after a real page reload.",
+      "The restored route rendered an explicit resume control; the smoke does not click it or submit a payment.",
       "The checkpoint test used only a public XRPL owner, transaction hash, wallet ID, and executor fee; it never entered a signing flow or touched a secret, bid, ciphertext, or FDC proof.",
       "The explicit forget action removed the checkpoint from browser storage and the rendered recovery notice.",
     ],
