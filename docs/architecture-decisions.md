@@ -656,6 +656,16 @@ registered but no longer answer for the running container. Preserving two
 survivors is compatible with the threshold design and safer than weakening the
 TEE trust boundary to manufacture same-identity restart evidence.
 
+This boundary was rechecked against Flare's pinned upstream source: the
+official `tee-node v0.0.23` `node.Initialize` implementation generates a fresh
+key with `crypto.GenerateKey()` and derives `teeID` from that key on every
+process start; it does not load an identity key from `SEALED_STORE_DIR`.
+The official Coston2 guide also treats `rRap` as the supported registration
+operation and documents re-running registration after environment changes.
+VeilBid therefore does not fork or patch the framework to restore an identity
+key, because that would be an unsupported runtime/code path and would require a
+new extension image/code-version registration.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:
@@ -666,6 +676,8 @@ These decisions must be revalidated against the pinned versions in Gate 0:
   for ECIES/private-channel and long-lived ciphertext guidance
 - [FCC signed-result example](https://dev.flare.network/fcc/guides/weather-insurance-extension)
   for domain-separated TEE result verification
+- [Pinned tee-node v0.0.23 source](https://github.com/flare-foundation/tee-node/blob/v0.0.23/internal/node/node.go)
+  for the identity initialization boundary described in ADR-025
 - [Flare Smart Accounts overview](https://dev.flare.network/smart-accounts/overview)
   and [custom instruction flow](https://dev.flare.network/smart-accounts/custom-instruction)
 - [FAssets reference](https://dev.flare.network/fassets/reference) and
