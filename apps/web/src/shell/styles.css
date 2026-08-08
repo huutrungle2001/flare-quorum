@@ -4032,6 +4032,25 @@ main {
   cursor: not-allowed;
 }
 
+.text-button {
+  background: transparent;
+  border: 0;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  margin-left: 10px;
+  padding: 2px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.text-button:hover:not(:disabled),
+.text-button:focus-visible {
+  color: var(--color-ink-black);
+}
+
 footer {
   align-items: end;
   background: var(--color-ink-black);

@@ -1,6 +1,12 @@
 import { useState } from "react";
 import type { Address, Hex } from "viem";
 import { sendXrplTestnetPaymentWithGemWallet } from "./xrplWallet";
+import {
+  clearPublicFlareFundingCheckpoint,
+  readPublicFlareFundingCheckpoint,
+  savePublicFlareFundingCheckpoint,
+  type PublicFlareFundingCheckpoint,
+} from "./fundingCheckpoint";
 
 export interface XrpFundingPrepareInput {
   xrplOwner: string;
@@ -28,10 +34,11 @@ interface FlareXrpFundingPanelProps {
 }
 
 export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
-  const [xrplOwner, setXrplOwner] = useState("");
-  const [xrplTransactionId, setXrplTransactionId] = useState("");
-  const [walletId, setWalletId] = useState("0");
-  const [executorFeeUBA, setExecutorFeeUBA] = useState("");
+  const [checkpoint, setCheckpoint] = useState<PublicFlareFundingCheckpoint | null>(() => readPublicFlareFundingCheckpoint());
+  const [xrplOwner, setXrplOwner] = useState(() => checkpoint?.xrplOwner ?? "");
+  const [xrplTransactionId, setXrplTransactionId] = useState(() => checkpoint?.xrplTransactionId ?? "");
+  const [walletId, setWalletId] = useState(() => checkpoint?.walletId ?? "0");
+  const [executorFeeUBA, setExecutorFeeUBA] = useState(() => checkpoint?.executorFeeUBA ?? "");
   const [preview, setPreview] = useState<XrpFundingPreview | null>(null);
   const [busy, setBusy] = useState(false);
   const [walletBusy, setWalletBusy] = useState(false);
@@ -40,6 +47,27 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
   const [copied, setCopied] = useState(false);
   const [paymentCopied, setPaymentCopied] = useState(false);
 
+  function saveCheckpoint(input: { xrplOwner: string; xrplTransactionId: string; walletId: string; executorFeeUBA: string }) {
+    if (!/^0x[0-9a-f]{64}$/i.test(input.xrplTransactionId)) return;
+    const next = {
+      xrplOwner: input.xrplOwner.trim(),
+      xrplTransactionId: input.xrplTransactionId.toLowerCase() as `0x${string}`,
+      walletId: input.walletId.trim(),
+      executorFeeUBA: input.executorFeeUBA.trim(),
+    };
+    try {
+      savePublicFlareFundingCheckpoint(next);
+      setCheckpoint({ schemaVersion: 1, ...next });
+    } catch {
+      // Invalid input remains visible in the form and is rejected by prepare.
+    }
+  }
+
+  function forgetCheckpoint() {
+    clearPublicFlareFundingCheckpoint();
+    setCheckpoint(null);
+  }
+
   async function prepare() {
     setBusy(true);
     setError(null);
@@ -47,7 +75,11 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
     setPaymentCopied(false);
     setWalletSubmitted(false);
     try {
-      setPreview(await onPrepare({ xrplOwner, xrplTransactionId, walletId, executorFeeUBA }));
+      const nextPreview = await onPrepare({ xrplOwner, xrplTransactionId, walletId, executorFeeUBA });
+      setPreview(nextPreview);
+      if (nextPreview.xrplTransactionId) {
+        saveCheckpoint({ xrplOwner, xrplTransactionId: nextPreview.xrplTransactionId, walletId, executorFeeUBA });
+      }
     } catch (cause) {
       setPreview(null);
       setError(cause instanceof Error ? cause.message : "XRPL_FUNDING_PREVIEW_FAILED");
@@ -71,6 +103,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
       // refresh is unavailable, the user can retry preparation without ever
       // sending a second payment.
       setXrplTransactionId(transactionId);
+      saveCheckpoint({ xrplOwner, xrplTransactionId: transactionId, walletId, executorFeeUBA });
       setWalletSubmitted(true);
       try {
         const refreshed = await onPrepare({
@@ -80,6 +113,9 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
           executorFeeUBA,
         });
         setPreview(refreshed);
+        if (refreshed.xrplTransactionId) {
+          saveCheckpoint({ xrplOwner, xrplTransactionId: refreshed.xrplTransactionId, walletId, executorFeeUBA });
+        }
       } catch {
         setError("XRPL_PAYMENT_SUBMITTED_PREPARE_RETRY");
       }
@@ -197,6 +233,12 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
           </> : <p className="form-hint"><strong>Payment draft only.</strong> After your XRPL wallet confirms the payment, enter its transaction ID above and prepare again to produce the executor job.</p>}
           <p className="form-hint"><strong>Delayed is not success.</strong> If AssetManager returns <code>DirectMintingDelayed</code>, preserve this public-safe checkpoint and run <code>pnpm flare:funding:resume</code>. The executor reuses the same payment, FDC request, and nonce; it never requests a second XRPL payment.</p>
         </section>
+      )}
+      {checkpoint && !preview && (
+        <p className="form-hint" role="status">
+          Public payment checkpoint restored after reload. It contains only the XRPL owner and transaction hash; no wallet secret or bid material is stored.
+          <button className="text-button" type="button" onClick={forgetCheckpoint}>FORGET CHECKPOINT</button>
+        </p>
       )}
       <div className="readiness-strip" aria-live="polite">
         <span className="signal-dot" aria-hidden="true" />

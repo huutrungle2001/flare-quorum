@@ -210,6 +210,9 @@ selection and conserves the public escrow.
 - [x] Handle delayed mint, duplicate nonce, hash mismatch, and stuck-mint
   recovery through a public-safe executor checkpoint and `flare:funding:resume`;
   duplicate payments, nonce drift, quote drift, and commitment drift fail closed.
+- [x] Persist a browser-safe XRP funding checkpoint containing only the public
+  XRPL owner, payment hash, wallet ID, and executor fee so a reload can rebuild
+  the same public payment handoff without retaining a secret, bid, or ciphertext.
 - [x] Add direct EVM funding as a recovery/developer path, not the flagship demo;
   the Buyer workspace keeps it explicitly labeled as EVM recovery.
 
