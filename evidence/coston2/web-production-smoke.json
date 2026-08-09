@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-08T09:49:41.082Z",
+  "recordedAt": "2026-08-09T14:18:44.368Z",
   "publicIdentifiers": {
-    "sourceCommit": "e490d3831f58e282ee4717803666a844571e7c84",
+    "sourceCommit": "1e3877811b52663e3d5acbb368de6fa9a6dc618c",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -17,9 +17,11 @@
   "routeStatuses": {
     "/": 200,
     "/flare": 200,
-    "/?role=evidence": 200,
-    "/?role=buyer": 200,
-    "/?role=vendor": 200,
+    "/flare?role=treasury": 200,
+    "/flare?role=buyer": 200,
+    "/flare?role=vendor": 200,
+    "/flare?role=finalizer": 200,
+    "/flare?role=evidence": 200,
     "/room": 200,
     "/docs": 200
   },
@@ -29,35 +31,56 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "a410fc088d1678fe9f8fc2792022f0f8522ac6df7571b2f190b2300b739cece5"
+      "sha256": "a790b3c051bc554d4397d52dbcac6f8eab4f0a54f62e6154fc894f9ca8dd70fc"
+    },
+    "tenders": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "cd6ec51617e00fc420b8f47e44d492259e03b21a616bee66e9908355b0a3773b"
     },
     "mobile": {
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sha256": "cf88f545e0dc24a8835756c9339cb167af4c60efea7bcd8484c1fa627893668e"
+      "sha256": "da8a09511473508f3b17d43a9d82f64c7f51b657cf250a41bc5a5957b70a4094"
     },
     "evidence": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "633b379632152c4b836b074812cdf743e3da9115f85f60f4068714bb9df656dd"
+      "sha256": "b089fca766afb35818e74d819e273a47778b8db5e431e0b526e4a3866482a766"
+    },
+    "treasury": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "b77df9ec8e8578547b44ee3344f430b2906ae88bd6a6e76aa7d3846dda55a183"
     },
     "buyer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "e82c42b3b10c02a75f14b81673d5406481d80eedd26a3a3d57c2e8df04b56471"
+      "sha256": "d9dc1588e307e0a333fe148c9ad1ff0e7b424558151827f0bcfc8b67f9f9aaa6"
     },
     "vendor": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "20af821a960353eb5c634e013b7684689547600c7fda86b27f03f46ece280bc2"
+      "sha256": "e4f444409ade80dcb953785e08952898e707c3e605d83283e8ca6e63edffa687"
+    },
+    "finalizer": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "11d8d5817b029034b7bde76f4941529fcea04fdbee9d6782ed9fcaa68d990561"
     },
     "docsMobile": {
       "viewport": {
@@ -73,12 +96,18 @@
     "coston2NetworkRendered": true,
     "verifiedReleaseRendered": true,
     "walletFreeTenderListLoaded": true,
+    "productStoryRendered": true,
+    "roleTaxonomyRendered": true,
+    "redundantRailControlsRemoved": true,
+    "publicProtocolFactsCollapsed": true,
     "awardedTenderVisible": true,
     "privacyBoundaryVisible": true,
     "publicEvidenceLedgerRendered": true,
     "publicEvidenceNoWalletGate": true,
+    "publicFinalizerRendered": true,
     "buyerBriefRendered": true,
     "xrpFundingBoundaryRendered": true,
+    "evmBuyerSeparatedFromXrpTreasury": true,
     "vendorRedemptionBoundaryRendered": true,
     "noPublicStateFailureRendered": true,
     "mobileTenderNavigationActive": true,
@@ -91,10 +120,11 @@
   "blockers": [],
   "notes": [
     "The deployed v2 Vercel project loaded the verified Coston2 public market without a wallet.",
-    "The dedicated Activity/Evidence route reread the same finalized market snapshot without a wallet or bid payload.",
+    "The Auditor route reread the same finalized market snapshot without a wallet, bid payload, signer, or decryption capability.",
+    "The Public Finalizer route exposes only canonical lifecycle actions; FCC dispatch and threshold grouping remain dedicated relay operations.",
     "The Vendor route exposes the official redemption request boundary but keeps approval and redemption behind the winning Coston2 wallet.",
-    "The Buyer route exposes the structured public brief and commits its canonical hash without collecting bid plaintext.",
-    "The Buyer route exposes a public-safe XRPL 0xFE wallet-ready payment draft and optional GemWallet Testnet submit action; this wallet-free smoke does not click it and no XRPL secret is accepted.",
+    "The EVM Buyer route exposes the structured public brief and commits its canonical hash without collecting bid plaintext.",
+    "The separate XRP Treasury route exposes a public-safe XRPL 0xFE wallet-ready payment draft and optional GemWallet Testnet submit action; this wallet-free smoke does not click it and no XRPL secret is accepted.",
     "The /docs route serves current Flare documentation when the verified release is enabled; the historical Sepolia/Nox guide remains on /room and is linked as a separate baseline.",
     "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
     "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed."

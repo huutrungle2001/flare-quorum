@@ -241,8 +241,9 @@ custodial VeilBid signer.
   public-safe XRP `0xFE` Payment/job/memo preview, and optional GemWallet
   Testnet signing/submission are implemented; reload-safe public checkpoint
   resume is now explicit; browser-native executor recovery and broader wallet
-  coverage remain open. The expanded source shell and award/receipt dossier are
-  implemented; hosted redeployment and replacement smoke evidence remain open.
+  coverage remain open. The expanded shell and award/receipt dossier are live;
+  hosted production, role, mobile, keyboard, XRP draft, and reload-checkpoint
+  smoke evidence pass.
 - [x] Show verified extension, code version, TEE identities/key fingerprints,
   quorum, rule version, FTSO snapshot, result digest, and sanitized FAssets/FDC/
   Smart Account bindings in the wallet-free Flare dossier.

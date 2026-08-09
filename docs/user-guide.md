@@ -2,10 +2,10 @@
 
 > Status: verified Coston2 experience. The checked-in `/` and `/flare` routes
 > provide the fail-closed wallet-free evidence view and explicit Coston2 role
-> routes. The source now separates Public, XRP Treasury, EVM Buyer, Vendor,
-> Public Finalizer, and Auditor/Evidence; production validation of this expanded
-> role shell remains pending the next hosted deployment. The XRP-native funding
-> protocol and executor have live Gate G
+> routes. The hosted production release now separates Public, XRP Treasury, EVM
+> Buyer, Vendor, Public Finalizer, and Auditor/Evidence; the expanded role shell,
+> mobile layout, keyboard path, XRP draft, and reload checkpoint all pass hosted
+> smoke validation. The XRP-native funding protocol and executor have live Gate G
 > evidence plus a public-safe delayed-mint checkpoint/resume path. The Buyer
 > workspace can also prepare a wallet-ready XRPL Payment draft and public-safe
 > `0xFE` executor job preview from read-only Coston2 state; the live

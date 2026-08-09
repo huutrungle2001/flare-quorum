@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-keyboard-accessibility",
-  "recordedAt": "2026-08-08T09:49:46.992Z",
+  "recordedAt": "2026-08-09T14:18:56.066Z",
   "publicIdentifiers": {
-    "sourceCommit": "e490d3831f58e282ee4717803666a844571e7c84",
+    "sourceCommit": "1e3877811b52663e3d5acbb368de6fa9a6dc618c",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -12,7 +12,7 @@
     "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05"
   },
   "measurements": {
-    "desktopInteractiveCount": 39,
+    "desktopInteractiveCount": 45,
     "mobileViewportWidth": 320,
     "focusSequence": [
       {
@@ -44,29 +44,29 @@
         "focusIndicator": true
       },
       {
-        "tag": "A",
-        "text": "OPEN BUYER WORKSPACE →",
+        "tag": "BUTTON",
+        "text": "◇CONNECT WALLET",
         "ariaLabel": null,
         "visible": true,
         "focusIndicator": true
       },
       {
-        "tag": "A",
-        "text": "OPEN VENDOR WORKSPACE →",
+        "tag": "BUTTON",
+        "text": "PUBLIC",
         "ariaLabel": null,
         "visible": true,
         "focusIndicator": true
       },
       {
-        "tag": "A",
-        "text": "OPEN ACTIVITY LEDGER →",
+        "tag": "BUTTON",
+        "text": "BUYER",
         "ariaLabel": null,
         "visible": true,
         "focusIndicator": true
       },
       {
-        "tag": "A",
-        "text": "0x1a9C4A…7618aE ↗",
+        "tag": "BUTTON",
+        "text": "PRIVATE BIDS",
         "ariaLabel": null,
         "visible": true,
         "focusIndicator": true

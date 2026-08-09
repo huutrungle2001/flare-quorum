@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-xrp-funding-checkpoint",
-  "recordedAt": "2026-08-08T09:50:03.523Z",
+  "recordedAt": "2026-08-09T14:19:11.408Z",
   "publicIdentifiers": {
-    "sourceCommit": "e490d3831f58e282ee4717803666a844571e7c84",
+    "sourceCommit": "1e3877811b52663e3d5acbb368de6fa9a6dc618c",
     "provider": "vercel",
     "project": "veilbid-flare",
     "canonicalUrl": "https://veilbid-flare.vercel.app",
@@ -19,7 +19,7 @@
   },
   "blockers": [],
   "notes": [
-    "The production Buyer route restored a browser-safe public checkpoint after a real page reload.",
+    "The production XRP Treasury route restored a browser-safe public checkpoint after a real page reload.",
     "The restored route rendered an explicit resume control; the smoke does not click it or submit a payment.",
     "The checkpoint test used only a public XRPL owner, transaction hash, wallet ID, and executor fee; it never entered a signing flow or touched a secret, bid, ciphertext, or FDC proof.",
     "The explicit forget action removed the checkpoint from browser storage and the rendered recovery notice."
