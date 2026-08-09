@@ -40,6 +40,10 @@ function sha256(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
+function delaySync(milliseconds) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+}
+
 function findChrome() {
   const candidates = [
     process.env.CHROME_BIN,
@@ -54,7 +58,7 @@ function findChrome() {
 
 function browserCapture(chrome, path, viewport, screenshotName) {
   const screenshotPath = join(screenshotDirectory, screenshotName);
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
     const profile = mkdtempSync(join(tmpdir(), "veilbid-flare-smoke-"));
     try {
       const result = spawnSync(
@@ -74,14 +78,17 @@ function browserCapture(chrome, path, viewport, screenshotName) {
         { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
       );
       const appRendered = result.stdout.includes("VEILBID") && result.stdout.includes("SKIP TO CONTENT");
-      if (result.status === 0 && existsSync(screenshotPath) && appRendered) {
+      const publicStateLoaded = !result.stdout.includes("Coston2 state unavailable");
+      if (result.status === 0 && existsSync(screenshotPath) && appRendered && publicStateLoaded) {
+        delaySync(2_000);
         return { dom: result.stdout, screenshot: { viewport, sha256: sha256(screenshotPath) } };
       }
     } finally {
       rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
     }
+    delaySync(attempt * 4_000);
   }
-  throw new Error(`Chrome smoke failed to render the app for ${path} after 3 attempts`);
+  throw new Error(`Chrome smoke failed to render the app for ${path} after 5 attempts`);
 }
 
 async function fetchRoute(path) {
@@ -142,7 +149,8 @@ const assertions = {
   xrpFundingBoundaryRendered: treasuryRoute.dom.includes("XRP TREASURY / XRPL") && treasuryRoute.dom.includes("Keep the XRPL signature outside VeilBid") && treasuryRoute.dom.includes("DirectMintingDelayed") && treasuryRoute.dom.includes("NON-CUSTODIAL") && treasuryRoute.dom.includes("PREPARE PUBLIC 0xFE JOB") && treasuryRoute.dom.includes("XRPL owner address") && treasuryRoute.dom.includes("wallet-ready XRPL Payment draft") && treasuryRoute.dom.includes("AssetManager destination and fee"),
   evmBuyerSeparatedFromXrpTreasury: buyerRoute.dom.includes("COSTON2 BUYER / EVM RECOVERY PATH") && !buyerRoute.dom.includes("Keep the XRPL signature outside VeilBid"),
   vendorRedemptionBoundaryRendered: vendorRoute.dom.includes("Request XRP redemption") && vendorRoute.dom.includes("Connect the winning Coston2 wallet"),
-  noPublicStateFailureRendered: !desktop.dom.includes("Flare state unavailable") && !mobile.dom.includes("Flare state unavailable"),
+  noPublicStateFailureRendered: [desktop, tenderRoom, mobile, evidenceRoute, treasuryRoute, buyerRoute, vendorRoute, finalizerRoute]
+    .every((capture) => !capture.dom.includes("Coston2 state unavailable") && !capture.dom.includes("Flare state unavailable")),
   mobileTenderNavigationActive: mobile.dom.includes('class="primary-nav-link active"') && mobile.dom.includes('aria-current="page"'),
   docsRouteRendered: docsMobile.dom.includes("CURRENT JUDGE PATH") && docsMobile.dom.includes("Five primitives, one product path") && docsMobile.dom.includes("Same-identity restore is not claimed") && docsMobile.dom.includes('class="docs-nav"'),
   historicalDocsRemainSeparated: docsMobile.dom.includes("OPEN HISTORICAL SEPOLIA BASELINE") && !docsMobile.dom.includes("Use VeilBid from tender to settlement"),
