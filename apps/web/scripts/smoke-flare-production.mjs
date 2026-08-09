@@ -53,32 +53,35 @@ function findChrome() {
 }
 
 function browserCapture(chrome, path, viewport, screenshotName) {
-  const profile = mkdtempSync(join(tmpdir(), "veilbid-flare-smoke-"));
   const screenshotPath = join(screenshotDirectory, screenshotName);
-  try {
-    const result = spawnSync(
-      chrome,
-      [
-        "--headless=new",
-        "--no-sandbox",
-        "--disable-gpu",
-        "--hide-scrollbars",
-        `--user-data-dir=${profile}`,
-        `--window-size=${viewport.width},${viewport.height}`,
-        "--virtual-time-budget=30000",
-        `--screenshot=${screenshotPath}`,
-        "--dump-dom",
-        new URL(path, baseUrl).toString(),
-      ],
-      { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
-    );
-    if (result.status !== 0 || !existsSync(screenshotPath)) {
-      throw new Error(`Chrome smoke failed for ${path}`);
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const profile = mkdtempSync(join(tmpdir(), "veilbid-flare-smoke-"));
+    try {
+      const result = spawnSync(
+        chrome,
+        [
+          "--headless=new",
+          "--no-sandbox",
+          "--disable-gpu",
+          "--hide-scrollbars",
+          `--user-data-dir=${profile}`,
+          `--window-size=${viewport.width},${viewport.height}`,
+          "--virtual-time-budget=30000",
+          `--screenshot=${screenshotPath}`,
+          "--dump-dom",
+          new URL(path, baseUrl).toString(),
+        ],
+        { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
+      );
+      const appRendered = result.stdout.includes("VEILBID") && result.stdout.includes("SKIP TO CONTENT");
+      if (result.status === 0 && existsSync(screenshotPath) && appRendered) {
+        return { dom: result.stdout, screenshot: { viewport, sha256: sha256(screenshotPath) } };
+      }
+    } finally {
+      rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
     }
-    return { dom: result.stdout, screenshot: { viewport, sha256: sha256(screenshotPath) } };
-  } finally {
-    rmSync(profile, { recursive: true, force: true });
   }
+  throw new Error(`Chrome smoke failed to render the app for ${path} after 3 attempts`);
 }
 
 async function fetchRoute(path) {

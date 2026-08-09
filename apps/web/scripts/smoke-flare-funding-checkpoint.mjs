@@ -161,7 +161,7 @@ try {
   const injection = await cdp.request("Page.addScriptToEvaluateOnNewDocument", {
     source: `localStorage.setItem(${JSON.stringify(storageKey)}, ${JSON.stringify(JSON.stringify(checkpoint))});`,
   });
-  await cdp.request("Page.navigate", { url: new URL("/?role=buyer", baseUrl).toString() });
+  await cdp.request("Page.navigate", { url: new URL("/flare?role=treasury", baseUrl).toString() });
   await waitFor(cdp, `document.readyState === "complete" && document.body.innerText.includes("Public payment checkpoint restored after reload")`, "the persisted checkpoint");
   const firstLoad = await cdp.evaluate(`(() => ({
     restoredNotice: document.body.innerText.includes("Public payment checkpoint restored after reload"),
@@ -214,7 +214,7 @@ try {
     assertions,
     blockers,
     notes: [
-      "The production Buyer route restored a browser-safe public checkpoint after a real page reload.",
+      "The production XRP Treasury route restored a browser-safe public checkpoint after a real page reload.",
       "The restored route rendered an explicit resume control; the smoke does not click it or submit a payment.",
       "The checkpoint test used only a public XRPL owner, transaction hash, wallet ID, and executor fee; it never entered a signing flow or touched a secret, bid, ciphertext, or FDC proof.",
       "The explicit forget action removed the checkpoint from browser storage and the rendered recovery notice.",
@@ -228,5 +228,5 @@ try {
 } finally {
   if (cdp) cdp.close();
   if (chromeProcess.exitCode === null) chromeProcess.kill("SIGTERM");
-  rmSync(profile, { recursive: true, force: true });
+  rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 }

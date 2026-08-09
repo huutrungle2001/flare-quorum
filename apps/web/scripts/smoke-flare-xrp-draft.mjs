@@ -136,7 +136,7 @@ const chromeProcess = spawn(
     "--remote-debugging-port=0",
     `--user-data-dir=${profile}`,
     "--window-size=1440,1000",
-    new URL("/?role=buyer", baseUrl).toString(),
+    new URL("/flare?role=treasury", baseUrl).toString(),
   ],
   { cwd: root, stdio: ["ignore", "ignore", "pipe"] },
 );
@@ -149,7 +149,7 @@ try {
   const page = await findPage(port, baseUrl.origin);
   cdp = await CdpSession.connect(page.webSocketDebuggerUrl);
   await cdp.request("Runtime.enable");
-  await waitFor(cdp, `document.readyState === "complete" && Boolean(document.querySelector("#xrpl-owner-address"))`, "the Buyer funding panel");
+  await waitFor(cdp, `document.readyState === "complete" && Boolean(document.querySelector("#xrpl-owner-address"))`, "the XRP Treasury funding panel");
 
   const values = {
     "#xrpl-owner-address": "rXPAEkUGWD7pyjgSTrjqB1njTdrKLauTx",
@@ -231,5 +231,5 @@ try {
 } finally {
   cdp?.close();
   chromeProcess.kill("SIGTERM");
-  rmSync(profile, { recursive: true, force: true });
+  rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 }
