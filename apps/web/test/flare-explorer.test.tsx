@@ -89,6 +89,11 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByRole("heading", { name: "No Coston2 tenders yet" })).toBeInTheDocument();
   });
 
+  it("keeps the verified release label visible inside the tender room", () => {
+    render(<MemoryRouter><FlareExplorerView state={{ status: "ready", error: null, data: { chainId: 114, tenders: [], indexedBlock: 22n, finalizedBlock: 22n, latestBlock: 34n, deploymentStatus: "verified" } }} onRetry={() => undefined} /></MemoryRouter>);
+    expect(screen.getByText("VERIFIED COSTON2 RELEASE")).toBeInTheDocument();
+  });
+
   it("offers an optional Coston2 wallet without gating the read-only Flare route", () => {
     render(<MemoryRouter initialEntries={["/flare"]}><PrimaryNavigation wallet={wallet} /></MemoryRouter>);
     expect(screen.getByText("COSTON2")).toBeInTheDocument();

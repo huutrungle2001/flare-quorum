@@ -465,7 +465,7 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
           note="Public reads never require a wallet and never substitute Sepolia or mock chain state."
         />
         <div><p className="eyebrow">CONFIDENTIAL PROCUREMENT / LIVE COSTON2 STATE</p><h1>Public rules.<br /><em>Private bids.</em></h1></div>
-        <div className="intro-copy"><p>Browse finalized tender coordination without connecting a wallet. Commercial terms remain sealed while public award and settlement evidence stay inspectable.</p><span className="deployment-label">COSTON2 DEPLOYMENT · {state.data?.deploymentStatus === "verified" ? "SOURCE/DEPLOYMENT VERIFIED" : "NOT YET VERIFIED"}</span></div>
+        <div className="intro-copy"><p>Browse finalized tender coordination without connecting a wallet. Commercial terms remain sealed while public award and settlement evidence stay inspectable.</p><span className="deployment-label">{state.data?.deploymentStatus === "verified" ? "VERIFIED COSTON2 RELEASE" : "COSTON2 DEPLOYMENT · NOT YET VERIFIED"}</span></div>
       </section>
       <ProtocolFacts compact />
       {state.status === "loading" && <section className="state-panel"><span className="loading-mark" /><div><h2>Reading Coston2 state</h2><p>No placeholder tender is inserted.</p></div></section>}
