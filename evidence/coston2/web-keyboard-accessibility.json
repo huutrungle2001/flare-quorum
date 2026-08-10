@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-keyboard-accessibility",
-  "recordedAt": "2026-08-10T04:22:14.289Z",
+  "recordedAt": "2026-08-10T17:15:49.391Z",
   "publicIdentifiers": {
-    "sourceCommit": "4844e1ebc7ef99d987718f20d0a2894c47abef9f",
+    "sourceCommit": "23e12bf24da02ab3f1892347fc63f499df000a44",
     "provider": "vercel",
     "project": "flare-quorum",
     "canonicalUrl": "https://flare-quorum.vercel.app",
@@ -12,8 +12,27 @@
     "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05"
   },
   "measurements": {
-    "desktopInteractiveCount": 45,
+    "desktopInteractiveCount": 43,
     "mobileViewportWidth": 320,
+    "mobileScrollWidth": 320,
+    "mobileOverflowingElements": [
+      {
+        "tag": "BUTTON",
+        "className": "",
+        "ariaLabel": null,
+        "left": 270,
+        "right": 343,
+        "width": 73
+      },
+      {
+        "tag": "BUTTON",
+        "className": "",
+        "ariaLabel": null,
+        "left": 351,
+        "right": 420,
+        "width": 69
+      }
+    ],
     "focusSequence": [
       {
         "tag": "A",
@@ -45,6 +64,13 @@
       },
       {
         "tag": "BUTTON",
+        "text": "↻",
+        "ariaLabel": "Refresh state",
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
         "text": "◇CONNECT WALLET",
         "ariaLabel": null,
         "visible": true,
@@ -60,13 +86,6 @@
       {
         "tag": "BUTTON",
         "text": "BUYER",
-        "ariaLabel": null,
-        "visible": true,
-        "focusIndicator": true
-      },
-      {
-        "tag": "BUTTON",
-        "text": "PRIVATE BIDS",
         "ariaLabel": null,
         "visible": true,
         "focusIndicator": true

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-10T05:40:33.547Z",
+  "recordedAt": "2026-08-10T17:15:42.442Z",
   "publicIdentifiers": {
-    "sourceCommit": "7eb267fbae70b7cadc1f1fb7d0d2828f9bcec81f",
+    "sourceCommit": "23e12bf24da02ab3f1892347fc63f499df000a44",
     "provider": "vercel",
     "project": "flare-quorum",
     "canonicalUrl": "https://flare-quorum.vercel.app",
@@ -38,49 +38,49 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "eb90ab5dba2d47563ece953c2b1b3d9f48c995e29f9b3b9ff3e1f13d7993d368"
+      "sha256": "0e33bdf5150f016a0e2dd6e9ede0fbbbda746a91435aa7a064abcd9b8cecae86"
     },
     "mobile": {
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sha256": "80571b5974b21d00f147c77ce1da6e2af6c926215ac6a3a266267b63d929457e"
+      "sha256": "0455c9f3d5f5088dda899bf8167e6b3a3bd2c72f291f50b92aa16dfb821c682d"
     },
     "evidence": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "e9da401d3cb21f01f8c69ce3972a64f5da47f1d947c57dc178a754e403be21dd"
+      "sha256": "6e0bbf8efd8ae6aa0f4c2a5d745cb762500d3fca324b977c155f7281e6eef5f1"
     },
     "treasury": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "a964143d37480f5a39fc0cf598c2b9734634c3138c4611511848628c52d6d6f8"
+      "sha256": "67695fe1f0f938405293da7d4c3d7d88346dd90179bd814a7e30dec77ed3b69e"
     },
     "buyer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "b7b8cc13d53acc4e0904e69ba414d379019cdd7b29ace44f996ccc81f6cc0697"
+      "sha256": "102d92b3d5bac8a19d61c31ac9cb5e3a7ae7bde2e765b827044453a040000e52"
     },
     "vendor": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "8eab937c689f00dbde57f2b2d8a671c1775c5543f0c74bae2038e739c8b07c4b"
+      "sha256": "daae69a5e38ce34ca964f8d2ee5ef1824b896e100cfdc5fbc980deb2f0830fbf"
     },
     "finalizer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "b57acb4aea0a373498a5db539e632806bb3571e73dbedc3168428c996a94c09e"
+      "sha256": "55d4ad5d07b759997a7c0b96f654c6fc0c9fccdf398867f91397e6725c55c5a7"
     },
     "docsMobile": {
       "viewport": {
@@ -99,6 +99,8 @@
     "productStoryRendered": true,
     "roleTaxonomyRendered": true,
     "redundantRailControlsRemoved": true,
+    "globalRefreshAndWalletAssetsRendered": true,
+    "tenderSortRendered": true,
     "publicProtocolFactsCollapsed": true,
     "awardedTenderVisible": true,
     "privacyBoundaryVisible": true,
@@ -107,7 +109,7 @@
     "publicFinalizerRendered": true,
     "buyerBriefRendered": true,
     "xrpFundingBoundaryRendered": true,
-    "evmBuyerSeparatedFromXrpTreasury": true,
+    "unifiedBuyerDefaultsToCoston2": true,
     "vendorRedemptionBoundaryRendered": true,
     "noPublicStateFailureRendered": true,
     "mobileTenderNavigationActive": true,
@@ -123,8 +125,9 @@
     "The Auditor route reread the same finalized market snapshot without a wallet, bid payload, signer, or decryption capability.",
     "The Public Finalizer route exposes only canonical lifecycle actions; FCC dispatch and threshold grouping remain dedicated relay operations.",
     "The Vendor route exposes the official redemption request boundary but keeps approval and redemption behind the winning Coston2 wallet.",
-    "The EVM Buyer route exposes the structured public brief and commits its canonical hash without collecting bid plaintext.",
-    "The separate XRP Treasury route exposes a public-safe XRPL 0xFE wallet-ready payment draft and optional GemWallet Testnet submit action; this wallet-free smoke does not click it and no XRPL secret is accepted.",
+    "The unified Buyer route defaults to direct Coston2/FTestXRP funding and exposes the structured public brief without collecting bid plaintext.",
+    "The legacy treasury URL selects the advanced XRP-native option inside Buyer and exposes a public-safe XRPL 0xFE wallet-ready payment draft plus optional GemWallet Testnet submit action; this wallet-free smoke does not click it and no XRPL secret is accepted.",
+    "The global refresh control, read-only wallet-assets panel, and public tender sort controls are rendered without requesting a signature.",
     "The /docs route serves current Flare documentation when the verified release is enabled; the historical Sepolia/Nox guide remains on /room and is linked as a separate baseline.",
     "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
     "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed."
