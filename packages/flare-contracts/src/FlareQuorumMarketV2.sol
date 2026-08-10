@@ -49,7 +49,7 @@ contract FlareQuorumMarketV2 {
         Awarded,
         Refunded,
         Cancelled
-}
+    }
     enum RefundReason {
         NoValidBid,
         SelectionExpired,
@@ -357,7 +357,7 @@ contract FlareQuorumMarketV2 {
         if (!isApprovedVendor[tenderId][msg.sender]) revert NotApprovedVendor();
         if (hasSubmittedBid[tenderId][msg.sender]) revert AlreadySubmitted();
         BidReceipt calldata first = receipts[0];
-        uint8 receiptBitmap;
+        uint8 receiptBitmap = 0;
         for (uint8 i; i < BID_RECEIPT_THRESHOLD; ++i) {
             BidReceipt calldata receipt = receipts[i];
             if (
@@ -571,8 +571,8 @@ contract FlareQuorumMarketV2 {
             ) revert InvalidResult();
         }
         bytes memory resultData = abi.encode(result);
-        uint8 seen;
-        uint256 valid;
+        uint8 seen = 0;
+        uint256 valid = 0;
         for (uint256 i; i < proofs.length; ++i) {
             TeeActionProof calldata proof = proofs[i];
             if (
@@ -761,8 +761,8 @@ contract FlareQuorumMarketV2 {
     }
 
     function _activeCommonTeeIds(Tender storage tender) internal view returns (address[] memory ids) {
-        address[3] memory active;
-        uint8 count;
+        address[3] memory active = [address(0), address(0), address(0)];
+        uint8 count = 0;
         for (uint8 i; i < TEE_COUNT; ++i) {
             if ((tender.commonQuorumBitmap & uint8(2 ** i)) != 0 && _isFrozenTeeIdentity(tender, i)) {
                 active[count++] = tender.teeIds[i];

@@ -19,6 +19,7 @@ interface InvariantVm {
     function sign(uint256 privateKey, bytes32 digest) external returns (uint8 v, bytes32 r, bytes32 s);
     function warp(uint256 timestamp) external;
 }
+
 /// @notice Stateful multi-tender escrow conservation harness.
 /// @dev Each invariant run executes award, zero-winner refund, cancellation,
 /// and a pre-dispatch quorum-loss refund in one sequence, then checks that no

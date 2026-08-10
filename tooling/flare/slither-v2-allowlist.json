@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "slitherVersion": "0.11.6",
+  "target": "src/FlareQuorumMarketV2.sol",
+  "minimumImpact": "Medium",
+  "excludedImpacts": {
+    "values": ["Low", "Informational"],
+    "rationale": "The release gate fails on unsuppressed Medium or High findings. Low and informational findings remain review input but are not blocking because the fixed three-machine registry loops, explicit time deadlines, signature assembly, and protocol constants are intentional design elements."
+  },
+  "excludedDetectors": [
+    {
+      "name": "reentrancy-balance",
+      "match": "FlareQuorumMarketV2.createTender",
+      "rationale": "Slither does not recognize the contract's custom nonReentrant modifier. createTender checks the official FTestXRP balance delta exactly, and the V2 suite proves malicious token callbacks cannot reenter createTender or refund, duplicate a tender, or duplicate settlement."
+    },
+    {
+      "name": "incorrect-equality",
+      "match": "FlareQuorumMarketV2._dispatchSelection",
+      "rationale": "The zero bytes32 comparison validates the FCC registry's request-ID sentinel, not a manipulable Ether or token balance. A zero request ID is required to revert atomically and leave the tender eligible for bounded undispatched recovery."
+    }
+  ]
+}

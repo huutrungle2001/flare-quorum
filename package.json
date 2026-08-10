@@ -70,6 +70,7 @@
     "test:preflight": "node --env-file-if-exists=.env.local tooling/scripts/preflight.mjs",
     "evidence:validate": "node tooling/scripts/validate-evidence.mjs",
     "flare:judge:check": "node tooling/scripts/validate-flare-judge-package.mjs",
+    "flare:slither:v2": "node tooling/scripts/run-slither-v2.mjs",
     "verify:deployment": "pnpm --filter @flarequorum/auction-house verify:deployment:release",
     "verify:deployment:release": "pnpm --filter @flarequorum/auction-house verify:deployment:release",
     "verify:deployment:test": "pnpm --filter @flarequorum/auction-house verify:deployment:test",

@@ -54,6 +54,12 @@ jobs:
       - name: Compile contracts
         run: pnpm compile
 
+      - name: Install pinned Slither
+        run: python3 -m pip install --disable-pip-version-check slither-analyzer==0.11.6
+
+      - name: Run V2 market static analysis
+        run: pnpm flare:slither:v2
+
       - name: Run workspace tests
         run: pnpm test
 

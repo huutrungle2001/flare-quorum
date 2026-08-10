@@ -17,6 +17,7 @@ interface Vm {
     function sign(uint256 privateKey, bytes32 digest) external returns (uint8 v, bytes32 r, bytes32 s);
     function warp(uint256 timestamp) external;
 }
+
 contract FlareTokenMock is IERC20 {
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
@@ -30,7 +31,7 @@ contract FlareTokenMock is IERC20 {
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 amount) external override returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) external virtual override returns (bool) {
         if (allowance[from][msg.sender] < amount || balanceOf[from] < amount) return false;
         allowance[from][msg.sender] -= amount;
         balanceOf[from] -= amount;
@@ -57,16 +58,28 @@ contract FlareTokenMock is IERC20 {
             reentryCalldata = data;
         }
 
+        function transferFrom(address from, address to, uint256 amount) external override returns (bool) {
+            _attemptReentry();
+            if (allowance[from][msg.sender] < amount || balanceOf[from] < amount) return false;
+            allowance[from][msg.sender] -= amount;
+            balanceOf[from] -= amount;
+            balanceOf[to] += amount;
+            return true;
+        }
+
         function transfer(address to, uint256 amount) external override returns (bool) {
-            if (msg.sender == reentryTarget && !reentryAttempted) {
-                reentryAttempted = true;
-                (bool success,) = reentryTarget.call(reentryCalldata);
-                reentryBlocked = !success;
-            }
+            _attemptReentry();
             if (balanceOf[msg.sender] < amount) return false;
             balanceOf[msg.sender] -= amount;
             balanceOf[to] += amount;
             return true;
+        }
+
+        function _attemptReentry() private {
+            if (msg.sender != reentryTarget || reentryAttempted) return;
+            reentryAttempted = true;
+            (bool success,) = reentryTarget.call(reentryCalldata);
+            reentryBlocked = !success;
         }
     }
 
@@ -892,6 +905,24 @@ contract FlareTokenMock is IERC20 {
                     || market.getTender(tenderId).status != FlareQuorumMarketV2.TenderStatus.Refunded
                     || token.balanceOf(address(this)) != 1_000 || token.balanceOf(address(market)) != 0
             ) revert("reentrant refund was not safely contained");
+        }
+
+        function testCreateTenderBlocksTokenReentrancyAndConservesExactEscrow() external {
+            ReentrantFlareTokenMock reentrantToken = new ReentrantFlareTokenMock();
+            token = reentrantToken;
+            market = new FlareQuorumMarketV2(reentrantToken, manager, ftso, registry);
+            registry.setSender(address(market));
+            reentrantToken.mint(address(this), 1_000);
+            reentrantToken.approve(address(market), 1_000);
+            FlareQuorumMarketV2.TenderTerms memory terms = _terms();
+            reentrantToken.configureReentry(address(market), abi.encodeCall(FlareQuorumMarketV2.createTender, (terms)));
+
+            uint256 tenderId = market.createTender(terms);
+            if (
+                tenderId != 1 || market.tenderCount() != 1 || !reentrantToken.reentryAttempted()
+                    || !reentrantToken.reentryBlocked() || token.balanceOf(address(market)) != 1_000
+                    || market.getTender(tenderId).status != FlareQuorumMarketV2.TenderStatus.Open
+            ) revert("create reentrancy or escrow conservation mismatch");
         }
 
         function testRefundTransferFailureRollsBackAndCanRetry() external {
