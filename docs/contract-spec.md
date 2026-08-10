@@ -157,6 +157,7 @@ block. Both timeout refunds are public failure terminal states, not successful
 selection fallbacks; they create no award receipt and return only the original
 escrow to the buyer. The verified V1 release implements only the post-dispatch
 refund. The V2 pre-dispatch path remains a local candidate.
+Its live deployment and promotion are planned post-Summer Signal upgrades.
 
 ## 4. Creation and funding
 

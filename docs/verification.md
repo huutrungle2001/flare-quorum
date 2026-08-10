@@ -5,12 +5,13 @@
 > also recorded, including a three-vendor one-result-outage recovery; the canonical release is verified, the hosted ciphertext
 > ingress is live with a fail-closed finalized-tender health check, and the wallet-free Coston2 judge/role/accessibility smokes
 > pass. The supported three-machine replacement-TEE fault drill also passes;
-> browser-native XRP recovery and user-validation work remain open. The wallet-ready browser XRPL Payment/job preview, optional
+> browser-native XRP recovery is planned post-Summer Signal hardening, while
+> Gate H user validation remains `NOT_RUN`. The wallet-ready browser XRPL Payment/job preview, optional
 > GemWallet Testnet signing/submission path, and server-side XRP funding checkpoint/resume have fail-closed
 > coverage, and the hosted Railway runtime-log review found no forbidden-material
 > pattern matches. A review identified a V1 pre-dispatch closed-tender liveness
-> gap; the local V2 candidate and adversarial tests pass, but V2 has no live
-> deployment or evidence yet. Historical Sepolia/Nox
+> gap; the local V2 candidate and adversarial tests pass, and its live release
+> is a planned post-Summer Signal upgrade. Historical Sepolia/Nox
 > artifacts are pre-hackathon baseline only. Local adversarial coverage is
 > recorded separately and is not promoted to live Coston2 evidence.
 
@@ -37,10 +38,10 @@ in-memory and save only an allowlisted pass/fail code.
 | B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext; rotated runtime fails closed and supported replacement restores capacity for new tenders | Commitment/receipt IDs, redaction assertions, identity-drift and replacement checkpoint | PASSED (aggregate) — live ingress/replay evidence plus `fcc-replacement-recovery.json` prove identity rotation, three replacement registrations, safe stale-identity retirement, and a new tender on the replacement set |
 | C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | PASSED (core + result-collection recovery) — live two- and three-vendor lifecycles plus `three-vendor-recovery.release.json`; replacement recovery must not mutate an existing frozen set |
 | D — Private scoring | Real TEEs match shared `SCORING_V1` vectors and select the deterministic eligible winner | Vector hashes, public inputs, result digest, Boolean expectations | PASSED — live FCC selection bound to XRP/USD terms and the common root |
-| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED for live result correctness; RECOVERY PARTIAL — two frozen machines finalized tender 21 while the third result endpoint was unavailable, but V1 pre-dispatch quorum loss lacks a refund path; local V2 fixes it and still needs live success/refund evidence |
+| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED for live result correctness; RECOVERY PARTIAL — two frozen machines finalized tender 21 while the third result endpoint was unavailable, but V1 pre-dispatch quorum loss lacks a refund path; local V2 addresses it, with live success/refund evidence planned as a post-Summer Signal upgrade |
 | F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP and the award can enter the official redemption path | Feed snapshot, discovered asset IDs, balance conservation, redemption request | PASSED — live FTSO snapshot, conserved FTestXRP award, and amount-based AssetManager redemption request in `fassets-redemption.release.json` |
 | G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | PASSED — live evidence in `gate-g-smart-account.json`; delayed-mint checkpoint/resume is fail-closed and covered by relay tests |
-| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — the expanded product shell, separate XRP Treasury/EVM Buyer/Public Finalizer/Auditor workspaces, per-bid receipt inspection, award dossier, mobile layout, keyboard path, XRP draft, and reload checkpoint now pass on the hosted production release; browser-native executor recovery, broader wallet coverage, and user validation remain |
+| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — the hosted product shell, XRP Treasury/EVM Buyer/Public Finalizer/Auditor workspaces, per-bid receipt inspection, award dossier, mobile layout, keyboard path, XRP draft, and reload checkpoint pass; browser-native executor recovery and broader wallet coverage are planned post-Summer Signal hardening, while user validation remains `NOT_RUN` |
 
 No later gate converts an earlier failure into success. Private ingress, FCC
 selection, FTestXRP conservation, and the XRP-native flagship path are product
