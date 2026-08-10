@@ -1,0 +1,106 @@
+import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+
+import {
+  artifactAbiDigest,
+  inspectV2LocalReadiness,
+} from "../flare/v2-release.mjs";
+
+const root = resolve(import.meta.dirname, "../..");
+const check = process.argv.includes("--check");
+const readiness = inspectV2LocalReadiness(root);
+if (readiness.status !== "PASSED") {
+  throw new Error(`FLARE_V2_LOCAL_READINESS_FAILED:${JSON.stringify(readiness.assertions)}`);
+}
+
+const { plan } = readiness;
+const marketArtifact = JSON.parse(readFileSync(resolve(root, plan.contracts.market.artifact), "utf8"));
+const receiptArtifact = JSON.parse(readFileSync(resolve(root, plan.contracts.awardReceipt.artifact), "utf8"));
+const sourceDigest = (path) => createHash("sha256")
+  .update(readFileSync(resolve(root, path)))
+  .digest("hex");
+const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
+const files = new Map([
+  [plan.artifacts.candidateMarketAbi, json(marketArtifact.abi)],
+  [plan.artifacts.candidateAwardReceiptAbi, json(receiptArtifact.abi)],
+]);
+const manifest = {
+  schemaVersion: 1,
+  kind: "flarequorum-v2-local-bindings",
+  network: "flare-coston2",
+  chainId: 114,
+  status: "LOCAL_CANDIDATE",
+  consumerSelectable: false,
+  liveDeploymentIncluded: false,
+  contracts: {
+    FlareQuorumMarketV2: {
+      source: plan.contracts.market.source,
+      sourceSha256: sourceDigest(plan.contracts.market.source),
+      abi: plan.artifacts.candidateMarketAbi,
+      abiSha256: artifactAbiDigest(marketArtifact.abi),
+    },
+    FlareQuorumAwardReceiptV2: {
+      source: plan.contracts.awardReceipt.source,
+      sourceSha256: sourceDigest(plan.contracts.awardReceipt.source),
+      abi: plan.artifacts.candidateAwardReceiptAbi,
+      abiSha256: artifactAbiDigest(receiptArtifact.abi),
+    },
+  },
+  promotionRequirements: plan.promotionRequirements,
+  blockers: [
+    "V2_CANDIDATE_NOT_DEPLOYED",
+    "V2_EXTENSION_NOT_REGISTERED",
+    "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
+    "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
+    "V2_REFUND_LIFECYCLE_NOT_VERIFIED",
+  ],
+};
+files.set(plan.artifacts.candidateBindingsManifest, json(manifest));
+
+if (check) {
+  for (const [relativePath, expected] of files) {
+    const path = resolve(root, relativePath);
+    if (!existsSync(path) || readFileSync(path, "utf8") !== expected) {
+      throw new Error(`FLARE_V2_CANDIDATE_BINDING_STALE:${relativePath}`);
+    }
+  }
+  console.log(JSON.stringify({ status: "PASSED", scope: "V2 local candidate bindings", files: [...files.keys()] }, null, 2));
+  process.exit(0);
+}
+
+for (const [relativePath, contents] of files) {
+  const path = resolve(root, relativePath);
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, contents);
+}
+
+const evidencePath = resolve(root, plan.artifacts.localReadinessEvidence);
+const evidence = {
+  schemaVersion: 1,
+  gate: "FLARE_V2_LOCAL_RELEASE_READINESS",
+  status: "PARTIAL",
+  scope: "local source, bytecode, ABI, and release-boundary checks only",
+  recordedAt: new Date().toISOString(),
+  sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
+  network: { name: "flare-coston2", chainId: 114 },
+  publicIdentifiers: readiness.publicFacts,
+  assertions: readiness.assertions,
+  blockers: manifest.blockers,
+  notes: [
+    "No Coston2 transaction was sent and no V2 address, extension ID, machine identity, or live lifecycle result is claimed.",
+    "Candidate ABIs are intentionally excluded from the public @flarequorum/flare-bindings exports until promotion.",
+    "The verified V1 release remains the only consumer-selectable Coston2 release.",
+  ],
+};
+mkdirSync(dirname(evidencePath), { recursive: true });
+writeFileSync(evidencePath, json(evidence));
+
+console.log(JSON.stringify({
+  status: evidence.status,
+  scope: evidence.scope,
+  bindings: [...files.keys()],
+  evidence: plan.artifacts.localReadinessEvidence,
+  blockers: evidence.blockers,
+}, null, 2));

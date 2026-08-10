@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "gate": "FLARE_V2_LOCAL_RELEASE_READINESS",
+  "status": "PARTIAL",
+  "scope": "local source, bytecode, ABI, and release-boundary checks only",
+  "recordedAt": "2026-08-10T11:36:03.463Z",
+  "sourceCommit": "76a2f019014756f1e86918b59492049f19b142f9",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114
+  },
+  "publicIdentifiers": {
+    "marketContract": "FlareQuorumMarketV2",
+    "awardReceiptContract": "FlareQuorumAwardReceiptV2",
+    "marketAbiSha256": "230e4fadbe34bd908ac5205c9e425949ce357fc0f82b6d055fc9e8e80859c977",
+    "awardReceiptAbiSha256": "379308c6df499a5b19294e36574d9d34bda9bd8e332a05f0f46291a398206a13",
+    "runtimeSizeBytes": 22671,
+    "candidateManifestPresent": false,
+    "promotedReleasePresent": false
+  },
+  "assertions": {
+    "verifiedV1ReleasePreserved": true,
+    "v2MarketArtifactPresent": true,
+    "v2AwardReceiptArtifactPresent": true,
+    "boundedUndispatchedRefundPresent": true,
+    "explicitRefundReasonInAbi": true,
+    "sideBySideContractNames": true,
+    "runtimeFitsEip170": true,
+    "v2ArtifactsCannotClaimReleaseWithoutPromotion": true
+  },
+  "blockers": [
+    "V2_CANDIDATE_NOT_DEPLOYED",
+    "V2_EXTENSION_NOT_REGISTERED",
+    "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
+    "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
+    "V2_REFUND_LIFECYCLE_NOT_VERIFIED"
+  ],
+  "notes": [
+    "No Coston2 transaction was sent and no V2 address, extension ID, machine identity, or live lifecycle result is claimed.",
+    "Candidate ABIs are intentionally excluded from the public @flarequorum/flare-bindings exports until promotion.",
+    "The verified V1 release remains the only consumer-selectable Coston2 release."
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "kind": "flarequorum-v2-release-plan",
+  "network": "flare-coston2",
+  "chainId": 114,
+  "status": "LOCAL_CANDIDATE",
+  "contracts": {
+    "market": {
+      "name": "FlareQuorumMarketV2",
+      "source": "packages/flare-contracts/src/FlareQuorumMarketV2.sol",
+      "artifact": "packages/flare-contracts/out/FlareQuorumMarketV2.sol/FlareQuorumMarketV2.json"
+    },
+    "awardReceipt": {
+      "name": "FlareQuorumAwardReceiptV2",
+      "source": "packages/flare-contracts/src/FlareQuorumAwardReceiptV2.sol",
+      "artifact": "packages/flare-contracts/out/FlareQuorumAwardReceiptV2.sol/FlareQuorumAwardReceiptV2.json"
+    }
+  },
+  "artifacts": {
+    "candidateManifest": "packages/flare-contracts/deployments/coston2.v2-candidate.json",
+    "candidateDeploymentEvidence": "evidence/coston2/market-v2-candidate-deployment.json",
+    "extensionRegistrationEvidence": "evidence/coston2/fcc-market-v2-extension-registration.json",
+    "governanceEvidence": "evidence/coston2/fcc-market-v2-governance.json",
+    "machineEvidence": "evidence/coston2/fcc-market-v2-machines.json",
+    "successLifecycleEvidence": "evidence/coston2/market-v2-success-lifecycle.json",
+    "refundLifecycleEvidence": "evidence/coston2/market-v2-undispatched-refund.json",
+    "releaseManifest": "packages/flare-contracts/deployments/coston2.v2.release.json",
+    "deploymentConsistencyEvidence": "evidence/coston2/market-v2-deployment-consistency.json",
+    "localReadinessEvidence": "evidence/local/flare-v2-release-readiness.json",
+    "candidateBindingsManifest": "packages/flare-bindings/candidates/v2/manifest.json",
+    "candidateMarketAbi": "packages/flare-bindings/candidates/v2/abis/FlareQuorumMarketV2.json",
+    "candidateAwardReceiptAbi": "packages/flare-bindings/candidates/v2/abis/FlareQuorumAwardReceiptV2.json"
+  },
+  "runtimeEnvironment": {
+    "extensionId": "FCC_V2_EXTENSION_ID",
+    "publicProxyUrls": "FLARE_FCC_V2_PROXY_URLS",
+    "controlProxyUrls": "FCC_V2_PROXY_CONTROL_URLS",
+    "normalProxyUrl": "FCC_V2_NORMAL_PROXY_URL",
+    "governanceSigners": "FCC_V2_GOVERNANCE_SIGNERS",
+    "governanceThreshold": "FCC_V2_GOVERNANCE_THRESHOLD"
+  },
+  "promotionRequirements": {
+    "freshExtension": true,
+    "threeFreshMachines": true,
+    "exactActiveMachineSet": true,
+    "verifiedRuntimeAndConstructor": true,
+    "successLifecycle": true,
+    "undispatchedRefundLifecycle": true,
+    "consumerSwitchRequiresPromotion": true
+  }
+}

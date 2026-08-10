@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "flarequorum-v2-local-bindings",
+  "network": "flare-coston2",
+  "chainId": 114,
+  "status": "LOCAL_CANDIDATE",
+  "consumerSelectable": false,
+  "liveDeploymentIncluded": false,
+  "contracts": {
+    "FlareQuorumMarketV2": {
+      "source": "packages/flare-contracts/src/FlareQuorumMarketV2.sol",
+      "sourceSha256": "6834a950a92f8a112a1bd14e2e34d0194c9685c8789b174d5507d0cb192d0095",
+      "abi": "packages/flare-bindings/candidates/v2/abis/FlareQuorumMarketV2.json",
+      "abiSha256": "230e4fadbe34bd908ac5205c9e425949ce357fc0f82b6d055fc9e8e80859c977"
+    },
+    "FlareQuorumAwardReceiptV2": {
+      "source": "packages/flare-contracts/src/FlareQuorumAwardReceiptV2.sol",
+      "sourceSha256": "834b6c88e18eb7199f861da587e8bd36d3db2c08e72df0b8a21e36c39331f093",
+      "abi": "packages/flare-bindings/candidates/v2/abis/FlareQuorumAwardReceiptV2.json",
+      "abiSha256": "379308c6df499a5b19294e36574d9d34bda9bd8e332a05f0f46291a398206a13"
+    }
+  },
+  "promotionRequirements": {
+    "freshExtension": true,
+    "threeFreshMachines": true,
+    "exactActiveMachineSet": true,
+    "verifiedRuntimeAndConstructor": true,
+    "successLifecycle": true,
+    "undispatchedRefundLifecycle": true,
+    "consumerSwitchRequiresPromotion": true
+  },
+  "blockers": [
+    "V2_CANDIDATE_NOT_DEPLOYED",
+    "V2_EXTENSION_NOT_REGISTERED",
+    "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
+    "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
+    "V2_REFUND_LIFECYCLE_NOT_VERIFIED"
+  ]
+}
