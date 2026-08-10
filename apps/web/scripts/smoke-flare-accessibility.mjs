@@ -215,7 +215,20 @@ try {
   await delay(300);
   const mobile = await cdp.evaluate(`(() => ({
     width: window.innerWidth,
+    scrollWidth: document.documentElement.scrollWidth,
     noHorizontalOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
+    overflowingElements: [...document.querySelectorAll("body *")]
+      .map((element) => ({ element, rect: element.getBoundingClientRect() }))
+      .filter(({ rect }) => rect.width > 0 && (rect.left < -1 || rect.right > window.innerWidth + 1))
+      .slice(0, 12)
+      .map(({ element, rect }) => ({
+        tag: element.tagName,
+        className: typeof element.className === "string" ? element.className.slice(0, 120) : "",
+        ariaLabel: element.getAttribute("aria-label"),
+        left: Math.round(rect.left),
+        right: Math.round(rect.right),
+        width: Math.round(rect.width),
+      })),
     tenderVisible: Boolean(document.querySelector(".tender-card")),
     alertCount: document.querySelectorAll('[role="alert"]').length,
   }))()`);
@@ -253,6 +266,8 @@ try {
     measurements: {
       desktopInteractiveCount: desktop.interactiveCount,
       mobileViewportWidth: mobile.width,
+      mobileScrollWidth: mobile.scrollWidth,
+      mobileOverflowingElements: mobile.overflowingElements,
       focusSequence: desktop.focusSequence.map(({ tag, text, ariaLabel, visible, focusIndicator }) => ({ tag, text, ariaLabel, visible, focusIndicator })),
     },
     assertions,
