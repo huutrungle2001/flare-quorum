@@ -1,4 +1,4 @@
-# VeilBid Flare — Judge Package
+# FlareQuorum — Judge Package
 
 This folder is the Summer Signal submission material for the Flare v2 release.
 The files in the parent `submission/` folder describe the historical
@@ -28,7 +28,7 @@ proxy credential is requested by the browser.
 
 ## One-line submission copy
 
-> VeilBid lets XRP treasuries fund public procurement rules from Flare Coston2,
+> FlareQuorum lets XRP treasuries fund public procurement rules from Flare Coston2,
 > while three registered FCC TEEs privately score encrypted vendor offers and
 > the market accepts only a matching threshold result before paying the winner
 > in FTestXRP.
@@ -40,13 +40,13 @@ proxy credential is requested by the browser.
   judge follows the recorded XRPL → FDC `XRPPayment` → Smart Account direct
   mint → FTestXRP tender journey, then the winning Coston2 wallet can submit an
   official amount-based FAssets redemption request. The agent's later XRPL
-  payment remains protocol-governed; VeilBid never holds an XRPL secret.
+  payment remains protocol-governed; FlareQuorum never holds an XRPL secret.
 
 FCC is essential: the winner is computed from sealed bid state inside the
   registered extension, not supplied by the browser, buyer, or relay. FTSO is
   essential for the close-time XRP/USD snapshot. FDC and Smart Accounts are
   essential for the XRP-native funding path. FAssets are the official asset
-  boundary and redemption route; VeilBid never receives an XRPL secret.
+  boundary and redemption route; FlareQuorum never receives an XRPL secret.
 
 ## Judge route (no wallet)
 
@@ -147,7 +147,7 @@ contains no wallet, bid, credential, or private-key material.
 
 | Time | Screen and narration | Judge proof |
 | --- | --- | --- |
-| `0:00–0:25` | Open the public Coston2 dossier. “VeilBid makes a procurement decision private, not unverifiable.” | Chain `114`, verified release, market address |
+| `0:00–0:25` | Open the public Coston2 dossier. “FlareQuorum makes a procurement decision private, not unverifiable.” | Chain `114`, verified release, market address |
 | `0:25–0:55` | Open Activity/Evidence. Explain public rules hash, root, receipt quorum, FTSO snapshot, and why losing prices are absent. | Finalized tender ledger; no wallet and no payload |
 | `0:55–1:30` | Show Buyer workspace and the exact FTestXRP approval/create flow. Then show Vendor workspace with the explicit Coston2 wallet gate. | No silent authorization; no mainnet asset |
 | `1:30–2:10` | Show a sealed bid submission as three separate encrypted ingress requests and receipt quorum. | Hosted ingress health, three frozen TEE identities, atomic receipt submission |

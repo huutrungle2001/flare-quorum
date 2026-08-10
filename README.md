@@ -1,9 +1,9 @@
-# VeilBid Flare
+# FlareQuorum
 
 > Confidential procurement for XRP and Flare treasuries, powered by Flare
 > Confidential Compute.
 
-VeilBid Flare is the next edition of VeilBid. XRP-native buyers atomically mint
+FlareQuorum is the Flare-native successor to the historical VeilBid baseline. XRP-native buyers atomically mint
 FXRP and fund a tender; approved vendors privately deliver encrypted
 multi-criteria offers to a fixed Flare TEE quorum; and a Flare smart contract
 settles only after two registered TEE identities agree on the same deterministic
@@ -30,14 +30,20 @@ The project targets **Flare Summer Signal** with:
 > This repository contains unaudited hackathon software. Use disposable testnet
 > wallets and assets only.
 
-## Why VeilBid
+> [!NOTE]
+> FlareQuorum is the current product and repository brand. Existing `VeilBid*`
+> Solidity identifiers, verified Coston2 deployment artifacts, and the
+> Sepolia/Nox `/room` baseline retain their original names so the rebrand never
+> rewrites historical or on-chain evidence.
+
+## Why FlareQuorum
 
 Public procurement leaks commercial information. A vendor that can see earlier
 offers may copy, undercut, or coordinate around them. A private server hides the
 offers but gives buyers and vendors weak assurance that the published winner
 was actually produced by the agreed rule.
 
-VeilBid Flare combines:
+FlareQuorum combines:
 
 - Public tender rules, deadlines, vendor admission, escrow, and lifecycle.
 - Private ECIES bid ingress with no permanent on-chain ciphertext.

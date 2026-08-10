@@ -1,4 +1,4 @@
-# VeilBid Flare — before/after work ledger
+# FlareQuorum — before/after work ledger
 
 This ledger separates the pre-existing Sepolia/Nox product from work built for
 Summer Signal. Commit IDs refer to the Flare v2 repository's `main` branch.
@@ -11,7 +11,7 @@ Summer Signal. Commit IDs refer to the Flare v2 repository's `main` branch.
 | Newly built | Public-safe Buyer `0xFE` job/memo preview with read-only PersonalAccount/nonce discovery | `apps/web/src/flare/FlareXrpFundingPanel.tsx`, `evidence/coston2/web-production-smoke.json` | Makes the XRP-native handoff understandable without browser custody or XRPL secrets |
 | Newly built | Optional GemWallet XRPL Testnet Payment signer/submitter with network/address checks and public-hash-only handoff | `apps/web/src/flare/xrplWallet.ts`, `apps/web/test/xrpl-wallet.test.ts` | Lets a buyer approve the exact memo in a browser wallet without exposing a seed or signed private material |
 | Integrated | FTestXRP escrow, XRP/USD FTSO close snapshot, FXRP AssetManager discovery | `evidence/coston2/gate-c-e-f-three-vendor.json`, `packages/flare-contracts/deployments/coston2.release.json` | Settlement is tied to official Flare asset and price infrastructure |
-| Integrated | XRPL `0xFE`, FDC `XRPPayment`, Smart Account direct mint and atomic tender funding | `evidence/coston2/gate-g-smart-account.json` | XRP-native buyers can fund the same procurement market without VeilBid custody |
+| Integrated | XRPL `0xFE`, FDC `XRPPayment`, Smart Account direct mint and atomic tender funding | `evidence/coston2/gate-g-smart-account.json` | XRP-native buyers can fund the same procurement market without FlareQuorum custody |
 | Improved | Domain binding, code/key fingerprints, threshold result checks, recovery states, secret/evidence scans | `docs/architecture-decisions.md`, `evidence/coston2/three-vendor-recovery.release.json` | Retries and outages cannot silently change the tender or manufacture a winner |
 | Live hardening | Result-collection outage drill: one endpoint unavailable, two frozen machines finalize | `evidence/coston2/three-vendor-recovery.release.json`, commit `03c51a3` | Demonstrates threshold liveness without weakening the quorum |
 | Live hardening | Read-only hosted runtime-log review across the three FCC services and ingress; forbidden-material scan runs in memory only | `evidence/coston2/hosted-runtime-log-review.json`, commit `5c743ab` | Adds an auditable privacy check without publishing runtime bodies or credentials |

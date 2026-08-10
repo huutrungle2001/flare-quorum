@@ -1,4 +1,4 @@
-# VeilBid — Style Reference
+# FlareQuorum — Style Reference
 
 > Cel-shaded confidential procurement terminal — sealed-envelope anime rendered
 > as an institutional bidding interface.
@@ -7,10 +7,14 @@
 > specification. The implemented app now defaults to the verified Coston2/FCC
 > product; the historical Sepolia baseline remains available only as a clearly
 > labeled, lazy-loaded comparison route.
+>
+> Rebrand boundary: these orange tokens apply only to FlareQuorum routes. The
+> historical `/room` VeilBid baseline intentionally retains its original
+> `#a1fea0` green treatment for provenance and visual separation.
 
 **Theme:** mixed
 
-VeilBid uses a monochromatic canvas with one neon-green signal. The atmosphere
+FlareQuorum uses a monochromatic canvas with one vivid-orange signal. The atmosphere
 comes from 90s anime title cards, confidential dossier stamps, sealed envelopes,
 radar rings, and procurement-terminal typography—not from generic crypto
 gradients or dashboard chrome.
@@ -19,7 +23,7 @@ The product must still behave like serious financial software. Display serif
 type carries brand moments; condensed sans-serif carries navigation and actions;
 monospace carries commitments, extension IDs, signatures, blocks, and timestamps. Surfaces remain
 flat. Cards and controls use ink outlines, generous 25px corners, and no
-elevation shadows. Neon green appears only when the interface is inviting an
+elevation shadows. Vivid orange appears only when the interface is inviting an
 action, marking a selected state, or confirming verified evidence.
 
 ## 1. Experience principles
@@ -43,14 +47,14 @@ action, marking a selected state, or confirming verified evidence.
 
 | Name | Value | Token | Role |
 |---|---|---|---|
-| Veil Green | `#a1fea0` | `--color-veil-green` | Primary action, selected role/tender, verified proof, award spotlight, illustration accent |
+| Flare Orange | `#ff8a1f` | `--color-veil-green` (compatibility token) | Primary action, selected role/tender, verified proof, award spotlight, illustration accent |
 | Ink Black | `#000000` | `--color-ink-black` | Text, borders, dark bands, destructive actions, encrypted-state fill |
 | Paper White | `#ffffff` | `--color-paper-white` | Page canvas, cards, fields, text on dark surfaces |
 
 No additional semantic colors are introduced. State must never rely on color
 alone:
 
-- Verified: green plus check icon and `VERIFIED`.
+- Verified: orange plus check icon and `VERIFIED`.
 - Pending: white plus animated/patterned indicator and `PENDING`.
 - Encrypted: black plus lock icon and `ENCRYPTED`.
 - Error: black double border plus warning icon and explicit error text.
@@ -150,10 +154,10 @@ Rules:
 
 - Standard structural border: `1px solid #000`.
 - Hovered actionable border: `2px solid #000` without changing outer size.
-- Focus ring: `3px solid #a1fea0` plus a 1px black outer outline.
+- Focus ring: `3px solid #ff8a1f` plus a 1px black outer outline.
 - No 4px, 8px, or 12px component radii.
 - No card/button drop shadows.
-- A green blurred halo is allowed only behind a verified winner/proof spotlight;
+- An orange blurred halo is allowed only behind a verified winner/proof spotlight;
   it is decorative, never an elevation cue.
 
 ## 5. Layout system
@@ -176,7 +180,7 @@ Fixed white top navigation over a full-bleed black hero:
 2. Stacked display statement.
 3. Dual CTA pair.
 4. Cel-shaded sealed-bid illustration.
-5. White/green lifecycle marquee.
+5. White/orange lifecycle marquee.
 6. Product explanation and live evidence.
 7. Full-bleed black footer.
 
@@ -221,7 +225,7 @@ Right:
 
 - Coston2 network indicator.
 - Wallet state.
-- Black or green `ENTER TENDER ROOM` pill.
+- Black or orange `ENTER TENDER ROOM` pill.
 
 Social links belong in the footer, not the primary product navigation.
 
@@ -331,7 +335,7 @@ Required hierarchy:
 6. Privacy badges.
 7. One primary next action.
 
-Selected card uses a green edge marker or fill block—not a shadow.
+Selected card uses an orange edge marker or fill block—not a shadow.
 
 ### Bid composer
 
@@ -383,7 +387,7 @@ states:
 `2 OF 3 RESULTS AGREE`.
 
 - Barlow Condensed 700 uppercase.
-- Current step: green.
+- Current step: orange.
 - Completed steps: black with check.
 - Future steps: white outline.
 - On mobile it becomes a vertical timeline.
@@ -399,7 +403,7 @@ Full-bleed black or black card:
 - Receipt owner equals the winning vendor and the receipt is non-transferable.
 - Winning settlement amount is public and explicitly labeled. Losing prices
   remain encrypted.
-- One optional green glow halo behind the award seal.
+- One optional orange glow halo behind the award seal.
 
 ### Result inspector
 
@@ -474,7 +478,7 @@ Primary CTA: `ENTER TENDER ROOM`
 Secondary CTA: `EXPLORE LIVE TENDERS →`
 
 The illustration depicts sealed bid envelopes moving through a black FCC/TEE
-aperture toward a green signed-result award stamp. Use flat cel-shaded forms, thick ink
+aperture toward an orange signed-result award stamp. Use flat cel-shaded forms, thick ink
 outlines, no photographic texture, and no token/coin imagery.
 
 ### Marquee
@@ -519,8 +523,8 @@ privacy/status badges.
 
 ## 10. Accessibility and responsive rules
 
-- Ink Black on Veil Green is the only text combination allowed on green.
-- Never use white body text on green or green body text on white.
+- Ink Black on Flare Orange is the only text combination allowed on orange.
+- Never use white body text on orange or orange body text on white.
 - Body text contrast must meet WCAG AA.
 - Focus is visible in keyboard and high-contrast modes.
 - Display serif never carries essential instructions alone.
@@ -539,7 +543,7 @@ privacy/status badges.
 - Use only Veil Green, Ink Black, and Paper White.
 - Use display serif sparingly for brand and award moments.
 - Keep operational UI in Barlow Condensed and evidence in Space Mono.
-- Pair green primary and white outlined secondary actions.
+- Pair orange primary and white outlined secondary actions.
 - Use 25px component corners and 100px role/nav pills.
 - Give major landing sections at least 80px vertical separation.
 - Explain privacy and authority next to every confidential transaction.
@@ -549,7 +553,7 @@ privacy/status badges.
 ## 12. Do not
 
 - Do not introduce red, blue, yellow, purple, or gray semantic tokens.
-- Do not use green as body text or a full-page background.
+- Do not use orange as body text or a full-page background.
 - Do not use shadows, gradients, glass blur, beveled panels, or elevation stacks.
 - Do not put operational body copy in the display serif or mono font.
 - Do not hide invalid/error states using color alone.
@@ -583,12 +587,12 @@ as the championship hero or primary demo.
 ```css
 :root {
   /* Colors */
-  --color-veil-green: #a1fea0;
+  --color-veil-green: #ff8a1f;
   --color-ink-black: #000000;
   --color-paper-white: #ffffff;
   --color-ink-72: rgba(0, 0, 0, 0.72);
   --color-ink-12: rgba(0, 0, 0, 0.12);
-  --color-veil-halo: rgba(161, 254, 160, 0.5);
+  --color-veil-halo: rgba(255, 138, 31, 0.5);
 
   /* Font families */
   --font-display: "GT Alpina Condensed", "Cormorant Garamond",
@@ -639,7 +643,7 @@ as the championship hero or primary demo.
 
 ### Global prompt
 
-> Build a VeilBid interface using only `#a1fea0`, `#000000`, and `#ffffff`.
+> Build a FlareQuorum interface using only `#ff8a1f`, `#000000`, and `#ffffff`.
 > Use Cormorant Garamond 300 for sparse display moments, Barlow Condensed for
 > operational UI, and Space Mono for privacy/evidence metadata. All cards and
 > buttons use 25px corners, role pills use 100px corners, structural borders are
@@ -662,7 +666,7 @@ as the championship hero or primary demo.
 > Create a sealed-dossier bid composer for XRP/USD price, delivery, warranty,
 > and supported credentials. Show three verified TEE fingerprints, private
 > ingress, per-machine receipt progress, commitment, and common quorum. Use a
-> green `SEND PRIVATELY & SUBMIT RECEIPTS` pill. Do not place plaintext or
+> orange `SEND PRIVATELY & SUBMIT RECEIPTS` pill. Do not place plaintext or
 > ciphertext in URL, activity, analytics, calldata, or completed-state copy.
 
 ### Winner panel prompt
@@ -671,7 +675,7 @@ as the championship hero or primary demo.
 > PUBLIC SETTLEMENT`, a thin serif `AWARDED` headline, public winner identity, result
 > and receipt evidence, and a clearly public winning-settlement amount. Losing
 > bid prices remain sealed/private. Show the two matching TEE signers and frozen
-> FTSO snapshot. A single green halo may sit behind the award seal.
+> FTSO snapshot. A single orange halo may sit behind the award seal.
 
 ### XRP treasury header prompt
 

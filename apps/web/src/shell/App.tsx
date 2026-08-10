@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useLocation } from "react-router";
 import { FlareDocsPage } from "../flare/FlareDocsPage";
 import { FlareLandingPage } from "../flare/FlareLandingPage";
@@ -33,6 +33,12 @@ export function App() {
   const wallet = useWallet();
   const flareWallet = useWallet("coston2");
   const flareReleaseEnabled = isFlareReleaseEnabled();
+  const isFlareExperience = location.pathname === "/flare" || (
+    flareReleaseEnabled && (
+      location.pathname === "/" ||
+      location.pathname === "/docs"
+    )
+  );
   const legacyRoomLink =
     new URLSearchParams(location.search).has("role") ||
     new URLSearchParams(location.search).has("tender");
@@ -50,10 +56,21 @@ export function App() {
     ) : (
       <LandingPage />
     );
+
+  useEffect(() => {
+    const description = isFlareExperience
+      ? "FlareQuorum — confidential procurement with threshold FCC on Flare Coston2."
+      : "VeilBid — the historical confidential procurement baseline on Ethereum Sepolia.";
+    document.title = isFlareExperience
+      ? "FlareQuorum · Confidential procurement on Flare"
+      : "VeilBid · Historical confidential procurement baseline";
+    document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute("content", description);
+  }, [isFlareExperience]);
+
   return (
-    <>
+    <div className={isFlareExperience ? "flare-quorum-app" : "veilbid-legacy-app"}>
       <PrimaryNavigation wallet={wallet} flareWallet={flareWallet} />
       {page}
-    </>
+    </div>
   );
 }

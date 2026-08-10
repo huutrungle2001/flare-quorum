@@ -1,4 +1,4 @@
-# VeilBid Flare Championship User Guide
+# FlareQuorum Championship User Guide
 
 > Status: verified Coston2 experience. The checked-in `/` and `/flare` routes
 > provide the fail-closed wallet-free evidence view and explicit Coston2 role
@@ -17,7 +17,7 @@
 
 ## 1. What the product will do
 
-VeilBid lets an XRP-native or Flare treasury escrow a public FTestXRP budget
+FlareQuorum lets an XRP-native or Flare treasury escrow a public FTestXRP budget
 while vendors keep price, delivery, warranty, and qualification inputs private.
 A fixed quorum of registered FCC TEEs evaluates the public deterministic rule.
 The contract accepts only two matching TEE results, then publicly pays the
@@ -63,7 +63,7 @@ wallet.
 
 The current Flare application is intentionally split into two shells. Clicking
 the `VEILBID` wordmark returns to the standalone product landing page. Clicking
-`TENDERS` enters `/flare`, where the old VeilBid-style left rail remains visible
+`TENDERS` enters `/flare`, where the dossier-style left rail remains visible
 while the right side renders the selected workspace: `PUBLIC`, `BUYER`,
 `PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public finalizer), `XRP TREASURY`,
 and `AUDITOR`. The rail keeps one shared refresh action, help/boundaries, and

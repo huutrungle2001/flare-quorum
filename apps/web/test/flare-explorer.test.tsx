@@ -196,7 +196,7 @@ describe("Coston2 public evidence boundary", () => {
 
   it("keeps the XRP-native funding signature outside the browser", () => {
     render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} />);
-    expect(screen.getByRole("heading", { name: "Keep the XRPL signature outside VeilBid" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Keep the XRPL signature outside FlareQuorum" })).toBeInTheDocument();
     expect(screen.getByText(/never asks for a seed/)).toBeInTheDocument();
     expect(screen.getByText(/DirectMintingDelayed/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "READ FUNDING RUNBOOK ↗" })).toHaveAttribute("href", "/docs#flare-coston2");

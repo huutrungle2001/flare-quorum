@@ -508,13 +508,13 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
       <section className="flare-faq-section">
         <div><p className="eyebrow">BEFORE YOU START</p><h2>Common questions.</h2></div>
         <div>
-          <details><summary>Do I need a wallet to inspect VeilBid?</summary><p>No. Public dossiers and Auditor evidence are wallet-free. Connect a Coston2 wallet only for a transaction action.</p></details>
+          <details><summary>Do I need a wallet to inspect FlareQuorum?</summary><p>No. Public dossiers and Auditor evidence are wallet-free. Connect a Coston2 wallet only for a transaction action.</p></details>
           <details><summary>Can the buyer or finalizer choose the winner?</summary><p>No. The market settles only a result signed by two distinct tender-fixed FCC identities over the exact frozen domain.</p></details>
           <details><summary>Are bidder identities and winning amounts private?</summary><p>No. Participation, transaction timing, winner, and ordinary FTestXRP settlement amounts are public by design.</p></details>
           <details><summary>What happens when a TEE restarts?</summary><p>Its identity rotates. A normally registered replacement serves new tenders; an existing tender never swaps its frozen machine set.</p></details>
         </div>
       </section>
-      <footer><div><span className="wordmark inverted">VEILBID FLARE</span><p>Threshold confidential procurement on Coston2.</p></div><div className="footer-meta"><span>FLARE COSTON2 / 114</span><span>TEST ASSETS ONLY</span><span>UNAUDITED HACKATHON SOFTWARE</span></div></footer>
+      <footer><div><span className="wordmark inverted">FLAREQUORUM</span><p>Threshold confidential procurement on Coston2.</p></div><div className="footer-meta"><span>FLARE COSTON2 / 114</span><span>TEST ASSETS ONLY</span><span>UNAUDITED HACKATHON SOFTWARE</span></div></footer>
     </main>
   );
 }

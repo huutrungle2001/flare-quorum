@@ -391,7 +391,7 @@ export function FlareBuyerWorkspace({
       Account: xrplOwner,
       Destination: paymentDestination,
       Amount: quote.paymentAmountUBA.toString(),
-      Memos: [{ Memo: { MemoData: plan.memoData.slice(2).toUpperCase(), MemoType: "VEILBID_0XFE" } }],
+      Memos: [{ Memo: { MemoData: plan.memoData.slice(2).toUpperCase(), MemoType: "FLAREQUORUM_0XFE" } }],
     };
     const job = xrplTransactionId === null ? null : {
       version: 1,
@@ -423,7 +423,7 @@ export function FlareBuyerWorkspace({
         <p className="eyebrow">{journey === "xrp" ? "XRP TREASURY / XRPL → FDC → SMART ACCOUNT" : "COSTON2 BUYER / EVM RECOVERY PATH"}</p>
         <h1>{journey === "xrp" ? "Fund from XRP." : "Fund transparent rules."}</h1>
         <p>{journey === "xrp"
-          ? "Build a wallet-ready XRPL Payment whose 0xFE memo commits to the exact Smart Account operation. VeilBid receives only public identifiers and never an XRPL secret."
+          ? "Build a wallet-ready XRPL Payment whose 0xFE memo commits to the exact Smart Account operation. FlareQuorum receives only public identifiers and never an XRPL secret."
           : "Approve the exact public FTestXRP ceiling, then create a tender frozen to the verified FCC extension and three production-status identities. Bid values remain outside the contract."}</p>
       </section>
       {journey !== "xrp" && <WalletPanel wallet={wallet} network="coston2" />}

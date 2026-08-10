@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Product Plan
+# FlareQuorum Championship Product Plan
 
 > Status: Product and architecture direction approved; the verified Coston2
 > market, FCC extension/quorum, FTestXRP settlement, Gate G XRP-native funding
@@ -11,7 +11,7 @@
 
 ## 1. Product identity
 
-- Name: VeilBid Flare
+- Name: FlareQuorum
 - Tagline: Confidential Procurement for XRP and Flare Treasuries
 - Primary bounty: Confidential Compute Apps
 - Secondary bounty target: Interoperable Asset Products
@@ -26,7 +26,7 @@ XRP treasuries can hold and transfer value globally but do not have a native,
 credible procurement workflow. Public offers leak vendor strategy; a private
 server hides offers but asks participants to trust the operator's winner.
 
-VeilBid Flare lets an XRP user fund a tender through a Flare Smart Account,
+FlareQuorum lets an XRP user fund a tender through a Flare Smart Account,
 keeps vendor proposals inside attested TEEs, evaluates a public deterministic
 multi-criteria rule, and settles an XRP-backed asset only after a threshold of
 registered machines agrees on the result.
@@ -212,7 +212,7 @@ All formerly open choices are accepted in
 ## 13. Post-Summer Signal expansion — Flare Treasury Exchange
 
 The post-competition product direction is **Flare Treasury Exchange**. This is
-an intentional expansion of the VeilBid Flare foundation, not a claim that the
+an intentional expansion of the FlareQuorum foundation, not a claim that the
 current championship release already implements an intent marketplace or
 milestone execution network.
 

@@ -1,4 +1,5 @@
-const storageKey = "veilbid:flare-funding-checkpoint:v1";
+const storageKey = "flarequorum:funding-checkpoint:v1";
+const legacyStorageKey = "veilbid:flare-funding-checkpoint:v1";
 const xrplAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 const transactionPattern = /^0x[0-9a-f]{64}$/i;
 
@@ -45,7 +46,9 @@ export function readPublicFlareFundingCheckpoint(storage?: Storage): PublicFlare
   const target = checkpointStorage(storage);
   if (!target) return null;
   try {
-    return parseCheckpoint(JSON.parse(target.getItem(storageKey) ?? "null"));
+    const current = parseCheckpoint(JSON.parse(target.getItem(storageKey) ?? "null"));
+    if (current) return current;
+    return parseCheckpoint(JSON.parse(target.getItem(legacyStorageKey) ?? "null"));
   } catch {
     return null;
   }
@@ -72,6 +75,7 @@ export function clearPublicFlareFundingCheckpoint(storage?: Storage): void {
   if (!target) return;
   try {
     target.removeItem(storageKey);
+    target.removeItem(legacyStorageKey);
   } catch {
     // Ignore cleanup failures; no chain state or secret is affected.
   }

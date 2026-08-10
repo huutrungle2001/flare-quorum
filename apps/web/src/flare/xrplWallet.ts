@@ -26,7 +26,7 @@ function responseResult(value: unknown, code: string): unknown {
 /**
  * Submit exactly the public Payment draft through the user's GemWallet
  * extension. The wallet owns signing and submission; no seed, private key, or
- * signed blob enters the VeilBid process.
+ * signed blob enters the FlareQuorum process.
  */
 export async function sendXrplTestnetPaymentWithGemWallet(input: GemWalletPaymentInput): Promise<Hex> {
   if (!xrplClassicAddress.test(input.owner.trim())) throw new Error("XRPL_WALLET_OWNER_INVALID");
@@ -61,7 +61,7 @@ export async function sendXrplTestnetPaymentWithGemWallet(input: GemWalletPaymen
   const response = await wallet.sendPayment({
     amount: input.amountUBA,
     destination: input.destination.trim(),
-    memos: [{ memo: { memoData: input.memoData.slice(2).toUpperCase(), memoType: "VEILBID_0XFE" } }],
+    memos: [{ memo: { memoData: input.memoData.slice(2).toUpperCase(), memoType: "FLAREQUORUM_0XFE" } }],
   });
   const result = responseResult(response, "XRPL_WALLET_PAYMENT_REJECTED");
   const hash = result && typeof result === "object" ? (result as { hash?: unknown }).hash : undefined;

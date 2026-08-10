@@ -30,7 +30,7 @@ describe("public Flare funding checkpoint", () => {
 
   it("rejects malformed or secret-shaped values without throwing on read", () => {
     const storage = memoryStorage();
-    storage.setItem("veilbid:flare-funding-checkpoint:v1", JSON.stringify({
+    storage.setItem("flarequorum:funding-checkpoint:v1", JSON.stringify({
       schemaVersion: 1,
       xrplOwner: checkpoint.xrplOwner,
       xrplTransactionId: checkpoint.xrplTransactionId,
@@ -40,6 +40,14 @@ describe("public Flare funding checkpoint", () => {
     }));
     expect(readPublicFlareFundingCheckpoint(storage)).toBeNull();
     expect(() => savePublicFlareFundingCheckpoint({ ...checkpoint, xrplTransactionId: "0x00" as `0x${string}` }, storage)).toThrow("FLARE_FUNDING_CHECKPOINT_INVALID");
+  });
+
+  it("restores a public checkpoint saved before the FlareQuorum rebrand", () => {
+    const storage = memoryStorage();
+    storage.setItem("veilbid:flare-funding-checkpoint:v1", JSON.stringify({ schemaVersion: 1, ...checkpoint }));
+    expect(readPublicFlareFundingCheckpoint(storage)).toEqual({ schemaVersion: 1, ...checkpoint });
+    clearPublicFlareFundingCheckpoint(storage);
+    expect(readPublicFlareFundingCheckpoint(storage)).toBeNull();
   });
 
   it("clears the checkpoint explicitly", () => {

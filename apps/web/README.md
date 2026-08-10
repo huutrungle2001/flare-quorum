@@ -1,10 +1,10 @@
-# Tender Room
+# FlareQuorum Web
 
 > Runtime note: the default judge path targets the verified Coston2 release when
 > its public `VITE_*` configuration is supplied. The `/room` route remains the
 > explicitly historical Sepolia/Nox baseline.
 
-VeilBid's browser product. Its Flare shell has a standalone landing page at `/`
+FlareQuorum's browser product has a standalone landing page at `/`
 and a separate tender application at `/flare`. The app's left rail includes
 `PUBLIC`, `BUYER`, `PRIVATE BIDS`, `ACTIVITY`, `XRP TREASURY`, and `AUDITOR`; these
 map to the distinct `?role=treasury`, `?role=buyer`, `?role=vendor`,

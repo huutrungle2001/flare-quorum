@@ -64,7 +64,7 @@ export function FlareProcurementSignal() {
 
 export function FlareLifecycleMarquee() {
   return (
-    <div className="flare-lifecycle-marquee" aria-label="VeilBid Flare lifecycle">
+    <div className="flare-lifecycle-marquee" aria-label="FlareQuorum lifecycle">
       <span>XRPL AUTHORIZATION</span><b aria-hidden="true">→</b>
       <span>FTESTXRP ESCROW</span><b aria-hidden="true">→</b>
       <span>PRIVATE TEE BIDS</span><b aria-hidden="true">→</b>

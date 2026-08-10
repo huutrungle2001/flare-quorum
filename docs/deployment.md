@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Deployment Guide
+# FlareQuorum Championship Deployment Guide
 
 > Status: the canonical Coston2 market release, release smoke, UI, and judge
 > package are live and verified. The organizer-approved rolling replacement-TEE

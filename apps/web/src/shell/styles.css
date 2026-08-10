@@ -22,6 +22,18 @@
   font-synthesis: none;
 }
 
+.flare-quorum-app {
+  --color-veil-green: #ff8a1f;
+  --color-input-surface: #fff8ed;
+  --color-input-hover: #ffecd6;
+  --color-surface-muted: #f5eee7;
+  min-height: 100vh;
+}
+
+.veilbid-legacy-app {
+  min-height: 100vh;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -6725,6 +6737,11 @@ footer p {
 
   .topbar-actions {
     gap: 6px;
+  }
+
+  .flare-quorum-app .wordmark {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
   }
 
   .network-pill {

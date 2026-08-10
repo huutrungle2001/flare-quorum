@@ -64,6 +64,8 @@ describe("standalone public routes", () => {
       );
       expect(screen.getByRole("heading", { name: /Private bids.*Public awards/i })).toBeInTheDocument();
       expect(screen.getByRole("link", { name: "TENDERS" })).toHaveAttribute("href", "/flare");
+      expect(screen.getByRole("link", { name: "FlareQuorum home" })).toHaveTextContent("FLAREQUORUM");
+      expect(document.querySelector(".flare-quorum-app")).not.toBeNull();
       expect(screen.queryByRole("button", { name: "PUBLIC" })).toBeNull();
     } finally {
       vi.unstubAllEnvs();

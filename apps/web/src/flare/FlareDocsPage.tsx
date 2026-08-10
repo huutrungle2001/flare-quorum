@@ -65,10 +65,10 @@ export function FlareDocsPage() {
         </aside>
         <article className="docs-content">
           <section id="flare-coston2">
-            <p className="eyebrow">VEILBID FLARE / COSTON2 · CURRENT JUDGE PATH</p>
+            <p className="eyebrow">FLAREQUORUM / COSTON2 · CURRENT JUDGE PATH</p>
             <h1>Public evidence.<br /><em>Private computation.</em></h1>
             <p className="docs-lede">
-              VeilBid turns an XRP-native procurement decision into one verifiable
+              FlareQuorum turns an XRP-native procurement decision into one verifiable
               Coston2 lifecycle: public rules and FTestXRP escrow, browser-encrypted
               vendor bids, private FCC scoring, and a matching threshold result.
             </p>
@@ -132,7 +132,7 @@ export function FlareDocsPage() {
             </p>
             <StepList steps={[
               { title: "Connect a Coston2 wallet for a write", copy: "The wallet must explicitly approve FTestXRP and create the tender; the public dossier remains wallet-free." },
-              { title: "Use the XRP-native handoff when needed", copy: "Prepare the exact XRPL Testnet Payment draft and 0xFE memo. GemWallet is optional and receives only the public transaction hash; VeilBid never receives a seed." },
+              { title: "Use the XRP-native handoff when needed", copy: "Prepare the exact XRPL Testnet Payment draft and 0xFE memo. GemWallet is optional and receives only the public transaction hash; FlareQuorum never receives a seed." },
               { title: "Treat delayed minting as pending", copy: "A DirectMintingDelayed response is not success. The executor checkpoint reuses the same public payment, FDC request, and Smart Account nonce without asking for a second payment." },
             ]} />
           </section>

@@ -77,7 +77,7 @@ function browserCapture(chrome, path, viewport, screenshotName) {
         ],
         { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
       );
-      const appRendered = result.stdout.includes("VEILBID") && result.stdout.includes("SKIP TO CONTENT");
+      const appRendered = result.stdout.includes("FLAREQUORUM") && result.stdout.includes("SKIP TO CONTENT");
       const publicStateLoaded = !result.stdout.includes("Coston2 state unavailable");
       if (result.status === 0 && existsSync(screenshotPath) && appRendered && publicStateLoaded) {
         delaySync(2_000);
@@ -146,8 +146,8 @@ const assertions = {
   publicEvidenceNoWalletGate: evidenceRoute.dom.includes("PUBLIC VERIFICATION ONLY") && evidenceRoute.dom.includes("NO BID DECRYPTION") && !evidenceRoute.dom.includes("Wallet providers are unavailable"),
   publicFinalizerRendered: finalizerRoute.dom.includes("Advance public checkpoints.") && finalizerRoute.dom.includes("CANONICAL ACTION QUEUE") && finalizerRoute.dom.includes("no bid-decryption capability"),
   buyerBriefRendered: buyerRoute.dom.includes("Public objective") && buyerRoute.dom.includes("Acceptance criteria") && buyerRoute.dom.includes("Optional vendor questions"),
-  xrpFundingBoundaryRendered: treasuryRoute.dom.includes("XRP TREASURY / XRPL") && treasuryRoute.dom.includes("Keep the XRPL signature outside VeilBid") && treasuryRoute.dom.includes("DirectMintingDelayed") && treasuryRoute.dom.includes("NON-CUSTODIAL") && treasuryRoute.dom.includes("PREPARE PUBLIC 0xFE JOB") && treasuryRoute.dom.includes("XRPL owner address") && treasuryRoute.dom.includes("wallet-ready XRPL Payment draft") && treasuryRoute.dom.includes("AssetManager destination and fee"),
-  evmBuyerSeparatedFromXrpTreasury: buyerRoute.dom.includes("COSTON2 BUYER / EVM RECOVERY PATH") && !buyerRoute.dom.includes("Keep the XRPL signature outside VeilBid"),
+  xrpFundingBoundaryRendered: treasuryRoute.dom.includes("XRP TREASURY / XRPL") && treasuryRoute.dom.includes("Keep the XRPL signature outside FlareQuorum") && treasuryRoute.dom.includes("DirectMintingDelayed") && treasuryRoute.dom.includes("NON-CUSTODIAL") && treasuryRoute.dom.includes("PREPARE PUBLIC 0xFE JOB") && treasuryRoute.dom.includes("XRPL owner address") && treasuryRoute.dom.includes("wallet-ready XRPL Payment draft") && treasuryRoute.dom.includes("AssetManager destination and fee"),
+  evmBuyerSeparatedFromXrpTreasury: buyerRoute.dom.includes("COSTON2 BUYER / EVM RECOVERY PATH") && !buyerRoute.dom.includes("Keep the XRPL signature outside FlareQuorum"),
   vendorRedemptionBoundaryRendered: vendorRoute.dom.includes("Request XRP redemption") && vendorRoute.dom.includes("Connect the winning Coston2 wallet"),
   noPublicStateFailureRendered: [desktop, tenderRoom, mobile, evidenceRoute, treasuryRoute, buyerRoute, vendorRoute, finalizerRoute]
     .every((capture) => !capture.dom.includes("Coston2 state unavailable") && !capture.dom.includes("Flare state unavailable")),

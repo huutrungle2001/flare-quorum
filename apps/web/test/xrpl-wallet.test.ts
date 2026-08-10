@@ -33,7 +33,7 @@ describe("GemWallet XRPL Testnet boundary", () => {
     expect(mocks.sendPayment).toHaveBeenCalledWith({
       amount: "1000000",
       destination: owner,
-      memos: [{ memo: { memoData: "FE".repeat(42), memoType: "VEILBID_0XFE" } }],
+      memos: [{ memo: { memoData: "FE".repeat(42), memoType: "FLAREQUORUM_0XFE" } }],
     });
   });
 
@@ -44,4 +44,3 @@ describe("GemWallet XRPL Testnet boundary", () => {
     expect(mocks.sendPayment).not.toHaveBeenCalled();
   });
 });
-

@@ -157,7 +157,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
       <header className="detail-header">
         <div>
           <p className="eyebrow">FLAGSHIP FUNDING / XRPL → FDC → SMART ACCOUNT</p>
-          <h2>Keep the XRPL signature outside VeilBid</h2>
+          <h2>Keep the XRPL signature outside FlareQuorum</h2>
         </div>
         <span className="privacy-badge verified">NON-CUSTODIAL</span>
       </header>
@@ -222,13 +222,13 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
           </dl>
           <details className="funding-job-details" open>
             <summary>WALLET-READY XRPL PAYMENT DRAFT</summary>
-            <p className="form-hint">Copy this public JSON into an XRPL testnet wallet or use it to fill a Payment form. The wallet signs it; VeilBid never receives the seed or private key.</p>
+            <p className="form-hint">Copy this public JSON into an XRPL testnet wallet or use it to fill a Payment form. The wallet signs it; FlareQuorum never receives the seed or private key.</p>
             <pre>{preview.paymentDraftJson}</pre>
             <button className="secondary-button" type="button" onClick={() => void copyPaymentDraft()}>{paymentCopied ? "COPIED PAYMENT DRAFT ✓" : "COPY PAYMENT DRAFT JSON"}</button>
             <button className="secondary-button" type="button" onClick={() => void submitWithGemWallet()} disabled={busy || walletBusy || walletSubmitted || Boolean(preview.xrplTransactionId)}>
               {walletBusy ? "WAITING FOR GEMWALLET…" : walletSubmitted || preview.xrplTransactionId ? "PUBLIC PAYMENT ALREADY PROVIDED ✓" : "SIGN & SUBMIT WITH GEMWALLET ↗"}
             </button>
-            <p className="form-hint">Optional browser-native path: GemWallet must be on XRPL Testnet and will show the exact destination, amount, and memo for your approval. VeilBid receives only the public transaction ID.</p>
+            <p className="form-hint">Optional browser-native path: GemWallet must be on XRPL Testnet and will show the exact destination, amount, and memo for your approval. FlareQuorum receives only the public transaction ID.</p>
           </details>
           <label className="funding-code-field">
             0xFE memo data
@@ -254,7 +254,7 @@ export function FlareXrpFundingPanel({ onPrepare }: FlareXrpFundingPanelProps) {
       <div className="readiness-strip" aria-live="polite">
         <span className="signal-dot" aria-hidden="true" />
         <div>
-          <strong>XRPL wallet signing stays outside VeilBid.</strong>
+          <strong>XRPL wallet signing stays outside FlareQuorum.</strong>
           <span>GemWallet may submit the public Payment after your approval; the dedicated executor still handles FDC/minting and never receives an XRPL signing key.</span>
         </div>
       </div>

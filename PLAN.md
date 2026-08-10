@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Execution Plan
+# FlareQuorum Championship Execution Plan
 
 > Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
 > lifecycle, and Gate G pass on Coston2. Three stable Railway FCC origins accept encrypted bids and
@@ -27,7 +27,7 @@ The supplied competition requirements are preserved in
 
 ## 1. Championship product
 
-**Product:** VeilBid Flare
+**Product:** FlareQuorum
 
 **One-line pitch:** XRP treasuries fund procurement from XRPL, vendors submit
 private multi-criteria offers, a quorum of Flare TEEs selects the best eligible
@@ -384,7 +384,7 @@ intent describes the outcome, budget, deadline, and public acceptance policy;
 approved vendors, solvers, or executors submit private offers; escrow releases
 only against a frozen milestone proof.
 
-The existing VeilBid Flare market remains the championship vertical slice. Its
+The existing FlareQuorum market remains the championship vertical slice. Its
 FCC ingress, receipt quorum, deterministic selection, FTSO binding, Smart
 Account funding, FDC proof adapters, settlement, and public evidence are the
 technical foundation. The historical VeilBid repository remains read-only and

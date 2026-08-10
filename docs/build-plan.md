@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Build Plan
+# FlareQuorum Championship Build Plan
 
 > Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
 > lifecycle, and Gate G pass with three registered Coston2 FCC machines and a verified XRP-native

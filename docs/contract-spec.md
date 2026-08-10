@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Contract Specification
+# FlareQuorum Championship Contract Specification
 
 > Status: The local Flare market slice implements canonical public scoring
 > policy, receipt quorum, conditional close-time FTSO, canonical FCC

@@ -1,4 +1,4 @@
-# VeilBid Flare Architecture Decision Record
+# FlareQuorum Architecture Decision Record
 
 > Status: Accepted decisions with live Coston2 implementation/evidence for the
 > FCC, ingress, market, and XRP-native funding path. Restart/recovery, final
@@ -7,7 +7,7 @@
 
 ## ADR-001 — Product shape
 
-**Decision:** VeilBid Flare is a confidential multi-criteria procurement system
+**Decision:** FlareQuorum is a confidential multi-criteria procurement system
 for XRP-native and Flare treasuries, not a price-only sealed auction.
 
 The championship release must demonstrate one coherent lifecycle:

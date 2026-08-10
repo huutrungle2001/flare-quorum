@@ -202,7 +202,7 @@ export function FlareRedemptionPanel({
       </header>
       <p>
         An awarded vendor may request redemption of public FTestXRP through the
-        verified AssetManager. The wallet signs both approval and request; VeilBid
+        verified AssetManager. The wallet signs both approval and request; FlareQuorum
         never asks for an XRPL secret. The agent pays the XRPL address later, so a
         submitted request is not an instant payout.
       </p>

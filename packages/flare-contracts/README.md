@@ -1,4 +1,4 @@
-# VeilBid Flare contracts
+# FlareQuorum contracts
 
 This package contains only the Coston2/Flare implementation. The historical
 Sepolia/Nox contracts remain isolated in `packages/contracts`.

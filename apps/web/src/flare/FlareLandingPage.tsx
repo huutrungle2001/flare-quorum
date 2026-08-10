@@ -7,7 +7,7 @@ const workspaces = [
   ["02", "BUYER", "Open an EVM recovery tender from a connected Coston2 wallet with the public brief hashed into the market.", "/flare?role=buyer", "OPEN BUYER"],
   ["03", "PRIVATE BIDS", "Submit a sealed vendor bid through the three-machine FCC ingress and keep commercial terms outside chain state.", "/flare?role=vendor", "OPEN PRIVATE BIDS"],
   ["04", "ACTIVITY", "Advance permissionless close and inspect relay-ready FCC checkpoints without choosing a winner in the browser.", "/flare?role=finalizer", "OPEN ACTIVITY"],
-  ["05", "XRP TREASURY", "Prepare the XRP-native XRPL, FDC, and Smart Account funding handoff without placing an XRPL secret in VeilBid.", "/flare?role=treasury", "OPEN XRP TREASURY"],
+  ["05", "XRP TREASURY", "Prepare the XRP-native XRPL, FDC, and Smart Account funding handoff without placing an XRPL secret in FlareQuorum.", "/flare?role=treasury", "OPEN XRP TREASURY"],
   ["06", "AUDITOR", "Verify the public binding, commitments, result digest, payout, and remainder with no signer or reveal path.", "/flare?role=auditor", "OPEN AUDITOR"],
 ] as const;
 
@@ -22,7 +22,7 @@ export function FlareLandingPage() {
           <div className="landing-lede">
             <div className="flare-marketing-signal"><FlareProcurementSignal /></div>
             <p>
-              VeilBid makes public procurement rules easy to inspect while
+              FlareQuorum makes public procurement rules easy to inspect while
               vendors seal price, delivery, warranty, and qualification terms
               to three fixed FCC TEEs. Two matching machines unlock one public
               FTestXRP award; losing offers never become browser or chain data.
@@ -106,7 +106,7 @@ export function FlareLandingPage() {
         <section className="landing-faq">
           <div><p className="eyebrow">BEFORE YOU START</p><h2>Common questions.</h2></div>
           <div>
-            <details><summary>Do I need a wallet to inspect VeilBid?</summary><p>No. Public dossiers and Auditor evidence are wallet-free. Connect only for a Coston2 transaction or the XRP Treasury handoff.</p></details>
+            <details><summary>Do I need a wallet to inspect FlareQuorum?</summary><p>No. Public dossiers and Auditor evidence are wallet-free. Connect only for a Coston2 transaction or the XRP Treasury handoff.</p></details>
             <details><summary>Why is the app split into Public and Activity?</summary><p>Public is the wallet-free judge path. Activity/Public Finalizer exposes canonical lifecycle readiness and safe close/recovery actions without granting winner or decryption authority.</p></details>
             <details><summary>Can a buyer or finalizer choose the winner?</summary><p>No. The market settles only a result signed by two distinct tender-fixed FCC identities over the exact frozen domain.</p></details>
             <details><summary>Are losing bids private?</summary><p>Yes, within the documented TEE boundary. Public participation and the winning amount remain visible; losing commercial terms do not.</p></details>

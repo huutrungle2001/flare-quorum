@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Feasibility Plan
+# FlareQuorum Championship Feasibility Plan
 
 > Status: Gate 0 passed on Coston2 at block `33745484`, Gate A passed at block
 > `33745987`, live Gate-B ingress/replay passed at block `33746423`, Gates C–F

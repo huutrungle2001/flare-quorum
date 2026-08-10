@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Verification Plan
+# FlareQuorum Championship Verification Plan
 
 > Status: Gates 0–A, the live Gate-B ingress/replay portion, Gates C–F, and Gate
 > G are recorded on Coston2. Two- and three-vendor encrypted lifecycles are now
@@ -65,7 +65,7 @@ wallet/executor secrets are never persisted.
 | Result threshold | Two distinct approved common-quorum signers agree; one signer, duplicate signer, and split digests fail | PARTIAL — live two-signature finalization plus local duplicate/split/wrong-domain tests pass; full live negative drill remains |
 | Domain/replay | Wrong root, rule, FTSO snapshot, close block, nonce, expiry, winner ID, or amount fails | PARTIAL — shared contract/binding/relay rejection suites plus live terminal replay/zero-result guards pass; full stateful live replay matrix remains |
 | FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | PASSED (local stateful multi-tender harness plus live C-E-F lifecycle) |
-| FAssets redemption | Awarded vendor can request an official amount-based FTestXRP/FXRP redemption without VeilBid custody | PASSED — live Coston2 approval and `RedemptionRequested` evidence in `fassets-redemption.release.json` |
+| FAssets redemption | Awarded vendor can request an official amount-based FTestXRP/FXRP redemption without FlareQuorum custody | PASSED — live Coston2 approval and `RedemptionRequested` evidence in `fassets-redemption.release.json` |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | PARTIAL — public binding, quote, nonce, proof-domain, and checkpoint-drift tests pass; full live fault-drill evidence remains |
 | Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage and organizer-supported three-machine replacement recovery are live; XRP funding checkpoint/resume, public-safe browser job preview, reload-safe public checkpoint with an explicit resume control, and GemWallet hash handoff are implemented and tested (`evidence/coston2/web-xrp-funding-checkpoint.json`); browser-native executor recovery and broader stateful fault drills remain |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED for the expanded hosted release — `evidence/coston2/web-production-smoke.json`, `evidence/coston2/web-role-workspaces.json`, and `evidence/coston2/flare-ingress-production.json` record the wallet-free role shell, finalized tender, trust boundary, and fail-closed ingress |
@@ -183,7 +183,7 @@ two-machine-loss drills.
   user-op bytes/hash, FDC proof, and AssetManager binding.
 - Duplicate proof/nonce, delayed proof, executor interruption, partial-call
   failure, and recovery after a mined public checkpoint.
-- Confirmation that VeilBid never receives or logs an XRPL secret.
+- Confirmation that FlareQuorum never receives or logs an XRPL secret.
 
 ## 6. Historical baseline and new-work ledger
 

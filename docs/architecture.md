@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Architecture
+# FlareQuorum Championship Architecture
 
 > Status: Accepted architecture implemented by the verified Coston2 release;
 > replacement-TEE recovery is the organizer-confirmed model and its rolling
@@ -216,7 +216,7 @@ same payment, FDC request/round, quote, nonce, and user-operation commitment
 before retrying the direct mint; no second XRPL payment is accepted and it
 never becomes a sample or optimistic success state.
 
-The PersonalAccount is the on-chain buyer. VeilBid has no XRPL key or custodial
+The PersonalAccount is the on-chain buyer. FlareQuorum has no XRPL key or custodial
 signer. Direct EVM funding remains a recovery and developer path.
 
 ## 9. Settlement and redemption

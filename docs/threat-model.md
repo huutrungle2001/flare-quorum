@@ -1,4 +1,4 @@
-# VeilBid Flare Championship Threat Model
+# FlareQuorum Championship Threat Model
 
 > Status: accepted security model with live Coston2 FCC, ingress, market, and
 > XRP-native evidence recorded. Adversarial/restart hardening and runtime-log
@@ -7,7 +7,7 @@
 
 ## 1. Security objectives
 
-VeilBid Flare aims to:
+FlareQuorum aims to:
 
 - keep every bid plaintext and ciphertext outside public calldata, storage,
   events, logs, analytics, and committed evidence;
@@ -56,10 +56,10 @@ release, display chain/market/extension/code/machine fingerprints, and clear
 session plaintext on account, network, tender, key, or policy changes.
 
 The flagship buyer path relies on an XRPL payment memo committing the exact
-Smart Account user-operation hash. VeilBid never receives an XRPL secret or
+Smart Account user-operation hash. FlareQuorum never receives an XRPL secret or
 operates a hidden buyer signer. The user may sign in an external wallet or the
 optional GemWallet browser integration; the latter is network- and address-
-checked before it asks the wallet to submit, and VeilBid receives only the
+checked before it asks the wallet to submit, and FlareQuorum receives only the
 public transaction ID. The executor accepts only that public ID and the
 domain-bound job.
 
@@ -98,7 +98,7 @@ The XRP-native journey trusts the supported Flare protocol deployments and
 their documented assumptions. FDC proves the supported XRPL payment statement;
 it does not prove procurement quality. FTSO supplies a public price snapshot;
 it does not hide conversion or settlement. FAssets and Smart Accounts provide
-minting, account, and redemption mechanics; VeilBid does not inherit a security
+minting, account, and redemption mechanics; FlareQuorum does not inherit a security
 guarantee beyond those exact interfaces.
 
 ### Relays, RPCs, and indexers

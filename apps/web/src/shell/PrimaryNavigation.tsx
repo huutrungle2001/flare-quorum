@@ -29,6 +29,7 @@ function HeaderWalletMenu({
     state.status === "connected" && state.account ? state.account : null;
   const wrongChain = state.status === "wrong-chain";
   const coston2 = network === "coston2";
+  const productName = coston2 ? "FlareQuorum" : "VeilBid";
   const networkLabel = coston2 ? "Flare Coston2" : "Ethereum Sepolia";
   const buttonLabel = connected
     ? shortAddress(connected)
@@ -128,7 +129,7 @@ function HeaderWalletMenu({
           ) : (
             <>
               <p>
-                Choose an EIP-6963 provider once. VeilBid connects it and asks
+                Choose an EIP-6963 provider once. {productName} connects it and asks
                 for the {networkLabel} switch automatically when needed. Private keys
                 never leave your wallet.
               </p>
@@ -180,7 +181,13 @@ export function PrimaryNavigation({
   const isTenders =
     location.pathname === tenderPath || (!flareReleaseEnabled && legacyTenderRoute);
   const isDocs = location.pathname === "/docs";
-  const isFlare = location.pathname === "/flare" || (flareReleaseEnabled && location.pathname === "/");
+  const isFlare = location.pathname === "/flare" || (
+    flareReleaseEnabled && (
+      location.pathname === "/" ||
+      location.pathname === "/docs"
+    )
+  );
+  const productName = isFlare ? "FlareQuorum" : "VeilBid";
   const items: NavigationItem[] = [
     { label: "TENDERS", to: tenderPath, active: isTenders },
     ...(!flareReleaseEnabled && import.meta.env.VITE_FLARE_MARKET_ADDRESS
@@ -225,11 +232,11 @@ export function PrimaryNavigation({
       <Link
         className={`wordmark${isHome ? " active" : ""}`}
         to="/"
-        aria-label="VeilBid home"
+        aria-label={`${productName} home`}
         aria-current={isHome ? "page" : undefined}
         onClick={scrollToPageTop}
       >
-        VEILBID
+        {isFlare ? "FLAREQUORUM" : "VEILBID"}
       </Link>
       <nav aria-label="Primary navigation">
         {items.map((item) => (

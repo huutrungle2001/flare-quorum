@@ -1,4 +1,4 @@
-# VeilBid Flare Repository Layout
+# FlareQuorum Repository Layout
 
 > Status: Current release layout. Historical workspaces remain isolated; new
 > Flare workspaces and release-facing additions are gated by feasibility and
@@ -7,7 +7,7 @@
 ## 1. Target structure
 
 ```text
-VeilBid/
+FlareQuorum/
 ├── apps/
 │   ├── web/                 # shared UI, migrated to Coston2 judge path
 │   ├── relay/               # stateless public lifecycle automation

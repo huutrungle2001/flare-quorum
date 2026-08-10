@@ -1,4 +1,4 @@
-# VeilBid Flare integration guide
+# FlareQuorum integration guide
 
 This guide is for an XRP treasury, procurement team, or wallet/infrastructure
 partner that wants to integrate the verified Coston2 release without taking
@@ -6,7 +6,7 @@ custody of a vendor bid or an XRPL secret.
 
 ## What the integration provides
 
-VeilBid exposes one public procurement lifecycle:
+FlareQuorum exposes one public procurement lifecycle:
 
 1. A buyer publishes a Buyer Brief and a complete scoring policy, then escrows
    public FTestXRP on Flare Coston2.
@@ -18,7 +18,7 @@ VeilBid exposes one public procurement lifecycle:
 4. Two distinct frozen TEE identities must sign the same bound result before
    the market pays the winner and conserves the remainder.
 5. The awarded vendor can request the official FAssets redemption amount. The
-   later agent payment is governed by FAssets; VeilBid never receives an XRPL
+   later agent payment is governed by FAssets; FlareQuorum never receives an XRPL
    secret and does not promise instant native-XRP payout.
 
 FCC is the selection boundary, FTSO supplies the close-time XRP/USD snapshot,
@@ -57,7 +57,7 @@ this order:
 GET  /flare/ingress/tenders/{tenderId}/machines
 POST /flare/ingress/bids                    (once per frozen machine)
 GET  /flare/ingress/tenders/{tenderId}/machines/{machineIndex}/results/{actionId}
-POST the three verified receipts to VeilBid's market contract
+POST the three verified receipts to FlareQuorum's market contract
 ```
 
 The machine discovery response contains only public encryption keys and frozen
@@ -98,7 +98,7 @@ exact UBA amount and 42-byte `0xFE` memo. A buyer may either copy that draft to
 an external wallet or use the optional GemWallet browser integration. The
 integration first verifies XRPL Testnet and the wallet address, asks the wallet
 to show/sign/submit the exact public Payment, and returns only its public
-transaction ID. VeilBid never receives an XRPL secret or signed private
+transaction ID. FlareQuorum never receives an XRPL secret or signed private
 material. If the follow-up Coston2 read is temporarily unavailable, the hash
 stays in the form so the buyer can retry preparation without sending a second
 payment. The dedicated server-side executor boundary above remains unchanged.

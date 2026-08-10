@@ -3,7 +3,7 @@
 This is a draft for a builder to review and send manually. It is not a claim
 that Flare or a user has endorsed the project.
 
-> VeilBid Flare is a Coston2 confidential procurement release for XRP
+> FlareQuorum is a Coston2 confidential procurement release for XRP
 > treasuries. Buyers publish auditable rules and escrow public FTestXRP;
 > vendors submit browser-encrypted bids to three registered FCC machines; the
 > market accepts only a matching 2-of-3 TEE result. The release also records a

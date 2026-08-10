@@ -14,7 +14,7 @@ const evidencePath = resolve(
 const release = JSON.parse(
   readFileSync(resolve(root, "packages/flare-contracts/deployments/coston2.release.json"), "utf8"),
 );
-const storageKey = "veilbid:flare-funding-checkpoint:v1";
+const storageKey = "flarequorum:funding-checkpoint:v1";
 const checkpoint = {
   schemaVersion: 1,
   xrplOwner: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p",

@@ -1,4 +1,4 @@
-# VeilBid Flare validation protocol
+# FlareQuorum validation protocol
 
 This protocol is ready for real participants. It is a plan, not evidence of
 completed interviews or pilot traction. Do not fill in results until a person
