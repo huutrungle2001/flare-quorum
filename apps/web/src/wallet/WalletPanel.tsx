@@ -37,18 +37,21 @@ export function WalletPanel({
   if (state.status === "wrong-chain") {
     return (
       <section className="wallet-panel warning" role="alert">
-        <div>
-          <span aria-hidden="true">!</span>
           <div>
-            <strong>{coston2 ? "Coston2 confirmation needed" : "Sepolia confirmation needed"}</strong>
-            <span>The automatic switch did not complete. Confirm the next wallet request.</span>
+            <span aria-hidden="true">!</span>
+            <div>
+              <strong>{coston2 ? "Coston2 confirmation needed" : "Sepolia confirmation needed"}</strong>
+              <span>
+                Wallet is on chain {state.chainId ?? "unknown"}. Confirm the next
+                request to add and switch to {networkLabel} (chain {coston2 ? 114 : 11155111}).
+              </span>
+            </div>
           </div>
-        </div>
         <button
           className="secondary-button"
           onClick={coston2 ? wallet.switchToCoston2 : wallet.switchToSepolia}
         >
-          RETRY {coston2 ? "COSTON2" : "SEPOLIA"} CONNECTION →
+          ADD / SWITCH TO {coston2 ? "COSTON2" : "SEPOLIA"} →
         </button>
       </section>
     );

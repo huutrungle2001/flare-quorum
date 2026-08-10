@@ -31,12 +31,17 @@ const coston2 = {
   name: "Coston2",
   nativeCurrency: { name: "Coston2 Flare", symbol: "C2FLR", decimals: 18 },
   rpcUrls: { default: { http: ["https://coston2-api.flare.network/ext/C/rpc"] } },
+  blockExplorers: {
+    default: { name: "Coston2 Explorer", url: "https://coston2-explorer.flare.network" },
+  },
 } as const;
 
-const networkConfig: Record<WalletNetwork, {
+type WalletNetworkConfig = {
   chain: typeof sepolia | typeof coston2;
   label: string;
-}> = {
+};
+
+const networkConfig: Record<WalletNetwork, WalletNetworkConfig> = {
   sepolia: { chain: sepolia, label: "Ethereum Sepolia" },
   coston2: { chain: coston2, label: "Flare Coston2" },
 };
@@ -86,6 +91,54 @@ async function currentChain(provider: EIP1193Provider) {
       method: "eth_chainId",
     }),
   );
+}
+
+function errorCode(error: unknown): number | null {
+  if (!error || typeof error !== "object") return null;
+  const value = (error as { code?: unknown }).code;
+  return typeof value === "number" ? value : null;
+}
+
+function isUnknownChainError(error: unknown): boolean {
+  const code = errorCode(error);
+  if (code === 4902) return true;
+  const message = error instanceof Error ? error.message : String(error);
+  return /unknown chain|unrecognized chain|chain not added|does not exist/i.test(message);
+}
+
+async function switchWalletChain(
+  provider: EIP1193Provider,
+  config: WalletNetworkConfig,
+) {
+  const chainId = numberToHex(config.chain.id);
+  try {
+    await provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId }],
+    });
+  } catch (error) {
+    if (!isUnknownChainError(error)) throw error;
+    await provider.request({
+      method: "wallet_addEthereumChain",
+      params: [{
+        chainId,
+        chainName: config.chain.name,
+        nativeCurrency: config.chain.nativeCurrency,
+        rpcUrls: config.chain.rpcUrls.default.http,
+        ...(config.chain.blockExplorers
+          ? { blockExplorerUrls: [config.chain.blockExplorers.default.url] }
+          : {}),
+      }],
+    });
+    await provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId }],
+    });
+  }
+  const detectedChainId = await currentChain(provider);
+  if (detectedChainId !== config.chain.id) {
+    throw new Error(`Wallet did not switch to ${config.label}`);
+  }
 }
 
 function connectedState(
@@ -162,10 +215,7 @@ export function useWallet(network: WalletNetwork = "sepolia") {
           toastId,
           `${detail.info.name} authorized. Confirm the switch to ${config.label}…`,
         );
-        await detail.provider.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: numberToHex(config.chain.id) }],
-        });
+        await switchWalletChain(detail.provider, config);
         detectedChainId = await currentChain(detail.provider);
         if (detectedChainId !== config.chain.id) {
           throw new Error(`Wallet did not switch to ${config.label}`);
@@ -207,10 +257,7 @@ export function useWallet(network: WalletNetwork = "sepolia") {
       "Waiting for the wallet to switch to Ethereum Sepolia…",
     );
     try {
-      await detail.provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: numberToHex(sepolia.id) }],
-      });
+      await switchWalletChain(detail.provider, networkConfig.sepolia);
       const account = await accounts(detail.provider, false);
       if (!account) throw new Error("Wallet has no connected account");
       setState((current) =>
@@ -235,10 +282,7 @@ export function useWallet(network: WalletNetwork = "sepolia") {
       "Waiting for the wallet to switch to Flare Coston2…",
     );
     try {
-      await detail.provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: numberToHex(coston2.id) }],
-      });
+      await switchWalletChain(detail.provider, networkConfig.coston2);
       const account = await accounts(detail.provider, false);
       if (!account) throw new Error("Wallet has no connected account");
       setState((current) =>

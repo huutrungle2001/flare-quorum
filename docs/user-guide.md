@@ -186,8 +186,14 @@ Every workflow labels data as one of:
 
 ## 8. Troubleshooting
 
-- **Wrong network or release:** disable writes and compare the verified Coston2
-  manifest and runtime.
+- **Wrong network or release:** the header changes to `SWITCH TO COSTON2` and
+  the role panel shows `ADD / SWITCH TO COSTON2`. Confirm that wallet request;
+  if Coston2 is not saved in the wallet yet, FlareQuorum asks to add the
+  official chain (ID `114`) before enabling writes. If the request is rejected,
+  retry from the same button after unlocking the selected wallet. The app never
+  asks for a signature just to connect; transaction buttons open the separate
+  wallet signing prompt only after the correct chain is active. Compare the
+  verified Coston2 manifest and runtime before retrying writes.
 - **Machine key/policy changed:** discard the unsent payload; a live tender must
   not silently adopt the new policy.
 - **Receipt quorum failed:** do not submit a weaker receipt set; retry only the

@@ -9,8 +9,11 @@ const secondAccount = "0x2222222222222222222222222222222222222222";
 
 class TestProvider {
   chainId = "0xaa36a7";
+  switchChainId = "0xaa36a7";
   accounts = [account];
   rejectSwitch = false;
+  unknownChain = false;
+  addedChain = false;
   requestedMethods: string[] = [];
   listeners = new Map<string, Set<(...parameters: unknown[]) => void>>();
 
@@ -22,8 +25,15 @@ class TestProvider {
     if (method === "eth_chainId") return this.chainId;
     if (method === "wallet_switchEthereumChain") {
       if (this.rejectSwitch) throw new Error("Switch rejected");
-      this.chainId = "0xaa36a7";
+      if (this.unknownChain && !this.addedChain) {
+        throw Object.assign(new Error("Unrecognized chain"), { code: 4902 });
+      }
+      this.chainId = this.switchChainId;
       this.emit("chainChanged", this.chainId);
+      return null;
+    }
+    if (method === "wallet_addEthereumChain") {
+      this.addedChain = true;
       return null;
     }
     throw new Error(`Unsupported method: ${method}`);
@@ -97,6 +107,26 @@ describe("provider-aware wallet session", () => {
     expect(result.current.state.status).toBe("connected");
     expect(result.current.state.walletClient).not.toBeNull();
     expect(provider.requestedMethods).toContain("wallet_switchEthereumChain");
+  });
+
+  it("adds Coston2 when the wallet has not saved the network yet", async () => {
+    const provider = new TestProvider();
+    provider.chainId = "0x1";
+    provider.switchChainId = "0x72";
+    provider.unknownChain = true;
+    const { result } = renderHook(() => useWallet("coston2"));
+
+    act(() => announce(provider));
+    await waitFor(() => expect(result.current.state.providers).toHaveLength(1));
+    await act(() => result.current.connect(result.current.state.providers[0]));
+
+    expect(result.current.state.status).toBe("connected");
+    expect(result.current.state.chainId).toBe(114);
+    expect(result.current.state.walletClient).not.toBeNull();
+    expect(provider.requestedMethods).toEqual(expect.arrayContaining([
+      "wallet_switchEthereumChain",
+      "wallet_addEthereumChain",
+    ]));
   });
 
   it("keeps a connected wrong-chain wallet recoverable when switching is rejected", async () => {

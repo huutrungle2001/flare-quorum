@@ -34,7 +34,7 @@ function HeaderWalletMenu({
   const buttonLabel = connected
     ? shortAddress(connected)
     : wrongChain
-      ? "WRONG NETWORK"
+      ? `SWITCH TO ${coston2 ? "COSTON2" : "SEPOLIA"}`
       : state.status === "connecting"
         ? "CONNECTING WALLET…"
         : "CONNECT WALLET";
@@ -65,10 +65,18 @@ function HeaderWalletMenu({
         type="button"
         aria-expanded={open}
         aria-haspopup="dialog"
-        onClick={() => setOpen((current) => !current)}
+        aria-label={wrongChain ? `Switch wallet to ${networkLabel}` : undefined}
+        onClick={() => {
+          if (wrongChain) {
+            setOpen(true);
+            void (coston2 ? wallet.switchToCoston2() : wallet.switchToSepolia());
+            return;
+          }
+          setOpen((current) => !current);
+        }}
         disabled={state.status === "connecting"}
       >
-        <span aria-hidden="true">{connected ? "✓" : "◇"}</span>
+        <span aria-hidden="true">{connected ? "✓" : wrongChain ? "!" : "◇"}</span>
         {buttonLabel}
       </button>
       {open && (
@@ -108,20 +116,25 @@ function HeaderWalletMenu({
             <>
               <strong>{coston2 ? "Coston2" : "Sepolia"} confirmation needed</strong>
               <p>
-                The wallet connected, but the automatic network switch did not
-                complete. Confirm the next wallet request to enable signing.
+                The wallet is on chain {state.chainId ?? "unknown"}. FlareQuorum
+                needs {networkLabel} (chain {coston2 ? 114 : 11155111}) before it
+                can send a transaction. The next request adds the network if your
+                wallet has not saved it yet, then switches to it.
               </p>
               <button
                 className="primary-button"
                 type="button"
                 onClick={() => void (coston2 ? wallet.switchToCoston2() : wallet.switchToSepolia())}
               >
-                RETRY {coston2 ? "COSTON2" : "SEPOLIA"} CONNECTION →
+                ADD / SWITCH TO {coston2 ? "COSTON2" : "SEPOLIA"} →
               </button>
               <button
                 className="secondary-button"
                 type="button"
-                onClick={wallet.disconnect}
+                onClick={() => {
+                  wallet.disconnect();
+                  setOpen(false);
+                }}
               >
                 CHOOSE ANOTHER WALLET
               </button>
