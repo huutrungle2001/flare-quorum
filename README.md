@@ -199,6 +199,7 @@ Verified public release facts:
 - [Original Source Materials](docs/original/README.md)
 - [Competition Requirements and Judging Map](docs/hackathon-brief.md)
 - [FCC Coston2 Operational Baseline](docs/fcc-coston2-operations.md)
+- [V2 Staged Release Runbook](docs/v2-release-runbook.md)
 - [User Guide](docs/user-guide.md)
 - [Championship Execution Plan](PLAN.md)
 - [Architecture Decisions](docs/architecture-decisions.md)
