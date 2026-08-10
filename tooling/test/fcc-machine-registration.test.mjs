@@ -3,6 +3,7 @@ import test from "node:test";
 import { privateKeyToAccount } from "viem/accounts";
 
 import {
+  evaluateActiveMachineSet,
   evaluateRegisteredMachine,
   inspectMachineRegistrationEndpoints,
   isTeeNotFoundError,
@@ -143,6 +144,56 @@ test("repairs only an existing machine whose registered route differs", () => {
     teeProxyId: "0x0000000000000000000000000000000000000000",
     url: "",
   }, machine), null);
+});
+
+test("accepts only the exact three active identities and routes", () => {
+  const expectedMachines = [1, 2, 3].map((value) => ({
+    teeId: `0x${value.toString(16).padStart(40, "0")}`,
+    publicUrl: `https://tee-${value}.example/`,
+  }));
+  const activeIds = expectedMachines.map(({ teeId }) => teeId).reverse();
+  const activeUrls = expectedMachines.map(({ publicUrl }) =>
+    publicUrl.replace(/\/$/, "")
+  ).reverse();
+  assert.equal(
+    evaluateActiveMachineSet(activeIds, activeUrls, expectedMachines).status,
+    "PASSED",
+  );
+
+  const staleId = "0x0000000000000000000000000000000000000004";
+  const withStaleMachine = evaluateActiveMachineSet(
+    [...activeIds, staleId],
+    [...activeUrls, expectedMachines[0].publicUrl],
+    expectedMachines,
+  );
+  assert.equal(withStaleMachine.status, "FAILED");
+  assert.equal(withStaleMachine.assertions.exactlyThreeActiveMachines, false);
+
+  const wrongRoute = evaluateActiveMachineSet(
+    activeIds,
+    ["https://stale.example", ...activeUrls.slice(1)],
+    expectedMachines,
+  );
+  assert.equal(wrongRoute.status, "FAILED");
+  assert.equal(wrongRoute.assertions.exactActiveRoutes, false);
+
+  const expectedSubset = evaluateActiveMachineSet(
+    activeIds.slice(0, 1),
+    activeUrls.slice(0, 1),
+    expectedMachines,
+    { requireComplete: false },
+  );
+  assert.equal(expectedSubset.status, "PASSED");
+  assert.equal(expectedSubset.assertions.exactlyThreeActiveMachines, false);
+
+  const staleSubset = evaluateActiveMachineSet(
+    [staleId],
+    [expectedMachines[0].publicUrl],
+    expectedMachines,
+    { requireComplete: false },
+  );
+  assert.equal(staleSubset.status, "FAILED");
+  assert.equal(staleSubset.assertions.activeIdentitiesExpected, false);
 });
 
 test("recognizes only the current manager's TeeNotFound error", () => {

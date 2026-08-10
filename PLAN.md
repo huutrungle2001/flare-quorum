@@ -339,6 +339,9 @@ confidential bid or settlement boundary:
 - [x] Gate the V2 candidate in CI with pinned Slither `0.11.6`; fail on every
   unsuppressed medium/high finding and keep the two reviewed exceptions scoped
   to their exact detector and function.
+- [x] Re-resolve `FtsoV2` from the live Flare registry before deployment or
+  promotion, and reject any unexpected active FCC identity/route before machine
+  registration; the complete post-registration set must be exactly three.
 - [ ] Deploy and verify V2 with a fresh FCC extension/machine set, then record
   both a flagship success lifecycle and a pre-dispatch full-refund lifecycle.
 - [x] Generate Flare bindings and reject all drift.

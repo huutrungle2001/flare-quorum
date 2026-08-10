@@ -9,6 +9,7 @@ import {
   http,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { resolveRegistryBindings } from "../flare/foundations.mjs";
 import { compareMarketRuntime } from "../flare/market-runtime-verifier.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
@@ -74,6 +75,14 @@ const chain = {
 const account = privateKeyToAccount(privateKey);
 const publicClient = createPublicClient({ chain, transport: http(rpcUrl, { timeout: 15_000, retryCount: 2 }) });
 const walletClient = createWalletClient({ account, chain, transport: http(rpcUrl, { timeout: 15_000, retryCount: 2 }) });
+const registryBindings = await resolveRegistryBindings({
+  client: publicClient,
+  registryAddress: official.flareContractRegistry,
+  expectedBindings: { FtsoV2: addresses.ftso },
+});
+if (!registryBindings.FtsoV2.matchesExpected) {
+  throw new Error("FTSOV2_REGISTRY_BINDING_DRIFT");
+}
 const [chainId, balance, dependencyCodes] = await Promise.all([
   publicClient.getChainId(),
   publicClient.getBalance({ address: account.address }),
@@ -123,6 +132,7 @@ const assertions = {
   paymentTokenBindingMatches: getAddress(paymentToken) === addresses.paymentToken,
   teeManagerBindingMatches: getAddress(teeManager) === addresses.teeManager,
   ftsoBindingMatches: getAddress(ftso) === addresses.ftso,
+  ftsoRegistryBindingFresh: registryBindings.FtsoV2.matchesExpected,
   extensionRegistryBindingMatches: getAddress(teeExtensionRegistry) === addresses.teeExtensionRegistry,
   awardReceiptCodePresent: awardCode !== undefined && awardCode !== "0x",
   awardReceiptMarketBindingMatches: getAddress(awardMarket) === market,

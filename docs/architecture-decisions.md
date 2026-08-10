@@ -768,6 +768,28 @@ flagship lifecycle, and one undispatched-refund lifecycle are recorded on
 Coston2. Until then, `coston2.release.json` and its V1 limitation remain the
 authoritative live facts.
 
+## ADR-029 — Live registry and exact active-machine preflight
+
+**Decision:** Every new market deployment and release promotion re-resolves
+`FtsoV2` from the live Coston2 `FlareContractRegistry` before any transaction or
+promotion write. A mismatch with the reviewed foundation binding is a hard
+failure even when the old address still contains bytecode.
+
+Machine registration separately queries `getActiveTeeMachines(extensionId)`.
+Before registration it permits only an empty or partial subset of the intended
+three identities with exact public routes; any foreign, duplicate, or stale
+identity/route blocks execution. After registration, the complete active set
+must be exactly the three intended identities and routes, and every individual
+machine binding must pass at one checkpoint. Stale retirement remains a
+separate irreversible owner operation guarded by unfinished-tender checks.
+
+**Reason:** Protocol addresses can change without making the retired contract
+revert, so deployed code alone cannot establish canonical FTSO authority.
+Likewise, a valid dispatch event and three healthy endpoints do not prove that
+the indexer-backed proxy is routing against the intended active set. These two
+pre-write checks turn silent dependency drift into explicit blockers without
+weakening FCC thresholds or changing a frozen tender.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:

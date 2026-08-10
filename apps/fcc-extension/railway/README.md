@@ -27,3 +27,15 @@ Attach a Railway volume at `/data` before registration. Upstream `tee-node`
 v0.0.23 creates a new simulated identity whenever its process starts, so any
 restart requires endpoint identity verification and re-registration. Do not
 redeploy a registered machine during the demo window.
+
+The co-located `tee-proxy` obtains instructions from the configured C-chain
+indexer database; `COSTON2_RPC_URL` does not replace that database path. A port
+connect alone is not an indexer health check: diagnose startup from inside the
+same Railway service and require a completed MySQL handshake/authenticated
+query plus a live proxy process. Never print the rendered TOML or database
+variables.
+
+After registration, require status `2` and run the machine preflight to compare
+the public `/info` identity, on-chain URL, and the extension's complete active
+machine set. Status `1`, a successful dispatch transaction, or an HTTP listener
+alone does not prove that the instruction can be consumed.

@@ -220,6 +220,59 @@ export function requiredMachineRouteUpdate(record, machine) {
   };
 }
 
+export function evaluateActiveMachineSet(
+  activeIds,
+  activeUrls,
+  expectedMachines,
+  { requireComplete = true } = {},
+) {
+  const expectedById = new Map(
+    expectedMachines.map(({ teeId, publicUrl }) => [
+      getAddress(teeId),
+      normalizeMachineOrigin(publicUrl),
+    ]),
+  );
+  const activeById = new Map(
+    activeIds.map((teeId, index) => [
+      getAddress(teeId),
+      normalizeMachineOrigin(activeUrls[index] ?? ""),
+    ]),
+  );
+  const assertions = {
+    activeArraysAligned: activeIds.length === activeUrls.length,
+    activeIdentitiesUnique: activeById.size === activeIds.length,
+    activeIdentitiesExpected:
+      [...activeById.keys()].every((teeId) => expectedById.has(teeId)),
+    activeRoutesExpected:
+      [...activeById].every(
+        ([teeId, publicUrl]) => expectedById.get(teeId) === publicUrl,
+      ),
+    exactlyThreeActiveMachines:
+      activeIds.length === 3 && activeById.size === 3,
+    exactActiveIdentitySet:
+      activeById.size === expectedById.size &&
+      [...expectedById.keys()].every((teeId) => activeById.has(teeId)),
+    exactActiveRoutes:
+      [...expectedById].every(
+        ([teeId, publicUrl]) => activeById.get(teeId) === publicUrl,
+      ),
+  };
+  const requiredAssertions = requireComplete
+    ? Object.values(assertions)
+    : [
+        assertions.activeArraysAligned,
+        assertions.activeIdentitiesUnique,
+        assertions.activeIdentitiesExpected,
+        assertions.activeRoutesExpected,
+      ];
+  return {
+    status: requiredAssertions.every(Boolean) ? "PASSED" : "FAILED",
+    activeMachineCount: activeIds.length,
+    completeSetRequired: requireComplete,
+    assertions,
+  };
+}
+
 export function isTeeNotFoundError(error) {
   let current = error;
   while (current && typeof current === "object") {

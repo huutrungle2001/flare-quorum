@@ -6,6 +6,8 @@ import {
   isStableProxyUrl,
   normalizePrivateKey,
   parseVersion,
+  registryBindingsMatch,
+  resolveRegistryBindings,
   verifyFccExtensionReleaseRecipe,
   verifyFccRuntimeAlignment,
   verifyTeeProxyReleaseRecipe,
@@ -56,6 +58,30 @@ test("normalizes a key without disclosing or mutating its bytes", () => {
 test("requires every assertion before reporting a passed gate", () => {
   assert.equal(gateStatus({ chain: true, manager: true }), "PASSED");
   assert.equal(gateStatus({ chain: true, manager: false }), "IN_PROGRESS");
+});
+
+test("resolves live registry bindings and rejects silent address drift", async () => {
+  const registry = "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019";
+  const expected = "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d";
+  const client = {
+    async readContract({ address, functionName, args, blockNumber }) {
+      assert.equal(address, registry);
+      assert.equal(functionName, "getContractAddressByName");
+      assert.deepEqual(args, ["FtsoV2"]);
+      assert.equal(blockNumber, 123n);
+      return expected;
+    },
+  };
+  const bindings = await resolveRegistryBindings({
+    client,
+    registryAddress: registry,
+    expectedBindings: { FtsoV2: expected },
+    blockNumber: 123n,
+  });
+  assert.equal(registryBindingsMatch(bindings), true);
+  assert.equal(registryBindingsMatch({
+    FtsoV2: { address: expected, matchesExpected: false },
+  }), false);
 });
 
 test("checks pinned source bytes against their SHA-256 digest", async () => {

@@ -20,6 +20,7 @@ import { privateKeyToAccount } from "viem/accounts";
 
 import {
   evaluateRegisteredMachine,
+  evaluateActiveMachineSet,
   inspectMachineRegistrationEndpoints,
   machineRegistrationEnvironment,
   machineEvidenceRelativePath,
@@ -38,6 +39,7 @@ const managerAbi = parseAbi([
   "function getPublicKey(address) view returns ((bytes32 x,bytes32 y))",
   "function getTeeMachine(address) view returns ((address teeId,address teeProxyId,string url))",
   "function getTeeMachineWithAttestationData(address) view returns ((address teeId,address initialTeeId,string url,bytes32 codeHash,bytes32 platform))",
+  "function getActiveTeeMachines(uint256 extensionId) view returns (address[] teeIds,string[] urls)",
   "function updateTeeMachineSettings(address teeId,address teeProxyId,string url)",
 ]);
 const repositoryRoot = resolve(import.meta.dirname, "../..");
@@ -96,13 +98,15 @@ function extractRegistrationBinary(recipe) {
   return binaryPath;
 }
 
-function publicPreflight(result, extraBlockers) {
+function publicPreflight(result, extraBlockers, activeSet) {
   const blockers = [...extraBlockers, ...result.blockers];
   return {
     status: blockers.length === 0 ? "READY" : "BLOCKED",
     mode: "simulated-coston2",
     command: "rRap",
     machineCount: result.machines.length,
+    activeMachineCount: activeSet?.activeMachineCount ?? null,
+    activeSetAssertions: activeSet?.assertions ?? null,
     machines: result.machines.map((machine) => ({
       machine: machine.machine,
       teeId: machine.teeId,
@@ -173,6 +177,18 @@ async function machineStatus({ client, manager, machine }) {
 
 async function verifyOnchainMachines({ client, manager, extensionId, endpointResult }) {
   const blockNumber = await client.getBlockNumber();
+  const [activeIds, activeUrls] = await client.readContract({
+    address: manager,
+    abi: managerAbi,
+    functionName: "getActiveTeeMachines",
+    args: [extensionId],
+    blockNumber,
+  });
+  const activeSet = evaluateActiveMachineSet(
+    activeIds,
+    activeUrls,
+    endpointResult.machines,
+  );
   const machines = [];
   for (const machine of endpointResult.machines) {
     const [status, registeredExtensionId, record, publicKey] = await Promise.all([
@@ -192,10 +208,12 @@ async function verifyOnchainMachines({ client, manager, extensionId, endpointRes
   }
   return {
     blockNumber,
-    status: machines.every(({ assertions }) => Object.values(assertions).every(Boolean))
+    status: activeSet.status === "PASSED" &&
+      machines.every(({ assertions }) => Object.values(assertions).every(Boolean))
       ? "PASSED"
       : "FAILED",
     machines,
+    activeSet,
   };
 }
 
@@ -235,7 +253,35 @@ try {
     expected,
     forbiddenHostnameSuffix: manifest.externalRequirements.forbiddenProxyHostnameSuffix,
   });
-  const preflight = publicPreflight(endpointResult, extraBlockers);
+  let activeSet;
+  if (
+    secureRpcUrl(rpcUrl) &&
+    /^0x[0-9a-f]{64}$/i.test(extensionIdHex ?? "")
+  ) {
+    try {
+      const readClient = createPublicClient({
+        transport: http(rpcUrl, { retryCount: 2, timeout: 20_000 }),
+      });
+      const [activeIds, activeUrls] = await readClient.readContract({
+        address: getAddress(manifest.contracts.flareTeeManager),
+        abi: managerAbi,
+        functionName: "getActiveTeeMachines",
+        args: [BigInt(extensionIdHex)],
+      });
+      activeSet = evaluateActiveMachineSet(
+        activeIds,
+        activeUrls,
+        endpointResult.machines,
+        { requireComplete: false },
+      );
+      if (activeSet.status !== "PASSED") {
+        extraBlockers.push("FCC_ACTIVE_MACHINE_SET_CONFLICT");
+      }
+    } catch {
+      extraBlockers.push("FCC_ACTIVE_MACHINE_SET_UNAVAILABLE");
+    }
+  }
+  const preflight = publicPreflight(endpointResult, extraBlockers, activeSet);
   if (!process.argv.includes("--execute") || preflight.status !== "READY") {
     console.log(JSON.stringify(preflight, null, 2));
     if (preflight.status !== "READY") process.exitCode = 1;
@@ -311,12 +357,14 @@ try {
         extensionId: extensionIdHex,
         command: "rRap",
         simulatedTee: true,
+        activeMachineCount: verification.activeSet.activeMachineCount,
         machines: verification.machines,
       },
       assertions: {
         threeMachinesVerified: verification.machines.length === 3,
         allProductionAndBound: verification.status === "PASSED",
         threeDistinctIdentities: new Set(verification.machines.map(({ teeId }) => teeId)).size === 3,
+        exactActiveMachineSet: verification.activeSet.status === "PASSED",
       },
       notes: [
         "This evidence records public Coston2 machine bindings only and does not claim hardware-backed confidentiality.",

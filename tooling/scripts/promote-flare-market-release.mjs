@@ -7,6 +7,7 @@ import {
   getAddress,
   http,
 } from "viem";
+import { resolveRegistryBindings } from "../flare/foundations.mjs";
 import { compareMarketRuntime } from "../flare/market-runtime-verifier.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
@@ -138,6 +139,15 @@ if (
 ) throw new Error("MARKET_RUNTIME_MISMATCH");
 const decoded = decodeDeployData({ abi: artifact.abi, bytecode, data: deploymentTransaction.input });
 const official = gate0.publicIdentifiers.contracts;
+const registryBindings = await resolveRegistryBindings({
+  client: publicClient,
+  registryAddress: official.flareContractRegistry,
+  expectedBindings: { FtsoV2: official.ftsoV2 },
+  blockNumber: latestBlock - 12n,
+});
+if (!registryBindings.FtsoV2.matchesExpected) {
+  throw new Error("FTSOV2_REGISTRY_BINDING_DRIFT");
+}
 const constructorArguments = [
   getAddress(official.fTestXRP),
   getAddress(official.flareTeeManager),

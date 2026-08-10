@@ -44,6 +44,33 @@ const ftsoAbi = parseAbi([
   "function getSupportedFeedIds() view returns (bytes21[])",
 ]);
 
+export async function resolveRegistryBindings({
+  client,
+  registryAddress,
+  expectedBindings,
+  blockNumber,
+}) {
+  const resolved = {};
+  for (const [name, expected] of Object.entries(expectedBindings)) {
+    const address = getAddress(await client.readContract({
+      address: getAddress(registryAddress),
+      abi: registryAbi,
+      functionName: "getContractAddressByName",
+      args: [name],
+      blockNumber,
+    }));
+    resolved[name] = {
+      address,
+      matchesExpected: address === getAddress(expected),
+    };
+  }
+  return resolved;
+}
+
+export function registryBindingsMatch(bindings) {
+  return Object.values(bindings).every(({ matchesExpected }) => matchesExpected);
+}
+
 function command(program, args) {
   const result = spawnSync(program, args, { encoding: "utf8" });
   return {
@@ -290,20 +317,18 @@ export async function inspectFoundations({
     codeSizes[name] = bytecode ? (bytecode.length - 2) / 2 : 0;
   }
 
-  const registryResults = {};
-  for (const [name, expected] of Object.entries(manifest.registryNames)) {
-    registryResults[name] = await client.readContract({
-      address: getAddress(manifest.contracts.flareContractRegistry),
-      abi: registryAbi,
-      functionName: "getContractAddressByName",
-      args: [name],
-      blockNumber,
-    });
-    registryResults[name] = getAddress(registryResults[name]);
-    if (registryResults[name] !== getAddress(expected)) {
-      registryResults[name] = `${registryResults[name]}:MISMATCH`;
-    }
-  }
+  const resolvedRegistryBindings = await resolveRegistryBindings({
+    client,
+    registryAddress: manifest.contracts.flareContractRegistry,
+    expectedBindings: manifest.registryNames,
+    blockNumber,
+  });
+  const registryResults = Object.fromEntries(
+    Object.entries(resolvedRegistryBindings).map(([name, binding]) => [
+      name,
+      binding.matchesExpected ? binding.address : `${binding.address}:MISMATCH`,
+    ]),
+  );
 
   const [
     nextPublicExtensionId,
@@ -496,9 +521,7 @@ export async function inspectFoundations({
   const indexerConfigured = manifest.externalRequirements.indexerEnvironmentVariables.every(
     (name) => Boolean(environment[name]),
   );
-  const registryDiscoveryMatches = Object.values(registryResults).every(
-    (value) => !value.endsWith(":MISMATCH"),
-  );
+  const registryDiscoveryMatches = registryBindingsMatch(resolvedRegistryBindings);
   const [feedValue, feedDecimals, feedTimestamp] = feed;
   const assertions = {
     chainIdMatches: chainId === manifest.network.chainId,

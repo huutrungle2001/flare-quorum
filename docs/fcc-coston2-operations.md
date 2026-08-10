@@ -182,6 +182,47 @@ The machine record URL must equal the currently served stable URL. `PRODUCTION`
 alone does not prove private ingress, sealed state, scoring correctness, or
 multi-machine quorum.
 
+### 5.1 Instruction delivery and indexer diagnosis
+
+The organizer's 2026-08-10
+[routing clarification](original/fcc-indexer-routing-response-2026-08-10.md)
+matches the current official guide: the extension proxy consumes C-chain events
+through the configured indexer database, and the TEE node polls that proxy. An
+on-chain dispatch event therefore proves addressing, not delivery. The proxy's
+inbound FTDC response port is not a substitute instruction-delivery endpoint.
+
+Diagnose a dispatched-but-unexecuted instruction in this order:
+
+1. From the same runtime/network as `tee-proxy`, verify that the indexer returns
+   a MySQL handshake and an authenticated `SELECT 1`; a TCP-open result alone is
+   insufficient. Never print the connection string or password.
+2. Confirm the proxy process remains alive after database initialization and
+   that its local/public `/info` views expose the same extension and identity.
+3. Query `getActiveTeeMachines(extensionId)` and require exactly the three
+   intended identities and public origins. `pnpm flare:machines:register` now
+   rejects a missing, additional, duplicated, or stale active identity/route.
+4. Require every intended identity to be status `2`. Status `1` is a failed
+   readiness gate even if an availability keeper is running.
+5. If an old identity remains active, run
+   `pnpm flare:machines:retirement:preflight`. Pause it only through
+   `pnpm flare:machines:retire-stale` after the tool proves ownership, three
+   healthy replacements, and that no unfinished tender froze the stale ID.
+6. If the manager record contains `localhost`, an expired tunnel, or another
+   wrong origin, use the owner-authorized route reconciliation in the machine
+   registration tool or intentionally create a fresh extension. Re-running a
+   registration command without reconciling the existing record is not proof
+   that the URL changed.
+
+Do not copy shared chat credentials into a tracked file, command argument,
+evidence record, browser variable, or container image. Obtain the current
+read-only credential out of band and inject it only as the documented runtime
+secret variables.
+
+Before any new market deployment, FlareQuorum also re-resolves `FtsoV2` through
+the live `FlareContractRegistry` and fails before sending a transaction if it
+differs from the reviewed foundation binding. Deployed code at an old address is
+not evidence that it is still the canonical protocol address.
+
 ## 6. Simulated TEE policy
 
 The supplied organizer message states that `SIMULATED_TEE=true` on Coston2 is
