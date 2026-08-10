@@ -4,10 +4,10 @@
 > provide the fail-closed wallet-free evidence view and explicit Coston2 role
 > routes. The current source build combines direct Coston2 and XRP-native
 > funding under the Buyer workspace alongside Public, Vendor, Public Finalizer,
-> and Auditor/Evidence. Repository tests cover the unified chooser; hosted
-> redeployment remains pending. The previously recorded role shell, mobile
-> layout, keyboard path, XRP draft, and reload checkpoint pass hosted smoke
-> validation. The XRP-native funding protocol and executor have live Gate G
+> and Auditor/Evidence. Repository tests and the current hosted deployment cover
+> the unified chooser. The role shell, mobile/320px layout, keyboard path, XRP
+> draft, and reload checkpoint pass hosted smoke validation. The XRP-native
+> funding protocol and executor have live Gate G
 > evidence plus a public-safe delayed-mint checkpoint/resume path. The Buyer
 > workspace can also prepare a wallet-ready XRPL Payment draft and public-safe
 > `0xFE` executor job preview from read-only Coston2 state; the live

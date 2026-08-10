@@ -186,6 +186,7 @@ pnpm evidence:validate
 pnpm flare:judge:check
 pnpm test:flare:production
 pnpm test:flare:accessibility
+pnpm test:flare:xrp:draft
 pnpm test:flare:xrp:checkpoint
 ```
 

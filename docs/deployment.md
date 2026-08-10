@@ -1,8 +1,9 @@
 # FlareQuorum Championship Deployment Guide
 
-> Status: the canonical Coston2 market release and existing hosted judge package
-> are live and verified. The unified Buyer source build passes repository
-> test/lint/build; its hosted redeployment remains pending. The
+> Status: the canonical Coston2 market release and hosted judge package are live
+> and verified. The unified Buyer deployment passes repository test/lint/build
+> and hosted production, 320px keyboard/accessibility, XRP draft, and reload-
+> checkpoint smoke validation. The
 > organizer-approved rolling replacement-TEE drill passes. Broader browser
 > recovery is planned post-Summer Signal hardening, while Gate H user validation
 > remains `NOT_RUN`; the historical Sepolia/Nox baseline remains separate.

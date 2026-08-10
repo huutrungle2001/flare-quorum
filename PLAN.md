@@ -11,8 +11,9 @@
 > same-identity restoration; a full three-machine rolling replacement drill now
 > passes on Coston2. A one-result-endpoint outage recovery, verified release, hosted
 > ingress, public Evidence workspace, wallet-free Coston2 judge smoke, and
-> read-only live negative guards are live. The wallet-ready XRP Payment/job
-> preview and captioned judge video are shipped. Browser-native signing and
+> read-only live negative guards are live. The unified Buyer deployment,
+> wallet-ready XRP Payment/job preview, hosted desktop/mobile/keyboard smokes,
+> and captioned judge video are shipped. Browser-native signing and
 > executor recovery plus additional stateful fault-drill breadth are planned
 > post-Summer Signal hardening; Gate H user validation remains `NOT_RUN`.
 > A review found that the verified V1 market can remain `Closed` indefinitely
@@ -233,24 +234,24 @@ custodial FlareQuorum signer.
 
 - [x] Build the two-shell Flare UI: a standalone landing page and a separate
   FlareQuorum-style tender room with a fixed left workspace/asset rail. The rail
-  exposes Public, Buyer, Private Bids, Activity, XRP Treasury, Auditor, one
-  shared refresh action, help, and the Coston2 faucet. Wallet access remains in
-  the global header; Sepolia-only vcUSDC controls are omitted and FXRP
-  redemption stays contextual to the winning vendor workspace.
+  exposes Public, unified Buyer, Private Bids, Activity, and Auditor, plus
+  compact wallet assets, help, and the Coston2 faucet. One global refresh action
+  and wallet access remain in the header; Sepolia-only vcUSDC controls are
+  omitted and FXRP redemption stays contextual to the winning vendor workspace.
 
 - [x] Add fail-closed Coston2 public-market and XRP funding consumer adapters;
   the browser route is now backed by the verified Coston2 release.
 - [x] Replace the Sepolia judge path with verified Coston2 bindings for `/` and
   `/flare`; `/room` remains explicitly historical.
-- [~] Build role workspaces: the wallet-free Public dossier, separate XRP
-  Treasury, EVM Buyer, Vendor, Public Finalizer, and Auditor/Evidence paths,
-  wallet-ready
-  public-safe XRP `0xFE` Payment/job/memo preview, and optional GemWallet
-  Testnet signing/submission are implemented; reload-safe public checkpoint
-  resume is now explicit; browser-native executor recovery and broader wallet
-  coverage remain open. The expanded shell and award/receipt dossier are live;
-  hosted production, role, mobile, keyboard, XRP draft, and reload-checkpoint
-  smoke evidence pass.
+- [x] Build the current-release role workspaces: the wallet-free Public dossier,
+  unified Buyer with direct Coston2 and XRP-native funding choices, Vendor,
+  Public Finalizer, and Auditor/Evidence paths. The Buyer includes a wallet-ready
+  public-safe XRP `0xFE` Payment/job/memo preview, optional GemWallet Testnet
+  signing/submission, and explicit reload-safe public checkpoint resume. The old
+  `?role=treasury` URL remains a compatibility alias into Buyer. Hosted
+  production, role, mobile, 320px keyboard/accessibility, XRP draft, and
+  reload-checkpoint smoke evidence pass. Browser-native executor recovery and
+  broader wallet coverage remain a separate post-Summer Signal hardening track.
 - [x] Show verified extension, code version, TEE identities/key fingerprints,
   quorum, rule version, FTSO snapshot, result digest, and sanitized FAssets/FDC/
   Smart Account bindings in the wallet-free Flare dossier.
@@ -582,7 +583,7 @@ the championship product and requires Product Plan approval.
 | Flare contracts | V1 LIVE VERIFIED; V2 PLANNED POST-SUMMER SIGNAL UPGRADE — current Coston2 market/escrow/FTSO/receipt wiring agrees with its immutable manifest; the bounded-recovery V2 candidate is staged locally and has no live release claim |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, official amount-based FTestXRP redemption request, and fail-closed delayed-mint checkpoint/resume are implemented; evidence is recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
-| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke, public role/accessibility smoke, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; additional live fault breadth and browser-native XRP recovery are planned post-Summer Signal hardening, while Gate H user validation remains `NOT_RUN` |
+| Coston2 deployment/evidence | CURRENT RELEASE VALIDATED; GATE H IN PROGRESS — Gates 0–G and verified deployment evidence recorded; the unified Buyer deployment, wallet-free judge/role/accessibility/XRP smokes, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; additional live fault breadth and browser-native XRP recovery are planned post-Summer Signal hardening, while Gate H user validation remains `NOT_RUN` |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported

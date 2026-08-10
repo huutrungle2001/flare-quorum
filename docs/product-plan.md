@@ -2,8 +2,9 @@
 
 > Status: Product and architecture direction approved; the verified Coston2
 > market, FCC extension/quorum, FTestXRP settlement, Gate G XRP-native funding
-> evidence, hosted ingress, public/EVM role surfaces, the structured Buyer
-> Brief, and an official amount-based redemption request are implemented. The
+> evidence, hosted ingress, the unified Buyer and public role surfaces, the
+> structured Buyer Brief, and an official amount-based redemption request are
+> implemented. The
 > server-side XRP funding checkpoint/resume path, optional GemWallet Testnet
 > signing/submission, and public checkpoint resume are implemented; browser-
 > native executor recovery, broader wallet coverage, and user validation remain

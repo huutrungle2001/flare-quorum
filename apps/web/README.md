@@ -6,9 +6,9 @@
 
 FlareQuorum's browser product has a standalone landing page at `/`
 and a separate tender application at `/flare`. The app's left rail includes
-`PUBLIC`, `BUYER`, `PRIVATE BIDS`, `ACTIVITY`, `XRP TREASURY`, and `AUDITOR`; these
-map to the distinct `?role=treasury`, `?role=buyer`, `?role=vendor`,
-`?role=finalizer`, and `?role=evidence` workspaces. The historical EOA/Safe
+`PUBLIC`, `BUYER`, `PRIVATE BIDS`, `ACTIVITY`, and `AUDITOR`; these map to the
+distinct `?role=buyer`, `?role=vendor`, `?role=finalizer`, and `?role=evidence`
+workspaces. The historical EOA/Safe
 Buyer flows, Private Bids views, and Nox Activity recovery exist only under the
 separate `/room` baseline. The
 default `/` and `/flare` routes read finalized Coston2 contract state, and
@@ -21,11 +21,14 @@ integration without wallet access or confidential payloads.
 When the hosted ingress origin is configured, `/flare?role=vendor` opens the
 Coston2 browser composer: each bid is encrypted separately to the three
 tender-frozen TEE keys, authorized with EIP-712, receipt-checked, and submitted
-as one atomic receipt set. `/flare?role=buyer` is the direct EVM funding/recovery
-path with a structured public Buyer Brief whose canonical hash is committed as
-tender metadata; `/flare?role=treasury` is the XRP-native XRPL/FDC/Smart Account
-journey. `/flare?role=finalizer` exposes canonical close and buyer-only recovery
-readiness without moving FCC dispatch or result grouping into the browser.
+as one atomic receipt set. `/flare?role=buyer` opens a unified Buyer workspace
+that defaults to direct Coston2/FTestXRP funding and can switch to the XRP-native
+XRPL/FDC/Smart Account journey before preparing the same structured public Buyer
+Brief. Its canonical hash is committed as tender metadata;
+`/flare?role=treasury` remains a compatibility alias that preselects the
+XRP-native option. `/flare?role=finalizer` exposes canonical close and
+buyer-only recovery readiness without moving FCC dispatch or result grouping
+into the browser.
 `/flare?role=evidence` is a wallet-free Auditor dossier with public bid commitments,
 machine bindings, result digest, payout/remainder, and no signer or decryption
 path. An awarded vendor can use the same Coston2 role to approve the exact
