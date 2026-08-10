@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-10T04:21:35.135Z",
+  "recordedAt": "2026-08-10T05:40:33.547Z",
   "publicIdentifiers": {
-    "sourceCommit": "4844e1ebc7ef99d987718f20d0a2894c47abef9f",
+    "sourceCommit": "7eb267fbae70b7cadc1f1fb7d0d2828f9bcec81f",
     "provider": "vercel",
     "project": "flare-quorum",
     "canonicalUrl": "https://flare-quorum.vercel.app",
@@ -31,14 +31,14 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "d14bb25eb660ea63e6b482704ffe829e1c3111719d0053eda71b7cbcf64d6679"
+      "sha256": "bf8a6e92ba7453870b8b48233025b563d976d00891c8ce6f621329fc472a088c"
     },
     "tenders": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "8b891e41241fe8185b03c79f98a35b2e78910ba7d6a9b50e4a25deb12c4788bd"
+      "sha256": "eb90ab5dba2d47563ece953c2b1b3d9f48c995e29f9b3b9ff3e1f13d7993d368"
     },
     "mobile": {
       "viewport": {
@@ -52,7 +52,7 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "33c9fb85ba45c42d7efea0feee44581b9773fc3656fe592f3ec8daba451be253"
+      "sha256": "e9da401d3cb21f01f8c69ce3972a64f5da47f1d947c57dc178a754e403be21dd"
     },
     "treasury": {
       "viewport": {
@@ -73,14 +73,14 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "d94f384d72dedbd890d8d4f1b80933be3518cd0479158359e09cb23352bec400"
+      "sha256": "8eab937c689f00dbde57f2b2d8a671c1775c5543f0c74bae2038e739c8b07c4b"
     },
     "finalizer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "33a4dd072687b18dbd631dee6022066091cd7088458e9acf63e703565d992faa"
+      "sha256": "b57acb4aea0a373498a5db539e632806bb3571e73dbedc3168428c996a94c09e"
     },
     "docsMobile": {
       "viewport": {
