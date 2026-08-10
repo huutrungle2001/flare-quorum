@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-09T14:18:44.368Z",
+  "recordedAt": "2026-08-10T02:45:49.888Z",
   "publicIdentifiers": {
-    "sourceCommit": "1e3877811b52663e3d5acbb368de6fa9a6dc618c",
+    "sourceCommit": "56b9dc99ef0318d5febc305a4ad68dacb6ff245c",
     "provider": "vercel",
-    "project": "veilbid-flare",
-    "canonicalUrl": "https://veilbid-flare.vercel.app",
+    "project": "flare-quorum",
+    "canonicalUrl": "https://flare-quorum.vercel.app",
     "network": "flare-coston2",
     "chainId": 114,
     "deploymentKind": "release",
@@ -31,63 +31,63 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "a790b3c051bc554d4397d52dbcac6f8eab4f0a54f62e6154fc894f9ca8dd70fc"
+      "sha256": "bf8a6e92ba7453870b8b48233025b563d976d00891c8ce6f621329fc472a088c"
     },
     "tenders": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "cd6ec51617e00fc420b8f47e44d492259e03b21a616bee66e9908355b0a3773b"
+      "sha256": "b2d77354dc096aa6c3940eafa8456bfe853834b61c04455cb5acb4f1c37a5c80"
     },
     "mobile": {
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sha256": "da8a09511473508f3b17d43a9d82f64c7f51b657cf250a41bc5a5957b70a4094"
+      "sha256": "80571b5974b21d00f147c77ce1da6e2af6c926215ac6a3a266267b63d929457e"
     },
     "evidence": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "b089fca766afb35818e74d819e273a47778b8db5e431e0b526e4a3866482a766"
+      "sha256": "c79150db02ce2cf5ba3446dec3a0dc1ab7dc8e3559f82bb29a0cbf75dcc767ae"
     },
     "treasury": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "b77df9ec8e8578547b44ee3344f430b2906ae88bd6a6e76aa7d3846dda55a183"
+      "sha256": "a964143d37480f5a39fc0cf598c2b9734634c3138c4611511848628c52d6d6f8"
     },
     "buyer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "d9dc1588e307e0a333fe148c9ad1ff0e7b424558151827f0bcfc8b67f9f9aaa6"
+      "sha256": "b6639269abe8d650b2a7cee12c7fa31ee88ceda34e2818b68888b7e7e946d9d8"
     },
     "vendor": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "e4f444409ade80dcb953785e08952898e707c3e605d83283e8ca6e63edffa687"
+      "sha256": "fa9bf6003e4ec0734f4f1000f2488a1290d1e26632565bb858d91a937badbf68"
     },
     "finalizer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "11d8d5817b029034b7bde76f4941529fcea04fdbee9d6782ed9fcaa68d990561"
+      "sha256": "da16c437620796ede45a9c652736116950cb83931e787ef332bb34ffe21ff17a"
     },
     "docsMobile": {
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sha256": "a5f6c79c35deef8d762ca236bf61531a2d6d0ee624998171fe218eb2dafbaf66"
+      "sha256": "6bf20a9153ff3c0d2a8b4877f58165fa4b96b659c751be6400a1f811469dc138"
     }
   },
   "assertions": {

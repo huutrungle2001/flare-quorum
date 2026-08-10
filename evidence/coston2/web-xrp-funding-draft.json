@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-xrp-funding-draft",
-  "recordedAt": "2026-08-09T14:19:03.468Z",
+  "recordedAt": "2026-08-10T02:46:53.722Z",
   "publicIdentifiers": {
-    "sourceCommit": "1e3877811b52663e3d5acbb368de6fa9a6dc618c",
+    "sourceCommit": "56b9dc99ef0318d5febc305a4ad68dacb6ff245c",
     "provider": "vercel",
-    "project": "veilbid-flare",
-    "canonicalUrl": "https://veilbid-flare.vercel.app",
+    "project": "flare-quorum",
+    "canonicalUrl": "https://flare-quorum.vercel.app",
     "network": "flare-coston2",
     "chainId": 114,
     "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05"
