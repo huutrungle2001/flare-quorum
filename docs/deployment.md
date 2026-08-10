@@ -2,8 +2,9 @@
 
 > Status: the canonical Coston2 market release, release smoke, UI, and judge
 > package are live and verified. The organizer-approved rolling replacement-TEE
-> drill passes; remaining release work is broader browser recovery and user validation;
-> the historical Sepolia/Nox baseline remains separate.
+> drill passes. Broader browser recovery is planned post-Summer Signal
+> hardening, while Gate H user validation remains `NOT_RUN`; the historical
+> Sepolia/Nox baseline remains separate.
 
 FCC registration and proxy operations must also satisfy the current
 [`FCC Coston2 Operational Baseline`](fcc-coston2-operations.md), derived from
@@ -15,7 +16,7 @@ the preserved organizer-group redeploy bulletin and official scaffold sources.
 |---|---|---|
 | Historical Sepolia/Nox | `packages/contracts/deployments/sepolia.release.json` | Verified pre-hackathon baseline |
 | Coston2/FCC championship | `packages/flare-contracts/deployments/coston2.release.json` | Verified live candidate promoted after runtime/wiring/evidence checks |
-| Coston2 liveness V2 | No release manifest yet | Local candidate only; bounded pre-dispatch refund tests pass, deployment and live evidence do not |
+| Coston2 liveness V2 | No release manifest yet | Planned post-Summer Signal upgrade; the local bounded pre-dispatch refund tests pass without creating live release authority |
 
 Never put Flare addresses into the Sepolia manifest/bindings or reuse historical
 deployment artifacts as Coston2 evidence.
@@ -23,10 +24,11 @@ deployment artifacts as Coston2 evidence.
 The current verified Coston2 row is V1 and has a known liveness gap when fewer
 than two frozen TEEs remain valid before the first selection dispatch succeeds.
 `FlareQuorumMarketV2` is intentionally side-by-side rather than an upgrade or
-rewrite. It must receive a fresh extension/machine registration, candidate
-manifest, source/runtime verification, generated bindings, flagship lifecycle,
-and undispatched-refund lifecycle before any consumer or judge route points to
-it. V1 artifacts and evidence remain immutable.
+rewrite. Its planned post-Summer Signal promotion requires a fresh
+extension/machine registration, candidate manifest, source/runtime verification,
+generated bindings, flagship lifecycle, and undispatched-refund lifecycle
+before any consumer route points to it. V1 artifacts and evidence remain
+immutable.
 
 ## 2. Phase 0: pin before building
 
