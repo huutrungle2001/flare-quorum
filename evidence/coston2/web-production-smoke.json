@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-10T02:45:49.888Z",
+  "recordedAt": "2026-08-10T04:21:35.135Z",
   "publicIdentifiers": {
-    "sourceCommit": "56b9dc99ef0318d5febc305a4ad68dacb6ff245c",
+    "sourceCommit": "4844e1ebc7ef99d987718f20d0a2894c47abef9f",
     "provider": "vercel",
     "project": "flare-quorum",
     "canonicalUrl": "https://flare-quorum.vercel.app",
@@ -31,14 +31,14 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "bf8a6e92ba7453870b8b48233025b563d976d00891c8ce6f621329fc472a088c"
+      "sha256": "d14bb25eb660ea63e6b482704ffe829e1c3111719d0053eda71b7cbcf64d6679"
     },
     "tenders": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "b2d77354dc096aa6c3940eafa8456bfe853834b61c04455cb5acb4f1c37a5c80"
+      "sha256": "8b891e41241fe8185b03c79f98a35b2e78910ba7d6a9b50e4a25deb12c4788bd"
     },
     "mobile": {
       "viewport": {
@@ -52,7 +52,7 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "c79150db02ce2cf5ba3446dec3a0dc1ab7dc8e3559f82bb29a0cbf75dcc767ae"
+      "sha256": "33c9fb85ba45c42d7efea0feee44581b9773fc3656fe592f3ec8daba451be253"
     },
     "treasury": {
       "viewport": {
@@ -66,21 +66,21 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "b6639269abe8d650b2a7cee12c7fa31ee88ceda34e2818b68888b7e7e946d9d8"
+      "sha256": "b7b8cc13d53acc4e0904e69ba414d379019cdd7b29ace44f996ccc81f6cc0697"
     },
     "vendor": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "fa9bf6003e4ec0734f4f1000f2488a1290d1e26632565bb858d91a937badbf68"
+      "sha256": "d94f384d72dedbd890d8d4f1b80933be3518cd0479158359e09cb23352bec400"
     },
     "finalizer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "da16c437620796ede45a9c652736116950cb83931e787ef332bb34ffe21ff17a"
+      "sha256": "33a4dd072687b18dbd631dee6022066091cd7088458e9acf63e703565d992faa"
     },
     "docsMobile": {
       "viewport": {

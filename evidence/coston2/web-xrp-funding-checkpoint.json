@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-xrp-funding-checkpoint",
-  "recordedAt": "2026-08-10T02:46:55.087Z",
+  "recordedAt": "2026-08-10T04:21:43.783Z",
   "publicIdentifiers": {
-    "sourceCommit": "56b9dc99ef0318d5febc305a4ad68dacb6ff245c",
+    "sourceCommit": "4844e1ebc7ef99d987718f20d0a2894c47abef9f",
     "provider": "vercel",
     "project": "flare-quorum",
     "canonicalUrl": "https://flare-quorum.vercel.app",
