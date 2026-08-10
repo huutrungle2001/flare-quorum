@@ -2,7 +2,7 @@
 
 > Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
 > lifecycle, and Gate G pass on Coston2. Three stable Railway FCC origins accept encrypted bids and
-> return domain-bound receipts; the v2 Railway ingress now fronts that path for
+> return domain-bound receipts; the current Railway ingress fronts that path for
 > browser ciphertext, while a three-bid, two-signature lifecycle proves
 > common quorum, private scoring, threshold finalization, FTSO binding, and
 > exact FTestXRP settlement. The XRP-native run also proves an XRPL `0xFE`
@@ -12,13 +12,15 @@
 > passes on Coston2. A one-result-endpoint outage recovery, verified release, hosted
 > ingress, public Evidence workspace, wallet-free Coston2 judge smoke, and
 > read-only live negative guards are live. The wallet-ready XRP Payment/job
-> preview and captioned judge video are shipped; browser-native signing and
-> executor recovery, full stateful fault drills, and user validation remain open.
+> preview and captioned judge video are shipped. Browser-native signing and
+> executor recovery plus additional stateful fault-drill breadth are planned
+> post-Summer Signal hardening; Gate H user validation remains `NOT_RUN`.
 > A review found that the verified V1 market can remain `Closed` indefinitely
 > when its first selection dispatch cannot obtain two active frozen TEEs. The
 > local `FlareQuorumMarketV2` candidate now has bounded pre-dispatch recovery and
-> comprehensive contract tests; V2 deployment and live success/refund evidence
-> remain open, so V1 is still the canonical Coston2 release.
+> comprehensive contract tests. Live V2 deployment and promotion are a planned
+> post-Summer Signal upgrade; V1 remains the canonical Coston2 submission
+> release.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -322,9 +324,10 @@ confidential bid or settlement boundary:
   `evidence/coston2/live-negative-calls.release.json`; the local Docker
   identity-rotation boundary and fail-closed two-machine-loss drill are
   recorded in `evidence/local/fcc-local-tee-restart-boundary.json` and
-  `evidence/local/fcc-local-two-machine-loss.json`. Stateful Coston2 fault
-  injection and live two-machine-loss drills remain open; replacement-process
-  recovery passes in `evidence/coston2/fcc-replacement-recovery.json`.
+  `evidence/local/fcc-local-two-machine-loss.json`. Additional stateful
+  Coston2 fault injection and live two-machine-loss drills are planned
+  post-Summer Signal hardening; replacement-process recovery passes in
+  `evidence/coston2/fcc-replacement-recovery.json`.
 - [x] Record public gas, block-latency, close-to-result, recovery, and
   independently measured bid-ingress benchmarks from live Coston2 lifecycles in
   `evidence/coston2/performance-benchmarks.release.json` and
@@ -342,10 +345,12 @@ confidential bid or settlement boundary:
 - [x] Re-resolve `FtsoV2` from the live Flare registry before deployment or
   promotion, and reject any unexpected active FCC identity/route before machine
   registration; the complete post-registration set must be exactly three.
-- [ ] Deploy and verify V2 with a fresh FCC extension/machine set, then record
-  both a flagship success lifecycle and a pre-dispatch full-refund lifecycle.
+- [x] Prepare an isolated V2 staged-release kit for a future side-by-side
+  deployment, fresh FCC extension, exact three-machine set, success lifecycle,
+  bounded-refund lifecycle, and explicit promotion gate. The address-free
+  candidate artifacts make no live V2 claim.
 - [x] Generate Flare bindings and reject all drift.
-- [x] Deploy the v2 web judge and record desktop/mobile/keyboard smoke evidence;
+- [x] Deploy the current Flare web judge and record desktop/mobile/keyboard smoke evidence;
   the separate Coston2 write-relay deployment remains gated on its dedicated
   finalizer environment, and the browser ingress is a separate hosted Railway
   service with server-only FCC credentials. Its live `/health` route rereads
@@ -389,11 +394,39 @@ Exit: the submission contains real user evidence, not only technical claims.
 Exit: a judge can understand usefulness in 30 seconds, verify Flare depth in
 two minutes, and reproduce the public path from the repository.
 
-### Phase 9 — post-Summer Signal product expansion: Flare Treasury Exchange
+### Gate classification at handoff
+
+| Gate or track | Classification | Recorded state |
+|---|---|---|
+| Gates 0–G | Current Summer Signal technical acceptance | Passed with the cited Coston2 evidence |
+| Gate H | Current product and user-validation gate | `NOT_RUN`; no interview, usability, or traction result is claimed |
+| Organizer submission and bounty-selection actions | External submission actions | Builder-controlled; not an engineering pass/fail result |
+| V2 live release promotion | Planned post-Summer Signal upgrade | Staged locally; no V2 address, machine set, or live lifecycle is claimed |
+| Additional live fault breadth and browser-native XRP recovery | Planned post-Summer Signal hardening | The current recorded drills and public-safe wallet handoff remain the submission boundary |
+| Flare Treasury Exchange | Planned post-Summer Signal product expansion | Roadmap only |
+
+### Phase 9 — post-Summer Signal upgrades
 
 This phase is a post-competition roadmap. It is not part of the current FlareQuorum
 Flare championship claim and must not be presented as implemented until its own
 contracts, Coston2 evidence, and user validation exist.
+
+#### 9.0 — staged V2 release promotion
+
+- [ ] Deploy `FlareQuorumMarketV2` alongside the immutable verified V1 release.
+- [ ] Register a fresh FCC extension and exactly three fresh TEE machines
+  without reusing or pausing the V1 machine set.
+- [ ] Publish a V2-specific manifest and generated bindings only after source,
+  runtime, registry, extension, code-version, machine, and signer checks agree.
+- [ ] Record both a flagship success lifecycle and the bounded pre-dispatch
+  full-refund lifecycle with public-safe Coston2 evidence.
+- [ ] Expand stateful Coston2 fault injection, live two-machine-loss coverage,
+  and browser-native XRP recovery without weakening the current fail-closed
+  boundary.
+- [ ] Promote V2 only after its release gate passes; switching consumers remains
+  a separate explicit release decision.
+
+#### 9.1 — Flare Treasury Exchange direction
 
 **Product direction:** evolve the private procurement engine into **Flare
 Treasury Exchange**, a treasury execution network for intents that require a
@@ -408,7 +441,7 @@ Account funding, FDC proof adapters, settlement, and public evidence are the
 technical foundation. The historical predecessor repository remains read-only and
 is never changed as part of this roadmap.
 
-#### 9.1 — product discovery and boundary
+#### 9.2 — product discovery and boundary
 
 - [ ] Interview treasury operators, DAO operations teams, and service
   providers to select one narrow pilot (for example, an on-chain deployment
@@ -423,7 +456,7 @@ is never changed as part of this roadmap.
   `Attestation`, `Release`, and `Refund`; do not silently relabel the current
   tender ABI or its historical evidence.
 
-#### 9.2 — milestone escrow vertical slice
+#### 9.3 — milestone escrow vertical slice
 
 - [ ] Implement a separate non-upgradeable `MilestoneEscrow` or equivalent
   module whose public state contains only the intent, milestone amounts,
@@ -439,7 +472,7 @@ is never changed as part of this roadmap.
 - [ ] Keep milestone amounts public. Do not claim private token settlement or
   private payout amounts without a separately verified mechanism.
 
-#### 9.3 — private offer and executor workflow
+#### 9.4 — private offer and executor workflow
 
 - [ ] Reuse the FCC private-ingress pattern, but create a new intent/offer
   domain and result schema instead of extending the championship tender
@@ -455,7 +488,7 @@ is never changed as part of this roadmap.
   only for a verifiable external fact; every dependency must have an unavailable
   and recovery state.
 
-#### 9.4 — XRP-native settlement and pilot
+#### 9.5 — XRP-native settlement and pilot
 
 - [ ] Run the complete Coston2 path: XRPL Payment → FDC proof → Smart Account
   funding → private FCC offer selection → milestone attestation → FTestXRP or
@@ -471,10 +504,14 @@ is never changed as part of this roadmap.
 - [ ] Treat mainnet FXRP, production custody, formal audit, SLA, and legal
   delivery arbitration as later roadmap items, not MVP claims.
 
-**Phase 9 exit:** one real Coston2 intent with at least two private offers and
-two objective milestones completes selection, proof verification, release or
-refund, and public-safe recovery without weakening any championship privacy or
-threshold invariant.
+**V2 track exit:** its separate verified release, fresh FCC identity set, live
+success/refund evidence, and consumer-promotion decision all agree without
+changing V1 authority.
+
+**Treasury Exchange track exit:** one real Coston2 intent with at least two
+private offers and two objective milestones completes selection, proof
+verification, release or refund, and public-safe recovery without weakening any
+championship privacy or threshold invariant.
 
 ## 5. Quality bars
 
@@ -542,10 +579,10 @@ the championship product and requires Product Plan approval.
 | FCC foundation operation | LIVE PASSED — deterministic `PING_V1` result verified on Coston2 with registered signer/domain |
 | FCC private ingress | LIVE PASSED — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, changed-ciphertext rejection, and supported rolling replacement recovery pass |
 | Multi-TEE quorum | LIVE PASSED for one three-bid lifecycle — atomic 3-of-3 receipts, common root, two matching frozen-TEE signatures, and one-machine resilience assertions recorded; replacements never mutate an existing frozen set |
-| Flare contracts | V1 LIVE VERIFIED; V2 LOCAL CANDIDATE — current Coston2 market/escrow/FTSO/receipt wiring agrees with its immutable manifest, while bounded pre-dispatch recovery passes locally and still needs a separate deployment/manifest/evidence chain |
+| Flare contracts | V1 LIVE VERIFIED; V2 PLANNED POST-SUMMER SIGNAL UPGRADE — current Coston2 market/escrow/FTSO/receipt wiring agrees with its immutable manifest; the bounded-recovery V2 candidate is staged locally and has no live release claim |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, official amount-based FTestXRP redemption request, and fail-closed delayed-mint checkpoint/resume are implemented; evidence is recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
-| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke, public role/accessibility smoke, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; broader adversarial suites, browser XRPL signing/recovery, and Gate H user validation remain open |
+| Coston2 deployment/evidence | IN PROGRESS — Gates 0–G and verified deployment evidence recorded; wallet-free judge smoke, public role/accessibility smoke, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; additional live fault breadth and browser-native XRP recovery are planned post-Summer Signal hardening, while Gate H user validation remains `NOT_RUN` |
 | User research/traction | NOT STARTED |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported

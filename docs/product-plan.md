@@ -209,14 +209,30 @@ All formerly open choices are accepted in
 > evidence. The winning payout is public; losing commercial offers remain inside
 > the selected attested TEEs.
 
-## 13. Post-Summer Signal expansion — Flare Treasury Exchange
+## 13. Post-Summer Signal upgrades
+
+Two independent tracks follow the current verified V1 submission. First, the
+staged `FlareQuorumMarketV2` candidate can be promoted only after a separate
+side-by-side Coston2 release, fresh FCC extension and three-machine set,
+verified bindings, and live success/refund evidence. Second, product discovery
+can expand the proven procurement foundation into Flare Treasury Exchange.
+Neither track is claimed as part of the current V1 release.
+
+### 13.1 V2 release promotion
+
+The repository already contains the address-free staged-release kit and local
+V2 liveness evidence. The post-Summer Signal release must preserve V1, create
+new FCC identities, verify the complete V2 authority chain, execute both live
+lifecycle cases, and make consumer promotion a separate explicit decision.
+
+### 13.2 Flare Treasury Exchange
 
 The post-competition product direction is **Flare Treasury Exchange**. This is
 an intentional expansion of the FlareQuorum foundation, not a claim that the
 current championship release already implements an intent marketplace or
 milestone execution network.
 
-### Product promise
+#### Product promise
 
 Treasury teams publish an outcome-oriented intent, receive private offers from
 approved vendors/solvers/executors, and fund an objective milestone workflow.
@@ -224,7 +240,7 @@ The selected executor is determined by registered FCC machines; FDC verifies
 external completion facts; Smart Accounts and FAssets move the public escrow;
 FTSO fixes any required currency/risk snapshot.
 
-### Product vocabulary
+#### Product vocabulary
 
 | Treasury Exchange | Current FlareQuorum foundation |
 |---|---|
@@ -239,7 +255,7 @@ The new intent/offer schemas and escrow module must be versioned separately from
 the championship tender ABI. Historical Sepolia/Nox assets and the predecessor
 repository remain read-only references.
 
-### First vertical slice
+#### First vertical slice
 
 The first pilot should use one narrow, objectively verifiable operation, such
 as an EVM deployment or an XRPL payment milestone. It should include two or
@@ -248,7 +264,7 @@ two-of-three FCC result, an FDC proof, a timeout/refund path, and a public-safe
 recovery checkpoint. Web2Json sources are a later extension after source
 allowlisting, transformation, freshness, and outage semantics are proven.
 
-### Explicit boundaries
+#### Explicit boundaries
 
 - No AI or subjective buyer override selects an executor.
 - No private token settlement or hidden payout amounts are claimed.

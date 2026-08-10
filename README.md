@@ -31,8 +31,9 @@ The project targets **Flare Summer Signal** with:
 > tender is already `Closed` and fewer than two frozen TEEs remain valid before
 > the first selection request succeeds, V1 cannot start its 24-hour refund
 > clock. `FlareQuorumMarketV2` fixes this locally with a close-time bounded
-> refund, but it is not release authority until a separate V2 deployment,
-> manifest, bindings, and live success/refund evidence are verified.
+> refund. Its live deployment and promotion are a planned post-Summer Signal
+> upgrade requiring a separate manifest, bindings, fresh FCC identity set, and
+> verified success/refund evidence. V1 remains the current submission release.
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet

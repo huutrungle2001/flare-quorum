@@ -3,8 +3,11 @@
 > Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
 > lifecycle, and Gate G pass with three registered Coston2 FCC machines and a verified XRP-native
 > lifecycle. The public release hardening and product UX are recorded; the
-> supported replacement-TEE drill passes, while broader stateful fault drills
-> and Gate H user validation remain open.
+> supported replacement-TEE drill passes. Additional stateful fault breadth and
+> browser-native XRP recovery are planned post-Summer Signal hardening; Gate H
+> user validation remains `NOT_RUN`. The isolated V2 release kit is staged
+> locally, and its live deployment/promotion is part of the same post-Summer
+> roadmap rather than a blocker for the verified V1 submission release.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.
@@ -80,7 +83,7 @@ placeholders are forbidden after that commit.
 - [x] Implement XRP-native executor and EVM buyer paths; delayed XRP minting
   now has public-safe checkpoint/resume, and the optional GemWallet Testnet
   signer returns only a public payment hash while browser-native recovery
-  remains outside the app.
+  is tracked as post-Summer Signal hardening.
 - [x] Implement Activity recovery and public Evidence workspace.
 - [x] Migrate relay and console to Flare bindings.
 
@@ -89,12 +92,13 @@ placeholders are forbidden after that commit.
 - [x] Deploy and verify canonical Coston2 contracts/extension/machine policy.
 - [~] Run full live/adversarial/recovery suites; core live lifecycles and one-
   endpoint recovery plus the replacement-TEE drill pass, while complete fault
-  drills remain open. Local rejection coverage, the Docker identity-rotation boundary,
+  drills are planned post-Summer Signal hardening. Local rejection coverage,
+  the Docker identity-rotation boundary,
   and read-only Coston2 terminal/invalid-terms calls are recorded without
   promoting them to stateful live evidence.
 - [~] Publish sanitized evidence and performance benchmarks; release evidence,
   public receipt/block timing, and independent bid-ingress timing are current,
-  while broader fault-drill evidence remains open.
+  while broader fault-drill evidence belongs to the post-Summer hardening track.
 - [x] Deploy web and relay; verify desktop/mobile/keyboard behavior.
 - [ ] Complete user research, vendor tests, and pilot outreach.
 - [ ] Pass Gate H.
@@ -109,6 +113,19 @@ placeholders are forbidden after that commit.
 - [x] Complete the repository/evidence/hosted-runtime claim, privacy, and
   secret review; user-validation and organizer submission decisions remain
   external.
+
+### Milestone 7 — planned post-Summer Signal V2 promotion
+
+- [ ] Deploy V2 alongside V1 with a fresh extension and exactly three fresh
+  machine identities.
+- [ ] Verify a V2-only manifest and bindings against source, runtime, registry,
+  extension, code version, signer, and machine facts.
+- [ ] Record one live flagship success lifecycle and one bounded pre-dispatch
+  full-refund lifecycle before any consumer promotion.
+- [ ] Expand stateful live fault coverage and browser-native XRP recovery under
+  the same public-safe, fail-closed release policy.
+- [ ] Keep V1 consumer-selectable until the separate V2 promotion decision is
+  explicitly approved.
 
 ## 4. Production packages
 

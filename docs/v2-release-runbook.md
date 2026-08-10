@@ -8,6 +8,10 @@ success lifecycle, bounded-refund lifecycle, and promotion gate are available.
 No V2 address, extension ID, TEE identity, lifecycle result, or verified-release
 claim exists yet.
 
+Live V2 deployment and promotion are a planned post-Summer Signal upgrade. They
+are not an acceptance criterion or blocker for the current verified V1
+submission release.
+
 The verified V1 Coston2 release remains the only consumer-selectable release.
 Web, relay, console, and `@flarequorum/flare-bindings` continue to use V1. The
 V2 candidate directory is intentionally not exported from that package.

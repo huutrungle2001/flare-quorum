@@ -10,9 +10,10 @@
 > run also finalized with one result endpoint unavailable. The organizer has
 > confirmed that restart recovery uses replacement registration rather than
 > same-identity restoration; the full rolling replacement drill now passes on
-> Coston2. A newly identified V1 pre-dispatch refund gap is fixed only in the
-> local V2 candidate and requires a separate live release. Gate H remains
-> mandatory.
+> Coston2. A newly identified V1 pre-dispatch refund gap is addressed by the
+> local V2 candidate. Live V2 promotion is a planned post-Summer Signal upgrade
+> and is not an acceptance criterion for the current verified V1 release. Gate
+> H remains mandatory for any user-validation or traction claim.
 
 ## 1. Rules
 
