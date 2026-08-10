@@ -123,7 +123,7 @@ describe("Coston2 public evidence boundary", () => {
     render(<MemoryRouter><FlareLandingPage /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: /Private bids.*Public awards/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "EXPLORE TENDERS →" })).toHaveAttribute("href", "/flare");
-    expect(screen.getByText(/SIX WORKSPACES \/ ONE APP SHELL/i)).toBeInTheDocument();
+    expect(screen.getByText(/FIVE WORKSPACES \/ ONE APP SHELL/i)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Private bids produce a threshold-signed award/i })).toBeInTheDocument();
   });
 
@@ -133,7 +133,7 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByRole("button", { name: "BUYER" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "PRIVATE BIDS" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "ACTIVITY" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "XRP TREASURY" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "XRP TREASURY" })).toBeNull();
     expect(screen.getByRole("button", { name: "AUDITOR" })).toBeInTheDocument();
   });
 
@@ -194,8 +194,19 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText(/Brief and rules are public; bids are sealed/)).toBeInTheDocument();
   });
 
-  it("keeps the XRP-native funding signature outside the browser", () => {
+  it("defaults to Coston2 funding and lets the buyer switch to the XRP-native path", () => {
     render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} />);
+    const coston2Option = screen.getByRole("button", { name: /COSTON2 \/ FTESTXRP/i });
+    const xrplOption = screen.getByRole("button", { name: /XRPL \/ XRP/i });
+    expect(coston2Option).toHaveAttribute("aria-pressed", "true");
+    expect(xrplOption).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(xrplOption);
+    expect(xrplOption).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("heading", { name: "Keep the XRPL signature outside FlareQuorum" })).toBeInTheDocument();
+  });
+
+  it("keeps the XRP-native funding signature outside the browser", () => {
+    render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} initialFundingMethod="xrpl" />);
     expect(screen.getByRole("heading", { name: "Keep the XRPL signature outside FlareQuorum" })).toBeInTheDocument();
     expect(screen.getByText(/never asks for a seed/)).toBeInTheDocument();
     expect(screen.getByText(/DirectMintingDelayed/)).toBeInTheDocument();

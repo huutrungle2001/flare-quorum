@@ -1,6 +1,6 @@
 import { formatUnits } from "viem";
 import { useSearchParams } from "react-router";
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { coston2FlarePublicRelease } from "@flarequorum/flare-bindings";
 import type { FlareMarketState } from "../public-market/useFlareMarket";
 import { useFlareMarket } from "../public-market/useFlareMarket";
@@ -10,9 +10,12 @@ import { FlareVendorWorkspace } from "./FlareVendorWorkspace";
 import { FlareBuyerWorkspace } from "./FlareBuyerWorkspace";
 import { FlareAuditorWorkspace } from "./FlareAuditorWorkspace";
 import { FlareFinalizerWorkspace } from "./FlareFinalizerWorkspace";
+import { FlareWalletAssets } from "./FlareWalletAssets";
 import { ContextHelp } from "../shell/ContextHelp";
+import { refreshStateEvent } from "../shell/refreshState";
 
 type FlareTenderFilter = "current" | "all" | "open" | "compute" | "awarded" | "refunded";
+type FlareTenderSort = "newest" | "oldest";
 
 const flareTenderFilters: readonly { value: FlareTenderFilter; label: string }[] = [
   { value: "current", label: "Current, awarded & refunded" },
@@ -21,6 +24,11 @@ const flareTenderFilters: readonly { value: FlareTenderFilter; label: string }[]
   { value: "compute", label: "Close / compute pending" },
   { value: "awarded", label: "Awarded" },
   { value: "refunded", label: "Refunded" },
+];
+
+const flareTenderSorts: readonly { value: FlareTenderSort; label: string }[] = [
+  { value: "newest", label: "Newest first" },
+  { value: "oldest", label: "Oldest first" },
 ];
 
 function short(value: string) {
@@ -61,6 +69,19 @@ function filterTenders(
     return tenders.filter((tender) => ["Closed", "ComputePending"].includes(tender.status));
   }
   return tenders.filter((tender) => tender.status.toLowerCase() === filter);
+}
+
+function sortTenders(
+  tenders: readonly FlarePublicTender[],
+  sort: FlareTenderSort,
+) {
+  return [...tenders].sort((left, right) => {
+    if (left.tenderId === right.tenderId) return 0;
+    const leftComesAfter = left.tenderId > right.tenderId;
+    return sort === "newest"
+      ? (leftComesAfter ? -1 : 1)
+      : (leftComesAfter ? 1 : -1);
+  });
 }
 
 function ProtocolFacts({ compact = false }: { compact?: boolean }) {
@@ -326,7 +347,7 @@ export function FlareEvidenceWorkspace({
   );
 }
 
-type FlareRole = "public" | "treasury" | "buyer" | "vendor" | "finalizer" | "evidence";
+type FlareRole = "public" | "buyer" | "vendor" | "finalizer" | "evidence";
 
 export function FlareRoleBar({
   activeRole,
@@ -340,7 +361,6 @@ export function FlareRoleBar({
     ["buyer", "BUYER"],
     ["vendor", "PRIVATE BIDS"],
     ["finalizer", "ACTIVITY"],
-    ["treasury", "XRP TREASURY"],
     ["evidence", "AUDITOR"],
   ];
   return (
@@ -365,11 +385,11 @@ export function FlareRoleBar({
 function FlareAppSidebar({
   activeRole,
   onRoleChange,
-  onRefresh,
+  wallet,
 }: {
   activeRole: FlareRole;
   onRoleChange: (role: FlareRole) => void;
-  onRefresh: () => void;
+  wallet?: WalletController;
 }) {
   return (
     <aside className="flare-app-sidebar" aria-label="Tender application sidebar">
@@ -378,26 +398,11 @@ function FlareAppSidebar({
         <strong>FLARE / COSTON2</strong>
       </div>
       <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
-      <div className="flare-sidebar-tools">
-        <button className="sidebar-tool-button" type="button" onClick={onRefresh}>
-          <span aria-hidden="true">↻</span> REFRESH STATE
-        </button>
-        <ContextHelp
-          label="Help for the Flare tender room"
-          title="HOW TO USE THIS TENDER ROOM"
-          steps={[
-            "PUBLIC is wallet-free inspection of finalized Coston2 dossiers.",
-            "BUYER and XRP TREASURY open separate EVM and XRP-native funding journeys.",
-            "PRIVATE BIDS and ACTIVITY expose vendor and canonical lifecycle operations without moving winner logic into the browser.",
-            "AUDITOR checks commitments and result binding without a signer or decryption path.",
-          ]}
-          note="No Flare route falls back to Sepolia data or mock success."
-        />
-      </div>
+      {wallet && <FlareWalletAssets wallet={wallet} />}
       <section className="flare-sidebar-assets" aria-label="Coston2 asset actions">
         <p className="eyebrow">COSTON2 ASSETS</p>
-        <a className="sidebar-asset-button" href="https://faucet.flare.network/coston2" target="_blank" rel="noreferrer">GET TEST C2FLR ↗</a>
-        <p className="sidebar-asset-note">Funding belongs in XRP TREASURY. FXRP redemption controls appear in PRIVATE BIDS only for a connected winning vendor. FTestXRP settlement amounts are public.</p>
+        <a className="sidebar-asset-button" href="https://faucet.flare.network/coston2" target="_blank" rel="noreferrer">GET TEST C2FLR &amp; FXRP ↗</a>
+        <p className="sidebar-asset-note">Funding options are inside BUYER. FXRP redemption controls appear in PRIVATE BIDS only for a connected winning vendor. FTestXRP settlement amounts are public.</p>
       </section>
       <p className="flare-sidebar-footnote">PUBLIC READS · 12-BLOCK FINALITY · NO BID PAYLOADS</p>
     </aside>
@@ -407,17 +412,17 @@ function FlareAppSidebar({
 function FlareRoleWorkspace({
   activeRole,
   onRoleChange,
-  onRefresh,
+  wallet,
   children,
 }: {
   activeRole: FlareRole;
   onRoleChange: (role: FlareRole) => void;
-  onRefresh: () => void;
+  wallet?: WalletController;
   children: ReactNode;
 }) {
   return (
     <div className="tender-layout flare-tender-layout">
-      <FlareAppSidebar activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={onRefresh} />
+      <FlareAppSidebar activeRole={activeRole} onRoleChange={onRoleChange} wallet={wallet} />
       <div className="flare-app-main">{children}</div>
     </div>
   );
@@ -430,7 +435,11 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
   const filter = flareTenderFilters.some((option) => option.value === requestedFilter)
     ? requestedFilter as FlareTenderFilter
     : "current";
-  const visibleTenders = useMemo(() => filterTenders(tenders, filter), [filter, tenders]);
+  const requestedSort = params.get("sort");
+  const sort = flareTenderSorts.some((option) => option.value === requestedSort)
+    ? requestedSort as FlareTenderSort
+    : "newest";
+  const visibleTenders = useMemo(() => sortTenders(filterTenders(tenders, filter), sort), [filter, sort, tenders]);
   const selectedId = params.get("tender");
   const selected = visibleTenders.find((tender) => tender.tenderId.toString() === selectedId) ?? visibleTenders[0] ?? null;
 
@@ -441,6 +450,13 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
     if (selectedId && !filterTenders(tenders, nextFilter).some((tender) => tender.tenderId.toString() === selectedId)) {
       updated.delete("tender");
     }
+    setParams(updated);
+  }
+
+  function setSort(nextSort: FlareTenderSort) {
+    const updated = new URLSearchParams(params);
+    if (nextSort === "newest") updated.delete("sort");
+    else updated.set("sort", nextSort);
     setParams(updated);
   }
 
@@ -491,7 +507,10 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
           <aside className="dossier-list">
             <div className="dossier-list-controls">
               <header><div><p className="eyebrow">COSTON2 DOSSIERS</p><h2>{visibleTenders.length} tenders</h2></div></header>
-              <label className="public-filter-control"><span>Show</span><select aria-label="Filter Coston2 tenders" value={filter} onChange={(event) => setFilter(event.target.value as FlareTenderFilter)}>{flareTenderFilters.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+              <div className="public-filter-controls">
+                <label className="public-filter-control"><span>Show</span><select aria-label="Filter Coston2 tenders" value={filter} onChange={(event) => setFilter(event.target.value as FlareTenderFilter)}>{flareTenderFilters.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+                <label className="public-filter-control"><span>Sort by</span><select aria-label="Sort Coston2 tenders" value={sort} onChange={(event) => setSort(event.target.value as FlareTenderSort)}>{flareTenderSorts.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+              </div>
             </div>
             {visibleTenders.map((tender) => <div className="tender-card-shell" key={tender.tenderId.toString()}><button type="button" onClick={() => selectTender(tender.tenderId)} aria-pressed={selected?.tenderId === tender.tenderId} className={`tender-card ${selected?.tenderId === tender.tenderId ? "selected" : ""}`}><span className="card-kicker">TENDER / {tender.tenderId.toString()}</span><span className="card-title">Flare confidential procurement</span><span className="card-facts"><span><strong>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</strong>Public ceiling</span><span><strong>{tender.bidCount.toString()}/{tender.approvedVendorCount}</strong>TEE receipts</span></span><span className="card-deadline">Deadline · {formatDeadline(tender.bidDeadline)}</span><span className="card-footer"><span className={`privacy-badge ${statusClass(tender.status)}`}>{tender.status.toUpperCase()}</span><span className="card-arrow" aria-hidden="true">→</span></span></button></div>)}
           </aside>
@@ -522,8 +541,16 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
 export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   const { state, refresh } = useFlareMarket();
   const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    const onRefresh = () => void refresh();
+    window.addEventListener(refreshStateEvent, onRefresh);
+    return () => window.removeEventListener(refreshStateEvent, onRefresh);
+  }, [refresh]);
   const role = params.get("role")?.toLowerCase();
-  const activeRole: FlareRole = role === "treasury" || role === "buyer" || role === "vendor"
+  const legacyTreasury = role === "treasury";
+  const activeRole: FlareRole = legacyTreasury
+    ? "buyer"
+    : role === "buyer" || role === "vendor"
     || role === "finalizer" || role === "evidence"
     ? role
     : role === "auditor"
@@ -539,7 +566,7 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
   };
   if (activeRole === "evidence") {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()}>
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} wallet={wallet}>
         {state.status === "ready" && state.data ? (
           <FlareAuditorWorkspace tenders={state.data.tenders} finalizedBlock={state.data.finalizedBlock} />
         ) : (
@@ -548,16 +575,16 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
       </FlareRoleWorkspace>
     );
   }
-  if ((activeRole === "treasury" || activeRole === "buyer") && wallet) {
+  if (activeRole === "buyer" && wallet) {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()}>
-        <FlareBuyerWorkspace wallet={wallet} onRefresh={() => void refresh()} journey={activeRole === "treasury" ? "xrp" : "evm"} />
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} wallet={wallet}>
+        <FlareBuyerWorkspace wallet={wallet} onRefresh={() => void refresh()} initialFundingMethod={legacyTreasury ? "xrpl" : "coston2"} />
       </FlareRoleWorkspace>
     );
   }
   if ((activeRole === "vendor" || activeRole === "finalizer") && wallet) {
     return (
-      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} onRefresh={() => void refresh()}>
+      <FlareRoleWorkspace activeRole={activeRole} onRoleChange={onRoleChange} wallet={wallet}>
         {state.status === "ready" && state.data ? (
           activeRole === "vendor"
             ? <FlareVendorWorkspace wallet={wallet} tenders={state.data.tenders} onRefresh={() => void refresh()} />
@@ -574,7 +601,7 @@ export function FlareRoom({ wallet }: { wallet?: WalletController } = {}) {
     );
   }
   return (
-    <FlareRoleWorkspace activeRole="public" onRoleChange={onRoleChange} onRefresh={() => void refresh()}>
+    <FlareRoleWorkspace activeRole="public" onRoleChange={onRoleChange} wallet={wallet}>
       <FlareExplorerView state={state} onRetry={() => void refresh()} />
     </FlareRoleWorkspace>
   );

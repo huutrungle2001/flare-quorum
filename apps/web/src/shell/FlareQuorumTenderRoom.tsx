@@ -15,6 +15,7 @@ import { ActivityWorkspace } from "../activity/ActivityWorkspace";
 import { WinnerNotificationBanner } from "../activity/WinnerNotifications";
 import { ContextHelp } from "./ContextHelp";
 import { scrollToPageTop } from "./navigationScroll";
+import { refreshStateEvent } from "./refreshState";
 import {
   formatLocalDeadline,
   formatUtcDeadline,
@@ -808,6 +809,11 @@ export function ExplorerView({
 function TenderRoomApp({ wallet }: { wallet: WalletController }) {
   const { state, refresh } = usePublicMarket();
   const [roomParams, setRoomParams] = useSearchParams();
+  useEffect(() => {
+    const onRefresh = () => void refresh();
+    window.addEventListener(refreshStateEvent, onRefresh);
+    return () => window.removeEventListener(refreshStateEvent, onRefresh);
+  }, [refresh]);
   const requestedRole = roomParams
     .get("role")
     ?.toUpperCase()

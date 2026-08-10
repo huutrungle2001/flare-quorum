@@ -24,7 +24,7 @@ import {
 import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
 import { useToasts } from "../shell/ToastProvider";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FlareXrpFundingPanel, type XrpFundingPrepareInput, type XrpFundingPreview } from "./FlareXrpFundingPanel";
 
 const coston2 = {
@@ -42,15 +42,38 @@ const erc20Abi = [{
   outputs: [{ name: "", type: "bool" }],
 }] as const;
 
-function parseVendors(value: string): Address[] {
-  const entries = value.split(/[\s,]+/).map((item) => item.trim()).filter(Boolean);
-  if (entries.length === 0 || entries.length > 8) throw new Error("Enter 1–8 approved vendor addresses.");
-  const vendors = entries.map((entry) => {
-    if (!isAddress(entry)) throw new Error("Every vendor must be a valid EVM address.");
-    return getAddress(entry);
+const maxApprovedVendors = 8;
+
+function vendorRowErrors(values: readonly string[]): string[] {
+  const errors = values.map(() => "");
+  const seen = new Map<string, number>();
+  values.forEach((rawValue, index) => {
+    const value = rawValue.trim();
+    if (!value) {
+      errors[index] = "Enter a vendor address.";
+      return;
+    }
+    if (!isAddress(value)) {
+      errors[index] = "Enter a valid EVM address.";
+      return;
+    }
+    const normalized = getAddress(value).toLowerCase();
+    const previousIndex = seen.get(normalized);
+    if (previousIndex !== undefined) {
+      errors[previousIndex] ||= "Duplicate vendor address.";
+      errors[index] = `Duplicate of vendor ${previousIndex + 1}.`;
+      return;
+    }
+    seen.set(normalized, index);
   });
-  if (new Set(vendors.map((entry) => entry.toLowerCase())).size !== vendors.length) throw new Error("Vendor addresses must be unique.");
-  return vendors;
+  return errors;
+}
+
+function parseVendors(values: readonly string[]): Address[] {
+  if (values.length === 0 || values.length > maxApprovedVendors) throw new Error("Enter 1–8 approved vendor addresses.");
+  const errors = vendorRowErrors(values);
+  if (errors.some(Boolean)) throw new Error(errors.find(Boolean) ?? "Enter valid approved vendor addresses.");
+  return values.map((value) => getAddress(value.trim()));
 }
 
 function parseCeiling(value: string): bigint {
@@ -61,14 +84,53 @@ function parseCeiling(value: string): bigint {
   return amount;
 }
 
-function parseWeight(value: string, label: string): number {
-  if (!/^[0-9]+$/.test(value)) throw new Error(`${label} weight is invalid.`);
+function parseWeightPercent(value: string): number | null {
+  if (!/^\d{1,3}$/.test(value)) return null;
   const parsed = Number(value);
-  if (!Number.isSafeInteger(parsed) || parsed < 0 || parsed > 10_000) throw new Error(`${label} weight is invalid.`);
-  return parsed;
+  return Number.isSafeInteger(parsed) && parsed >= 0 && parsed <= 100 ? parsed : null;
+}
+
+function weightTotalPercent(values: readonly string[]) {
+  return values.reduce((total, value) => total + (parseWeightPercent(value) ?? 0), 0);
+}
+
+function weightValidationMessage(values: readonly string[]) {
+  if (values.some((value) => parseWeightPercent(value) === null)) {
+    return "Enter each weight as a whole percentage from 0% to 100%.";
+  }
+  const total = weightTotalPercent(values);
+  return total === 100 ? null : `Weights must total 100% (currently ${total}%).`;
+}
+
+function parseWeight(value: string, label: string): number {
+  const parsed = parseWeightPercent(value);
+  if (parsed === null) throw new Error(`${label} weight must be a whole percentage from 0% to 100%.`);
+  return parsed * 100;
+}
+
+function flareTenderErrorMessage(cause: unknown): string {
+  const raw = cause instanceof Error ? cause.message : String(cause ?? "");
+  const normalized = raw.toLowerCase();
+  if (raw.includes("UserRejectedRequestError") || normalized.includes("user rejected") || normalized.includes("user denied")) {
+    return "The wallet request was rejected.";
+  }
+  if (normalized.includes("insufficient funds")) return "This wallet needs more C2FLR for gas.";
+  if (raw.includes("InvalidTokenTransfer")) return "This wallet does not have enough FTestXRP for the escrow ceiling.";
+  if (raw.includes("NotRegisteredTee") || raw.includes("NotEnoughTeeIdentities")) {
+    return "The Coston2 FCC identities are unavailable. Refresh state and try again.";
+  }
+  if (raw.includes("InvalidCodeVersion")) return "The Coston2 FCC extension binding is stale. Refresh state and try again.";
+  if (raw.includes("InvalidScoringPolicy")) return "The tender scoring rules were rejected. Check the deadline and weight total.";
+  if (raw.includes("InvalidTender")) return "The tender rules were rejected. Check the required fields and vendor list.";
+  if (normalized.includes("http request failed") || normalized.includes("failed to fetch") || normalized.includes("rpcrequesterror")) {
+    return "Coston2 RPC is temporarily unavailable. Try again in a moment.";
+  }
+  const message = raw.trim();
+  return message.length > 280 ? `${message.slice(0, 277)}…` : message || "Tender creation failed on Coston2.";
 }
 
 export type FlareBuyerBriefCategory = "software" | "design" | "marketing" | "operations" | "research";
+type FlareFundingMethod = "coston2" | "xrpl";
 
 export interface FlareBuyerBriefInput {
   title: string;
@@ -103,11 +165,38 @@ interface BuyerFormValues {
   acceptanceCriteria: string;
   vendorQuestions: string;
   ceiling: string;
-  vendors: string;
+  vendors: readonly string[];
   deadlineMinutes: string;
   priceWeight: string;
   deliveryWeight: string;
   warrantyWeight: string;
+}
+
+type BuyerFieldKey =
+  | "title"
+  | "ceiling"
+  | "deadlineMinutes"
+  | "objective"
+  | "acceptanceCriteria"
+  | "vendors"
+  | "priceWeight"
+  | "deliveryWeight"
+  | "warrantyWeight";
+
+type BuyerFieldErrors = Partial<Record<BuyerFieldKey, string>>;
+
+function requiredFieldErrors(input: BuyerFormValues): BuyerFieldErrors {
+  const errors: BuyerFieldErrors = {};
+  if (!input.title.trim()) errors.title = "Enter a public title.";
+  if (!input.ceiling.trim()) errors.ceiling = "Enter an escrow ceiling.";
+  if (!input.deadlineMinutes.trim()) errors.deadlineMinutes = "Enter a bid deadline.";
+  if (!input.objective.trim()) errors.objective = "Describe the public objective.";
+  if (!input.acceptanceCriteria.trim()) errors.acceptanceCriteria = "Add acceptance criteria.";
+  if (!input.vendors.some((vendor) => vendor.trim())) errors.vendors = "Add at least one approved vendor address.";
+  if (!input.priceWeight.trim()) errors.priceWeight = "Enter the price weight.";
+  if (!input.deliveryWeight.trim()) errors.deliveryWeight = "Enter the delivery weight.";
+  if (!input.warrantyWeight.trim()) errors.warrantyWeight = "Enter the warranty weight.";
+  return errors;
 }
 
 function buildFlareTenderTerms(input: BuyerFormValues, blockTimestamp: bigint): FlareTenderTerms {
@@ -116,7 +205,7 @@ function buildFlareTenderTerms(input: BuyerFormValues, blockTimestamp: bigint): 
   const price = parseWeight(input.priceWeight, "Price");
   const delivery = parseWeight(input.deliveryWeight, "Delivery");
   const warranty = parseWeight(input.warrantyWeight, "Warranty");
-  if (price + delivery + warranty !== 10_000) throw new Error("Scoring weights must total 10000 bps.");
+  if (price + delivery + warranty !== 10_000) throw new Error("Scoring weights must total 100%.");
   const approvedVendors = parseVendors(input.vendors);
   const amount = parseCeiling(input.ceiling);
   const metadata = input.title.trim();
@@ -199,11 +288,11 @@ function assertXrplPaymentDestination(value: string): string {
 export function FlareBuyerWorkspace({
   wallet,
   onRefresh,
-  journey = "combined",
+  initialFundingMethod = "coston2",
 }: {
   wallet: WalletController;
   onRefresh: () => void;
-  journey?: "combined" | "evm" | "xrp";
+  initialFundingMethod?: FlareFundingMethod;
 }) {
   const toasts = useToasts();
   const [title, setTitle] = useState("");
@@ -212,18 +301,100 @@ export function FlareBuyerWorkspace({
   const [acceptanceCriteria, setAcceptanceCriteria] = useState("");
   const [vendorQuestions, setVendorQuestions] = useState("");
   const [ceiling, setCeiling] = useState("1");
-  const [vendors, setVendors] = useState("");
+  const [vendors, setVendors] = useState<string[]>([""]);
   const [deadlineMinutes, setDeadlineMinutes] = useState("30");
-  const [priceWeight, setPriceWeight] = useState("6000");
-  const [deliveryWeight, setDeliveryWeight] = useState("2500");
-  const [warrantyWeight, setWarrantyWeight] = useState("1500");
+  const [priceWeight, setPriceWeight] = useState("60");
+  const [deliveryWeight, setDeliveryWeight] = useState("25");
+  const [warrantyWeight, setWarrantyWeight] = useState("15");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<BuyerFieldErrors>({});
+  const [vendorErrors, setVendorErrors] = useState<string[]>([""]);
+  const [vendorValidationAttempted, setVendorValidationAttempted] = useState(false);
+  const [fundingMethod, setFundingMethod] = useState<FlareFundingMethod>(initialFundingMethod);
   const [last, setLast] = useState<{ hash: string; tenderId: string } | null>(null);
   const connected = wallet.state.status === "connected" && wallet.state.account && wallet.state.walletClient;
+  const weightValues = [priceWeight, deliveryWeight, warrantyWeight] as const;
+  const weightTotal = weightTotalPercent(weightValues);
+  const weightError = weightValidationMessage(weightValues);
+  const vendorCount = vendors.filter((vendor) => vendor.trim()).length;
+  const usingXrplFunding = fundingMethod === "xrpl";
+
+  useEffect(() => {
+    setFundingMethod(initialFundingMethod);
+  }, [initialFundingMethod]);
+
+  function chooseFundingMethod(nextMethod: FlareFundingMethod) {
+    if (busy || nextMethod === fundingMethod) return;
+    setFundingMethod(nextMethod);
+    setError(null);
+    setLast(null);
+    setFieldErrors({});
+  }
+
+  function visibleVendorErrors(values: readonly string[]) {
+    const errors = vendorRowErrors(values);
+    return errors.map((message, index) => values[index].trim() || vendorValidationAttempted ? message : "");
+  }
+
+  function updateVendors(nextVendors: string[]) {
+    setVendors(nextVendors);
+    setVendorErrors(visibleVendorErrors(nextVendors));
+    clearFieldError("vendors");
+  }
+
+  function validateApprovedVendors() {
+    setVendorValidationAttempted(true);
+    const errors = vendorRowErrors(vendors);
+    setVendorErrors(errors);
+    if (errors.some(Boolean)) {
+      setError("Fix the highlighted vendor addresses before approving the tender.");
+      return false;
+    }
+    return true;
+  }
+
+  function addVendor() {
+    if (vendors.length >= maxApprovedVendors) return;
+    updateVendors([...vendors, ""]);
+  }
+
+  function removeVendor(index: number) {
+    if (vendors.length <= 1) return;
+    updateVendors(vendors.filter((_vendor, vendorIndex) => vendorIndex !== index));
+  }
+
+  function clearFieldError(field: BuyerFieldKey) {
+    setFieldErrors((current) => current[field] ? { ...current, [field]: undefined } : current);
+  }
+
+  function validateRequiredFields() {
+    const errors = requiredFieldErrors({
+      title,
+      category,
+      objective,
+      acceptanceCriteria,
+      vendorQuestions,
+      ceiling,
+      vendors,
+      deadlineMinutes,
+      priceWeight,
+      deliveryWeight,
+      warrantyWeight,
+    });
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setError("Complete the highlighted required fields before approving the tender.");
+      return false;
+    }
+    return true;
+  }
 
   async function createTender() {
     if (!connected) return;
+    const requiredFieldsValid = validateRequiredFields();
+    const approvedVendorsValid = validateApprovedVendors();
+    if (!requiredFieldsValid || !approvedVendorsValid) return;
     setError(null);
     setLast(null);
     setBusy(true);
@@ -299,14 +470,20 @@ export function FlareBuyerWorkspace({
       toasts.succeed(toastId, `Tender #${tenderId.toString()} is open on Coston2.`);
       onRefresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "FLARE_TENDER_CREATION_FAILED");
-      toasts.fail(toastId, "Tender creation stopped; no partial success is shown.");
+      const message = flareTenderErrorMessage(cause);
+      setError(message);
+      toasts.fail(toastId, message);
     } finally {
       setBusy(false);
     }
   }
 
   async function prepareXrpFunding(input: XrpFundingPrepareInput): Promise<XrpFundingPreview> {
+    const requiredFieldsValid = validateRequiredFields();
+    const approvedVendorsValid = validateApprovedVendors();
+    if (!requiredFieldsValid || !approvedVendorsValid) {
+      throw new Error("Complete the highlighted tender fields before preparing XRP funding.");
+    }
     const rpcUrl = import.meta.env.VITE_COSTON2_RPC_URL?.trim();
     if (!rpcUrl) throw new Error("COSTON2_RPC_URL_MISSING");
     const xrplOwner = parseXrplOwner(input.xrplOwner);
@@ -420,36 +597,96 @@ export function FlareBuyerWorkspace({
   return (
     <main id="main-content" className="role-workspace flare-buyer-workspace">
       <section className="workspace-intro">
-        <p className="eyebrow">{journey === "xrp" ? "XRP TREASURY / XRPL → FDC → SMART ACCOUNT" : "COSTON2 BUYER / EVM RECOVERY PATH"}</p>
-        <h1>{journey === "xrp" ? "Fund from XRP." : "Fund transparent rules."}</h1>
-        <p>{journey === "xrp"
-          ? "Build a wallet-ready XRPL Payment whose 0xFE memo commits to the exact Smart Account operation. FlareQuorum receives only public identifiers and never an XRPL secret."
-          : "Approve the exact public FTestXRP ceiling, then create a tender frozen to the verified FCC extension and three production-status identities. Bid values remain outside the contract."}</p>
+        <p className="eyebrow">BUYER / CHOOSE A FUNDING PATH</p>
+        <h1>Fund transparent rules.</h1>
+        <p>Define one public tender, then choose whether its escrow comes from a Coston2 wallet or an XRP-native XRPL payment.</p>
       </section>
-      {journey !== "xrp" && <WalletPanel wallet={wallet} network="coston2" />}
-      <section id="buyer-brief" className="evidence-panel flare-buyer-form" aria-label="Coston2 buyer tender composer">
-        <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>{journey === "xrp" ? "Prepare the XRP-funded tender" : "Open a Coston2 tender"}</h2></div><span className="privacy-badge verified">FTestXRP / TESTNET</span></header>
-        <label>Public title<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small>The public brief is hashed into immutable metadata; bids remain outside the contract.</small></label>
+      <section className="funding-method-picker" aria-labelledby="funding-method-title">
+        <header>
+          <div>
+            <p className="eyebrow">FUNDING METHOD</p>
+            <h2 id="funding-method-title">How will you fund this tender?</h2>
+          </div>
+          <span className="privacy-badge verified">CHOOSE ONE</span>
+        </header>
+        <div className="funding-method-options">
+          <button
+            className={`funding-method-option${fundingMethod === "coston2" ? " selected" : ""}`}
+            type="button"
+            aria-pressed={fundingMethod === "coston2"}
+            onClick={() => chooseFundingMethod("coston2")}
+            disabled={busy}
+          >
+            <span className="funding-method-kicker">COSTON2 / FTESTXRP</span>
+            <strong>Fund from a Coston2 wallet</strong>
+            <small>Approve FTestXRP and open the tender directly.</small>
+            <span className="funding-method-action" aria-hidden="true">{fundingMethod === "coston2" ? "SELECTED ✓" : "CHOOSE →"}</span>
+          </button>
+          <button
+            className={`funding-method-option${fundingMethod === "xrpl" ? " selected" : ""}`}
+            type="button"
+            aria-pressed={fundingMethod === "xrpl"}
+            onClick={() => chooseFundingMethod("xrpl")}
+            disabled={busy}
+          >
+            <span className="funding-method-kicker">XRPL / XRP · ADVANCED</span>
+            <strong>Fund from an XRP wallet</strong>
+            <small>Prepare an XRPL Payment, then hand off FDC and Smart Account funding.</small>
+            <span className="funding-method-action" aria-hidden="true">{fundingMethod === "xrpl" ? "SELECTED ✓" : "CHOOSE →"}</span>
+          </button>
+        </div>
+      </section>
+      {!usingXrplFunding && <WalletPanel wallet={wallet} network="coston2" />}
+      <section id="buyer-brief" className="evidence-panel flare-buyer-form" aria-label="Buyer tender composer">
+        <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>{usingXrplFunding ? "Prepare an XRP-funded tender" : "Open a Coston2 tender"}</h2></div><span className="privacy-badge verified">{usingXrplFunding ? "XRPL → FTESTXRP" : "FTESTXRP / TESTNET"}</span></header>
+        <label>Public title<input aria-invalid={Boolean(fieldErrors.title)} aria-describedby={fieldErrors.title ? "buyer-title-error" : undefined} value={title} onChange={(event) => { setTitle(event.target.value); clearFieldError("title"); }} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small>The public brief is hashed into immutable metadata; bids remain outside the contract.</small>{fieldErrors.title && <small id="buyer-title-error" className="field-error" role="alert">{fieldErrors.title}</small>}</label>
         <div className="form-grid-two">
           <label>Category<select value={category} onChange={(event) => setCategory(event.target.value as FlareBuyerBriefCategory)} disabled={busy}><option value="software">Software</option><option value="design">Design</option><option value="marketing">Marketing</option><option value="operations">Operations</option><option value="research">Research</option></select></label>
-          <label>Escrow ceiling (FTestXRP)<input inputMode="decimal" value={ceiling} onChange={(event) => setCeiling(event.target.value)} disabled={busy} /></label>
-          <label>Bid deadline (minutes)<input type="number" min={5} max={43200} value={deadlineMinutes} onChange={(event) => setDeadlineMinutes(event.target.value)} disabled={busy} /></label>
-          <label>Public objective<textarea value={objective} onChange={(event) => setObjective(event.target.value)} rows={4} maxLength={1200} placeholder="What outcome should the selected vendor deliver?" disabled={busy} /></label>
-          <label>Acceptance criteria<textarea value={acceptanceCriteria} onChange={(event) => setAcceptanceCriteria(event.target.value)} rows={4} maxLength={1200} placeholder="How will delivery be checked?" disabled={busy} /></label>
+          <label>Escrow ceiling (FTestXRP)<input aria-invalid={Boolean(fieldErrors.ceiling)} aria-describedby={fieldErrors.ceiling ? "buyer-ceiling-error" : undefined} inputMode="decimal" value={ceiling} onChange={(event) => { setCeiling(event.target.value); clearFieldError("ceiling"); }} disabled={busy} />{fieldErrors.ceiling && <small id="buyer-ceiling-error" className="field-error" role="alert">{fieldErrors.ceiling}</small>}</label>
+          <label>Bid deadline (minutes)<input aria-invalid={Boolean(fieldErrors.deadlineMinutes)} aria-describedby={fieldErrors.deadlineMinutes ? "buyer-deadline-error" : undefined} type="number" min={5} max={43200} value={deadlineMinutes} onChange={(event) => { setDeadlineMinutes(event.target.value); clearFieldError("deadlineMinutes"); }} disabled={busy} />{fieldErrors.deadlineMinutes && <small id="buyer-deadline-error" className="field-error" role="alert">{fieldErrors.deadlineMinutes}</small>}</label>
+          <label>Public objective<textarea aria-invalid={Boolean(fieldErrors.objective)} aria-describedby={fieldErrors.objective ? "buyer-objective-error" : undefined} value={objective} onChange={(event) => { setObjective(event.target.value); clearFieldError("objective"); }} rows={4} maxLength={1200} placeholder="What outcome should the selected vendor deliver?" disabled={busy} />{fieldErrors.objective && <small id="buyer-objective-error" className="field-error" role="alert">{fieldErrors.objective}</small>}</label>
+          <label>Acceptance criteria<textarea aria-invalid={Boolean(fieldErrors.acceptanceCriteria)} aria-describedby={fieldErrors.acceptanceCriteria ? "buyer-acceptance-error" : undefined} value={acceptanceCriteria} onChange={(event) => { setAcceptanceCriteria(event.target.value); clearFieldError("acceptanceCriteria"); }} rows={4} maxLength={1200} placeholder="How will delivery be checked?" disabled={busy} />{fieldErrors.acceptanceCriteria && <small id="buyer-acceptance-error" className="field-error" role="alert">{fieldErrors.acceptanceCriteria}</small>}</label>
           <label>Optional vendor questions<textarea value={vendorQuestions} onChange={(event) => setVendorQuestions(event.target.value)} rows={3} maxLength={1200} placeholder="What should every vendor answer?" disabled={busy} /></label>
-          <label>Approved vendor addresses<textarea value={vendors} onChange={(event) => setVendors(event.target.value)} rows={3} placeholder="0x… (one or more, comma/newline separated)" disabled={busy} /></label>
+          <fieldset className="vendor-fieldset" aria-invalid={Boolean(fieldErrors.vendors || vendorErrors.some(Boolean))} aria-describedby={fieldErrors.vendors ? "buyer-vendors-error" : undefined}>
+            <legend>Approved vendor addresses <span className="vendor-count">{vendorCount}/{maxApprovedVendors}</span></legend>
+            <div className="vendor-input-list">
+              {vendors.map((vendor, index) => (
+                <div className="vendor-input-row" key={index}>
+                  <div className="vendor-input-control">
+                    <input
+                      aria-label={`Approved vendor ${index + 1}`}
+                      aria-invalid={Boolean(vendorErrors[index])}
+                      aria-describedby={vendorErrors[index] ? `buyer-vendor-${index}-error` : undefined}
+                      value={vendor}
+                      onChange={(event) => updateVendors(vendors.map((current, vendorIndex) => vendorIndex === index ? event.target.value : current))}
+                      placeholder="0x…"
+                      disabled={busy}
+                      autoComplete="off"
+                    />
+                    {vendorErrors[index] && <small id={`buyer-vendor-${index}-error`} className="field-error" role="alert">{vendorErrors[index]}</small>}
+                  </div>
+                  <button className="vendor-remove-button" type="button" aria-label={`Remove approved vendor ${index + 1}`} onClick={() => removeVendor(index)} disabled={busy || vendors.length <= 1}>×</button>
+                </div>
+              ))}
+            </div>
+            <button className="vendor-add-button" type="button" onClick={addVendor} disabled={busy || vendors.length >= maxApprovedVendors}>+ Add vendor</button>
+            {fieldErrors.vendors && <small id="buyer-vendors-error" className="field-error" role="alert">{fieldErrors.vendors}</small>}
+          </fieldset>
           <div className="form-hint"><strong>Brief and rules are public; bids are sealed.</strong><br />The market records the canonical brief hash, ceiling, vendor allowlist, FCC binding, and lifecycle checkpoints.</div>
         </div>
         <div className="form-grid-three">
-          <label>Price weight (bps)<input inputMode="numeric" value={priceWeight} onChange={(event) => setPriceWeight(event.target.value)} disabled={busy} /></label>
-          <label>Delivery weight (bps)<input inputMode="numeric" value={deliveryWeight} onChange={(event) => setDeliveryWeight(event.target.value)} disabled={busy} /></label>
-          <label>Warranty weight (bps)<input inputMode="numeric" value={warrantyWeight} onChange={(event) => setWarrantyWeight(event.target.value)} disabled={busy} /></label>
+          <label>Price weight<span className="percentage-input"><input aria-invalid={Boolean(fieldErrors.priceWeight)} aria-describedby={fieldErrors.priceWeight ? "buyer-price-weight-error" : undefined} inputMode="numeric" maxLength={3} value={priceWeight} onChange={(event) => { setPriceWeight(event.target.value); clearFieldError("priceWeight"); }} disabled={busy} /><span aria-hidden="true">%</span></span>{fieldErrors.priceWeight && <small id="buyer-price-weight-error" className="field-error" role="alert">{fieldErrors.priceWeight}</small>}</label>
+          <label>Delivery weight<span className="percentage-input"><input aria-invalid={Boolean(fieldErrors.deliveryWeight)} aria-describedby={fieldErrors.deliveryWeight ? "buyer-delivery-weight-error" : undefined} inputMode="numeric" maxLength={3} value={deliveryWeight} onChange={(event) => { setDeliveryWeight(event.target.value); clearFieldError("deliveryWeight"); }} disabled={busy} /><span aria-hidden="true">%</span></span>{fieldErrors.deliveryWeight && <small id="buyer-delivery-weight-error" className="field-error" role="alert">{fieldErrors.deliveryWeight}</small>}</label>
+          <label>Warranty weight<span className="percentage-input"><input aria-invalid={Boolean(fieldErrors.warrantyWeight)} aria-describedby={fieldErrors.warrantyWeight ? "buyer-warranty-weight-error" : undefined} inputMode="numeric" maxLength={3} value={warrantyWeight} onChange={(event) => { setWarrantyWeight(event.target.value); clearFieldError("warrantyWeight"); }} disabled={busy} /><span aria-hidden="true">%</span></span>{fieldErrors.warrantyWeight && <small id="buyer-warranty-weight-error" className="field-error" role="alert">{fieldErrors.warrantyWeight}</small>}</label>
         </div>
+        <p className={`form-hint scoring-weight-note${weightError ? " invalid" : " valid"}`} role={weightError ? "alert" : undefined}>
+          {weightError ?? `Total weight: ${weightTotal}% ✓`}
+        </p>
         {error && <p className="inline-error" role="alert">{error}</p>}
-        {journey !== "xrp" && <button className="primary-button" type="button" onClick={() => void createTender()} disabled={busy || !connected}>{busy ? "WAITING FOR C2FLR…" : "APPROVE &amp; OPEN TENDER →"}</button>}
+        {!usingXrplFunding && <button className="primary-button" type="button" onClick={() => void createTender()} disabled={busy || !connected || Boolean(weightError)}>{busy ? "WAITING FOR C2FLR…" : "APPROVE &amp; OPEN TENDER →"}</button>}
         {last && <p className="form-hint" aria-live="polite">Tender #{last.tenderId} created · <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">inspect transaction ↗</a></p>}
       </section>
-      {journey !== "evm" && <FlareXrpFundingPanel onPrepare={prepareXrpFunding} />}
+      {usingXrplFunding && <FlareXrpFundingPanel onPrepare={prepareXrpFunding} />}
     </main>
   );
 }

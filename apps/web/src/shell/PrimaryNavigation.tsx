@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router";
 import type { WalletController } from "../wallet/WalletPanel";
 import type { WalletNetwork } from "../wallet/useWallet";
 import { scrollToPageTop } from "./navigationScroll";
+import { requestRefreshState } from "./refreshState";
 import { isFlareReleaseEnabled } from "../public-market/loadFlareMarket";
 
 type NavigationItem = {
@@ -269,6 +270,17 @@ export function PrimaryNavigation({
           <span aria-hidden="true" />
           <span className="network-label">{isFlare ? "COSTON2" : "SEPOLIA"}</span>
         </div>
+        {isTenders && (
+          <button
+            className="icon-button topbar-refresh"
+            type="button"
+            aria-label="Refresh state"
+            title="Refresh state"
+            onClick={requestRefreshState}
+          >
+            ↻
+          </button>
+        )}
         <HeaderWalletMenu wallet={isFlare && flareWallet ? flareWallet : wallet} network={isFlare ? "coston2" : "sepolia"} />
       </div>
     </header>
