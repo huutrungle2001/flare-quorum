@@ -108,7 +108,7 @@ describe("standalone public routes", () => {
     ).toEqual(["TENDERS", "DOCS"]);
     expect(screen.getByRole("button", { name: "CONNECT WALLET" })).toBeVisible();
     expect(
-      screen.getByRole("link", { name: "VeilBid home" }),
+      screen.getByRole("link", { name: "FlareQuorum home" }),
     ).toHaveAttribute("aria-current", "page");
   });
 
@@ -120,7 +120,7 @@ describe("standalone public routes", () => {
     );
     expect(
       screen.getByRole("heading", {
-        name: /Use VeilBid from tender to settlement/i,
+        name: /Use FlareQuorum from tender to settlement/i,
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(/does not verify delivered service quality/i)).toBeInTheDocument();
@@ -149,7 +149,7 @@ describe("standalone public routes", () => {
       );
       expect(screen.getByRole("heading", { name: /Public evidence/i })).toBeInTheDocument();
       expect(screen.getByText(/Five primitives, one product path/i)).toBeInTheDocument();
-      expect(screen.queryByText(/Use VeilBid from tender to settlement/i)).toBeNull();
+      expect(screen.queryByText(/Use FlareQuorum from tender to settlement/i)).toBeNull();
       expect(screen.getByText(/supported recovery is replacement registration/i)).toBeInTheDocument();
       expect(screen.getByText(/completed tender 23 on the new machine set/i)).toBeInTheDocument();
     } finally {
@@ -197,11 +197,11 @@ describe("standalone public routes", () => {
     ).toHaveAttribute("aria-current", "page");
 
     fireEvent.click(within(header as HTMLElement).getByRole("link", {
-      name: "VeilBid home",
+      name: "FlareQuorum home",
     }));
     expect(container.querySelector(".topbar")).toBe(header);
     expect(
-      within(header as HTMLElement).getByRole("link", { name: "VeilBid home" }),
+      within(header as HTMLElement).getByRole("link", { name: "FlareQuorum home" }),
     ).toHaveAttribute("aria-current", "page");
   });
 

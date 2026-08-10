@@ -13,6 +13,6 @@ async function main() {
 }
 
 main().catch(() => {
-  process.stderr.write("VeilBid MCP failed to start.\n");
+  process.stderr.write("FlareQuorum MCP failed to start.\n");
   process.exitCode = 1;
 });

@@ -72,7 +72,7 @@ func encodeRequest(t *testing.T, request types.FoundationRequest) []byte {
 func runFoundation(t *testing.T, extension *Extension, request types.FoundationRequest) teetypes.ActionResult {
 	t.Helper()
 	action := buildTestAction(
-		teeutils.ToHash(config.OPTypeVeilBidFoundation),
+		teeutils.ToHash(config.OPTypeFlareQuorumFoundation),
 		teeutils.ToHash(config.OPCommandPingV1),
 		encodeRequest(t, request),
 	)
@@ -187,7 +187,7 @@ func TestFoundationRejectsInvalidPublicDomainWithoutEchoingPayload(t *testing.T)
 
 func TestFoundationRejectsMalformedABIWithAllowlistedError(t *testing.T) {
 	action := buildTestAction(
-		teeutils.ToHash(config.OPTypeVeilBidFoundation),
+		teeutils.ToHash(config.OPTypeFlareQuorumFoundation),
 		teeutils.ToHash(config.OPCommandPingV1),
 		[]byte("secret-looking-invalid-payload"),
 	)
@@ -213,7 +213,7 @@ func TestUnknownOperationAndMalformedEnvelopeFailClosed(t *testing.T) {
 		}
 	})
 	t.Run("operation command", func(t *testing.T) {
-		action := buildTestAction(teeutils.ToHash(config.OPTypeVeilBidFoundation), teeutils.ToHash("UNKNOWN"), nil)
+		action := buildTestAction(teeutils.ToHash(config.OPTypeFlareQuorumFoundation), teeutils.ToHash("UNKNOWN"), nil)
 		status, _ := (&Extension{}).processAction(action)
 		if status != http.StatusNotImplemented {
 			t.Fatalf("got %d", status)

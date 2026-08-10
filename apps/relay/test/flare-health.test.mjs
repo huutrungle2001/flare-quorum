@@ -17,7 +17,7 @@ test("Flare health server exposes liveness and sanitized chain health", async ()
   const base = `http://127.0.0.1:${address.port}`;
   const live = await fetch(`${base}/live`);
   assert.equal(live.status, 200);
-  assert.deepEqual(await live.json(), { status: "ok", service: "veilbid-flare-relay" });
+  assert.deepEqual(await live.json(), { status: "ok", service: "flare-quorum-relay" });
   const health = await fetch(`${base}/health`);
   assert.equal(health.status, 200);
   assert.equal((await health.json()).chainId, 114);

@@ -99,12 +99,12 @@ All open design questions are resolved in
   requirements, and whether at least three registered TEE machines are
   available for one extension.
 - [x] Confirm real confidential hardware versus simulated TEE judge policy.
-- [x] Pin the official FCC scaffold commit and add a VeilBid tee-proxy release
+- [x] Pin the official FCC scaffold commit and add a FlareQuorum tee-proxy release
   recipe whose official source archive, builder, and runtime are checksum or
   digest pinned.
 - [x] Build that recipe on `linux/amd64`, verify the executable OCI manifest
   and extracted binary digest, and record sanitized Gate 0 image evidence.
-- [x] Pin and build the VeilBid FCC extension image, keep production
+- [x] Pin and build the FlareQuorum FCC extension image, keep production
   attestation as its safe default, and verify its binary, sealed-store volume,
   launch policy, and absence of embedded runtime secrets.
 - [x] Align `tee-node v0.0.23` with the exact version resolved by the pinned
@@ -220,12 +220,12 @@ selection and conserves the public escrow.
   the Buyer workspace keeps it explicitly labeled as EVM recovery.
 
 Exit: an XRPL-native buyer creates and funds the canonical tender without a
-custodial VeilBid signer.
+custodial FlareQuorum signer.
 
 ### Phase 5 — product UI and automation
 
 - [x] Build the two-shell Flare UI: a standalone landing page and a separate
-  VeilBid-style tender room with a fixed left workspace/asset rail. The rail
+  FlareQuorum-style tender room with a fixed left workspace/asset rail. The rail
   exposes Public, Buyer, Private Bids, Activity, XRP Treasury, Auditor, one
   shared refresh action, help, and the Coston2 faucet. Wallet access remains in
   the global header; Sepolia-only vcUSDC controls are omitted and FXRP
@@ -355,7 +355,7 @@ Exit: the submission contains real user evidence, not only technical claims.
 
 - [x] Live Coston2 app and wallet-free finalized tender.
 - [x] Four-minute captioned video following the single flagship journey is
-  checked in at `submission/flare/veilbid-flare-demo.mp4`; it uses live public
+  checked in at `submission/flare/flare-quorum-demo.mp4`; it uses live public
   smoke captures and states the testnet/simulated-TEE limits.
 - [x] Architecture diagram and 60-second privacy/trust explanation in
   `submission/flare/PRIVACY-TRUST-TALK.md`.
@@ -373,7 +373,7 @@ two minutes, and reproduce the public path from the repository.
 
 ### Phase 9 — post-Summer Signal product expansion: Flare Treasury Exchange
 
-This phase is a post-competition roadmap. It is not part of the current VeilBid
+This phase is a post-competition roadmap. It is not part of the current FlareQuorum
 Flare championship claim and must not be presented as implemented until its own
 contracts, Coston2 evidence, and user validation exist.
 
@@ -387,7 +387,7 @@ only against a frozen milestone proof.
 The existing FlareQuorum market remains the championship vertical slice. Its
 FCC ingress, receipt quorum, deterministic selection, FTSO binding, Smart
 Account funding, FDC proof adapters, settlement, and public evidence are the
-technical foundation. The historical VeilBid repository remains read-only and
+technical foundation. The historical predecessor repository remains read-only and
 is never changed as part of this roadmap.
 
 #### 9.1 — product discovery and boundary
@@ -447,7 +447,7 @@ is never changed as part of this roadmap.
   never expose offer plaintext, ciphertext, or private credentials.
 - [ ] Conduct at least five treasury interviews, five provider usability tests,
   and one honest design-partner pilot before claiming product usefulness.
-- [ ] Publish a new-work ledger that separates the current VeilBid foundation,
+- [ ] Publish a new-work ledger that separates the current FlareQuorum foundation,
   ported Flare components, and newly built Treasury Exchange contracts,
   extension commands, bindings, UI, and evidence.
 - [ ] Treat mainnet FXRP, production custody, formal audit, SLA, and legal

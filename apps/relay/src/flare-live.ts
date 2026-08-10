@@ -1,8 +1,8 @@
-import { veilBidFlareMarketAbi } from "@veilbid/flare-bindings";
+import { flareQuorumFlareMarketAbi } from "@flarequorum/flare-bindings";
 import { createPublicClient, http, type Abi, type PublicClient } from "viem";
 import type { FlareRelayConfig } from "./flare-config.js";
 
-const marketAbi = veilBidFlareMarketAbi as Abi;
+const marketAbi = flareQuorumFlareMarketAbi as Abi;
 const coston2Chain = {
   id: 114,
   name: "Coston2",

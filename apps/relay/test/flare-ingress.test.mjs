@@ -6,7 +6,7 @@ import {
   flareBidIngressTypedData,
   teeIdentityFromPublicKey,
   teePublicKeyFingerprint,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import { privateKeyToAccount } from "viem/accounts";
 import { encodeAbiParameters } from "viem";
 import {
@@ -158,7 +158,7 @@ test("gateway health validates the configured public tender without exposing mac
   );
   assert.deepEqual(await gateway.health(21n), {
     status: "ok",
-    service: "veilbid-flare-ingress",
+    service: "flare-quorum-ingress",
     chainId: 114,
     schemaVersion: 1,
     tenderId: "21",

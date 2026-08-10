@@ -39,7 +39,7 @@ describe("Safe proposal recovery store", () => {
 
   it("ignores malformed storage instead of inventing proposal state", () => {
     const storage = memoryStorage();
-    storage.setItem("veilbid.safe-proposals.v1", "not-json");
+    storage.setItem("flarequorum.safe-proposals.v1", "not-json");
     expect(loadSafeProposals(storage)).toEqual([]);
   });
 

@@ -1,6 +1,6 @@
-import tokenAbiJson from "@veilbid/chain-bindings/abis/VeilBidTestUSDC";
-import wrapperAbiJson from "@veilbid/chain-bindings/abis/VeilBidConfidentialUSDC";
-import deployment from "@veilbid/chain-bindings/addresses/sepolia.release";
+import tokenAbiJson from "@flarequorum/chain-bindings/abis/VeilBidTestUSDC";
+import wrapperAbiJson from "@flarequorum/chain-bindings/abis/VeilBidConfidentialUSDC";
+import deployment from "@flarequorum/chain-bindings/addresses/sepolia.release";
 import { createViemHandleClient } from "@iexec-nox/handle";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -715,7 +715,7 @@ export function WalletBalancePanel({
             title="HOW TO USE BALANCES"
             steps={[
               "SEP ETH pays Sepolia gas; acquire it from a Sepolia faucet if needed.",
-              "GET TEST USDC requests demo tokens from the VeilBid faucet contract.",
+              "GET TEST USDC requests demo tokens from the FlareQuorum faucet contract.",
               "WRAP TO vcUSDC converts a chosen Test USDC amount after an ERC-20 approval. EOA Buyer requires enough Test USDC before creation and never calls the faucet automatically.",
               "When vcUSDC shows ENCRYPTED, use the eye and authorize your wallet to reveal it for this session only.",
               "UNWRAP vcUSDC releases public Test USDC to this wallet after an unwrap request and public-proof finalization.",

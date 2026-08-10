@@ -740,8 +740,8 @@ export async function inspectFoundations({
     assertions,
     blockers,
     notes: [
-      "The official scaffold main branch is reference-only; VeilBid pins the organizer-directed tee-node module and tee-proxy release recipe independently.",
-      "The VeilBid extension build inputs and executable linux/amd64 image digest are pinned and locally verifiable without recording runtime secrets.",
+      "The official scaffold main branch is reference-only; FlareQuorum pins the organizer-directed tee-node module and tee-proxy release recipe independently.",
+      "The FlareQuorum extension build inputs and executable linux/amd64 image digest are pinned and locally verifiable without recording runtime secrets.",
       "The tee-proxy build inputs and executable linux/amd64 image digest are pinned and verified against the local Docker content store.",
       "The official register-tee operator is checksum-pinned, aligned to the selected FCC wire/ABI modules, and verified as a separate non-root image.",
       "No RPC URL, deployment key, indexer credential, proxy response, or machine secret is recorded.",

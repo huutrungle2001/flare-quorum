@@ -1,4 +1,4 @@
-# VeilBid FCC proxy image
+# FlareQuorum FCC proxy image
 
 This directory contains the release recipe for Flare's official `tee-proxy`.
 It does not fork or modify proxy behavior. The Dockerfile downloads the exact

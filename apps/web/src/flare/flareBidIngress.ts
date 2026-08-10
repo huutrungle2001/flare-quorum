@@ -6,11 +6,11 @@ import {
   prepareBidReceiptSet,
   privateBidCommitment,
   recoverBidReceiptSigner,
-  veilBidFlareMarketAbi,
+  flareQuorumFlareMarketAbi,
   type FlareBidReceipt,
   type FlarePrivateBidSubmission,
   type FlareTeePublicKey,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import {
   bytesToHex,
   createPublicClient,
@@ -280,7 +280,7 @@ export async function submitFlareBid(input: {
   const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl(env)) });
   const approved = await publicClient.readContract({
     address: market,
-    abi: veilBidFlareMarketAbi,
+    abi: flareQuorumFlareMarketAbi,
     functionName: "isApprovedVendor",
     args: [input.tender.tenderId, input.vendor],
   });
@@ -333,7 +333,7 @@ export async function submitFlareBid(input: {
   const simulation = await publicClient.simulateContract({
     account: input.vendor,
     address: market,
-    abi: veilBidFlareMarketAbi,
+    abi: flareQuorumFlareMarketAbi,
     functionName: "submitBidReceipts",
     args: [input.tender.tenderId, prepared.receipts, prepared.signatures],
   });

@@ -59,7 +59,7 @@ The foundation audit found this exact upstream drift:
   `v0.0.23` and Go `1.25.8`.
 
 The scaffold is therefore a reference, not a build-ready dependency snapshot.
-VeilBid tests one wire-compatible node/proxy pair rather than combining their
+FlareQuorum tests one wire-compatible node/proxy pair rather than combining their
 independent latest tags. The proxy release
 recipe at `apps/fcc-extension/proxy/Dockerfile` downloads the exact official
 source archive, verifies its checksum, and pins both image stages. The canonical
@@ -72,7 +72,7 @@ evidence is stored at `evidence/coston2/gate-0-proxy-image.json`. Provenance
 and SBOM are enabled, but their timestamp-bearing index digest is intentionally
 not substituted for the stable executable platform digest.
 
-The VeilBid extension recipe at `apps/fcc-extension/Dockerfile` is pinned by
+The FlareQuorum extension recipe at `apps/fcc-extension/Dockerfile` is pinned by
 the same policy. `pnpm flare:extension:image:verify` checks the executable
 platform digest, extracted binary, `MODE=0` default, persistent sealed-store
 volume, exact launch-policy environment allowlist, and absence of embedded
@@ -106,7 +106,7 @@ The foundation sender evidence remains under
 `0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05` is explicitly bound to extension
 `66011` in `evidence/coston2/fcc-market-extension-registration.json`. The
 allowed FCC wire/code version `v0.2.2` and simulated code/platform record is in
-`evidence/coston2/fcc-code-version.json`. The current reproducible VeilBid
+`evidence/coston2/fcc-code-version.json`. The current reproducible FlareQuorum
 application image is versioned independently in
 `evidence/coston2/gate-0-extension-image.json`. In simulated mode the live
 measurement remains the already registered code hash when the application
@@ -116,7 +116,7 @@ binary SHA-256 as separate release evidence. The three product machines share
 the approved wire/code binding and byte-identical application image while
 retaining distinct identities and stable public origins.
 
-VeilBid performs the missing governance step explicitly with
+FlareQuorum performs the missing governance step explicitly with
 `pnpm flare:governance:preflight` followed by `pnpm flare:governance:set`. The
 preflight derives the official plain-governance hash, compares it with all
 three public machines and the current extension owner/policy, and refuses an
@@ -127,7 +127,7 @@ The deployed V1 sender at `0x44A322A45e8D796d890271209D59d529501113B9`
 remains public evidence of manager/constructor compatibility only. It is
 unregistered and uses the scaffold's historical scan-based `setExtensionId()`;
 do not register it. Public extension IDs were already above `65900` during the
-2026-08-04 live check, so every fresh VeilBid sender uses the constant-time V2
+2026-08-04 live check, so every fresh FlareQuorum sender uses the constant-time V2
 binding and separately verifies the registry mapping.
 
 ## 4. Stable public proxy URL
@@ -199,7 +199,7 @@ confidential hardware.
 The pinned official runtime generates the TEE identity key during process
 initialization and starts extension mode from `ZeroState`. Its public API does
 not provide a supported identity restore path. Restarting `extension-tee`
-therefore creates a new TEE ID even if the VeilBid sealed-bid volume survives.
+therefore creates a new TEE ID even if the FlareQuorum sealed-bid volume survives.
 
 Operational rules:
 

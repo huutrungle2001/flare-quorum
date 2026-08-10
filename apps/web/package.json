@@ -1,5 +1,5 @@
 {
-  "name": "@veilbid/tender-room",
+  "name": "@flarequorum/tender-room",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -16,8 +16,8 @@
     "@iexec-nox/handle": "0.1.0-beta.13",
     "@safe-global/api-kit": "5.0.1",
     "@safe-global/protocol-kit": "8.0.4",
-    "@veilbid/chain-bindings": "workspace:*",
-    "@veilbid/flare-bindings": "workspace:*",
+    "@flarequorum/chain-bindings": "workspace:*",
+    "@flarequorum/flare-bindings": "workspace:*",
     "buffer": "6.0.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",

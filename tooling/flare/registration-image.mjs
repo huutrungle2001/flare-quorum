@@ -88,9 +88,9 @@ export function verifyLocalRegistrationImage(repositoryRoot, recipe) {
   const inspection = parseRegistrationImageInspection(JSON.parse(run("docker", [
     "image", "inspect", "--platform", recipe.platform, recipe.releaseImageTag,
   ], { cwd: repositoryRoot })));
-  const temporaryDirectory = mkdtempSync(join(tmpdir(), "veilbid-register-image-"));
+  const temporaryDirectory = mkdtempSync(join(tmpdir(), "flare-quorum-register-image-"));
   const temporaryBinary = join(temporaryDirectory, "register-tee");
-  const containerName = `veilbid-register-verify-${process.pid}-${Date.now()}`;
+  const containerName = `flare-quorum-register-verify-${process.pid}-${Date.now()}`;
   let created = false;
   try {
     run("docker", ["create", "--name", containerName, recipe.releaseImageTag], {

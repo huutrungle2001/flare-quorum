@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
 # One Railway service represents exactly one simulated Coston2 FCC machine.
-# It co-locates the pinned proxy, Redis queue, and byte-identical VeilBid TEE
+# It co-locates the pinned proxy, Redis queue, and byte-identical FlareQuorum TEE
 # binary because Railway does not execute Docker Compose inside a service.
 
 FROM golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa AS extension-builder

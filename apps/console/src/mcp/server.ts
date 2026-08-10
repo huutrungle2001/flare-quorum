@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { tenderStatuses } from "@veilbid/chain-bindings";
+import { tenderStatuses } from "@flarequorum/chain-bindings";
 import * as z from "zod/v4";
 import {
   OperatorQueryError,
@@ -34,16 +34,16 @@ function failure(error: unknown) {
 
 export function createOperatorMcpServer(service: PublicOperatorService) {
   const server = new McpServer({
-    name: "veilbid-operator-console",
+    name: "flare-quorum-operator-console",
     version: "0.0.0",
   });
 
   server.registerTool(
     "list_tenders",
     {
-      title: "List VeilBid tenders",
+      title: "List FlareQuorum tenders",
       description:
-        "List finalized public VeilBid tender coordination data. Returns no encrypted handles or confidential values.",
+        "List finalized public FlareQuorum tender coordination data. Returns no encrypted handles or confidential values.",
       inputSchema: {
         status: z.enum(tenderStatuses).optional(),
         limit: z.number().int().min(1).max(100).optional(),
@@ -61,7 +61,7 @@ export function createOperatorMcpServer(service: PublicOperatorService) {
   server.registerTool(
     "get_tender",
     {
-      title: "Get a VeilBid tender",
+      title: "Get a FlareQuorum tender",
       description:
         "Get one finalized public tender and its public bid identities and transaction references.",
       inputSchema: { tenderId: positiveId },

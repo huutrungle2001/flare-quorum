@@ -1,5 +1,5 @@
 {
-  "name": "@veilbid/operator-console",
+  "name": "@flarequorum/operator-console",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
-    "@veilbid/chain-bindings": "workspace:*",
-    "@veilbid/flare-bindings": "workspace:*",
+    "@flarequorum/chain-bindings": "workspace:*",
+    "@flarequorum/flare-bindings": "workspace:*",
     "viem": "2.47.6",
     "zod": "4.4.3"
   },

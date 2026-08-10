@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm --filter @veilbid/chain-bindings build && pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/tender-room build",
+  "buildCommand": "pnpm --filter @flarequorum/chain-bindings build && pnpm --filter @flarequorum/flare-bindings build && pnpm --filter @flarequorum/tender-room build",
   "installCommand": "pnpm install --frozen-lockfile",
   "outputDirectory": "apps/web/dist",
   "rewrites": [

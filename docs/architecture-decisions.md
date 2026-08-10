@@ -70,7 +70,7 @@ fallback is not considered championship-complete.
 
 **Current transport mapping:** The pinned 2026 FCC proxy exposes API-key
 protected `POST /direct`, removes the queued action body after the TEE fetches
-it, and exposes the signed `ActionResult` separately. VeilBid uses that direct
+it, and exposes the signed `ActionResult` separately. FlareQuorum uses that direct
 queue only for opaque ECIES. The API key remains server-side; a vendor-facing
 gateway authenticates the vendor request without learning the plaintext. The
 extension calls only tee-node's loopback `/decrypt` and `/sign` endpoints and
@@ -306,7 +306,7 @@ lifecycle.
 - Zero winner refunds the full escrow.
 - Fee-on-transfer or rebasing tokens are unsupported.
 - Settlement state changes before external token calls.
-- Winner can redeem FXRP through the official FAssets flow; VeilBid never holds
+- Winner can redeem FXRP through the official FAssets flow; FlareQuorum never holds
   an XRPL secret.
 
 Ordinary token amounts and the final winning price are public.
@@ -416,14 +416,14 @@ audit found their `main` branches still pinning `tee-node` `v0.0.21` and
 `tee-proxy` `v0.0.18`, below the organizer-supplied `tee-node >= v0.0.22`
 baseline.
 
-VeilBid pins the exact scaffold/example commits for provenance, but selects and
+FlareQuorum pins the exact scaffold/example commits for provenance, but selects and
 tests one wire-compatible runtime pair: `tee-node` `v0.0.23` at
 `9090eccbae1111742bd83ef0601485d9503b4a13` and `tee-proxy` at
 `0c6d016b09948cba9a508ba357e592eb6088fd1c`, whose own module graph resolves
 the same `tee-node` version. This supersedes the briefly tested independent
 `v0.0.24` extension pin after 2026-08-05 Flare maintainer guidance confirmed
 that node/proxy wire formats must be aligned rather than upgraded separately.
-The VeilBid proxy recipe pins the
+The FlareQuorum proxy recipe pins the
 official source archive by checksum and both build stages by digest. Gate 0 also
 requires the recipe to be built and the resulting immutable release image
 digest recorded; reproducible inputs alone are not deployment evidence. If
@@ -438,7 +438,7 @@ the organizer bulletin.
 
 ## ADR-018 — Deterministic FCC foundation wire format
 
-**Decision:** The first VeilBid FCC extension operation is `PING_V1`, with a
+**Decision:** The first FlareQuorum FCC extension operation is `PING_V1`, with a
 strict ABI tuple containing only `schemaVersion`, Coston2 `chainId`, market
 address, one-time request nonce, and an opaque payload hash. The extension
 returns the same public fields plus a binding hash over:
@@ -641,7 +641,7 @@ restore path. Consequently, restarting the `extension-tee` process creates a
 new machine identity and invalidates the old registration.
 
 Until Flare publishes a supported sealed identity/state restore mechanism,
-VeilBid treats a machine restart as loss of that frozen machine, not as
+FlareQuorum treats a machine restart as loss of that frozen machine, not as
 same-machine recovery. The championship topology uses three independent
 long-lived machines, stores the same accepted bid set on all three, and allows
 the two surviving registered identities to produce the exact same selection.
@@ -681,7 +681,7 @@ changed after one TEE restart, and a post-refresh three-machine local smoke
 still passed without treating the replacement identity as registered.
 The official Coston2 guide also treats `rRap` as the supported registration
 operation and documents re-running registration after environment changes.
-VeilBid therefore does not fork or patch the framework to restore an identity
+FlareQuorum therefore does not fork or patch the framework to restore an identity
 key, because that would be an unsupported runtime/code path and would require a
 new extension image/code-version registration.
 
@@ -710,7 +710,7 @@ recoverable without a plaintext shadow ledger or public ciphertext.
 
 ## ADR-027 — Separate application-image and simulated FCC wire versions
 
-**Decision:** Version the reproducible VeilBid application image independently
+**Decision:** Version the reproducible FlareQuorum application image independently
 from the FCC manager wire/code version. The nonce-addressed bid-slot release is
 application image `0.2.3`, while its Coston2 simulated runtime continues to emit
 the already registered FCC wire version `0.2.2`. The foundation manifest records
@@ -718,7 +718,7 @@ both values and validation requires the Go response constant to equal
 `wireVersion`, not the image tag.
 
 This separation is required because the live simulated `/info` measurement did
-not change when the VeilBid application binary changed. The verified
+not change when the FlareQuorum application binary changed. The verified
 `ExtensionManagerFacet.addTeeVersion` implementation keys versions by code hash
 and rejects an existing hash with `VersionAlreadyExists`; the same simulated
 measurement therefore cannot be relabeled from `v0.2.2` to `v0.2.3`. Production
@@ -728,7 +728,7 @@ matching version before use.
 **Reason:** Treating an application tag as though it were a new manager-attested
 measurement would either revert or create misleading evidence. Keeping the two
 version domains explicit preserves the real on-chain binding while the image
-digest and binary SHA-256 independently prove which VeilBid code was deployed.
+digest and binary SHA-256 independently prove which FlareQuorum code was deployed.
 This is a limitation of the accepted simulated Coston2 topology and must not be
 described as hardware-backed application measurement.
 

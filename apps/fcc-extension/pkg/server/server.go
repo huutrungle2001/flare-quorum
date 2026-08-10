@@ -2,7 +2,7 @@ package server
 
 import extension "github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/extension"
 
-// StartExtension creates and starts the VeilBid extension server in a goroutine.
+// StartExtension creates and starts the FlareQuorum extension server in a goroutine.
 // Returns an error channel that receives any ListenAndServe failure (e.g., port already in use).
 func StartExtension(extensionPort, signPort int) <-chan error {
 	errCh := make(chan error, 1)

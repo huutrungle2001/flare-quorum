@@ -1,6 +1,6 @@
 # Security Policy
 
-VeilBid is unaudited hackathon software. Do not use it with production keys,
+FlareQuorum is unaudited hackathon software. Do not use it with production keys,
 valuable funds, or operational procurement.
 
 ## Supported scope
@@ -49,7 +49,7 @@ participation, timing, traffic metadata, commitments, final winner, FTSO
 snapshot, XRPL/Flare funding trail, and transaction graph are also public.
 
 The XRP-native path additionally depends on official FAssets, FDC, FTSO, and
-Smart Account behavior. VeilBid never takes an XRPL secret or allows an admin,
+Smart Account behavior. FlareQuorum never takes an XRPL secret or allows an admin,
 relay, browser, buyer, or single TEE to override a frozen winner computation.
 
 Full objectives, threats, compromise impact, and residual risk are documented

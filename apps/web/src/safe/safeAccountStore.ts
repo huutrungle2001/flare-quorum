@@ -4,7 +4,7 @@ import {
   type Address,
 } from "viem";
 
-const storageKey = "veilbid.owner-safes.v1";
+const storageKey = "flarequorum.owner-safes.v1";
 const maximumStoredSafes = 20;
 
 export interface RememberedOwnerSafe {

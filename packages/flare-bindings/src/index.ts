@@ -12,8 +12,8 @@ export * from "./public-market.js";
 export * from "./private-bid.js";
 
 export const coston2ChainId = 114;
-export const veilBidFlareMarketAbi = marketAbiJson as Abi;
-export const veilBidFlareAwardReceiptAbi = awardReceiptAbiJson as Abi;
+export const flareQuorumFlareMarketAbi = marketAbiJson as Abi;
+export const flareQuorumFlareAwardReceiptAbi = awardReceiptAbiJson as Abi;
 
 export interface Coston2FlarePublicRelease {
   network: "coston2";

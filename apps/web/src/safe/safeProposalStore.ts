@@ -7,7 +7,7 @@ import {
 } from "viem";
 import type { SafeActionKind } from "./safePreparation";
 
-const storageKey = "veilbid.safe-proposals.v1";
+const storageKey = "flarequorum.safe-proposals.v1";
 const maximumStoredProposals = 20;
 
 export interface StoredSafeProposal {

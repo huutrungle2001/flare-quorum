@@ -50,7 +50,7 @@ test("requires exact image, binary, safe defaults, volume, and launch policy", (
   const binarySha256 = createHash("sha256").update(binary).digest("hex");
   const recipe = {
     platform: "linux/amd64",
-    releaseImageTag: "veilbid/fcc-extension:test",
+    releaseImageTag: "flarequorum/fcc-extension:test",
     releaseImageDigest: digest,
     releaseBinarySha256: binarySha256,
   };

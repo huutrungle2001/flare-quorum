@@ -21,7 +21,7 @@ const inspection = parseRegistrationImageInspection([{
 test("accepts only the pinned non-root registration executable", () => {
   const recipe = {
     platform: "linux/amd64",
-    releaseImageTag: "veilbid/fcc-register-tee:test",
+    releaseImageTag: "flarequorum/fcc-register-tee:test",
     releaseImageDigest: digest,
     releaseBinarySha256: createHash("sha256").update(binary).digest("hex"),
   };

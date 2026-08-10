@@ -30,14 +30,14 @@ function failure(error: unknown) {
 
 export function createFlareOperatorMcpServer(service: FlarePublicOperatorService) {
   const server = new McpServer({
-    name: "veilbid-flare-operator-console",
+    name: "flare-quorum-operator-console",
     version: "0.0.0",
   });
 
   server.registerTool(
     "list_flare_tenders",
     {
-      title: "List Coston2 VeilBid tenders",
+      title: "List Coston2 FlareQuorum tenders",
       description: "List finalized public Coston2 tender facts without bid payloads or signatures.",
       inputSchema: {
         status: z.enum(flareTenderStatuses).optional(),
@@ -56,7 +56,7 @@ export function createFlareOperatorMcpServer(service: FlarePublicOperatorService
   server.registerTool(
     "get_flare_tender",
     {
-      title: "Get one Coston2 VeilBid tender",
+      title: "Get one Coston2 FlareQuorum tender",
       description: "Inspect one finalized public tender and its frozen FCC/FTSO bindings.",
       inputSchema: { tenderId: positiveId },
     },

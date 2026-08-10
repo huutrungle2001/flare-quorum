@@ -2,7 +2,7 @@ import type {
   PublicMarketIndex,
   PublicTender,
   TenderStatus,
-} from "@veilbid/chain-bindings";
+} from "@flarequorum/chain-bindings";
 import type { Address, Hex } from "viem";
 
 export interface OperatorSnapshot {

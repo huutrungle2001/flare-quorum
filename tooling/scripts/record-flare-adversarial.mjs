@@ -12,7 +12,7 @@ function git(...args) {
 const commands = [
   {
     name: "fcc-extension-go-tests",
-    args: ["--filter", "@veilbid/fcc-extension", "test"],
+    args: ["--filter", "@flarequorum/fcc-extension", "test"],
     coverage: [
       "invalidBidRejected",
       "credentialDomainBindingRejected",
@@ -25,7 +25,7 @@ const commands = [
   },
   {
     name: "flare-contract-forge-tests",
-    args: ["--filter", "@veilbid/flare-contracts", "test"],
+    args: ["--filter", "@flarequorum/flare-contracts", "test"],
     coverage: [
       "zeroWinnerConservation",
       "resultDomainReplayRejected",
@@ -38,7 +38,7 @@ const commands = [
   },
   {
     name: "settlement-relay-tests",
-    args: ["--filter", "@veilbid/settlement-relay", "test"],
+    args: ["--filter", "@flarequorum/settlement-relay", "test"],
     coverage: [
       "wrongDomainAndMalformedIngressRejected",
       "resultSplitAndDuplicateSignerRemainPending",

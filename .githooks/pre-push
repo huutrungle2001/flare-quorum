@@ -2,7 +2,7 @@
 
 set -eu
 
-# This repository is the Flare product; the legacy VeilBid remote is out of scope.
+# This repository is the FlareQuorum product; every other remote is out of scope.
 remote_name=${1-}
 remote_url=${2-}
 

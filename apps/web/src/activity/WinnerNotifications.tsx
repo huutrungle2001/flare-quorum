@@ -1,4 +1,4 @@
-import type { PublicTender } from "@veilbid/chain-bindings";
+import type { PublicTender } from "@flarequorum/chain-bindings";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Address } from "viem";
 import { ContextHelp } from "../shell/ContextHelp";
@@ -180,7 +180,7 @@ export function WinnerNotificationHistory({
           label="Help for award notifications"
           title="HOW AWARD NOTIFICATIONS WORK"
           steps={[
-            "VeilBid derives this history from confirmed TenderAwarded events for the connected wallet.",
+            "FlareQuorum derives this history from confirmed TenderAwarded events for the connected wallet.",
             "Open an award to inspect its public dossier and non-transferable receipt.",
             "Only whether an award notification was opened is stored locally; award records remain recoverable from Sepolia after reload.",
           ]}

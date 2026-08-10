@@ -24,7 +24,7 @@ test("parses and compares strict semantic versions", () => {
 
 test("accepts only stable HTTPS proxy origins", () => {
   assert.equal(
-    isStableProxyUrl("https://fcc.veilbid.example", "trycloudflare.com"),
+    isStableProxyUrl("https://fcc.flarequorum.example", "trycloudflare.com"),
     true,
   );
   assert.equal(
@@ -34,13 +34,13 @@ test("accepts only stable HTTPS proxy origins", () => {
   assert.equal(isStableProxyUrl("http://localhost:6674", "trycloudflare.com"), false);
   assert.equal(
     isStableProxyUrl(
-      ["https://user", "secret@fcc.veilbid.example"].join(":"),
+      ["https://user", "secret@fcc.flarequorum.example"].join(":"),
       "trycloudflare.com",
     ),
     false,
   );
   assert.equal(
-    isStableProxyUrl("https://fcc.veilbid.example/private", "trycloudflare.com"),
+    isStableProxyUrl("https://fcc.flarequorum.example/private", "trycloudflare.com"),
     false,
   );
   assert.equal(isStableProxyUrl("not-a-url", "trycloudflare.com"), false);

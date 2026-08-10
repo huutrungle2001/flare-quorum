@@ -6,7 +6,7 @@ interface EventPosition {
   logIndex: number;
 }
 
-export type VeilBidPublicEvent =
+export type FlareQuorumPublicEvent =
   | (EventPosition & {
       name: "TenderCreated";
       tenderId: bigint;

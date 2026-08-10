@@ -1,4 +1,4 @@
-import type { PublicTender } from "@veilbid/chain-bindings";
+import type { PublicTender } from "@flarequorum/chain-bindings";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Address, WalletClient } from "viem";

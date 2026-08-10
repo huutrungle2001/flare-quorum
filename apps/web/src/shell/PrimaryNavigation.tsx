@@ -29,7 +29,7 @@ function HeaderWalletMenu({
     state.status === "connected" && state.account ? state.account : null;
   const wrongChain = state.status === "wrong-chain";
   const coston2 = network === "coston2";
-  const productName = coston2 ? "FlareQuorum" : "VeilBid";
+  const productName = "FlareQuorum";
   const networkLabel = coston2 ? "Flare Coston2" : "Ethereum Sepolia";
   const buttonLabel = connected
     ? shortAddress(connected)
@@ -187,7 +187,7 @@ export function PrimaryNavigation({
       location.pathname === "/docs"
     )
   );
-  const productName = isFlare ? "FlareQuorum" : "VeilBid";
+  const productName = "FlareQuorum";
   const items: NavigationItem[] = [
     { label: "TENDERS", to: tenderPath, active: isTenders },
     ...(!flareReleaseEnabled && import.meta.env.VITE_FLARE_MARKET_ADDRESS
@@ -236,7 +236,7 @@ export function PrimaryNavigation({
         aria-current={isHome ? "page" : undefined}
         onClick={scrollToPageTop}
       >
-        {isFlare ? "FLAREQUORUM" : "VEILBID"}
+        FLAREQUORUM
       </Link>
       <nav aria-label="Primary navigation">
         {items.map((item) => (

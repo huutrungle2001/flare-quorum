@@ -1,4 +1,4 @@
-import type { PublicBid, PublicTender } from "@veilbid/chain-bindings";
+import type { PublicBid, PublicTender } from "@flarequorum/chain-bindings";
 import { DisclosurePanel } from "../disclosure/DisclosurePanel";
 import { WalletPanel, type WalletController } from "../wallet/WalletPanel";
 import { BuyerTenderForm } from "./BuyerTenderForm";

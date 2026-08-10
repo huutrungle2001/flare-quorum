@@ -3,7 +3,7 @@ import type {
   Coston2PublicMarket,
   Coston2PublicTender,
   Coston2TenderStatus,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 
 export interface FlarePublicOperatorSource {
   snapshot(): Promise<Coston2PublicMarket>;

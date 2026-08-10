@@ -257,7 +257,7 @@
       "releaseBinarySha256": "d88d6816fb132275cd60a5e13bb181ee96db2811d3f78a309b842fb382b2a012"
     },
     "redisImage": "redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2",
-    "policy": "VeilBid's tee-proxy recipe pins the official source archive and both image stages. The executable linux/amd64 OCI manifest and binary SHA-256 are recorded separately from timestamp-bearing provenance attestations."
+    "policy": "FlareQuorum's tee-proxy recipe pins the official source archive and both image stages. The executable linux/amd64 OCI manifest and binary SHA-256 are recorded separately from timestamp-bearing provenance attestations."
   },
   "contracts": {
     "flareContractRegistry": "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019",
@@ -293,7 +293,7 @@
   "externalRequirements": {
     "simulatedTee": true,
     "stableProxyEnvironmentVariable": "FLARE_FCC_PROXY_URLS",
-    "machineIdsEnvironmentVariable": "VEILBID_FCC_TEE_IDS",
+    "machineIdsEnvironmentVariable": "FLAREQUORUM_FCC_TEE_IDS",
     "indexerEnvironmentVariables": [
       "FCC_INDEXER_HOST",
       "FCC_INDEXER_USER",

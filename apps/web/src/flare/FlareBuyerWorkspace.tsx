@@ -5,9 +5,9 @@ import {
   assetManagerFAssetsAbi,
   quoteSmartAccountDirectMinting,
   smartAccountReaderAbi,
-  veilBidFlareMarketAbi,
+  flareQuorumFlareMarketAbi,
   type FlareTenderTerms,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import {
   createPublicClient,
   decodeEventLog,
@@ -256,7 +256,7 @@ export function FlareBuyerWorkspace({
       const approvalReceipt = await publicClient.waitForTransactionReceipt({ hash: approvalHash });
       if (approvalReceipt.status !== "success") throw new Error("FLARE_APPROVAL_FAILED");
       toasts.update(toastId, "Creating the funded tender with frozen FCC identities…");
-      const creation = await publicClient.simulateContract({ account: wallet.state.account!, address: market, abi: veilBidFlareMarketAbi as Abi, functionName: "createTender", args: [terms] });
+      const creation = await publicClient.simulateContract({ account: wallet.state.account!, address: market, abi: flareQuorumFlareMarketAbi as Abi, functionName: "createTender", args: [terms] });
       const creationHash = await wallet.state.walletClient!.writeContract(creation.request);
       const receipt = await publicClient.waitForTransactionReceipt({ hash: creationHash });
       if (receipt.status !== "success") throw new Error("FLARE_TENDER_CREATION_FAILED");
@@ -265,7 +265,7 @@ export function FlareBuyerWorkspace({
         .map((log) => {
           try {
             return decodeEventLog({
-              abi: veilBidFlareMarketAbi,
+              abi: flareQuorumFlareMarketAbi,
               data: log.data,
               topics: log.topics,
               strict: true,

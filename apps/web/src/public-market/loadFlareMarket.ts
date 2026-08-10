@@ -3,7 +3,7 @@ import {
   type Coston2MarketConfig,
   type Coston2PublicMarket,
   type Coston2PublicTender,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import { getAddress, isAddress } from "viem";
 
 export type FlareMarketConfig = Coston2MarketConfig;

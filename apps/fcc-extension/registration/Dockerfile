@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
 # Build only the official register-tee operator from the pinned scaffold. The
 # scaffold's runtime dependencies are deliberately realigned to the same
-# tee-node and go-flare-common revisions as VeilBid's Coston2 stack.
+# tee-node and go-flare-common revisions as FlareQuorum's Coston2 stack.
 FROM --platform=linux/amd64 golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa AS builder
 
 ENV GOTOOLCHAIN=local

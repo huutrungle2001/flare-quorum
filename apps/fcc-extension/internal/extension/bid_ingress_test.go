@@ -94,7 +94,7 @@ func TestPrivateBidDirectActionReturnsContractVerifiableReceiptAndSealsCiphertex
 func directBidAction(t *testing.T, ciphertext []byte) teetypes.Action {
 	t.Helper()
 	direct, err := json.Marshal(teetypes.DirectInstruction{
-		OPType: teeutils.ToHash(config.OPTypeVeilBidBid), OPCommand: teeutils.ToHash(config.OPCommandSubmitV1), Message: hexutil.Bytes(ciphertext),
+		OPType: teeutils.ToHash(config.OPTypeFlareQuorumBid), OPCommand: teeutils.ToHash(config.OPCommandSubmitV1), Message: hexutil.Bytes(ciphertext),
 	})
 	if err != nil {
 		t.Fatal(err)

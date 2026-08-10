@@ -1,5 +1,5 @@
-import wrapperAbiJson from "@veilbid/chain-bindings/abis/VeilBidConfidentialUSDC";
-import deployment from "@veilbid/chain-bindings/addresses/sepolia.release";
+import wrapperAbiJson from "@flarequorum/chain-bindings/abis/VeilBidConfidentialUSDC";
+import deployment from "@flarequorum/chain-bindings/addresses/sepolia.release";
 import { createViemHandleClient } from "@iexec-nox/handle";
 import {
   decodeEventLog,

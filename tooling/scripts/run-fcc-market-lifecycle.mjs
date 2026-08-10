@@ -26,8 +26,8 @@ import {
   recoverBidReceiptSigner,
   teeIdentityFromPublicKey,
   verifySelectionActionResponse,
-  veilBidDirectOpType,
-  veilBidDirectSubmitCommand,
+  flareQuorumDirectOpType,
+  flareQuorumDirectSubmitCommand,
 } from "../../packages/flare-bindings/dist/index.js";
 import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
 import { lifecyclePathBlocker } from "../flare/market-lifecycle-guards.mjs";
@@ -205,7 +205,7 @@ async function sendDirect(url, apiKey, ciphertext) {
   const response = await fetch(`${url}/direct`, {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": apiKey, accept: "application/json" },
-    body: JSON.stringify({ opType: veilBidDirectOpType, opCommand: veilBidDirectSubmitCommand, message: ciphertext }),
+    body: JSON.stringify({ opType: flareQuorumDirectOpType, opCommand: flareQuorumDirectSubmitCommand, message: ciphertext }),
     redirect: "error",
     signal: AbortSignal.timeout(15_000),
   });
@@ -281,7 +281,7 @@ async function verifyBidReceipt(value, context, expectedTeeId) {
   const result = response?.result;
   if (
     !result || result.id.toLowerCase() !== context.actionId.toLowerCase() || result.submissionTag !== "submit"
-    || result.status !== 1 || result.opType !== veilBidDirectOpType || result.opCommand !== veilBidDirectSubmitCommand
+    || result.status !== 1 || result.opType !== flareQuorumDirectOpType || result.opCommand !== flareQuorumDirectSubmitCommand
   ) throw new Error("FCC_MARKET_BID_ACTION_INVALID");
   const receipt = decodeBidReceipt(result.data);
   const signer = await recoverBidReceiptSigner(receipt);
@@ -444,7 +444,7 @@ async function main() {
   const approval = await writeContract({ client, wallet: buyerWallet, account, address: token, abi: erc20Abi, functionName: "approve", args: [market, ceiling] });
   const tenderCountBefore = await client.readContract({ address: market, abi: marketAbi, functionName: "tenderCount" });
   const terms = {
-    metadataHash: keccak256(stringToHex(`VEILBID_C2_LIVE_TENDER_${Date.now()}`)),
+    metadataHash: keccak256(stringToHex(`FLAREQUORUM_C2_LIVE_TENDER_${Date.now()}`)),
     scoringPolicy: rules,
     approvedVendors: vendorAccounts.map((vendor) => vendor.address),
     extensionId,

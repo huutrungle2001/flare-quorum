@@ -1,4 +1,4 @@
-import type { PublicBid, PublicTender } from "@veilbid/chain-bindings";
+import type { PublicBid, PublicTender } from "@flarequorum/chain-bindings";
 import { useEffect, useMemo, useState } from "react";
 import type { Address } from "viem";
 import {
@@ -197,7 +197,7 @@ export function GrantedAccessPanel({
             title="HOW TO USE GRANTED ACCESS"
             steps={[
               "Connect the wallet that received review access or a Vendor grant.",
-              "Wait while VeilBid checks every indexed bid ACL and keeps only authorized references.",
+              "Wait while FlareQuorum checks every indexed bid ACL and keeps only authorized references.",
               "Select an authorized bid and reveal it for this browser session only.",
             ]}
           />
@@ -301,7 +301,7 @@ export function AuditorWorkspace(props: {
           title="HOW TO REVEAL GRANTED BIDS"
           steps={[
             "Connect the exact Sepolia wallet configured as review wallet or granted by a Vendor.",
-            "Wait while VeilBid checks indexed bid permissions automatically.",
+            "Wait while FlareQuorum checks indexed bid permissions automatically.",
             "Select one of the authorized bid references shown.",
             "Reveal it for this session; plaintext clears when the wallet session changes.",
           ]}

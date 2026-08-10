@@ -3,7 +3,7 @@ import {
   loadCoston2PublicMarket,
   type Coston2MarketConfig,
   type Coston2PublicReader,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import { getAddress, isAddress } from "viem";
 import type { FlarePublicOperatorSource } from "./flare-types.js";
 

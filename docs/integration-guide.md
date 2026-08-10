@@ -108,7 +108,7 @@ payment. The dedicated server-side executor boundary above remains unchanged.
 Run the hosted ciphertext ingress as a separate server process:
 
 ```bash
-pnpm --filter @veilbid/settlement-relay build
+pnpm --filter @flarequorum/settlement-relay build
 pnpm flare:ingress
 ```
 

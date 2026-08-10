@@ -172,7 +172,7 @@ export SEALED_STORE_DIR="$sealed_dir"
 /app/extension-tee &
 tee_pid=$!
 
-printf 'VeilBid FCC machine started in simulated Coston2 mode\n'
+printf 'FlareQuorum FCC machine started in simulated Coston2 mode\n'
 while :; do
   for process in "$redis_pid" "$proxy_pid" "$tee_pid"; do
     if ! kill -0 "$process" 2>/dev/null; then

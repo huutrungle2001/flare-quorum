@@ -8,7 +8,7 @@ import {
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { PublicMarketState } from "../src/public-market/usePublicMarket";
-import { ExplorerView } from "../src/shell/LegacyTenderRoom";
+import { ExplorerView } from "../src/shell/FlareQuorumTenderRoom";
 import type { WalletController } from "../src/wallet/WalletPanel";
 import { saveRecoveryRecord } from "../src/activity/recoveryStore";
 

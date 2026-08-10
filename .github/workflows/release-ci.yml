@@ -59,8 +59,8 @@ jobs:
 
       - name: Run critical coverage gates
         run: |
-          pnpm --filter @veilbid/settlement-relay test:coverage
-          pnpm --filter @veilbid/tender-room test:coverage
+          pnpm --filter @flarequorum/settlement-relay test:coverage
+          pnpm --filter @flarequorum/tender-room test:coverage
 
       - name: Run typed lint
         run: pnpm lint

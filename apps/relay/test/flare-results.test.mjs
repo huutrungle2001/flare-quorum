@@ -4,9 +4,9 @@ import {
   fccActionResultHash,
   fccSigningDigest,
   teeActionResultPrefix,
-  veilBidSelectionOpType,
-  veilBidSelectV1OpCommand,
-} from "@veilbid/flare-bindings";
+  flareQuorumSelectionOpType,
+  flareQuorumSelectV1OpCommand,
+} from "@flarequorum/flare-bindings";
 import { encodeAbiParameters, hashMessage } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import {
@@ -63,8 +63,8 @@ async function signedResponse(account, result = selection) {
     submissionTag: "threshold",
     status: 1,
     log: "ok",
-    opType: veilBidSelectionOpType,
-    opCommand: veilBidSelectV1OpCommand,
+    opType: flareQuorumSelectionOpType,
+    opCommand: flareQuorumSelectV1OpCommand,
     additionalResultStatus: "0x",
     version: "0.2.0",
     data: encodeAbiParameters(selectionParameter, [result]),

@@ -9,7 +9,7 @@ import {
   type FlareCredentialRequirement,
   type FlareScoringPolicy,
   type FlareTenderTerms,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import type { XrplFinality } from "./xrpl-finality.js";
 
 export interface FlareFundingJob {

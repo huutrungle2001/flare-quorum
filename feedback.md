@@ -1,6 +1,6 @@
 # Historical iExec Nox Developer Tooling Feedback
 
-> Project: VeilBid
+> Project: Historical predecessor
 >
 > Status: Pre-Summer-Signal baseline feedback from the completed Ethereum
 > Sepolia implementation. This file is retained to document what existed before
@@ -8,7 +8,7 @@
 
 ## 1. Tested stack
 
-VeilBid used the following pinned versions:
+The historical predecessor used the following pinned versions:
 
 | Component | Version |
 |---|---:|
@@ -50,7 +50,7 @@ Keeping all comparisons in one reviewed operation order was important:
 encrypted validity first, then encrypted lower-than comparison, then `select`
 for both best price and winner ID.
 
-Evidence: `evidence/sepolia/gate-b.json` and VeilBid Market property/static
+Evidence: `evidence/sepolia/gate-b.json` and historical market property/static
 tests.
 
 ### Public-decryption proof binding
@@ -67,7 +67,7 @@ Evidence: `evidence/sepolia/gate-c.json` and
 
 The official wrapper supported exact confidential winner payment, buyer
 remainder, and full-refund paths. Per-handle viewers and token operators were
-separate permissions, which allowed VeilBid to grant narrow audit visibility
+separate permissions, which allowed the implementation to grant narrow audit visibility
 without granting transfer authority.
 
 Evidence: `evidence/sepolia/gate-d.json`.
@@ -81,7 +81,7 @@ required a running Docker daemon. This is a meaningful onboarding boundary:
 having Sepolia ETH and an RPC endpoint is enough for live testnet execution, but
 not for the local confidential runtime.
 
-Workaround: VeilBid made the four mandatory feasibility gates Sepolia-first and
+Workaround: the implementation made the four mandatory feasibility gates Sepolia-first and
 kept deterministic local models for fast regression.
 
 Recommendation: document a short decision table showing which commands need
@@ -94,7 +94,7 @@ consumer contract, and the current viewer/operator authorization. A generic
 authorization failure does not immediately reveal which edge is missing,
 especially after a handle crosses transaction or contract boundaries.
 
-Workaround: VeilBid added explicit ACL checkpoints before each cross-contract
+Workaround: the implementation added explicit ACL checkpoints before each cross-contract
 use and before browser decryption. Evidence records only Boolean assertions,
 never handles or proofs.
 
@@ -121,7 +121,7 @@ An ERC-7984 transfer can produce an encrypted result, so transaction success
 alone does not publicly prove that the requested ceiling reached escrow. This
 matters when an underfunded balance must not open a tender.
 
-Workaround: VeilBid keeps the tender in `FundingPending` until a deliberately
+Workaround: the implementation keeps the tender in `FundingPending` until a deliberately
 public exact-funding proof confirms that the encrypted transferred amount equals
 the public ceiling.
 
@@ -173,7 +173,7 @@ The highest-value additions would be:
 
 ## 5. Verification boundary
 
-The observations above are limited to the pinned VeilBid implementation and its
+The observations above are limited to the pinned predecessor implementation and its
 recorded Sepolia runs. They do not establish formal security, mainnet readiness,
 Nox infrastructure correctness, or behavior outside the tested versions.
 Confidential values, handles, proofs, wallet signatures, RPC credentials, and

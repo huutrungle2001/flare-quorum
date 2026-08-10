@@ -22,7 +22,7 @@ declare global {
   }
 }
 
-export const selectedProviderStorageKey = "veilbid:selected-provider-rdns";
+export const selectedProviderStorageKey = "flarequorum:selected-provider-rdns";
 
 export function subscribeToWalletProviders(
   onProvider: (detail: WalletProviderDetail) => void,

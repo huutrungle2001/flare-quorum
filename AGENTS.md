@@ -1,9 +1,9 @@
-# VeilBid Flare — Agent and Contributor Guide
+# FlareQuorum — Agent and Contributor Guide
 
 ## 1. Objective
 
-This repository is porting VeilBid to Flare for Summer Signal. Preserve the
-product claim while changing the confidential-compute implementation:
+This repository ports the historical predecessor's product claim to Flare for
+Summer Signal while changing the confidential-compute implementation:
 
 - buyers create transparent procurement rules and escrow a real testnet asset;
 - approved vendors submit encrypted bids;

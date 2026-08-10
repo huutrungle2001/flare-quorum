@@ -1,11 +1,11 @@
 import {
   buildPublicLogBlockRanges,
   buildPublicMarketIndex,
-  decodeVeilBidPublicEvent,
+  decodeFlareQuorumPublicEvent,
   publicLogBlockChunkSize,
   type PublicMarketIndex,
-} from "@veilbid/chain-bindings";
-import deployment from "@veilbid/chain-bindings/addresses/sepolia.release";
+} from "@flarequorum/chain-bindings";
+import deployment from "@flarequorum/chain-bindings/addresses/sepolia.release";
 import {
   type Address,
   type Hex,
@@ -95,7 +95,7 @@ export async function loadPublicMarket(
         continue;
       }
       decoded.push(
-        decodeVeilBidPublicEvent({
+        decodeFlareQuorumPublicEvent({
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
           logIndex: log.logIndex,

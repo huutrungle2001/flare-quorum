@@ -1,4 +1,4 @@
-# VeilBid FCC extension
+# FlareQuorum FCC extension
 
 This Go module is the confidential-compute component of the Flare release. It
 was bootstrapped from Flare's official `fce-extension-scaffold` at commit

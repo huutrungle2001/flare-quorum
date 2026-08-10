@@ -69,7 +69,7 @@ flow, and submits the atomic receipt set on-chain.
 Build first, then load the root `.env.local`:
 
 ```bash
-pnpm --filter @veilbid/settlement-relay build
+pnpm --filter @flarequorum/settlement-relay build
 node --env-file-if-exists=.env.local apps/relay/dist/cli.js dry-run
 node --env-file-if-exists=.env.local apps/relay/dist/cli.js health
 node --env-file-if-exists=.env.local apps/relay/dist/cli.js once
@@ -133,7 +133,7 @@ FCC proxies, extension version, and instruction fee are configured.
 `dry-run` and `health` require only `SEPOLIA_RPC_URL`. `once` and `poll`
 require a dedicated gas-funded `FINALIZER_PRIVATE_KEY`. Runtime consumers use
 the verified canonical release manifest. The
-`VEILBID_ALLOW_UNVERIFIED_DEPLOYMENT` escape exists only for historical test
+`FLAREQUORUM_ALLOW_UNVERIFIED_DEPLOYMENT` escape exists only for historical test
 manifests and must remain false for release operation.
 
 Polling exposes chain readiness through the hosted health server at `GET

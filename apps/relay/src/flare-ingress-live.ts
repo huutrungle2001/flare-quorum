@@ -2,11 +2,11 @@ import {
   parseFccActionResponse,
   teeIdentityFromPublicKey,
   teePublicKeyFingerprint,
-  veilBidDirectOpType,
-  veilBidDirectSubmitCommand,
-  veilBidFlareMarketAbi,
+  flareQuorumDirectOpType,
+  flareQuorumDirectSubmitCommand,
+  flareQuorumFlareMarketAbi,
   type FlareTeePublicKey,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import {
   createPublicClient,
   getAddress,
@@ -80,7 +80,7 @@ const teeManagerAbi = [
   },
 ] as const satisfies Abi;
 
-const marketAbi = veilBidFlareMarketAbi as Abi;
+const marketAbi = flareQuorumFlareMarketAbi as Abi;
 const proxyResponseLimit = 640 * 1024;
 
 export interface FlareIngressReader {
@@ -524,8 +524,8 @@ export class LiveFlareBidIngressProxy implements FlareBidIngressProxy {
     const action = parseFccActionResponse(parsed).result;
     if (
       action.id.toLowerCase() !== actionId.toLowerCase() || action.submissionTag !== "submit" ||
-      action.opType.toLowerCase() !== veilBidDirectOpType.toLowerCase() ||
-      action.opCommand.toLowerCase() !== veilBidDirectSubmitCommand.toLowerCase()
+      action.opType.toLowerCase() !== flareQuorumDirectOpType.toLowerCase() ||
+      action.opCommand.toLowerCase() !== flareQuorumDirectSubmitCommand.toLowerCase()
     ) throw new Error("FCC_PROXY_ACTION_MISMATCH");
     return {
       actionId: action.id,

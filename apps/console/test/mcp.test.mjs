@@ -65,7 +65,7 @@ function service() {
 
 test("MCP exposes exactly five read-only public tools", async (context) => {
   const server = createOperatorMcpServer(service());
-  const client = new Client({ name: "veilbid-test", version: "0.0.0" });
+  const client = new Client({ name: "flare-quorum-test", version: "0.0.0" });
   const [clientTransport, serverTransport] =
     InMemoryTransport.createLinkedPair();
   context.after(async () => {
@@ -104,7 +104,7 @@ test("MCP exposes exactly five read-only public tools", async (context) => {
 
 test("MCP schema rejects a non-positive tender identifier", async (context) => {
   const server = createOperatorMcpServer(service());
-  const client = new Client({ name: "veilbid-test", version: "0.0.0" });
+  const client = new Client({ name: "flare-quorum-test", version: "0.0.0" });
   const [clientTransport, serverTransport] =
     InMemoryTransport.createLinkedPair();
   context.after(async () => {

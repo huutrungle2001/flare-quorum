@@ -33,7 +33,7 @@ import {
   safeReleaseConfiguration,
   safeWalletUrl,
   serializeSafeTransactionHandoff,
-  setupSafeForVeilBid,
+  setupSafeForFlareQuorum,
   unwrapFullSafeConfidentialBalance,
   unwrapPartialSafeConfidentialBalance,
   verifyOwnedSafes,
@@ -104,7 +104,7 @@ function safeActionTitle(result: SafePreparationResult) {
 }
 
 function safeActionLabel(kind: StoredSafeProposal["kind"]) {
-  if (kind === "setup") return "VEILBID SETUP";
+  if (kind === "setup") return "FLAREQUORUM SETUP";
   if (kind === "fund") return "SAFE FUNDING";
   if (kind === "tender") return "CREATE TENDER";
   if (kind === "view-balance") return "BALANCE VIEW";
@@ -309,7 +309,7 @@ function SafeConfigurationCard({
             label="Help for selected Safe"
             title="HOW TO READ SELECTED SAFE"
             steps={[
-              "This card shows the Safe currently used for VeilBid treasury actions.",
+              "This card shows the Safe currently used for FlareQuorum treasury actions.",
               "The owner count and threshold determine how many Safe approvals are required.",
               "Use Refresh or Open Safe to verify the public on-chain account.",
             ]}
@@ -487,7 +487,7 @@ function SafeTenderSetup({
             title="SAFE SETUP COMPLETE"
             steps={[
               "The dedicated module is deployed and enabled for this Safe.",
-              "The VeilBid Market is bound and can receive Safe-owned tender preparation calls.",
+              "The FlareQuorum Market is bound and can receive Safe-owned tender preparation calls.",
               "No setup proposal is needed again unless the Safe or deployment changes.",
             ]}
           />
@@ -507,7 +507,7 @@ function SafeTenderSetup({
       <div className="safe-tender-setup-heading">
         <div>
           <p className="eyebrow">TENDER SETUP</p>
-          <h3>One-time VeilBid setup</h3>
+          <h3>One-time FlareQuorum setup</h3>
           <p>
             Required only for Safe-owned tender creation. Setup deploys and
             enables the dedicated module, binds the Market, and grants
@@ -721,7 +721,7 @@ function SafeConfigurationSkeleton({ safe }: { safe: Address }) {
       <div className="form-heading">
         <p className="eyebrow">READING SELECTED SAFE</p>
         <h2>{shortAddress(safe)}</h2>
-        <p>Checking owners, threshold, vcUSDC, and VeilBid setup on Sepolia…</p>
+        <p>Checking owners, threshold, vcUSDC, and FlareQuorum setup on Sepolia…</p>
       </div>
       <div className="safe-skeleton-grid" aria-hidden="true">
         <span />
@@ -1045,7 +1045,7 @@ export function SafeTreasuryWorkspace({
       );
       toasts.succeed(
         toastId,
-        "Personal Safe created. Complete the one-time VeilBid setup next.",
+        "Personal Safe created. Complete the one-time FlareQuorum setup next.",
       );
     } catch (cause) {
       const message = transactionErrorMessage(cause, "Safe deployment failed.");
@@ -1143,7 +1143,7 @@ export function SafeTreasuryWorkspace({
   async function setup() {
     if (!connected || !configuration) return;
     await runAction("CONFIGURE SAFE", (onStage) =>
-      setupSafeForVeilBid({
+      setupSafeForFlareQuorum({
         configuration,
         provider: wallet.state.selectedProvider!.provider,
         account: wallet.state.account!,
@@ -1693,7 +1693,7 @@ export function SafeTreasuryWorkspace({
             "Connect any owner of a deployed Sepolia Safe.",
             "Choose the discovered Safe, or paste its address.",
             "Deposit vcUSDC from the connected wallet when the Safe needs funds.",
-            "Run the one-time VeilBid setup from the tender form if required.",
+            "Run the one-time FlareQuorum setup from the tender form if required.",
             "Reveal the current Safe balance and keep the public ceiling within it.",
             "Approve the atomic creation batch, then confirm the funding proof to open bidding.",
           ]}
@@ -1702,7 +1702,7 @@ export function SafeTreasuryWorkspace({
         <p className="eyebrow">SAFE BUYER / PRIMARY WORKFLOW</p>
         <h1>Use your own Safe treasury.</h1>
         <p>
-          VeilBid discovers Safe accounts owned by the connected wallet,
+          FlareQuorum discovers Safe accounts owned by the connected wallet,
           configures a dedicated preparation module, and preserves the Safe
           threshold for every treasury action.
         </p>
@@ -1715,7 +1715,7 @@ export function SafeTreasuryWorkspace({
             <p className="eyebrow">1 / SELECT TREASURY</p>
             <h2>Choose a Sepolia Safe</h2>
             <p>
-              Select a card to inspect its live configuration. VeilBid does not
+              Select a card to inspect its live configuration. FlareQuorum does not
               open or read full Safe details until you choose one.
             </p>
             <ContextHelp
@@ -1725,7 +1725,7 @@ export function SafeTreasuryWorkspace({
               steps={[
                 "Choose a discovered Safe owned by the connected wallet.",
                 "Use CHECK SAFE only for an address that is not listed; ownership is verified on-chain.",
-                "After selection, the live Safe funds and VeilBid readiness cards appear below.",
+                "After selection, the live Safe funds and FlareQuorum readiness cards appear below.",
               ]}
             />
           </div>
@@ -1757,7 +1757,7 @@ export function SafeTreasuryWorkspace({
                   >
                     <span className="safe-option-heading">
                       <span>
-                        {demo ? "VEILBID DEMO SAFE" : `SAFE TREASURY ${index + 1}`}
+                        {demo ? "FLAREQUORUM DEMO SAFE" : `SAFE TREASURY ${index + 1}`}
                       </span>
                       <span className="safe-option-badges">
                         {lastUsed && (
@@ -1798,7 +1798,7 @@ export function SafeTreasuryWorkspace({
               <strong>USE A SAFE NOT LISTED</strong>
               <span>
                 Enter its Sepolia address. Ownership is verified on-chain before
-                VeilBid displays the details.
+                FlareQuorum displays the details.
               </span>
             </div>
             <label>
@@ -1821,7 +1821,7 @@ export function SafeTreasuryWorkspace({
             <div>
               <strong>NO SAFE YET?</strong>
               <span>
-                Deploy a personal Safe 1/1 owned by this wallet. VeilBid setup
+                Deploy a personal Safe 1/1 owned by this wallet. FlareQuorum setup
                 remains a separate Safe proposal.
               </span>
             </div>
@@ -1853,7 +1853,7 @@ export function SafeTreasuryWorkspace({
           <div>
             <strong>SELECT A SAFE TO CONTINUE</strong>
             <span>
-              Safe authority, confidential vcUSDC, and VeilBid readiness will
+              Safe authority, confidential vcUSDC, and FlareQuorum readiness will
               appear here after your selection.
             </span>
           </div>

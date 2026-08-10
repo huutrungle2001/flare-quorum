@@ -4,7 +4,7 @@ import {
   type FlareTenderSelectionContext,
   type SelectionQuorum,
 } from "./flare-results.js";
-import { veilBidFlareMarketAbi } from "@veilbid/flare-bindings";
+import { flareQuorumFlareMarketAbi } from "@flarequorum/flare-bindings";
 import {
   createPublicClient,
   createWalletClient,
@@ -22,7 +22,7 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import type { FlareRelayConfig } from "./flare-config.js";
 
-const marketAbi = veilBidFlareMarketAbi as Abi;
+const marketAbi = flareQuorumFlareMarketAbi as Abi;
 const coston2Chain = {
   id: 114,
   name: "Coston2",

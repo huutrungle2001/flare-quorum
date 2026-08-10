@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { veilBidFlareMarketAbi } from "@veilbid/flare-bindings";
+import { flareQuorumFlareMarketAbi } from "@flarequorum/flare-bindings";
 import { decodeFunctionResult, encodeFunctionResult } from "viem";
 import {
   parseFlareTender,
@@ -55,12 +55,12 @@ test("parses the current tender tuple and rejects duplicate frozen TEE identitie
 
 test("parses the exact generated getTender ABI primitive types", () => {
   const encoded = encodeFunctionResult({
-    abi: veilBidFlareMarketAbi,
+    abi: flareQuorumFlareMarketAbi,
     functionName: "getTender",
     result: rawTender(3),
   });
   const decoded = decodeFunctionResult({
-    abi: veilBidFlareMarketAbi,
+    abi: flareQuorumFlareMarketAbi,
     functionName: "getTender",
     data: encoded,
   });

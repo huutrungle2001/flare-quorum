@@ -108,8 +108,8 @@ func (e *Extension) processAction(action teetypes.Action) (int, []byte) {
 		return http.StatusBadRequest, []byte(errorActionEnvelope)
 	}
 
-	if dataFixed.OPType != teeutils.ToHash(config.OPTypeVeilBidFoundation) {
-		if dataFixed.OPType == teeutils.ToHash(config.OPTypeVeilBidSelection) && dataFixed.OPCommand == teeutils.ToHash(config.OPCommandSelectV1) {
+	if dataFixed.OPType != teeutils.ToHash(config.OPTypeFlareQuorumFoundation) {
+		if dataFixed.OPType == teeutils.ToHash(config.OPTypeFlareQuorumSelection) && dataFixed.OPCommand == teeutils.ToHash(config.OPCommandSelectV1) {
 			result := e.processSelection(action, dataFixed)
 			body, marshalErr := json.Marshal(result)
 			if marshalErr != nil {
@@ -231,7 +231,7 @@ func (e *Extension) processDirectAction(action teetypes.Action) (int, []byte) {
 	if err != nil {
 		return http.StatusBadRequest, []byte(errorActionEnvelope)
 	}
-	if direct.OPType != teeutils.ToHash(config.OPTypeVeilBidBid) || direct.OPCommand != teeutils.ToHash(config.OPCommandSubmitV1) {
+	if direct.OPType != teeutils.ToHash(config.OPTypeFlareQuorumBid) || direct.OPCommand != teeutils.ToHash(config.OPCommandSubmitV1) {
 		return http.StatusNotImplemented, []byte("UNSUPPORTED_DIRECT_OPERATION")
 	}
 	dataFixed := &instruction.DataFixed{OPType: direct.OPType, OPCommand: direct.OPCommand}

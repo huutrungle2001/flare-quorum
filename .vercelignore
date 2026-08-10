@@ -21,6 +21,6 @@ evidence/
 **/*.log
 image/
 submission/
-VEILBID.mp4
+FLAREQUORUM.mp4
 .env*
 !.env.example

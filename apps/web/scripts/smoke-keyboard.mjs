@@ -12,12 +12,12 @@ import { join, resolve } from "node:path";
 const root = resolve(import.meta.dirname, "../../..");
 const baseUrl = new URL(
   process.argv[2] ??
-    process.env.VEILBID_PRODUCTION_URL ??
-    "https://veilbid-three.vercel.app",
+    process.env.FLAREQUORUM_PRODUCTION_URL ??
+    "https://flare-quorum.vercel.app",
 );
 const evidencePath = resolve(
   root,
-  process.env.VEILBID_KEYBOARD_EVIDENCE ??
+  process.env.FLAREQUORUM_KEYBOARD_EVIDENCE ??
     "evidence/sepolia/production-keyboard.json",
 );
 const deploymentEvidence = JSON.parse(
@@ -91,7 +91,7 @@ async function findPage(port) {
     if (page) return page;
     await delay(100);
   }
-  throw new Error("Timed out waiting for the VeilBid browser page");
+  throw new Error("Timed out waiting for the FlareQuorum browser page");
 }
 
 class CdpSession {
@@ -203,7 +203,7 @@ async function activeElement(cdp) {
 }
 
 const chrome = findChrome();
-const profile = mkdtempSync(join(tmpdir(), "veilbid-keyboard-"));
+const profile = mkdtempSync(join(tmpdir(), "flare-quorum-keyboard-"));
 const stderr = { value: "" };
 const chromeProcess = spawn(
   chrome,
@@ -417,7 +417,7 @@ try {
 
   const expectedFocusOrder = [
     "SKIP TO CONTENT",
-    "VEILBID",
+    "FLAREQUORUM",
     "TENDERS",
     "DOCS",
     "◇CONNECT WALLET",

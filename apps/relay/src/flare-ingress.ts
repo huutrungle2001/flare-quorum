@@ -5,10 +5,10 @@ import {
   recoverBidReceiptSigner,
   teeIdentityFromPublicKey,
   teePublicKeyFingerprint,
-  veilBidDirectOpType,
-  veilBidDirectSubmitCommand,
+  flareQuorumDirectOpType,
+  flareQuorumDirectSubmitCommand,
   type FlareTeePublicKey,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import {
   getAddress,
   isAddress,
@@ -156,7 +156,7 @@ export class FlareBidIngressGateway {
 
   async health(tenderId: bigint): Promise<{
     status: "ok";
-    service: "veilbid-flare-ingress";
+    service: "flare-quorum-ingress";
     chainId: 114;
     schemaVersion: 1;
     tenderId: string;
@@ -167,7 +167,7 @@ export class FlareBidIngressGateway {
     await Promise.all(tender.teeIds.map((_, index) => this.#assertRuntimeBinding(tender, index)));
     return {
       status: "ok",
-      service: "veilbid-flare-ingress",
+      service: "flare-quorum-ingress",
       chainId: 114,
       schemaVersion: 1,
       tenderId: tenderId.toString(),
@@ -237,8 +237,8 @@ export class FlareBidIngressGateway {
     if (
       result.actionId.toLowerCase() !== actionId.toLowerCase() ||
       result.status !== 1 || result.submissionTag !== "submit" ||
-      result.opType.toLowerCase() !== veilBidDirectOpType.toLowerCase() ||
-      result.opCommand.toLowerCase() !== veilBidDirectSubmitCommand.toLowerCase()
+      result.opType.toLowerCase() !== flareQuorumDirectOpType.toLowerCase() ||
+      result.opCommand.toLowerCase() !== flareQuorumDirectSubmitCommand.toLowerCase()
     ) throw new Error("FCC_PROXY_ACTION_MISMATCH");
     const receipt = decodeBidReceipt(result.data);
     const signer = await recoverBidReceiptSigner(receipt);

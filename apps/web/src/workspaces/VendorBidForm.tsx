@@ -1,4 +1,4 @@
-import type { PublicTender } from "@veilbid/chain-bindings";
+import type { PublicTender } from "@flarequorum/chain-bindings";
 import { useEffect, useMemo, useState } from "react";
 import type { Hex } from "viem";
 import {
@@ -264,7 +264,7 @@ export function VendorBidForm({
         <strong>Privacy boundary</strong>
         <span>
           The plaintext price is sent to the Nox handle client in memory. It is
-          never written to the public index, URL, storage, or VeilBid logs.
+          never written to the public index, URL, storage, or FlareQuorum logs.
         </span>
       </div>
       {stage && (

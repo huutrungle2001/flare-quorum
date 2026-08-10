@@ -56,7 +56,7 @@ func TestSelectionInstructionDecryptsSealedBidAndReturnsOnlyWinner(t *testing.T)
 	if err != nil {
 		t.Fatal(err)
 	}
-	dataFixed := &instruction.DataFixed{OPType: teeutils.ToHash(config.OPTypeVeilBidSelection), OPCommand: teeutils.ToHash(config.OPCommandSelectV1), OriginalMessage: requestBytes}
+	dataFixed := &instruction.DataFixed{OPType: teeutils.ToHash(config.OPTypeFlareQuorumSelection), OPCommand: teeutils.ToHash(config.OPCommandSelectV1), OriginalMessage: requestBytes}
 	result := extension.processSelection(teetypes.Action{Data: teetypes.ActionData{ID: common.HexToHash("0x55"), SubmissionTag: teetypes.Threshold}}, dataFixed)
 	if result.Status != 1 {
 		t.Fatalf("selection rejected: %s", result.Log)

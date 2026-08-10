@@ -47,7 +47,7 @@ function service() {
 
 test("Flare MCP exposes exactly four read-only Coston2 tools", async (context) => {
   const server = createFlareOperatorMcpServer(service());
-  const client = new Client({ name: "veilbid-flare-test", version: "0.0.0" });
+  const client = new Client({ name: "flare-quorum-test", version: "0.0.0" });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   context.after(async () => {
     await client.close();
@@ -74,7 +74,7 @@ test("Flare MCP exposes exactly four read-only Coston2 tools", async (context) =
 
 test("Flare MCP rejects a non-positive tender identifier", async (context) => {
   const server = createFlareOperatorMcpServer(service());
-  const client = new Client({ name: "veilbid-flare-test", version: "0.0.0" });
+  const client = new Client({ name: "flare-quorum-test", version: "0.0.0" });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   context.after(async () => {
     await client.close();

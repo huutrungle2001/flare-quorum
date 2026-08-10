@@ -1,6 +1,6 @@
-import type { PublicMarketIndex, PublicTender } from "@veilbid/chain-bindings";
-import { getTenderReadiness } from "@veilbid/chain-bindings";
-import deployment from "@veilbid/chain-bindings/addresses/sepolia.release";
+import type { PublicMarketIndex, PublicTender } from "@flarequorum/chain-bindings";
+import { getTenderReadiness } from "@flarequorum/chain-bindings";
+import deployment from "@flarequorum/chain-bindings/addresses/sepolia.release";
 import { useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
 import { useSearchParams } from "react-router";
@@ -791,7 +791,7 @@ export function ExplorerView({
 
         <footer id="evidence">
           <div>
-            <span className="wordmark inverted">VEILBID</span>
+            <span className="wordmark inverted">FLAREQUORUM</span>
             <p>Confidential procurement for Safe treasuries.</p>
           </div>
           <div className="footer-meta">
@@ -867,7 +867,7 @@ function TenderRoomApp({ wallet }: { wallet: WalletController }) {
   );
 }
 
-export function LegacyTenderRoom({ wallet }: { wallet: WalletController }) {
+export function FlareQuorumTenderRoom({ wallet }: { wallet: WalletController }) {
   return <TenderRoomApp wallet={wallet} />;
 }
 

@@ -2,7 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "RAILPACK",
-    "buildCommand": "pnpm install --frozen-lockfile && pnpm bindings:build && pnpm --filter @veilbid/flare-bindings build && pnpm --filter @veilbid/settlement-relay build",
+    "buildCommand": "pnpm install --frozen-lockfile && pnpm bindings:build && pnpm --filter @flarequorum/flare-bindings build && pnpm --filter @flarequorum/settlement-relay build",
     "watchPatterns": [
       ".nvmrc",
       "apps/relay/**",

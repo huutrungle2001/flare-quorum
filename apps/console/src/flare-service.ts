@@ -1,7 +1,7 @@
 import type {
   Coston2PublicTender,
   Coston2TenderStatus,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import type {
   FlarePublicOperatorSource,
   FlarePublicTenderOutput,

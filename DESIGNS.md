@@ -5,12 +5,12 @@
 >
 > Status: Canonical visual, interaction, responsive, and privacy-language
 > specification. The implemented app now defaults to the verified Coston2/FCC
-> product; the historical Sepolia baseline remains available only as a clearly
-> labeled, lazy-loaded comparison route.
+> product; the Sepolia compatibility workspace remains available as a clearly
+> labeled, lazy-loaded route with the current product branding.
 >
-> Rebrand boundary: these orange tokens apply only to FlareQuorum routes. The
-> historical `/room` VeilBid baseline intentionally retains its original
-> `#a1fea0` green treatment for provenance and visual separation.
+> Rebrand boundary: the FlareQuorum name and orange tokens apply to every web
+> route, including `/room`. The route keeps its existing Sepolia behavior; only
+> its presentation and product naming change.
 
 **Theme:** mixed
 
@@ -219,7 +219,7 @@ Left:
 
 Center:
 
-- `VEILBID` wordmark in Barlow Condensed 700.
+- `FLAREQUORUM` wordmark in Barlow Condensed 700.
 
 Right:
 

@@ -10,7 +10,7 @@ import {
   type PackedUserOperation,
   type XrpPaymentProof,
   type XrpPaymentProofExpectation,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import type { Address, Hex } from "viem";
 
 export interface FlareFundingPreparation {

@@ -48,7 +48,7 @@ export function DocsPage() {
         </aside>
         <article className="docs-content">
           <section id="flare-coston2">
-            <p className="eyebrow">VEILBID FLARE / COSTON2 · CURRENT JUDGE PATH</p>
+            <p className="eyebrow">FLAREQUORUM FLARE / COSTON2 · CURRENT JUDGE PATH</p>
             <h1>Public evidence.<br /><em>Private computation.</em></h1>
             <p className="docs-lede">
               The verified Summer Signal release runs on Flare Coston2. Buyers
@@ -75,9 +75,9 @@ export function DocsPage() {
           </section>
           <section id="overview">
             <p className="eyebrow">HISTORICAL BASELINE / SEPOLIA + NOX</p>
-            <h1>Use VeilBid from tender to settlement.</h1>
+            <h1>Use FlareQuorum from tender to settlement.</h1>
             <p className="docs-lede">
-              VeilBid is a confidential procurement protocol for Safe
+              FlareQuorum is a confidential procurement protocol for Safe
               treasuries. Buyers publish rules and escrow a public ceiling;
               approved vendors submit encrypted bids; iExec Nox selects the
               earliest valid minimum; the market verifies a public winner-ID
@@ -100,8 +100,8 @@ export function DocsPage() {
               { title: "Open Tenders", copy: "Use the TENDERS link to load confirmed public state. No wallet is required to browse; recent records are marked until finality." },
               { title: "Choose a workspace", copy: "The primary bar contains Public, Buyer, Private Bids, and Activity. Buyer opens EOA Buyer by default, with Safe Buyer beside it; Private Bids contains Submit Bid, My Bid, and Granted Access." },
               { title: "Use contextual help", copy: "Hover or focus the ? control beside the workspace tabs, at a card corner, or beside Balances for page-specific instructions." },
-              { title: "Connect your wallet", copy: "Select CONNECT WALLET beside the network indicator, then choose a detected EIP-6963 provider. VeilBid requests the Sepolia switch automatically when needed." },
-              { title: "Confirm wallet requests", copy: "Your wallet may show separate connection and network confirmations for security. Both belong to the same guided action on VeilBid." },
+              { title: "Connect your wallet", copy: "Select CONNECT WALLET beside the network indicator, then choose a detected EIP-6963 provider. FlareQuorum requests the Sepolia switch automatically when needed." },
+              { title: "Confirm wallet requests", copy: "Your wallet may show separate connection and network confirmations for security. Both belong to the same guided action on FlareQuorum." },
               { title: "Follow transaction progress", copy: "A bottom-right notification moves through validation, simulation, wallet signature, confirmation, and completion. Verify every target and value in the wallet prompt." },
               { title: "Refresh confirmed state", copy: "After confirmation, refresh the public dossier. It appears immediately with a finality-pending label; proof requests can be resumed from Activity if interrupted." },
             ]} />
@@ -207,7 +207,7 @@ export function DocsPage() {
               { title: "Request winner proof", copy: "The relay requests public decryption for the winner ID, not for bid or settlement values." },
               { title: "Resume after interruption", copy: "Activity stores only public tender IDs and trigger transaction hashes; handles and proofs are reread when resuming." },
               { title: "Finalize once", copy: "On-chain proof verification and replay protection permit confidential vendor payment or the protocol’s full refund outcome." },
-              { title: "Notify the winner", copy: "When the connected wallet is named by a confirmed TenderAwarded event, VeilBid shows a new-award banner. Opening it automatically acknowledges the notification; the complete history remains in Activity with the exact award transaction and receipt link." },
+              { title: "Notify the winner", copy: "When the connected wallet is named by a confirmed TenderAwarded event, FlareQuorum shows a new-award banner. Opening it automatically acknowledges the notification; the complete history remains in Activity with the exact award transaction and receipt link." },
               { title: "Review lifecycle history", copy: "Activity lists each indexed public lifecycle event with its confirmed block and Sepolia transaction link; no confidential amount or bid value is stored there." },
             ]} />
             <p className="docs-note">
@@ -223,7 +223,7 @@ export function DocsPage() {
             <h2>Preparation is not execution.</h2>
             <p>
               Choose any discovered Sepolia Safe owned by the connected wallet.
-              VeilBid lets the connected wallet deposit confidential funding,
+              FlareQuorum lets the connected wallet deposit confidential funding,
               then proposes tender setup, tender creation, balance-view grants,
               and unwraps through the Safe Transaction Service. Every treasury
               spend still satisfies that Safe’s configured threshold.
@@ -259,7 +259,7 @@ export function DocsPage() {
             <h2>Four boundaries, one settlement path.</h2>
             <dl className="docs-definition-grid">
               <div><dt>Tender Room</dt><dd>Wallet-free public index plus Buyer (Safe/EOA), Private Bids (Submit/My Bid/Granted Access), and Activity workspaces.</dd></div>
-              <div><dt>VeilBid Market</dt><dd>Non-upgradeable market, ERC-7984 demo assets, non-transferable receipt, and preparation-only Safe module.</dd></div>
+              <div><dt>FlareQuorum Market</dt><dd>Non-upgradeable market, ERC-7984 demo assets, non-transferable receipt, and preparation-only Safe module.</dd></div>
               <div><dt>Settlement Relay</dt><dd>Stateless permissionless close and finalize automation with bounded, sequential actions.</dd></div>
               <div><dt>Operator Console</dt><dd>Strict-schema MCP stdio tools with no signer, write, or private-decryption surface.</dd></div>
             </dl>
@@ -304,7 +304,7 @@ export function DocsPage() {
             <dl className="troubleshooting-list">
               <div><dt>No wallet detected</dt><dd>Unlock or install an EIP-6963 compatible browser wallet, then reload. Public mode remains available.</dd></div>
               <div><dt>Sepolia switch declined</dt><dd>Open the header wallet menu and select RETRY SEPOLIA CONNECTION. Write actions remain disabled until chain 11155111 is active.</dd></div>
-              <div><dt>Public state unavailable</dt><dd>Retry the Sepolia read. VeilBid deliberately shows an error instead of substituting mock data.</dd></div>
+              <div><dt>Public state unavailable</dt><dd>Retry the Sepolia read. FlareQuorum deliberately shows an error instead of substituting mock data.</dd></div>
               <div><dt>EOA ceiling exceeds Test USDC</dt><dd>Use GET TEST USDC in Balances, wait for confirmation, then submit again. Create Tender never calls the faucet automatically.</dd></div>
               <div><dt>Safe assets are not listed</dt><dd>Safe Buyer intentionally shows only vcUSDC. Open the selected account in Safe Wallet to inspect or transfer public ETH, vUSDC, and unrelated assets.</dd></div>
               <div><dt>Custom unwrap is unavailable</dt><dd>Reveal the current holder’s vcUSDC balance first. Full unwrap does not require reveal. Safe exits need the Safe threshold; EOA exits use the connected wallet directly. Both finish through public-proof finalization.</dd></div>
@@ -316,10 +316,10 @@ export function DocsPage() {
 
           <section id="boundaries">
             <p className="eyebrow">NON-CLAIMS</p>
-            <h2>What VeilBid does not promise.</h2>
+            <h2>What FlareQuorum does not promise.</h2>
             <ul>
               <li>Bidder identities, timing, tender metadata, and transaction graphs are public.</li>
-              <li>VeilBid does not verify delivered service quality or prevent off-chain collusion.</li>
+              <li>FlareQuorum does not verify delivered service quality or prevent off-chain collusion.</li>
               <li>The current release is Sepolia test infrastructure, not audited or mainnet-ready software.</li>
               <li>A closed tender waits for a valid Nox proof; there is no buyer timeout override or plaintext fallback.</li>
               <li>Safe preparation does not bypass the Safe threshold, and review access does not imply custody authority.</li>

@@ -1,4 +1,4 @@
-import { coston2FlarePublicRelease, veilBidFlareMarketAbi } from "@veilbid/flare-bindings";
+import { coston2FlarePublicRelease, flareQuorumFlareMarketAbi } from "@flarequorum/flare-bindings";
 import { createPublicClient, http, isAddressEqual, type Abi } from "viem";
 import { useEffect, useMemo, useState } from "react";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";
@@ -96,7 +96,7 @@ export function FlareFinalizerWorkspace({
       const simulation = await publicClient.simulateContract({
         account: wallet.state.account!,
         address: coston2FlarePublicRelease.market,
-        abi: veilBidFlareMarketAbi as Abi,
+        abi: flareQuorumFlareMarketAbi as Abi,
         functionName: action,
         args: [tender.tenderId],
       });

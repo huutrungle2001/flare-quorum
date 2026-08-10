@@ -1,4 +1,4 @@
-# Flare Summer Signal — VeilBid Competition Brief
+# Flare Summer Signal — FlareQuorum Competition Brief
 
 > Derived from the project-owner-supplied
 > [`original/hackathon-brief.md`](original/hackathon-brief.md). This file converts the supplied competition text
@@ -8,12 +8,12 @@
 ## 1. Competition fit
 
 Flare Summer Signal accepts products built from scratch, existing projects, and
-ports to Flare. VeilBid is an existing confidential-procurement product being
+ports to Flare. FlareQuorum is an existing confidential-procurement product being
 substantively rebuilt for Flare rather than merely changing its network.
 
 The supplied brief defines two bounties:
 
-| Bounty | Supplied prize pool | VeilBid strategy |
+| Bounty | Supplied prize pool | FlareQuorum strategy |
 |---|---:|---|
 | Interoperable Asset Products | $6,000 | Enter only after the XRP → FDC/Smart Account → FAssets escrow → award → redemption lifecycle passes |
 | Confidential Compute Apps | $6,000 | Primary bounty; FCC private intake and winner computation are mandatory |
@@ -36,7 +36,7 @@ organizer channel.
 
 ## 3. Required submission package
 
-| Supplied requirement | VeilBid authority | Release condition |
+| Supplied requirement | FlareQuorum authority | Release condition |
 |---|---|---|
 | Project name | `README.md`, `docs/product-plan.md` | Exact name agrees everywhere |
 | Selected bounty/bounties | `README.md`, `PLAN.md` | Primary FCC; interoperability only after its evidence gate passes |
@@ -53,7 +53,7 @@ organizer channel.
 
 The supplied brief encourages deployment network, acquisition, distribution,
 testing, feedback, usage, community interest, pilots, and partner conversations.
-VeilBid therefore requires:
+FlareQuorum therefore requires:
 
 - an explicit Coston2/Songbird/Flare deployment statement;
 - at least five structured XRP/treasury-user interviews;
@@ -69,7 +69,7 @@ These targets are tracked in `PLAN.md` Phase 7 and
 
 The final submission must keep four categories separate:
 
-| Category | VeilBid example |
+| Category | FlareQuorum example |
 |---|---|
 | Existed before Summer Signal | Sepolia/Nox/Safe/ERC-7984 contracts, app, relay, bindings, and evidence |
 | Newly built | FCC Go extension, private ingress, TEE receipts/quorum, Flare market, and Flare bindings |
@@ -84,7 +84,7 @@ new Flare work is not.
 
 ### Product usefulness
 
-VeilBid must solve the concrete problem of confidential vendor competition for
+FlareQuorum must solve the concrete problem of confidential vendor competition for
 XRP/Flare treasuries, demonstrate complete buyer/vendor journeys, and record
 real feedback. A protocol-only script does not pass.
 

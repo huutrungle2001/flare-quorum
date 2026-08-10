@@ -5,11 +5,11 @@ import { dirname, join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../../..");
 const baseUrl = new URL(
-  process.argv[2] ?? process.env.FLAREQUORUM_PRODUCTION_URL ?? process.env.VEILBID_FLARE_PRODUCTION_URL ?? "https://flare-quorum.vercel.app",
+  process.argv[2] ?? process.env.FLAREQUORUM_PRODUCTION_URL ?? "https://flare-quorum.vercel.app",
 );
 const evidencePath = resolve(
   root,
-  process.env.FLAREQUORUM_ACCESSIBILITY_EVIDENCE ?? process.env.VEILBID_FLARE_ACCESSIBILITY_EVIDENCE ?? "evidence/coston2/web-keyboard-accessibility.json",
+  process.env.FLAREQUORUM_ACCESSIBILITY_EVIDENCE ?? "evidence/coston2/web-keyboard-accessibility.json",
 );
 const release = JSON.parse(
   readFileSync(resolve(root, "packages/flare-contracts/deployments/coston2.release.json"), "utf8"),
@@ -18,9 +18,9 @@ const release = JSON.parse(
 if (baseUrl.protocol !== "https:") throw new Error("Flare accessibility smoke requires an HTTPS URL");
 if (release.chainId !== 114 || release.verified !== true) throw new Error("COSTON2_RELEASE_NOT_VERIFIED");
 
-const sourceCommitOverride = (process.env.FLAREQUORUM_SMOKE_SOURCE_COMMIT ?? process.env.VEILBID_FLARE_SMOKE_SOURCE_COMMIT)?.trim() ?? "";
+const sourceCommitOverride = (process.env.FLAREQUORUM_SMOKE_SOURCE_COMMIT)?.trim() ?? "";
 if (sourceCommitOverride !== "" && !/^[0-9a-f]{40}$/i.test(sourceCommitOverride)) {
-  throw new Error("VEILBID_FLARE_SMOKE_SOURCE_COMMIT_INVALID");
+  throw new Error("FLAREQUORUM_SMOKE_SOURCE_COMMIT_INVALID");
 }
 
 function git(...args) {
@@ -138,7 +138,7 @@ async function pressKey(cdp, key, code, keyCode) {
 }
 
 const chrome = findChrome();
-const profile = mkdtempSync(join(tmpdir(), "veilbid-flare-a11y-"));
+const profile = mkdtempSync(join(tmpdir(), "flare-quorum-a11y-"));
 const stderr = { value: "" };
 const chromeProcess = spawn(
   chrome,

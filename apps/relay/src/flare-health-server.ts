@@ -33,7 +33,7 @@ export async function startFlareHealthServer(
       return;
     }
     if (request.url === "/live") {
-      json(response, 200, { status: "ok", service: "veilbid-flare-relay" });
+      json(response, 200, { status: "ok", service: "flare-quorum-relay" });
       return;
     }
     if (request.url === "/health") {

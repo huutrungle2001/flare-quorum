@@ -5,11 +5,11 @@ import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../../..");
 const baseUrl = new URL(
-  process.argv[2] ?? process.env.FLAREQUORUM_PRODUCTION_URL ?? process.env.VEILBID_FLARE_PRODUCTION_URL ?? "https://flare-quorum.vercel.app",
+  process.argv[2] ?? process.env.FLAREQUORUM_PRODUCTION_URL ?? "https://flare-quorum.vercel.app",
 );
 const evidencePath = resolve(
   root,
-  process.env.FLAREQUORUM_FUNDING_CHECKPOINT_EVIDENCE ?? process.env.VEILBID_FLARE_FUNDING_CHECKPOINT_EVIDENCE ?? "evidence/coston2/web-xrp-funding-checkpoint.json",
+  process.env.FLAREQUORUM_FUNDING_CHECKPOINT_EVIDENCE ?? "evidence/coston2/web-xrp-funding-checkpoint.json",
 );
 const release = JSON.parse(
   readFileSync(resolve(root, "packages/flare-contracts/deployments/coston2.release.json"), "utf8"),
@@ -30,9 +30,9 @@ function git(...args) {
   return execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
 }
 
-const sourceCommitOverride = (process.env.FLAREQUORUM_SMOKE_SOURCE_COMMIT ?? process.env.VEILBID_FLARE_SMOKE_SOURCE_COMMIT)?.trim() ?? "";
+const sourceCommitOverride = (process.env.FLAREQUORUM_SMOKE_SOURCE_COMMIT)?.trim() ?? "";
 if (sourceCommitOverride !== "" && !/^[0-9a-f]{40}$/i.test(sourceCommitOverride)) {
-  throw new Error("VEILBID_FLARE_SMOKE_SOURCE_COMMIT_INVALID");
+  throw new Error("FLAREQUORUM_SMOKE_SOURCE_COMMIT_INVALID");
 }
 
 function findChrome() {
@@ -133,7 +133,7 @@ async function waitFor(cdp, expression, label) {
 }
 
 const chrome = findChrome();
-const profile = mkdtempSync(join(tmpdir(), "veilbid-flare-funding-checkpoint-"));
+const profile = mkdtempSync(join(tmpdir(), "flare-quorum-funding-checkpoint-"));
 const stderr = { value: "" };
 const chromeProcess = spawn(
   chrome,

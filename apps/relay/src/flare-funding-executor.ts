@@ -9,7 +9,7 @@ import {
   retrieveXrpPaymentProof,
   testXrpSourceId,
   xrpPaymentAttestationType,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import {
   parseEventLogs,
   type Address,

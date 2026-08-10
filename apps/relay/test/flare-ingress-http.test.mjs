@@ -54,7 +54,7 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
     async health() {
       return {
         status: "ok",
-        service: "veilbid-flare-ingress",
+        service: "flare-quorum-ingress",
         chainId: 114,
         schemaVersion: 1,
         tenderId: "7",
@@ -71,7 +71,7 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
     assert.equal(health.headers.get("access-control-allow-origin"), "https://app.example");
     assert.deepEqual(await health.json(), {
       status: "ok",
-      service: "veilbid-flare-ingress",
+      service: "flare-quorum-ingress",
       chainId: 114,
       schemaVersion: 1,
       tenderId: "7",

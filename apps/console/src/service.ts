@@ -3,7 +3,7 @@ import {
   tenderStatuses,
   type PublicTender,
   type TenderStatus,
-} from "@veilbid/chain-bindings";
+} from "@flarequorum/chain-bindings";
 import { getAddress, isAddress, type Address } from "viem";
 import type {
   PublicOperatorSource,

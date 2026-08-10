@@ -60,7 +60,7 @@ export function WalletPanel({
         <p className="eyebrow">EXPLICIT WALLET SELECTION</p>
         <h2>Connect only when you are ready to sign.</h2>
         <p>
-          Choose a provider once; VeilBid connects it and requests {networkLabel}{" "}
+          Choose a provider once; FlareQuorum connects it and requests {networkLabel}{" "}
           automatically when needed. Private keys never leave the wallet.
         </p>
         {state.error && <p className="inline-error" role="alert">{state.error}</p>}

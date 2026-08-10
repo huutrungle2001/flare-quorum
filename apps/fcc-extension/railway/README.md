@@ -2,7 +2,7 @@
 
 This image runs one Coston2 simulated FCC machine as three co-located
 processes: the pinned Redis queue, the pinned official `tee-proxy`, and the
-byte-identical VeilBid extension/`tee-node` binary. Deploy three independent
+byte-identical FlareQuorum extension/`tee-node` binary. Deploy three independent
 Railway services from this image to obtain three stable HTTPS origins and
 three independently generated TEE identities.
 

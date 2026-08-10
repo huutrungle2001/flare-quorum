@@ -1,8 +1,8 @@
-import deployment from "@veilbid/chain-bindings/addresses/sepolia.release";
+import deployment from "@flarequorum/chain-bindings/addresses/sepolia.release";
 import type { Address } from "viem";
 
 export const winnerNotificationChangedEvent =
-  "veilbid:winner-notifications-changed";
+  "flarequorum:winner-notifications-changed";
 
 function browserStorage() {
   return typeof window === "undefined" ? null : window.localStorage;
@@ -10,7 +10,7 @@ function browserStorage() {
 
 export function winnerNotificationStorageKey(account: Address) {
   return [
-    "veilbid:winner-notifications:v1",
+    "flarequorum:winner-notifications:v1",
     deployment.chainId.toString(),
     deployment.contracts.VeilBidMarket.address.toLowerCase(),
     account.toLowerCase(),

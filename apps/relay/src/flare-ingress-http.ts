@@ -191,7 +191,7 @@ export function createFlareIngressHandler(
           ? await gateway.health()
           : {
             status: "ok",
-            service: "veilbid-flare-ingress",
+            service: "flare-quorum-ingress",
             chainId: 114,
             schemaVersion: 1,
           };

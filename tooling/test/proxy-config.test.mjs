@@ -63,7 +63,7 @@ test("rejects missing, injected, and invalid indexer settings", () => {
 });
 
 test("writes confidential proxy config with owner-only permissions", () => {
-  const directory = mkdtempSync(join(tmpdir(), "veilbid-proxy-config-"));
+  const directory = mkdtempSync(join(tmpdir(), "flare-quorum-proxy-config-"));
   const path = join(directory, "nested", "config.toml");
   writePrivateProxyConfig(path, "private-runtime-config\n");
   assert.equal(readFileSync(path, "utf8"), "private-runtime-config\n");

@@ -1,7 +1,7 @@
 import {
   getTenderReadiness,
   type PublicMarketIndex,
-} from "@veilbid/chain-bindings";
+} from "@flarequorum/chain-bindings";
 import type { RelayAction } from "./types.js";
 
 const kindOrder: Record<RelayAction["kind"], number> = {

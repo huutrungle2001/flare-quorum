@@ -1,8 +1,8 @@
 import { isHash, type Hex } from "viem";
 import { sepolia } from "viem/chains";
 
-export const recoveryStorageKey = "veilbid:activity-recovery:v1";
-export const recoveryChangedEvent = "veilbid:activity-recovery-changed";
+export const recoveryStorageKey = "flarequorum:activity-recovery:v1";
+export const recoveryChangedEvent = "flarequorum:activity-recovery-changed";
 
 export type RecoveryKind = "funding" | "winner";
 

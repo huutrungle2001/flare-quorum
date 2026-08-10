@@ -1,4 +1,4 @@
-// Package types defines VeilBid's public FCC foundation wire format.
+// Package types defines FlareQuorum's public FCC foundation wire format.
 package types
 
 import (
@@ -93,7 +93,7 @@ func DecodeFoundationResponse(data []byte, destination *FoundationResponse) erro
 func FoundationBindingHash(request FoundationRequest) (common.Hash, error) {
 	encoded, err := foundationBindingArgs.Pack(
 		crypto.Keccak256Hash([]byte(config.FoundationDomain)),
-		teeutils.ToHash(config.OPTypeVeilBidFoundation),
+		teeutils.ToHash(config.OPTypeFlareQuorumFoundation),
 		teeutils.ToHash(config.OPCommandPingV1),
 		request.SchemaVersion,
 		request.ChainID,

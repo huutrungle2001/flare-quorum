@@ -202,7 +202,7 @@ All formerly open choices are accepted in
 
 ## 12. Submission message
 
-> Before Summer Signal, VeilBid proved confidential price procurement on
+> Before Summer Signal, the historical predecessor proved confidential price procurement on
 > Sepolia with Nox. During Summer Signal, we rebuilt the protocol around Flare:
 > XRP-native Smart Account funding, FAssets escrow, private FCC multi-criteria
 > bids, FTSO normalization, threshold TEE result verification, and Coston2
@@ -226,7 +226,7 @@ FTSO fixes any required currency/risk snapshot.
 
 ### Product vocabulary
 
-| Treasury Exchange | Current VeilBid foundation |
+| Treasury Exchange | Current FlareQuorum foundation |
 |---|---|
 | `Intent` | public tender rules and Buyer Brief |
 | `Offer` | private encrypted bid and TEE receipt quorum |
@@ -236,7 +236,7 @@ FTSO fixes any required currency/risk snapshot.
 | `Executor` | selected vendor/solver under a threshold result |
 
 The new intent/offer schemas and escrow module must be versioned separately from
-the championship tender ABI. Historical Sepolia/Nox assets and the old VeilBid
+the championship tender ABI. Historical Sepolia/Nox assets and the predecessor
 repository remain read-only references.
 
 ### First vertical slice

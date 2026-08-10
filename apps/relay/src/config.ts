@@ -105,7 +105,7 @@ export function loadRelayConfig(
       65_535,
     ),
     allowUnverifiedDeployment:
-      env.VEILBID_ALLOW_UNVERIFIED_DEPLOYMENT === "true",
+      env.FLAREQUORUM_ALLOW_UNVERIFIED_DEPLOYMENT === "true",
     signerPrivateKey: key,
   };
 }

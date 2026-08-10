@@ -16,11 +16,11 @@ import type { FlareSelectionResult } from "./protocol.js";
 
 export const teeActionResultPrefix = stringToHex("TEE_ACTION_RESULT", { size: 32 });
 export const proxyActionResultPrefix = stringToHex("PROXY_ACTION_RESULT", { size: 32 });
-export const veilBidFoundationOpType = stringToHex("VEILBID_FOUNDATION", { size: 32 });
-export const veilBidFoundationPingV1OpCommand = stringToHex("PING_V1", { size: 32 });
-export const veilBidSelectionOpType = stringToHex("VEILBID_SELECTION", { size: 32 });
-export const veilBidSelectV1OpCommand = stringToHex("SELECT_V1", { size: 32 });
-export const veilBidFoundationDomain = keccak256(stringToHex("VEILBID_FCC_FOUNDATION_V1"));
+export const flareQuorumFoundationOpType = stringToHex("VEILBID_FOUNDATION", { size: 32 });
+export const flareQuorumFoundationPingV1OpCommand = stringToHex("PING_V1", { size: 32 });
+export const flareQuorumSelectionOpType = stringToHex("VEILBID_SELECTION", { size: 32 });
+export const flareQuorumSelectV1OpCommand = stringToHex("SELECT_V1", { size: 32 });
+export const flareQuorumFoundationDomain = keccak256(stringToHex("VEILBID_FCC_FOUNDATION_V1"));
 
 const bytes32Pattern = /^0x[0-9a-fA-F]{64}$/;
 const bytes21Pattern = /^0x[0-9a-fA-F]{42}$/;
@@ -226,9 +226,9 @@ export function foundationBindingHash(request: FoundationRequest): Hex {
       { type: "bytes32" }, { type: "bytes32" },
     ],
     [
-      veilBidFoundationDomain,
-      veilBidFoundationOpType,
-      veilBidFoundationPingV1OpCommand,
+      flareQuorumFoundationDomain,
+      flareQuorumFoundationOpType,
+      flareQuorumFoundationPingV1OpCommand,
       request.schemaVersion,
       request.chainId,
       request.market,
@@ -278,7 +278,7 @@ export async function verifyFoundationActionResponse(
     throw new Error("FCC_FOUNDATION_NOT_FINAL");
   }
   if (action.status !== 1) throw new Error("FCC_FOUNDATION_FAILED");
-  if (action.opType !== veilBidFoundationOpType || action.opCommand !== veilBidFoundationPingV1OpCommand) {
+  if (action.opType !== flareQuorumFoundationOpType || action.opCommand !== flareQuorumFoundationPingV1OpCommand) {
     throw new Error("FCC_FOUNDATION_OPERATION_MISMATCH");
   }
   if (options.expectedVersion !== undefined && action.version !== options.expectedVersion) {
@@ -325,7 +325,7 @@ export async function verifySelectionActionResponse(
     throw new Error("FCC_SELECTION_NOT_FINAL");
   }
   if (action.status !== 1) throw new Error("FCC_SELECTION_FAILED");
-  if (action.opType !== veilBidSelectionOpType || action.opCommand !== veilBidSelectV1OpCommand) {
+  if (action.opType !== flareQuorumSelectionOpType || action.opCommand !== flareQuorumSelectV1OpCommand) {
     throw new Error("FCC_SELECTION_OPERATION_MISMATCH");
   }
   if (options.expectedVersion !== undefined && action.version !== options.expectedVersion) {

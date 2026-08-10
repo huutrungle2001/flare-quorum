@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import tokenAbiJson from "@veilbid/chain-bindings/abis/VeilBidTestUSDC";
-import wrapperAbiJson from "@veilbid/chain-bindings/abis/VeilBidConfidentialUSDC";
-import unwrapPreparationAbiJson from "@veilbid/chain-bindings/abis/VeilBidSafeUnwrapPreparation";
+import tokenAbiJson from "@flarequorum/chain-bindings/abis/VeilBidTestUSDC";
+import wrapperAbiJson from "@flarequorum/chain-bindings/abis/VeilBidConfidentialUSDC";
+import unwrapPreparationAbiJson from "@flarequorum/chain-bindings/abis/VeilBidSafeUnwrapPreparation";
 import {
   decodeFunctionData,
   keccak256,

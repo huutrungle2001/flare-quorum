@@ -73,7 +73,7 @@ function extractRegistrationBinary(recipe) {
   mkdirSync(binaryDirectory, { recursive: true, mode: 0o700 });
   chmodSync(binaryDirectory, 0o700);
   const binaryPath = resolve(binaryDirectory, "register-tee");
-  const containerName = `veilbid-register-extract-${process.pid}-${Date.now()}`;
+  const containerName = `flare-quorum-register-extract-${process.pid}-${Date.now()}`;
   let created = false;
   try {
     execFileSync("docker", ["create", "--name", containerName, recipe.releaseImageTag], {
@@ -327,7 +327,7 @@ try {
     mkdirSync(resolve(repositoryRoot, "evidence/coston2"), { recursive: true });
     writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`);
     setLocalEnvironmentValues(environmentPath, {
-      VEILBID_FCC_TEE_IDS: verification.machines.map(({ teeId }) => teeId).join(","),
+      FLAREQUORUM_FCC_TEE_IDS: verification.machines.map(({ teeId }) => teeId).join(","),
     });
     console.log(JSON.stringify({
       gate: evidence.gate,

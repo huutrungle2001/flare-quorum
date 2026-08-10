@@ -1,7 +1,7 @@
 import {
   assetManagerFAssetsAbi,
   coston2FlarePublicRelease,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import {
   createPublicClient,
   http,

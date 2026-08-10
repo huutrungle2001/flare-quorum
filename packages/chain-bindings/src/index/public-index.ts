@@ -5,7 +5,7 @@ import type {
   PublicTender,
   TenderStatus,
 } from "../domain/tender.js";
-import type { VeilBidPublicEvent } from "../events/types.js";
+import type { FlareQuorumPublicEvent } from "../events/types.js";
 
 const terminalStatuses = new Set<TenderStatus>([
   "Awarded",
@@ -13,13 +13,13 @@ const terminalStatuses = new Set<TenderStatus>([
   "Cancelled",
 ]);
 
-function positionKey(event: VeilBidPublicEvent): string {
+function positionKey(event: FlareQuorumPublicEvent): string {
   return `${event.transactionHash.toLowerCase()}:${event.logIndex}`;
 }
 
 function orderedEvents(
-  events: readonly VeilBidPublicEvent[],
-): VeilBidPublicEvent[] {
+  events: readonly FlareQuorumPublicEvent[],
+): FlareQuorumPublicEvent[] {
   return [...events].sort((left, right) => {
     if (left.blockNumber !== right.blockNumber) {
       return left.blockNumber < right.blockNumber ? -1 : 1;
@@ -45,7 +45,7 @@ function requireTender(
 function updateTender(
   tenders: Map<bigint, PublicTender>,
   tender: PublicTender,
-  event: VeilBidPublicEvent,
+  event: FlareQuorumPublicEvent,
   changes: Partial<PublicTender>,
 ): void {
   if (terminalStatuses.has(tender.status)) {
@@ -60,7 +60,7 @@ function updateTender(
   });
 }
 
-function publicLifecycleEvent(event: VeilBidPublicEvent): PublicLifecycleEvent {
+function publicLifecycleEvent(event: FlareQuorumPublicEvent): PublicLifecycleEvent {
   return {
     name: event.name,
     blockNumber: event.blockNumber,
@@ -71,7 +71,7 @@ function publicLifecycleEvent(event: VeilBidPublicEvent): PublicLifecycleEvent {
 function recordViewerGrant(
   tenders: Map<bigint, PublicTender>,
   tender: PublicTender,
-  event: VeilBidPublicEvent,
+  event: FlareQuorumPublicEvent,
 ): void {
   tenders.set(tender.tenderId, {
     ...tender,
@@ -87,12 +87,12 @@ function recordViewerGrant(
  * RPC pagination, finality depth, and reorg rollback remain caller concerns.
  */
 export function buildPublicMarketIndex(
-  events: readonly VeilBidPublicEvent[],
+  events: readonly FlareQuorumPublicEvent[],
 ): PublicMarketIndex {
   const tenders = new Map<bigint, PublicTender>();
   const bids = new Map<string, PublicBid>();
   const seen = new Set<string>();
-  let lastEvent: VeilBidPublicEvent | null = null;
+  let lastEvent: FlareQuorumPublicEvent | null = null;
 
   for (const event of orderedEvents(events)) {
     const key = positionKey(event);

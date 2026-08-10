@@ -1,4 +1,4 @@
-import { coston2FlarePublicRelease } from "@veilbid/flare-bindings";
+import { coston2FlarePublicRelease } from "@flarequorum/flare-bindings";
 import { Link } from "react-router";
 import { FlareLifecycleMarquee, FlareProcurementSignal } from "./FlareLandingVisuals";
 

@@ -19,7 +19,7 @@ import {
   buildMintAndFundPlan,
   quoteSmartAccountDirectMinting,
   teePublicKeyFingerprint,
-  veilBidFlareMarketAbi,
+  flareQuorumFlareMarketAbi,
 } from "../../packages/flare-bindings/dist/index.js";
 import { parseFlareFundingJob } from "../../apps/relay/dist/flare-funding-job.js";
 import { loadFlareFundingConfig } from "../../apps/relay/dist/flare-funding-config.js";
@@ -195,7 +195,7 @@ function termsFor({ extensionId, codeHash, machines, teeKeyFingerprints, vendor,
     requiredCredentials: [],
   };
   return {
-    metadataHash: keccak256(stringToHex(`VEILBID_GATE_G_${Date.now()}_${randomBytes(4).toString("hex")}`)),
+    metadataHash: keccak256(stringToHex(`FLAREQUORUM_GATE_G_${Date.now()}_${randomBytes(4).toString("hex")}`)),
     scoringPolicy,
     approvedVendors: [vendor],
     extensionId,
@@ -287,7 +287,7 @@ async function main() {
       const publicKey = await publicClient.readContract({
         address: await publicClient.readContract({
           address: market,
-          abi: veilBidFlareMarketAbi,
+          abi: flareQuorumFlareMarketAbi,
           functionName: "teeManager",
         }),
         abi: teeManagerPublicKeyAbi,
@@ -379,7 +379,7 @@ async function main() {
   if (outcome.outcome !== "executed") throw new Error("FCC_GATE_G_DIRECT_MINT_NOT_EXECUTED");
   currentPhase = "smart-account-settlement-checks";
   mark("settlement-read-tender");
-  const tender = await publicClient.readContract({ address: market, abi: veilBidFlareMarketAbi, functionName: "getTender", args: [outcome.tenderId] });
+  const tender = await publicClient.readContract({ address: market, abi: flareQuorumFlareMarketAbi, functionName: "getTender", args: [outcome.tenderId] });
   mark("settlement-read-balance");
   const ftestXrpBalance = await publicClient.readContract({ address: network.fTestXrp, abi: [{ type: "function", name: "balanceOf", stateMutability: "view", inputs: [{ name: "owner", type: "address" }], outputs: [{ name: "", type: "uint256" }] }], functionName: "balanceOf", args: [market] });
   const tenderBuyer = getAddress(field(tender, "buyer", 0));

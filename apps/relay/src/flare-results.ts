@@ -2,7 +2,7 @@ import {
   verifySelectionActionResponse,
   type FccActionResponse,
   type FlareSelectionResult,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import { isAddressEqual, keccak256, stringToHex, type Address, type Hex } from "viem";
 
 const coston2ChainId = 114n;

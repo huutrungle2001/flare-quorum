@@ -54,7 +54,7 @@ test("derives a public TEE identity only from a fully bound machine info envelop
 });
 
 test("requires three stable public endpoints exposing the same local identities", async () => {
-  const publicUrls = [1, 2, 3].map((n) => `https://tee-${n}.veilbid.example/`);
+  const publicUrls = [1, 2, 3].map((n) => `https://tee-${n}.flarequorum.example/`);
   const localUrls = [1, 2, 3].map((n) => `http://127.0.0.1:${6673 + n}/`);
   const allUrls = [...localUrls, ...publicUrls];
   const fetchImplementation = async (url) => {
@@ -169,7 +169,7 @@ test("writes the exact address keys expected by the FCC registration client", ()
 
 test("accepts stable remote control endpoints for hosted Railway machines", async () => {
   const publicUrls = [1, 2, 3].map(
-    (n) => `https://veilbid-flare-fcc-${n}-production.up.railway.app/`,
+    (n) => `https://flare-quorum-fcc-${n}-production.up.railway.app/`,
   );
   const fetchImplementation = async (url) => {
     if (url.href === "https://tee-proxy-coston2-1.flare.rocks/info") {
@@ -191,7 +191,7 @@ test("accepts stable remote control endpoints for hosted Railway machines", asyn
 
 test("accepts only a production on-chain machine with exact frozen bindings", () => {
   const machine = parseMachineInfo(info("11"), expected);
-  const runtime = { machine: 1, publicUrl: "https://tee-1.veilbid.example", ...machine };
+  const runtime = { machine: 1, publicUrl: "https://tee-1.flarequorum.example", ...machine };
   const result = evaluateRegisteredMachine({
     machine: runtime,
     status: 2,

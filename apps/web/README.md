@@ -52,10 +52,10 @@ It intentionally:
 Run it from the repository root with:
 
 ```bash
-pnpm --filter @veilbid/tender-room dev
-pnpm --filter @veilbid/tender-room test
-pnpm --filter @veilbid/tender-room build
-pnpm test:production https://veilbid-three.vercel.app
+pnpm --filter @flarequorum/tender-room dev
+pnpm --filter @flarequorum/tender-room test
+pnpm --filter @flarequorum/tender-room build
+pnpm test:production https://flare-quorum.vercel.app
 pnpm test:flare:production https://flare-quorum.vercel.app
 pnpm test:flare:accessibility https://flare-quorum.vercel.app
 ```

@@ -9,7 +9,7 @@ Ethereum Sepolia/Nox release and must not be used as evidence for this package.
 | Resource | Link |
 | --- | --- |
 | Live app | [flare-quorum.vercel.app](https://flare-quorum.vercel.app) |
-| Four-minute demo | [`veilbid-flare-demo.mp4`](veilbid-flare-demo.mp4) |
+| Four-minute demo | [`flare-quorum-demo.mp4`](flare-quorum-demo.mp4) |
 | Demo evidence | [`judge-demo-video.release.json`](../../evidence/coston2/judge-demo-video.release.json) |
 | Public evidence ledger | [Coston2 Activity/Evidence view](https://flare-quorum.vercel.app/flare?role=evidence) |
 | Buyer workspace | [Coston2 Buyer](https://flare-quorum.vercel.app/flare?role=buyer) |
@@ -136,7 +136,7 @@ flowchart LR
   S --> Q[2-of-3 matching result signatures]
   Q --> M
   M --> A[Public winner + FTestXRP\naward receipt / refund]
-  A -.-> X[Official FAssets redemption request\nVeilBid never holds XRPL secret]
+  A -.-> X[Official FAssets redemption request\nFlareQuorum never holds XRPL secret]
 ```
 
 ## Four-minute demo storyboard

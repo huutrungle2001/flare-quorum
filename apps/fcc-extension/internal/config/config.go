@@ -14,11 +14,11 @@ const (
 	FoundationSchemaVersion = uint16(1)
 	Coston2ChainID          = int64(114)
 
-	OPTypeVeilBidFoundation = "VEILBID_FOUNDATION"
+	OPTypeFlareQuorumFoundation = "VEILBID_FOUNDATION"
 	OPCommandPingV1         = "PING_V1"
-	OPTypeVeilBidBid        = "VEILBID_BID"
+	OPTypeFlareQuorumBid        = "VEILBID_BID"
 	OPCommandSubmitV1       = "SUBMIT_V1"
-	OPTypeVeilBidSelection  = "VEILBID_SELECTION"
+	OPTypeFlareQuorumSelection  = "VEILBID_SELECTION"
 	OPCommandSelectV1       = "SELECT_V1"
 	FoundationDomain        = "VEILBID_FCC_FOUNDATION_V1"
 

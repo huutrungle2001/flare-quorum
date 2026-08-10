@@ -1,4 +1,4 @@
-import type { PublicTender } from "@veilbid/chain-bindings";
+import type { PublicTender } from "@flarequorum/chain-bindings";
 
 function dateFromTimestamp(timestamp: bigint) {
   return new Date(Number(timestamp) * 1_000);

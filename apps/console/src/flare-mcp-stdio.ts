@@ -14,6 +14,6 @@ async function main() {
 }
 
 main().catch(() => {
-  process.stderr.write("VeilBid Coston2 MCP failed to start.\n");
+  process.stderr.write("FlareQuorum Coston2 MCP failed to start.\n");
   process.exitCode = 1;
 });

@@ -119,9 +119,9 @@ export function verifyLocalProxyImage(repositoryRoot, recipe) {
   const inspection = parseProxyImageInspection(JSON.parse(run("docker", [
     "image", "inspect", "--platform", recipe.platform, recipe.releaseImageTag,
   ], { cwd: repositoryRoot })));
-  const temporaryDirectory = mkdtempSync(join(tmpdir(), "veilbid-proxy-image-"));
+  const temporaryDirectory = mkdtempSync(join(tmpdir(), "flare-quorum-proxy-image-"));
   const temporaryBinary = join(temporaryDirectory, "tee-proxy");
-  const containerName = `veilbid-proxy-verify-${process.pid}-${Date.now()}`;
+  const containerName = `flare-quorum-proxy-verify-${process.pid}-${Date.now()}`;
   let created = false;
   try {
     run("docker", ["create", "--name", containerName, recipe.releaseImageTag], {

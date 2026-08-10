@@ -8,7 +8,7 @@ import {
   testXrpSourceId,
   xrpPaymentAttestationType,
   xrpPaymentResponseParameter,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import {
   encodeAbiParameters,
   encodeEventTopics,

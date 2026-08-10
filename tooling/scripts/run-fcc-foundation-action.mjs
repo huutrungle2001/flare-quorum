@@ -14,8 +14,8 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import {
   foundationBindingHash,
-  veilBidFoundationOpType,
-  veilBidFoundationPingV1OpCommand,
+  flareQuorumFoundationOpType,
+  flareQuorumFoundationPingV1OpCommand,
   verifyFoundationActionResponse,
 } from "../../packages/flare-bindings/dist/fcc-result.js";
 import { normalizePrivateKey } from "../flare/foundations.mjs";
@@ -149,8 +149,8 @@ async function main() {
     schemaVersion: 1,
     chainId: 114n,
     market: sender,
-    requestNonce: keccak256(stringToHex(`VEILBID_GATE_A_NONCE_${Date.now()}_${Math.random()}`)),
-    payloadHash: keccak256(stringToHex("VEILBID_GATE_A_PUBLIC_SAFE_PING_V1")),
+    requestNonce: keccak256(stringToHex(`FLAREQUORUM_GATE_A_NONCE_${Date.now()}_${Math.random()}`)),
+    payloadHash: keccak256(stringToHex("FLAREQUORUM_GATE_A_PUBLIC_SAFE_PING_V1")),
   };
   const expectedBindingHash = foundationBindingHash(fields);
   const transactionHash = await walletClient.writeContract({
@@ -187,7 +187,7 @@ async function main() {
   const assertions = {
     dispatchTransactionSucceeded: receipt.status === "success",
     instructionBoundToExtension: instruction.extensionId === extensionId,
-    instructionOperationMatches: sameHex(instruction.opCommand, veilBidFoundationPingV1OpCommand) && sameHex(instruction.opType, veilBidFoundationOpType),
+    instructionOperationMatches: sameHex(instruction.opCommand, flareQuorumFoundationPingV1OpCommand) && sameHex(instruction.opType, flareQuorumFoundationOpType),
     resultRetrieved: fetched.verified.response.result.id.toLowerCase() === actionId.toLowerCase(),
     resultStatusSuccess: fetched.verified.response.result.status === 1,
     resultBindingMatches: fetched.verified.result.bindingHash === expectedBindingHash,
@@ -206,7 +206,7 @@ async function main() {
       chainId: 114n,
       allowedTeeIds: [selectedTeeId],
       expectedVersion,
-      expectedRequest: { ...fields, payloadHash: keccak256(stringToHex("VEILBID_GATE_A_WRONG_PAYLOAD")) },
+      expectedRequest: { ...fields, payloadHash: keccak256(stringToHex("FLAREQUORUM_GATE_A_WRONG_PAYLOAD")) },
     });
   } catch (error) {
     assertions.wrongBindingRejected = error instanceof Error && error.message === "FCC_FOUNDATION_REQUEST_MISMATCH";

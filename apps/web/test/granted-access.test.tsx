@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { PublicBid, PublicTender } from "@veilbid/chain-bindings";
+import type { PublicBid, PublicTender } from "@flarequorum/chain-bindings";
 import type { Address, WalletClient } from "viem";
 import { GrantedAccessPanel } from "../src/auditor/AuditorWorkspace";
 import type { WalletController } from "../src/wallet/WalletPanel";

@@ -193,7 +193,7 @@ Prove:
 - award plus remainder, or zero-winner refund, equals ceiling;
 - unsupported/rebasing/fee-on-transfer asset cannot enter the release;
 - reentrancy and token failure cannot settle partially or twice;
-- winner can follow the supported FAssets redemption path without VeilBid
+- winner can follow the supported FAssets redemption path without FlareQuorum
   receiving an XRPL secret.
 - the awarded vendor can submit an amount-based `redeemAmount` request through
   the verified AssetManager, with the request event and agent payout obligation
@@ -224,7 +224,7 @@ Prove on XRPL testnet and Coston2:
    rate-limited Coston2 delay has not been forced and remains release-hardening
    evidence rather than a claimed live pass.
 
-Kill condition: VeilBid needs a custodial signer or the XRP payment/mint/tender
+Kill condition: FlareQuorum needs a custodial signer or the XRP payment/mint/tender
 actions cannot be cryptographically and atomically bound.
 
 ## 10. Gate H — product, evidence, and user validation

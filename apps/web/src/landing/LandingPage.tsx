@@ -54,7 +54,7 @@ export function LandingPage() {
               <VeilScoutMascot />
             </div>
             <p>
-              VeilBid combines public tender rules, encrypted vendor bids,
+              FlareQuorum combines public tender rules, encrypted vendor bids,
               Nox-computed selection, proof-derived awards, and confidential
               ERC-7984 settlement on Ethereum Sepolia. Buyers can start with
               a direct wallet or use a Safe treasury for threshold authority.
@@ -185,7 +185,7 @@ export function LandingPage() {
           </div>
           <div>
             <details>
-              <summary>Do I need a wallet to inspect VeilBid?</summary>
+              <summary>Do I need a wallet to inspect FlareQuorum?</summary>
               <p>No. Public tender state is wallet-free. Connect only for Safe Buyer, EOA Buyer, Private Bids, or Activity actions.</p>
             </details>
             <details>
@@ -194,7 +194,7 @@ export function LandingPage() {
             </details>
             <details>
               <summary>Are vendor identities private?</summary>
-              <p>No. Vendor addresses and transaction timing are public. VeilBid protects bid and settlement values, not transaction-graph metadata.</p>
+              <p>No. Vendor addresses and transaction timing are public. FlareQuorum protects bid and settlement values, not transaction-graph metadata.</p>
             </details>
             <details>
               <summary>Can the buyer change the winner?</summary>
@@ -219,7 +219,7 @@ export function LandingPage() {
           <div>
             <p>
               The canonical release has exact source/runtime mappings and a
-              real two-vendor Safe lifecycle on Ethereum Sepolia. VeilBid does
+              real two-vendor Safe lifecycle on Ethereum Sepolia. FlareQuorum does
               not claim anonymous bidders, hidden metadata, formal auditing,
               or mainnet readiness.
             </p>

@@ -14,12 +14,12 @@ import { createHash } from "node:crypto";
 const root = resolve(import.meta.dirname, "../../..");
 const baseUrl = new URL(
   process.argv[2] ??
-    process.env.VEILBID_PRODUCTION_URL ??
-    "https://veilbid-three.vercel.app",
+    process.env.FLAREQUORUM_PRODUCTION_URL ??
+    "https://flare-quorum.vercel.app",
 );
 const evidencePath = resolve(
   root,
-  process.env.VEILBID_PRODUCTION_EVIDENCE ??
+  process.env.FLAREQUORUM_PRODUCTION_EVIDENCE ??
     "evidence/sepolia/production-smoke.json",
 );
 const screenshotDirectory = resolve(root, ".local/screenshots");
@@ -64,7 +64,7 @@ function findChrome() {
 }
 
 function browserCapture(chrome, path, viewport, screenshotName) {
-  const profile = mkdtempSync(join(tmpdir(), "veilbid-smoke-"));
+  const profile = mkdtempSync(join(tmpdir(), "flare-quorum-smoke-"));
   const screenshotPath = join(screenshotDirectory, screenshotName);
   try {
     const result = spawnSync(
@@ -182,7 +182,7 @@ const assertions = {
     desktop.dom.includes("CONNECT WALLET") &&
     mobile.dom.includes("CONNECT WALLET"),
   docsGuideRendered:
-    docsDesktop.dom.includes("Use VeilBid from tender to settlement.") &&
+    docsDesktop.dom.includes("Use FlareQuorum from tender to settlement.") &&
     docsDesktop.dom.includes("BUYER GUIDE") &&
     docsMobile.dom.includes("TROUBLESHOOTING"),
   docsSidebarRendered:
@@ -220,7 +220,7 @@ const evidence = {
   publicIdentifiers: {
     sourceCommit: git("rev-parse", "HEAD"),
     provider: "vercel",
-    project: "veilbid",
+    project: "flare-quorum",
     deploymentId: process.env.VERCEL_DEPLOYMENT_ID ?? "not-recorded",
     canonicalUrl: baseUrl.origin,
     network: deployment.network,

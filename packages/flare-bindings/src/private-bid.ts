@@ -30,8 +30,8 @@ const bidDomain = keccak256(stringToHex("VEILBID_BID_V1"));
 const credentialDomain = keccak256(stringToHex("VEILBID_CREDENTIAL_V1"));
 const bidReceiptDomain = keccak256(stringToHex("VEILBID_BID_RECEIPT_V1"));
 
-export const veilBidDirectOpType = padHex(stringToHex("VEILBID_BID"), { dir: "right", size: 32 });
-export const veilBidDirectSubmitCommand = padHex(stringToHex("SUBMIT_V1"), { dir: "right", size: 32 });
+export const flareQuorumDirectOpType = padHex(stringToHex("VEILBID_BID"), { dir: "right", size: 32 });
+export const flareQuorumDirectSubmitCommand = padHex(stringToHex("SUBMIT_V1"), { dir: "right", size: 32 });
 
 const credentialRequirementComponents = [
   { name: "credentialType", type: "bytes32" },
@@ -228,7 +228,7 @@ export function flareBidIngressTypedData(authorization: FlareBidIngressAuthoriza
   directBidInstruction(authorization.ciphertext);
   return {
     domain: {
-      name: "VeilBid Flare Bid Gateway",
+      name: "FlareQuorum Bid Gateway",
       version: "1",
       chainId: 114,
       verifyingContract: authorization.market,
@@ -510,5 +510,5 @@ export function directBidInstruction(ciphertext: Hex): {
   if (!/^0x(?:[0-9a-fA-F]{2})+$/.test(ciphertext) || byteLength > 256 * 1024) {
     throw new Error("INVALID_PRIVATE_BID_CIPHERTEXT");
   }
-  return { opType: veilBidDirectOpType, opCommand: veilBidDirectSubmitCommand, message: ciphertext };
+  return { opType: flareQuorumDirectOpType, opCommand: flareQuorumDirectSubmitCommand, message: ciphertext };
 }

@@ -8,10 +8,10 @@ import {
   foundationBindingHash,
   parseFccActionResponse,
   teeActionResultPrefix,
-  veilBidFoundationOpType,
-  veilBidFoundationPingV1OpCommand,
-  veilBidSelectionOpType,
-  veilBidSelectV1OpCommand,
+  flareQuorumFoundationOpType,
+  flareQuorumFoundationPingV1OpCommand,
+  flareQuorumSelectionOpType,
+  flareQuorumSelectV1OpCommand,
   verifyFoundationActionResponse,
   verifySelectionActionResponse,
 } from "../src/fcc-result.ts";
@@ -58,11 +58,11 @@ const selection = {
 
 test("uses Solidity bytes32 operation identifiers instead of hashes", () => {
   assert.equal(
-    veilBidSelectionOpType,
+    flareQuorumSelectionOpType,
     "0x5645494c4249445f53454c454354494f4e000000000000000000000000000000",
   );
   assert.equal(
-    veilBidSelectV1OpCommand,
+    flareQuorumSelectV1OpCommand,
     "0x53454c4543545f56310000000000000000000000000000000000000000000000",
   );
 });
@@ -89,8 +89,8 @@ test("verifies a domain-bound foundation action and rejects a changed request", 
     submissionTag: "submit" as const,
     status: 1,
     log: "ok",
-    opType: veilBidFoundationOpType,
-    opCommand: veilBidFoundationPingV1OpCommand,
+    opType: flareQuorumFoundationOpType,
+    opCommand: flareQuorumFoundationPingV1OpCommand,
     additionalResultStatus: "0x" as const,
     version: "v0.2.2",
     data,
@@ -125,8 +125,8 @@ async function responseFixture() {
     submissionTag: "threshold" as const,
     status: 1,
     log: "ok",
-    opType: veilBidSelectionOpType,
-    opCommand: veilBidSelectV1OpCommand,
+    opType: flareQuorumSelectionOpType,
+    opCommand: flareQuorumSelectV1OpCommand,
     additionalResultStatus: "0x" as const,
     version: "0.2.0",
     data,

@@ -1,4 +1,4 @@
-import { coston2FlarePublicRelease } from "@veilbid/flare-bindings";
+import { coston2FlarePublicRelease } from "@flarequorum/flare-bindings";
 import { formatUnits } from "viem";
 import { useEffect, useMemo, useState } from "react";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";

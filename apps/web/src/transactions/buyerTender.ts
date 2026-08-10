@@ -1,7 +1,7 @@
-import marketAbiJson from "@veilbid/chain-bindings/abis/VeilBidMarket";
-import tokenAbiJson from "@veilbid/chain-bindings/abis/VeilBidTestUSDC";
-import wrapperAbiJson from "@veilbid/chain-bindings/abis/VeilBidConfidentialUSDC";
-import deployment from "@veilbid/chain-bindings/addresses/sepolia.release";
+import marketAbiJson from "@flarequorum/chain-bindings/abis/VeilBidMarket";
+import tokenAbiJson from "@flarequorum/chain-bindings/abis/VeilBidTestUSDC";
+import wrapperAbiJson from "@flarequorum/chain-bindings/abis/VeilBidConfidentialUSDC";
+import deployment from "@flarequorum/chain-bindings/addresses/sepolia.release";
 import {
   createPublicClient,
   decodeEventLog,

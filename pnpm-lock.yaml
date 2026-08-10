@@ -26,15 +26,15 @@ importers:
 
   apps/console:
     dependencies:
+      '@flarequorum/chain-bindings':
+        specifier: workspace:*
+        version: link:../../packages/chain-bindings
+      '@flarequorum/flare-bindings':
+        specifier: workspace:*
+        version: link:../../packages/flare-bindings
       '@modelcontextprotocol/sdk':
         specifier: 1.30.0
         version: 1.30.0(zod@4.4.3)
-      '@veilbid/chain-bindings':
-        specifier: workspace:*
-        version: link:../../packages/chain-bindings
-      '@veilbid/flare-bindings':
-        specifier: workspace:*
-        version: link:../../packages/flare-bindings
       viem:
         specifier: 2.47.6
         version: 2.47.6(typescript@5.9.3)(zod@4.4.3)
@@ -53,15 +53,15 @@ importers:
 
   apps/relay:
     dependencies:
+      '@flarequorum/chain-bindings':
+        specifier: workspace:*
+        version: link:../../packages/chain-bindings
+      '@flarequorum/flare-bindings':
+        specifier: workspace:*
+        version: link:../../packages/flare-bindings
       '@iexec-nox/handle':
         specifier: 0.1.0-beta.13
         version: 0.1.0-beta.13(ethers@6.17.0)(graphql@16.14.2)(viem@2.47.6(typescript@5.9.3)(zod@4.4.3))
-      '@veilbid/chain-bindings':
-        specifier: workspace:*
-        version: link:../../packages/chain-bindings
-      '@veilbid/flare-bindings':
-        specifier: workspace:*
-        version: link:../../packages/flare-bindings
       viem:
         specifier: 2.47.6
         version: 2.47.6(typescript@5.9.3)(zod@4.4.3)
@@ -75,6 +75,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@flarequorum/chain-bindings':
+        specifier: workspace:*
+        version: link:../../packages/chain-bindings
+      '@flarequorum/flare-bindings':
+        specifier: workspace:*
+        version: link:../../packages/flare-bindings
       '@gemwallet/api':
         specifier: 3.8.0
         version: 3.8.0
@@ -87,12 +93,6 @@ importers:
       '@safe-global/protocol-kit':
         specifier: 8.0.4
         version: 8.0.4(typescript@5.9.3)(zod@4.4.3)
-      '@veilbid/chain-bindings':
-        specifier: workspace:*
-        version: link:../../packages/chain-bindings
-      '@veilbid/flare-bindings':
-        specifier: workspace:*
-        version: link:../../packages/flare-bindings
       buffer:
         specifier: 6.0.3
         version: 6.0.3

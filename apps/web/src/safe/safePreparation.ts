@@ -2,13 +2,13 @@ import { createViemHandleClient } from "@iexec-nox/handle";
 import type {
   Eip1193Provider as SafeEip1193Provider,
 } from "@safe-global/protocol-kit";
-import factoryAbiJson from "@veilbid/chain-bindings/abis/VeilBidSafeModuleFactory";
-import marketAbiJson from "@veilbid/chain-bindings/abis/VeilBidMarket";
-import moduleAbiJson from "@veilbid/chain-bindings/abis/VeilBidSafePreparationModule";
-import unwrapPreparationAbiJson from "@veilbid/chain-bindings/abis/VeilBidSafeUnwrapPreparation";
-import tokenAbiJson from "@veilbid/chain-bindings/abis/VeilBidTestUSDC";
-import wrapperAbiJson from "@veilbid/chain-bindings/abis/VeilBidConfidentialUSDC";
-import deployment from "@veilbid/chain-bindings/addresses/sepolia.release";
+import factoryAbiJson from "@flarequorum/chain-bindings/abis/VeilBidSafeModuleFactory";
+import marketAbiJson from "@flarequorum/chain-bindings/abis/VeilBidMarket";
+import moduleAbiJson from "@flarequorum/chain-bindings/abis/VeilBidSafePreparationModule";
+import unwrapPreparationAbiJson from "@flarequorum/chain-bindings/abis/VeilBidSafeUnwrapPreparation";
+import tokenAbiJson from "@flarequorum/chain-bindings/abis/VeilBidTestUSDC";
+import wrapperAbiJson from "@flarequorum/chain-bindings/abis/VeilBidConfidentialUSDC";
+import deployment from "@flarequorum/chain-bindings/addresses/sepolia.release";
 import {
   decodeEventLog,
   encodeFunctionData,
@@ -695,7 +695,7 @@ async function proposeSafeBatch({
     safeTxHash,
     senderAddress: account,
     senderSignature,
-    origin: `VeilBid Safe ${kind}`,
+    origin: `FlareQuorum Safe ${kind}`,
   });
 
   const threshold = await safeKit.getThreshold();
@@ -729,7 +729,7 @@ async function proposeSafeBatch({
   };
 }
 
-export async function setupSafeForVeilBid({
+export async function setupSafeForFlareQuorum({
   configuration,
   provider,
   account,
@@ -793,7 +793,7 @@ export async function setupSafeForVeilBid({
     });
   }
   if (transactions.length === 0) {
-    throw new Error("This Safe is already configured for VeilBid.");
+    throw new Error("This Safe is already configured for FlareQuorum.");
   }
   return proposeSafeBatch({
     kind: "setup",
@@ -1362,7 +1362,7 @@ export async function prepareSafeTender({
   rpcUrl?: string;
 }) {
   if (!configuration.ready || !configuration.module) {
-    throw new Error("Configure this Safe for VeilBid before creating a tender.");
+    throw new Error("Configure this Safe for FlareQuorum before creating a tender.");
   }
   const terms = parseSafeTenderInput(input);
   const publicClient = createResilientSepoliaClient(rpcUrl);

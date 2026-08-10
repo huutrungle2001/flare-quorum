@@ -1,4 +1,4 @@
-import wrapperAbiJson from "@veilbid/chain-bindings/abis/VeilBidConfidentialUSDC";
+import wrapperAbiJson from "@flarequorum/chain-bindings/abis/VeilBidConfidentialUSDC";
 import { decodeFunctionData, encodeFunctionData, type Abi, type Address } from "viem";
 import { describe, expect, it } from "vitest";
 import {

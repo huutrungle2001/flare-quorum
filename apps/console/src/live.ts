@@ -1,15 +1,15 @@
 import {
   buildPublicLogBlockRanges,
   buildPublicMarketIndex,
-  decodeVeilBidPublicEvent,
-} from "@veilbid/chain-bindings";
-import receiptAbiJson from "@veilbid/chain-bindings/abis/VeilBidAwardReceipt" with {
+  decodeFlareQuorumPublicEvent,
+} from "@flarequorum/chain-bindings";
+import receiptAbiJson from "@flarequorum/chain-bindings/abis/VeilBidAwardReceipt" with {
   type: "json",
 };
-import marketAbiJson from "@veilbid/chain-bindings/abis/VeilBidMarket" with {
+import marketAbiJson from "@flarequorum/chain-bindings/abis/VeilBidMarket" with {
   type: "json",
 };
-import deploymentJson from "@veilbid/chain-bindings/addresses/sepolia.release" with {
+import deploymentJson from "@flarequorum/chain-bindings/addresses/sepolia.release" with {
   type: "json",
 };
 import {
@@ -87,7 +87,7 @@ export class LivePublicOperatorSource implements PublicOperatorSource {
             continue;
           }
           events.push(
-            decodeVeilBidPublicEvent({
+            decodeFlareQuorumPublicEvent({
               blockNumber: log.blockNumber,
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,

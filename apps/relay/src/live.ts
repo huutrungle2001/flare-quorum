@@ -2,13 +2,13 @@ import { createViemHandleClient, type HandleClient } from "@iexec-nox/handle";
 import {
   buildPublicLogBlockRanges,
   buildPublicMarketIndex,
-  decodeVeilBidPublicEvent,
+  decodeFlareQuorumPublicEvent,
   type PublicMarketIndex,
-} from "@veilbid/chain-bindings";
-import marketAbiJson from "@veilbid/chain-bindings/abis/VeilBidMarket" with {
+} from "@flarequorum/chain-bindings";
+import marketAbiJson from "@flarequorum/chain-bindings/abis/VeilBidMarket" with {
   type: "json",
 };
-import deploymentJson from "@veilbid/chain-bindings/addresses/sepolia.release" with {
+import deploymentJson from "@flarequorum/chain-bindings/addresses/sepolia.release" with {
   type: "json",
 };
 import {
@@ -287,7 +287,7 @@ export class LiveRelay {
             continue;
           }
           events.push(
-            decodeVeilBidPublicEvent({
+            decodeFlareQuorumPublicEvent({
               blockNumber: log.blockNumber,
               transactionHash: log.transactionHash,
               logIndex: log.logIndex,

@@ -200,7 +200,7 @@ try {
         },
         notes: [
           "This is the organizer-supported replacement plus re-registration recovery model; identity restoration is not claimed.",
-          "Retirement uses the verified FlareTeeManager owner pause path after checking every unfinished VeilBid tender.",
+          "Retirement uses the verified FlareTeeManager owner pause path after checking every unfinished FlareQuorum tender.",
           "No deployment key, TEE key, proxy credential, raw signature, attestation, ciphertext, or bid data is recorded.",
         ],
       };

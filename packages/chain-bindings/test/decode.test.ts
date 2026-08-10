@@ -5,7 +5,7 @@ import {
   encodeEventTopics,
   parseAbiItem,
 } from "viem";
-import { decodeVeilBidPublicEvent } from "../src/events/decode.ts";
+import { decodeFlareQuorumPublicEvent } from "../src/events/decode.ts";
 
 const createdEvent = parseAbiItem(
   "event TenderCreated(uint256 indexed tenderId, address indexed buyer, bytes32 indexed metadataHash, address paymentToken, address reviewViewer, uint256 publicCeiling, uint64 bidDeadline, uint8 approvedVendorCount)",
@@ -16,7 +16,7 @@ const reviewViewer = "0x3333333333333333333333333333333333333333";
 const metadataHash = `0x${"ab".repeat(32)}` as const;
 const transactionHash = `0x${"12".repeat(32)}` as const;
 
-describe("decodeVeilBidPublicEvent", () => {
+describe("decodeFlareQuorumPublicEvent", () => {
   it("decodes only the public TenderCreated coordination fields", () => {
     const topics = encodeEventTopics({
       abi: [createdEvent],
@@ -39,7 +39,7 @@ describe("decodeVeilBidPublicEvent", () => {
     );
 
     assert.deepEqual(
-      decodeVeilBidPublicEvent({
+      decodeFlareQuorumPublicEvent({
         blockNumber: 90n,
         transactionHash,
         logIndex: 3,
@@ -71,7 +71,7 @@ describe("decodeVeilBidPublicEvent", () => {
       args: { value: 1n },
     });
     assert.throws(() =>
-      decodeVeilBidPublicEvent({
+      decodeFlareQuorumPublicEvent({
         blockNumber: 1n,
         transactionHash,
         logIndex: 0,

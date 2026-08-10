@@ -7,9 +7,9 @@ import {
   flareSystemsManagerAbi,
   relayFinalizationAbi,
   smartAccountReaderAbi,
-  veilBidFlareMarketAbi,
+  flareQuorumFlareMarketAbi,
   type XrpPaymentProof,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import {
   createPublicClient,
   createWalletClient,
@@ -357,19 +357,19 @@ export class LiveFlareFundingChain implements FlareFundingChain {
         }),
         this.publicClient.readContract({
           address: this.config.marketAddress,
-          abi: veilBidFlareMarketAbi,
+          abi: flareQuorumFlareMarketAbi,
           functionName: "paymentToken",
           blockNumber: finalizedBlock,
         }),
         this.publicClient.readContract({
           address: this.config.marketAddress,
-          abi: veilBidFlareMarketAbi,
+          abi: flareQuorumFlareMarketAbi,
           functionName: "TEE_COUNT",
           blockNumber: finalizedBlock,
         }),
         this.publicClient.readContract({
           address: this.config.marketAddress,
-          abi: veilBidFlareMarketAbi,
+          abi: flareQuorumFlareMarketAbi,
           functionName: "RESULT_THRESHOLD",
           blockNumber: finalizedBlock,
         }),
@@ -424,7 +424,7 @@ export class LiveFlareFundingChain implements FlareFundingChain {
   async getMarketTenderCount(market: Address): Promise<bigint> {
     const count = await this.publicClient.readContract({
       address: market,
-      abi: veilBidFlareMarketAbi,
+      abi: flareQuorumFlareMarketAbi,
       functionName: "tenderCount",
     }) as bigint;
     return count;
@@ -433,7 +433,7 @@ export class LiveFlareFundingChain implements FlareFundingChain {
   async getMarketTender(market: Address, tenderId: bigint): Promise<FlareFundingTenderFact> {
     const value = await this.publicClient.readContract({
       address: market,
-      abi: veilBidFlareMarketAbi,
+      abi: flareQuorumFlareMarketAbi,
       functionName: "getTender",
       args: [tenderId],
     }) as Record<string, unknown> & readonly unknown[];

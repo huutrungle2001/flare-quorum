@@ -17,8 +17,8 @@ import {
   privateBidCommitment,
   recoverBidReceiptSigner,
   teeIdentityFromPublicKey,
-  veilBidDirectOpType,
-  veilBidDirectSubmitCommand,
+  flareQuorumDirectOpType,
+  flareQuorumDirectSubmitCommand,
 } from "../../packages/flare-bindings/dist/index.js";
 import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
 
@@ -139,15 +139,15 @@ async function verifyReceipt(value, context, teeId) {
   if (
     response.result.id.toLowerCase() !== context.actionId.toLowerCase() ||
     response.result.submissionTag !== "submit" ||
-    response.result.opType !== veilBidDirectOpType ||
-    response.result.opCommand !== veilBidDirectSubmitCommand
+    response.result.opType !== flareQuorumDirectOpType ||
+    response.result.opCommand !== flareQuorumDirectSubmitCommand
   ) throw new Error("FCC_GATE_B_RESULT_BINDING_INVALID");
   const receipt = decodeBidReceipt(response.result.data);
   const signer = await recoverBidReceiptSigner(receipt);
   const assertions = {
     actionIdMatches: response.result.id.toLowerCase() === context.actionId.toLowerCase(),
     resultStatusSuccess: response.result.status === 1,
-    operationMatches: response.result.opType === veilBidDirectOpType && response.result.opCommand === veilBidDirectSubmitCommand,
+    operationMatches: response.result.opType === flareQuorumDirectOpType && response.result.opCommand === flareQuorumDirectSubmitCommand,
     receiptSchemaMatches: receipt.schemaVersion === 1,
     receiptNetworkMatches: receipt.chainId === 114n,
     receiptMarketMatches: sameHex(receipt.market, context.submission.market),
@@ -233,7 +233,7 @@ async function main() {
     deliveryDays: 5,
     warrantyDays: 24,
     credentials: [],
-    salt: keccak256(stringToHex(`VEILBID_GATE_B_SALT_${Date.now()}`)),
+    salt: keccak256(stringToHex(`FLAREQUORUM_GATE_B_SALT_${Date.now()}`)),
   };
   const plaintext = encodePrivateBidSubmission(submission);
   const commitment = privateBidCommitment(submission);

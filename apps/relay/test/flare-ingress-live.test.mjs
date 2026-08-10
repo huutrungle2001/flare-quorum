@@ -4,7 +4,7 @@ import {
   directBidInstruction,
   teeIdentityFromPublicKey,
   teePublicKeyFingerprint,
-} from "@veilbid/flare-bindings";
+} from "@flarequorum/flare-bindings";
 import { privateKeyToAccount } from "viem/accounts";
 import {
   LiveFlareBidIngressChain,
@@ -158,7 +158,7 @@ function resultResponse(instruction, data = `0x${"77".repeat(32)}`) {
       opType: instruction.opType,
       opCommand: instruction.opCommand,
       additionalResultStatus: "0x",
-      version: "veilbid-coston2",
+      version: "flare-quorum-coston2",
       data,
     },
     signature: `0x${"00".repeat(65)}`,

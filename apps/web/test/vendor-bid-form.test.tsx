@@ -1,6 +1,6 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { PublicTender } from "@veilbid/chain-bindings";
+import type { PublicTender } from "@flarequorum/chain-bindings";
 import type { Address, WalletClient } from "viem";
 import { VendorBidForm } from "../src/workspaces/VendorBidForm";
 import type { WalletController } from "../src/wallet/WalletPanel";

@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import "../src/shell/styles.css";
 
-export default function VeilBidSite({
+export default function FlareQuorumSite({
   Component,
   pageProps,
 }: {

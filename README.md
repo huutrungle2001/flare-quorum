@@ -3,7 +3,7 @@
 > Confidential procurement for XRP and Flare treasuries, powered by Flare
 > Confidential Compute.
 
-FlareQuorum is the Flare-native successor to the historical VeilBid baseline. XRP-native buyers atomically mint
+FlareQuorum is the Flare-native successor to the historical predecessor baseline. XRP-native buyers atomically mint
 FXRP and fund a tender; approved vendors privately deliver encrypted
 multi-criteria offers to a fixed Flare TEE quorum; and a Flare smart contract
 settles only after two registered TEE identities agree on the same deterministic
@@ -119,7 +119,7 @@ count as a completed integration.
 
 ## What existed before Summer Signal
 
-VeilBid previously shipped a verified Ethereum Sepolia release for the iExec
+The historical predecessor previously shipped a verified Ethereum Sepolia release for the iExec
 Nox hackathon. That baseline includes Safe treasury funding, Nox encrypted
 argmin selection, ERC-7984 confidential settlement, a web application, a
 stateless relay, generated bindings, and sanitized evidence.
@@ -169,7 +169,7 @@ Sepolia/Nox baseline and must not be used as Flare evidence:
 ```bash
 corepack enable
 corepack pnpm install --frozen-lockfile
-corepack pnpm --filter @veilbid/tender-room dev --host 0.0.0.0
+corepack pnpm --filter @flarequorum/tender-room dev --host 0.0.0.0
 ```
 
 Open `/` or `/flare` for the wallet-free Coston2 evidence view. If the verified

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { Hex } from "viem";
-import type { VeilBidPublicEvent } from "../src/events/types.ts";
+import type { FlareQuorumPublicEvent } from "../src/events/types.ts";
 import { buildPublicMarketIndex } from "../src/index/public-index.ts";
 
 const buyer = "0x1111111111111111111111111111111111111111";
@@ -19,7 +19,7 @@ function position(blockNumber: bigint, logIndex = 0) {
   };
 }
 
-function lifecycle(): VeilBidPublicEvent[] {
+function lifecycle(): FlareQuorumPublicEvent[] {
   return [
     {
       ...position(10n),
@@ -84,7 +84,7 @@ describe("buildPublicMarketIndex", () => {
         viewer: token,
         grantor: buyer,
       },
-    ] as VeilBidPublicEvent[];
+    ] as FlareQuorumPublicEvent[];
 
     const index = buildPublicMarketIndex(shuffled);
     assert.equal(index.tenders.length, 1);

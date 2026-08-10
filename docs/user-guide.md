@@ -62,7 +62,7 @@ Sepolia only on the historical `/room` route. Public browsing never requires a
 wallet.
 
 The current Flare application is intentionally split into two shells. Clicking
-the `VEILBID` wordmark returns to the standalone product landing page. Clicking
+the `FLAREQUORUM` wordmark returns to the standalone product landing page. Clicking
 `TENDERS` enters `/flare`, where the dossier-style left rail remains visible
 while the right side renders the selected workspace: `PUBLIC`, `BUYER`,
 `PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public finalizer), `XRP TREASURY`,

@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { coston2FlarePublicRelease } from "@veilbid/flare-bindings";
+import { coston2FlarePublicRelease } from "@flarequorum/flare-bindings";
 
 function short(value: string): string {
   return `${value.slice(0, 8)}…${value.slice(-6)}`;

@@ -40,7 +40,7 @@ test("requires exact digest, binary, non-root user, entrypoint, and read-only mo
     binaryMode: 0o100555,
     recipe: {
       platform: "linux/amd64",
-      releaseImageTag: "veilbid/tee-proxy:test",
+      releaseImageTag: "flarequorum/tee-proxy:test",
       releaseImageDigest: digest,
       releaseBinarySha256: binarySha256,
     },
@@ -53,7 +53,7 @@ test("requires exact digest, binary, non-root user, entrypoint, and read-only mo
     binaryMode: 0o100755,
     recipe: {
       platform: "linux/amd64",
-      releaseImageTag: "veilbid/tee-proxy:test",
+      releaseImageTag: "flarequorum/tee-proxy:test",
       releaseImageDigest: digest,
       releaseBinarySha256: binarySha256,
     },

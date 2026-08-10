@@ -1,4 +1,4 @@
-// Package protocol contains the canonical VeilBid wire and scoring model shared
+// Package protocol contains the canonical FlareQuorum wire and scoring model shared
 // with the Flare market contract and generated TypeScript bindings.
 package protocol
 
@@ -37,7 +37,7 @@ type BidReference struct {
 	AcceptedBlock       uint64
 }
 
-// AppendBidRoot applies ADR-008 exactly as VeilBidFlareMarket does.
+// AppendBidRoot applies ADR-008 exactly as FlareQuorumFlareMarket does.
 func AppendBidRoot(previous common.Hash, tenderID *big.Int, reference BidReference) (common.Hash, error) {
 	if tenderID == nil || tenderID.Sign() <= 0 || reference.BidID == nil || reference.BidID.Sign() <= 0 {
 		return common.Hash{}, fmt.Errorf("tender and bid IDs must be positive")

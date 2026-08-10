@@ -164,9 +164,9 @@ export function verifyLocalExtensionImage(repositoryRoot, recipe) {
   const inspection = parseExtensionImageInspection(JSON.parse(run("docker", [
     "image", "inspect", "--platform", recipe.platform, recipe.releaseImageTag,
   ], { cwd: repositoryRoot })));
-  const temporaryDirectory = mkdtempSync(join(tmpdir(), "veilbid-extension-image-"));
+  const temporaryDirectory = mkdtempSync(join(tmpdir(), "flare-quorum-extension-image-"));
   const temporaryBinary = join(temporaryDirectory, "extension-tee");
-  const containerName = `veilbid-extension-verify-${process.pid}-${Date.now()}`;
+  const containerName = `flare-quorum-extension-verify-${process.pid}-${Date.now()}`;
   let created = false;
   try {
     run("docker", ["create", "--name", containerName, recipe.releaseImageTag], {

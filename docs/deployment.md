@@ -32,7 +32,7 @@ Collect sanitized evidence with `pnpm flare:foundations:collect`. The stricter
 `pnpm flare:gate:0` command fails until every external registration prerequisite
 also passes; an `IN_PROGRESS` evidence file is not a release gate pass.
 
-Build and verify the checksum-pinned `linux/amd64` VeilBid extension and
+Build and verify the checksum-pinned `linux/amd64` FlareQuorum extension and
 tee-proxy separately:
 
 ```bash
@@ -243,7 +243,7 @@ machine during the demonstration window.
 For a named Cloudflare Tunnel, install the checksum-pinned local client with
 `pnpm flare:tunnel:install` and verify it with `pnpm flare:tunnel:check`. The
 client is stored under ignored `.local/toolchains/`, is owner-executable only,
-and does not auto-update inside VeilBid's release process. Browser authentication
+and does not auto-update inside FlareQuorum's release process. Browser authentication
 must be completed by the project owner through `cloudflared tunnel login`; do
 not paste `cert.pem`, a tunnel credential JSON, or a tunnel token into chat,
 `.env.local`, logs, or the repository. One named tunnel may route three public
@@ -335,7 +335,7 @@ fingerprints agree.
   flows; record public fingerprints and confidential/simulated mode.
 - Deploy private ingress with authenticated vendor/tender binding, TLS, body
   logging disabled, strict size/rate/time bounds, and no plaintext database.
-- Configure FAssets/FDC/Smart Account executor paths with no VeilBid-custodied
+- Configure FAssets/FDC/Smart Account executor paths with no FlareQuorum-custodied
   XRPL secret.
 
 The funding service uses a dedicated disposable Coston2 executor identity. It

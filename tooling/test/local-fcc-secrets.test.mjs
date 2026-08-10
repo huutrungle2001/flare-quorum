@@ -10,7 +10,7 @@ import {
 } from "../flare/local-fcc-secrets.mjs";
 
 test("creates missing FCC runtime secrets without replacing existing values", () => {
-  const directory = mkdtempSync(join(tmpdir(), "veilbid-fcc-secrets-"));
+  const directory = mkdtempSync(join(tmpdir(), "flare-quorum-fcc-secrets-"));
   const path = join(directory, ".env.local");
   try {
     writeFileSync(path, "PROXY_PRIVATE_KEY=already-set\nFCC_DIRECT_API_KEY=\n", {
@@ -35,7 +35,7 @@ test("creates missing FCC runtime secrets without replacing existing values", ()
 });
 
 test("sets public FCC bindings without changing unrelated local values", () => {
-  const directory = mkdtempSync(join(tmpdir(), "veilbid-fcc-public-env-"));
+  const directory = mkdtempSync(join(tmpdir(), "flare-quorum-fcc-public-env-"));
   const path = join(directory, ".env.local");
   try {
     writeFileSync(path, "FCC_EXTENSION_ID=old\nPROXY_PRIVATE_KEY=unchanged\n", { mode: 0o600 });

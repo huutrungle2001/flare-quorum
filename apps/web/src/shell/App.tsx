@@ -9,9 +9,9 @@ import { isFlareReleaseEnabled } from "../public-market/loadFlareMarket";
 import { useWallet } from "../wallet/useWallet";
 import { PrimaryNavigation } from "./PrimaryNavigation";
 
-const LegacyTenderRoom = lazy(async () => {
-  const module = await import("./LegacyTenderRoom");
-  return { default: module.LegacyTenderRoom };
+const FlareQuorumTenderRoom = lazy(async () => {
+  const module = await import("./FlareQuorumTenderRoom");
+  return { default: module.FlareQuorumTenderRoom };
 });
 
 function LoadingWorkspace() {
@@ -51,7 +51,7 @@ export function App() {
       <FlareLandingPage />
     ) : location.pathname === "/room" || legacyRoomLink ? (
       <Suspense fallback={<LoadingWorkspace />}>
-        <LegacyTenderRoom wallet={wallet} />
+        <FlareQuorumTenderRoom wallet={wallet} />
       </Suspense>
     ) : (
       <LandingPage />
@@ -60,15 +60,15 @@ export function App() {
   useEffect(() => {
     const description = isFlareExperience
       ? "FlareQuorum — confidential procurement with threshold FCC on Flare Coston2."
-      : "VeilBid — the historical confidential procurement baseline on Ethereum Sepolia.";
+      : "FlareQuorum — historical confidential procurement compatibility workspace on Ethereum Sepolia.";
     document.title = isFlareExperience
       ? "FlareQuorum · Confidential procurement on Flare"
-      : "VeilBid · Historical confidential procurement baseline";
+      : "FlareQuorum · Historical Sepolia compatibility workspace";
     document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute("content", description);
   }, [isFlareExperience]);
 
   return (
-    <div className={isFlareExperience ? "flare-quorum-app" : "veilbid-legacy-app"}>
+    <div className="flare-quorum-app">
       <PrimaryNavigation wallet={wallet} flareWallet={flareWallet} />
       {page}
     </div>

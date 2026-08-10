@@ -1,4 +1,4 @@
-import type { PublicBid, PublicTender } from "@veilbid/chain-bindings";
+import type { PublicBid, PublicTender } from "@flarequorum/chain-bindings";
 import { useEffect, useMemo, useState } from "react";
 import { revealAuthorizedBid } from "../auditor/revealBid";
 import type { WalletController } from "../wallet/WalletPanel";

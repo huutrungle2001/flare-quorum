@@ -2,7 +2,7 @@ import {
   getTenderReadiness,
   type PublicLifecycleEvent,
   type PublicTender,
-} from "@veilbid/chain-bindings";
+} from "@flarequorum/chain-bindings";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   closeTenderForRecovery,

@@ -7,7 +7,7 @@ import {
 import marketAbiJson from "../../generated/abis/VeilBidMarket.json" with {
   type: "json",
 };
-import type { VeilBidPublicEvent } from "./types.js";
+import type { FlareQuorumPublicEvent } from "./types.js";
 
 const marketAbi = marketAbiJson as Abi;
 const publicEventNames = new Set([
@@ -21,7 +21,7 @@ const publicEventNames = new Set([
   "ViewerGranted",
 ]);
 
-export interface RawVeilBidLog {
+export interface RawFlareQuorumLog {
   blockNumber: bigint;
   transactionHash: Hex;
   logIndex: number;
@@ -31,7 +31,7 @@ export interface RawVeilBidLog {
 
 function argumentsRecord(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error("VeilBid event arguments are malformed");
+    throw new Error("FlareQuorum event arguments are malformed");
   }
   return value as Record<string, unknown>;
 }
@@ -42,7 +42,7 @@ function bigintArgument(
 ): bigint {
   const value = args[name];
   if (typeof value !== "bigint") {
-    throw new Error(`VeilBid event argument ${name} is not bigint`);
+    throw new Error(`FlareQuorum event argument ${name} is not bigint`);
   }
   return value;
 }
@@ -53,7 +53,7 @@ function addressArgument(
 ): Address {
   const value = args[name];
   if (typeof value !== "string") {
-    throw new Error(`VeilBid event argument ${name} is not address`);
+    throw new Error(`FlareQuorum event argument ${name} is not address`);
   }
   return value as Address;
 }
@@ -64,7 +64,7 @@ function numberArgument(
 ): number {
   const value = args[name];
   if (typeof value !== "number") {
-    throw new Error(`VeilBid event argument ${name} is not number`);
+    throw new Error(`FlareQuorum event argument ${name} is not number`);
   }
   return value;
 }
@@ -72,14 +72,14 @@ function numberArgument(
 function hexArgument(args: Record<string, unknown>, name: string): Hex {
   const value = args[name];
   if (typeof value !== "string") {
-    throw new Error(`VeilBid event argument ${name} is not hex`);
+    throw new Error(`FlareQuorum event argument ${name} is not hex`);
   }
   return value as Hex;
 }
 
-export function decodeVeilBidPublicEvent(
-  log: RawVeilBidLog,
-): VeilBidPublicEvent {
+export function decodeFlareQuorumPublicEvent(
+  log: RawFlareQuorumLog,
+): FlareQuorumPublicEvent {
   const decoded = decodeEventLog({
     abi: marketAbi,
     data: log.data,
@@ -90,7 +90,7 @@ export function decodeVeilBidPublicEvent(
     args: unknown;
   };
   if (!publicEventNames.has(decoded.eventName)) {
-    throw new Error(`Unsupported VeilBid event: ${decoded.eventName}`);
+    throw new Error(`Unsupported FlareQuorum event: ${decoded.eventName}`);
   }
   const args = argumentsRecord(decoded.args);
   const position = {
@@ -157,6 +157,6 @@ export function decodeVeilBidPublicEvent(
         grantor: addressArgument(args, "grantor"),
       };
     default:
-      throw new Error(`Unsupported VeilBid event: ${decoded.eventName}`);
+      throw new Error(`Unsupported FlareQuorum event: ${decoded.eventName}`);
   }
 }

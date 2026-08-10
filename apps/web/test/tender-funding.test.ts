@@ -78,7 +78,7 @@ describe("direct tender funding confirmation", () => {
       "confirming",
       "open",
     ]);
-    expect(window.localStorage.getItem("veilbid:activity-recovery:v1")).toBe("[]");
+    expect(window.localStorage.getItem("flarequorum:activity-recovery:v1")).toBe("[]");
   });
 
   it("treats a relay race as success after rereading the canonical state", async () => {
@@ -102,6 +102,6 @@ describe("direct tender funding confirmation", () => {
       transactionHash: null,
       alreadyResolved: true,
     });
-    expect(window.localStorage.getItem("veilbid:activity-recovery:v1")).toBe("[]");
+    expect(window.localStorage.getItem("flarequorum:activity-recovery:v1")).toBe("[]");
   });
 });

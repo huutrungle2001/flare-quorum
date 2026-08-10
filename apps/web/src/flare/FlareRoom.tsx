@@ -1,7 +1,7 @@
 import { formatUnits } from "viem";
 import { useSearchParams } from "react-router";
 import { useMemo, type ReactNode } from "react";
-import { coston2FlarePublicRelease } from "@veilbid/flare-bindings";
+import { coston2FlarePublicRelease } from "@flarequorum/flare-bindings";
 import type { FlareMarketState } from "../public-market/useFlareMarket";
 import { useFlareMarket } from "../public-market/useFlareMarket";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";

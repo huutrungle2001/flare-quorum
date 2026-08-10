@@ -1,4 +1,4 @@
-import type { PublicBid, PublicTender } from "@veilbid/chain-bindings";
+import type { PublicBid, PublicTender } from "@flarequorum/chain-bindings";
 import { useEffect, useRef } from "react";
 import { SafeTreasuryWorkspace } from "../safe/SafeTreasuryWorkspace";
 import { ContextHelp } from "../shell/ContextHelp";

@@ -13,11 +13,11 @@ import { dirname, join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../../..");
 const baseUrl = new URL(
-  process.argv[2] ?? process.env.FLAREQUORUM_PRODUCTION_URL ?? process.env.VEILBID_FLARE_PRODUCTION_URL ?? "https://flare-quorum.vercel.app",
+  process.argv[2] ?? process.env.FLAREQUORUM_PRODUCTION_URL ?? "https://flare-quorum.vercel.app",
 );
 const evidencePath = resolve(
   root,
-  process.env.FLAREQUORUM_PRODUCTION_EVIDENCE ?? process.env.VEILBID_FLARE_PRODUCTION_EVIDENCE ?? "evidence/coston2/web-production-smoke.json",
+  process.env.FLAREQUORUM_PRODUCTION_EVIDENCE ?? "evidence/coston2/web-production-smoke.json",
 );
 const screenshotDirectory = resolve(root, ".local/screenshots");
 const release = JSON.parse(
@@ -31,9 +31,9 @@ function git(...args) {
   return execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
 }
 
-const sourceCommitOverride = (process.env.FLAREQUORUM_SMOKE_SOURCE_COMMIT ?? process.env.VEILBID_FLARE_SMOKE_SOURCE_COMMIT)?.trim() ?? "";
+const sourceCommitOverride = (process.env.FLAREQUORUM_SMOKE_SOURCE_COMMIT)?.trim() ?? "";
 if (sourceCommitOverride !== "" && !/^[0-9a-f]{40}$/i.test(sourceCommitOverride)) {
-  throw new Error("VEILBID_FLARE_SMOKE_SOURCE_COMMIT_INVALID");
+  throw new Error("FLAREQUORUM_SMOKE_SOURCE_COMMIT_INVALID");
 }
 
 function sha256(path) {
@@ -59,7 +59,7 @@ function findChrome() {
 function browserCapture(chrome, path, viewport, screenshotName) {
   const screenshotPath = join(screenshotDirectory, screenshotName);
   for (let attempt = 1; attempt <= 5; attempt += 1) {
-    const profile = mkdtempSync(join(tmpdir(), "veilbid-flare-smoke-"));
+    const profile = mkdtempSync(join(tmpdir(), "flare-quorum-smoke-"));
     try {
       const result = spawnSync(
         chrome,
@@ -153,7 +153,7 @@ const assertions = {
     .every((capture) => !capture.dom.includes("Coston2 state unavailable") && !capture.dom.includes("Flare state unavailable")),
   mobileTenderNavigationActive: mobile.dom.includes('class="primary-nav-link active"') && mobile.dom.includes('aria-current="page"'),
   docsRouteRendered: docsMobile.dom.includes("CURRENT JUDGE PATH") && docsMobile.dom.includes("Five primitives, one product path") && docsMobile.dom.includes("Same-identity restore is not claimed") && docsMobile.dom.includes('class="docs-nav"'),
-  historicalDocsRemainSeparated: docsMobile.dom.includes("OPEN HISTORICAL SEPOLIA BASELINE") && !docsMobile.dom.includes("Use VeilBid from tender to settlement"),
+  historicalDocsRemainSeparated: docsMobile.dom.includes("OPEN HISTORICAL SEPOLIA BASELINE") && !docsMobile.dom.includes("Use FlareQuorum from tender to settlement"),
   desktopScreenshotCaptured: desktop.screenshot.sha256.length === 64,
   mobileScreenshotCaptured: mobile.screenshot.sha256.length === 64,
   docsMobileScreenshotCaptured: docsMobile.screenshot.sha256.length === 64,

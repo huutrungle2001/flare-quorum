@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;700&family=Cormorant+Garamond:wght@300&family=Space+Mono:wght@400;700&display=swap");
 
 :root {
-  --color-veil-green: #a1fea0;
+  --color-brand-accent: #a1fea0;
   --color-ink-black: #000000;
   --color-paper-white: #ffffff;
   --color-paper-warm: #faf9f4;
@@ -23,14 +23,14 @@
 }
 
 .flare-quorum-app {
-  --color-veil-green: #ff8a1f;
+  --color-brand-accent: #ff8a1f;
   --color-input-surface: #fff8ed;
   --color-input-hover: #ffecd6;
   --color-surface-muted: #f5eee7;
   min-height: 100vh;
 }
 
-.veilbid-legacy-app {
+.flare-quorum-legacy-app {
   min-height: 100vh;
 }
 
@@ -77,13 +77,13 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid var(--color-veil-green);
+  outline: 3px solid var(--color-brand-accent);
   outline-offset: 2px;
   box-shadow: 0 0 0 1px var(--color-ink-black);
 }
 
 .skip-link {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   color: var(--color-ink-black);
   font-family: var(--font-mono);
   left: 16px;
@@ -120,7 +120,7 @@ textarea:focus-visible {
 
 .wordmark.active {
   text-decoration: underline;
-  text-decoration-color: var(--color-veil-green);
+  text-decoration-color: var(--color-brand-accent);
   text-decoration-thickness: 4px;
   text-underline-offset: 8px;
 }
@@ -151,7 +151,7 @@ textarea:focus-visible {
 
 .topbar nav a.active,
 .topbar nav a[aria-current="page"] {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border-color: var(--color-ink-black);
 }
 
@@ -176,7 +176,7 @@ textarea:focus-visible {
 
 .network-pill span,
 .signal-dot {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   border-radius: 100%;
   height: 9px;
@@ -214,7 +214,7 @@ textarea:focus-visible {
 }
 
 .wallet-trigger.connected {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   color: var(--color-ink-black);
 }
 
@@ -356,7 +356,7 @@ textarea:focus-visible {
 
 .rolebar-links > button:hover:not(:disabled):not(.active),
 .workspace-subnav-links > button:hover:not(.active) {
-  background: color-mix(in srgb, var(--color-veil-green) 45%, var(--color-paper-white));
+  background: color-mix(in srgb, var(--color-brand-accent) 45%, var(--color-paper-white));
   color: var(--color-ink-black);
 }
 
@@ -371,7 +371,7 @@ textarea:focus-visible {
 }
 
 .rolebar-links > button.active {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   color: var(--color-ink-black);
 }
 
@@ -465,7 +465,7 @@ textarea:focus-visible {
 
 .sidebar-tool-button:hover,
 .sidebar-asset-button:hover {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .sidebar-tool-button span {
@@ -638,7 +638,7 @@ textarea:focus-visible {
 }
 
 .workspace-subnav-links > button.active {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   color: var(--color-ink-black);
 }
 
@@ -690,7 +690,7 @@ textarea:focus-visible {
 
 .context-help-trigger:hover,
 .context-help-trigger:focus-visible {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .context-help-card {
@@ -730,7 +730,7 @@ textarea:focus-visible {
 }
 
 .context-help-card strong {
-  color: var(--color-veil-green);
+  color: var(--color-brand-accent);
   display: block;
   font-size: 0.7rem;
   letter-spacing: 0.1em;
@@ -892,7 +892,7 @@ textarea:focus-visible {
 
 .sidebar-balances .balance-reveal:hover:not(:disabled),
 .sidebar-balances .balance-reveal:focus-visible {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .sidebar-balances .balance-reveal:disabled {
@@ -915,7 +915,7 @@ textarea:focus-visible {
 
 .sidebar-balances .balance-faucet,
 .sidebar-balances .balance-wrap-toggle {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   border-radius: 100px;
   color: var(--color-ink-black);
@@ -929,7 +929,7 @@ textarea:focus-visible {
 }
 
 .sidebar-balances .balance-wrap-toggle {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .sidebar-balances .balance-faucet:disabled,
@@ -971,7 +971,7 @@ textarea:focus-visible {
 
 .balance-wrap-form > div button,
 .balance-wrap-confirm {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   color: var(--color-ink-black);
   cursor: pointer;
@@ -982,7 +982,7 @@ textarea:focus-visible {
 }
 
 .balance-wrap-confirm {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   width: 100%;
 }
 
@@ -1048,7 +1048,7 @@ textarea:focus-visible {
 }
 
 .transaction-toast.success {
-  border-left: 6px solid var(--color-veil-green);
+  border-left: 6px solid var(--color-brand-accent);
 }
 
 .transaction-toast.error {
@@ -1076,8 +1076,8 @@ textarea:focus-visible {
 }
 
 .transaction-toast.success .toast-status-mark {
-  background: var(--color-veil-green);
-  border-color: var(--color-veil-green);
+  background: var(--color-brand-accent);
+  border-color: var(--color-brand-accent);
   color: var(--color-ink-black);
 }
 
@@ -1328,7 +1328,7 @@ main {
 
 .tender-card:hover,
 .tender-card.selected {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .tender-card.selected {
@@ -1409,7 +1409,7 @@ main {
 }
 
 .privacy-badge.verified {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   color: var(--color-ink-black);
 }
 
@@ -1486,7 +1486,7 @@ main {
 }
 
 .lifecycle li.active {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .lifecycle li.complete {
@@ -1687,7 +1687,7 @@ main {
 }
 
 .aperture span {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border-radius: 100%;
   height: 34px;
   width: 34px;
@@ -1707,7 +1707,7 @@ main {
 }
 
 .receipt-panel {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border-bottom: 1px solid var(--color-ink-black);
   display: grid;
   gap: 32px;
@@ -1901,7 +1901,7 @@ main {
 .flare-signal-bid circle,
 .flare-signal-award circle,
 .flare-signal-aperture circle {
-  fill: var(--color-veil-green);
+  fill: var(--color-brand-accent);
 }
 
 .flare-signal-aperture > path:first-child {
@@ -1911,7 +1911,7 @@ main {
 }
 
 .flare-signal-aperture > path:nth-child(2) {
-  fill: var(--color-veil-green);
+  fill: var(--color-brand-accent);
   stroke: var(--color-paper-white);
   stroke-width: 2;
 }
@@ -1975,7 +1975,7 @@ main {
 
 .flare-lifecycle-marquee {
   align-items: center;
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border-bottom: 1px solid var(--color-ink-black);
   display: flex;
   font-size: clamp(1rem, 2vw, 1.55rem);
@@ -2123,7 +2123,7 @@ main {
 }
 
 .award-proof-panel.awarded::before {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border-radius: 100%;
   content: "";
   filter: blur(52px);
@@ -2170,7 +2170,7 @@ main {
 
 .award-proof-panel .secondary-button {
   align-self: end;
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   color: var(--color-ink-black);
   grid-column: 1 / -1;
   justify-self: start;
@@ -2512,7 +2512,7 @@ main {
 .flare-buyer-form > .form-hint,
 .flare-vendor-form > .form-hint,
 .flare-redemption-panel > .form-hint {
-  border-left: 3px solid var(--color-veil-green);
+  border-left: 3px solid var(--color-brand-accent);
   font-family: var(--font-mono);
   font-size: 0.66rem;
   line-height: 1.5;
@@ -2740,7 +2740,7 @@ main {
 }
 
 .wallet-panel.warning {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .wallet-connect {
@@ -2779,7 +2779,7 @@ main {
 }
 
 .provider-button:hover {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .inline-error {
@@ -2932,7 +2932,7 @@ main {
 .vendor-remove-button:focus-visible,
 .vendor-add-button:hover:not(:disabled),
 .vendor-add-button:focus-visible {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .vendor-remove-button:disabled,
@@ -3111,7 +3111,7 @@ main {
 }
 
 .safe-treasury-option.selected {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   box-shadow: inset 0 0 0 2px var(--color-ink-black);
 }
 
@@ -3267,7 +3267,7 @@ main {
 }
 
 .safe-refreshing {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   font-size: 0.68rem;
   margin: 24px 0 -25px;
@@ -3372,7 +3372,7 @@ main {
 
 .safe-balance-eye:hover:not(:disabled),
 .safe-balance-eye:focus-visible {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   color: var(--color-ink-black);
 }
 
@@ -3516,7 +3516,7 @@ main {
 
 .safe-actions-toggle:hover,
 .safe-actions-toggle:focus-visible {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .safe-inline-deposit label,
@@ -3586,7 +3586,7 @@ main {
 
 .safe-tender-setup.is-ready {
   align-items: center;
-  background: color-mix(in srgb, var(--color-veil-green) 24%, var(--color-paper-white));
+  background: color-mix(in srgb, var(--color-brand-accent) 24%, var(--color-paper-white));
   display: flex;
   gap: 20px;
   justify-content: space-between;
@@ -3635,7 +3635,7 @@ main {
 }
 
 .safe-ready-badge {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -3879,7 +3879,7 @@ main {
 }
 
 .safe-vendor-count {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   font-family: var(--font-mono);
   font-size: 0.66rem;
@@ -3902,7 +3902,7 @@ main {
 
 .safe-vendor-row > button,
 .safe-vendor-add {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   color: var(--color-ink-black);
   cursor: pointer;
@@ -3927,7 +3927,7 @@ main {
 .safe-vendor-row > button:focus-visible,
 .safe-vendor-add:hover:not(:disabled),
 .safe-vendor-add:focus-visible {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .safe-vendor-add:disabled {
@@ -4010,7 +4010,7 @@ main {
   border: 2px solid var(--color-ink-black);
   border-radius: 4px;
   box-shadow:
-    inset 5px 0 0 var(--color-veil-green),
+    inset 5px 0 0 var(--color-brand-accent),
     inset 0 -2px 0 var(--color-ink-12);
   caret-color: var(--color-ink-black);
   color: var(--color-ink-black);
@@ -4041,7 +4041,7 @@ main {
 .public-filter-control select:hover:not(:disabled) {
   background-color: var(--color-input-hover);
   box-shadow:
-    inset 7px 0 0 var(--color-veil-green),
+    inset 7px 0 0 var(--color-brand-accent),
     inset 0 -2px 0 var(--color-ink-12);
 }
 
@@ -4055,7 +4055,7 @@ main {
 .public-filter-control select:focus-visible {
   background-color: var(--color-paper-white);
   box-shadow:
-    inset 7px 0 0 var(--color-veil-green),
+    inset 7px 0 0 var(--color-brand-accent),
     0 0 0 1px var(--color-ink-black);
   transform: translateY(-1px);
 }
@@ -4134,7 +4134,7 @@ main {
 }
 
 .safe-tender-submit .eyebrow {
-  color: var(--color-veil-green);
+  color: var(--color-brand-accent);
 }
 
 .safe-tender-submit dl {
@@ -4156,7 +4156,7 @@ main {
 }
 
 .safe-tender-submit dt {
-  color: var(--color-veil-green);
+  color: var(--color-brand-accent);
   font-size: 0.58rem;
   letter-spacing: 0.08em;
 }
@@ -4258,7 +4258,7 @@ main {
 }
 
 .safe-amount-input button[aria-pressed="true"] {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   color: var(--color-ink-black);
 }
 
@@ -4298,7 +4298,7 @@ main {
 
 .safe-unwrap-finalize {
   align-items: center;
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   display: flex;
   gap: 18px;
@@ -4335,7 +4335,7 @@ main {
 
 @keyframes safe-skeleton-pulse {
   to {
-    background: var(--color-veil-green);
+    background: var(--color-brand-accent);
   }
 }
 
@@ -4357,7 +4357,7 @@ main {
 }
 
 .safe-readiness-list li[data-ready="true"] {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .safe-recovery > ul {
@@ -4409,7 +4409,7 @@ main {
 
 .safe-history > summary:hover,
 .safe-history > summary:focus-visible {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .safe-history > summary > span:first-child {
@@ -4470,14 +4470,14 @@ main {
 }
 
 .result-line {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   margin: 0;
   padding: 12px;
 }
 
 .primary-button {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   cursor: pointer;
   font-weight: 700;
@@ -4518,7 +4518,7 @@ main {
 
 .winner-notification-banner {
   align-items: center;
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border-bottom: 1px solid var(--color-ink-black);
   display: grid;
   gap: 18px;
@@ -4623,11 +4623,11 @@ main {
 }
 
 .winner-notification-card[data-read="false"] {
-  border-left-color: var(--color-veil-green);
+  border-left-color: var(--color-brand-accent);
 }
 
 .winner-notification-card[data-read="false"] .winner-notification-state {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .winner-notification-card-copy {
@@ -4675,7 +4675,7 @@ main {
 }
 
 .activity-action-queue[data-attention="true"] {
-  border-top: 4px solid var(--color-veil-green);
+  border-top: 4px solid var(--color-brand-accent);
   padding-top: 25px;
 }
 
@@ -4693,7 +4693,7 @@ main {
 
 .activity-queue-toggle {
   align-items: center;
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   cursor: pointer;
   display: inline-flex;
@@ -4759,7 +4759,7 @@ main {
 
 .activity-queue-summary [data-state="ready"],
 .activity-state-badge[data-state="ready"] {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .activity-queue-summary [data-state="processing"],
@@ -4812,7 +4812,7 @@ main {
 }
 
 .activity-card[data-state="ready"] {
-  border-left: 8px solid var(--color-veil-green);
+  border-left: 8px solid var(--color-brand-accent);
 }
 
 .activity-card[data-state="processing"] {
@@ -4945,7 +4945,7 @@ main {
 }
 
 .activity-history-timeline li::before {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   border-radius: 50%;
   content: "";
@@ -5001,7 +5001,7 @@ main {
 }
 
 .success-line {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -5039,7 +5039,7 @@ main {
 
 .state-panel > span {
   align-items: center;
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   border-radius: 100%;
   display: flex;
@@ -5072,7 +5072,7 @@ main {
 }
 
 .secondary-button {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   border-radius: 25px;
   color: var(--color-ink-black);
@@ -5084,7 +5084,7 @@ main {
 
 .secondary-button:hover:not(:disabled),
 .secondary-button:focus-visible {
-  background: color-mix(in srgb, var(--color-veil-green) 72%, var(--color-ink-black));
+  background: color-mix(in srgb, var(--color-brand-accent) 72%, var(--color-ink-black));
 }
 
 .secondary-button:disabled {
@@ -5264,7 +5264,7 @@ footer p {
 
 .mascot-fill-green,
 .mascot-spark {
-  fill: var(--color-veil-green);
+  fill: var(--color-brand-accent);
 }
 
 .mascot-fill-paper {
@@ -5568,7 +5568,7 @@ footer p {
 }
 
 .release-facts {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
 }
 
 .release-facts dl {
@@ -5614,7 +5614,7 @@ footer p {
 }
 
 .truth-panel .text-link {
-  color: var(--color-veil-green);
+  color: var(--color-brand-accent);
   font-family: var(--font-mono);
 }
 
@@ -5693,7 +5693,7 @@ footer p {
 
 .docs-callout,
 .docs-note {
-  background: var(--color-veil-green);
+  background: var(--color-brand-accent);
   border: 1px solid var(--color-ink-black);
   margin-top: 28px;
   padding: 24px;
