@@ -9,8 +9,8 @@ const requiredFiles = [
   "NEW-WORK-LEDGER.md",
 ];
 const requiredText = [
-  "https://veilbid-flare.vercel.app",
-  "https://github.com/huutrungle2001/veilbid-flare",
+  "https://flare-quorum.vercel.app",
+  "https://github.com/huutrungle2001/flare-quorum",
   "evidence/coston2/three-vendor-recovery.release.json",
   "evidence/coston2/fcc-replacement-recovery.json",
   "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json",

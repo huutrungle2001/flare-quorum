@@ -24,7 +24,7 @@ import (
 	"syscall"
 	"time"
 
-	extserver "github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/pkg/server"
+	extserver "github.com/huutrungle2001/flare-quorum/apps/fcc-extension/pkg/server"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"

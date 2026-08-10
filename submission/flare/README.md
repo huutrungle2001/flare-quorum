@@ -8,17 +8,17 @@ Ethereum Sepolia/Nox release and must not be used as evidence for this package.
 
 | Resource | Link |
 | --- | --- |
-| Live app | [veilbid-flare.vercel.app](https://veilbid-flare.vercel.app) |
+| Live app | [flare-quorum.vercel.app](https://flare-quorum.vercel.app) |
 | Four-minute demo | [`veilbid-flare-demo.mp4`](veilbid-flare-demo.mp4) |
 | Demo evidence | [`judge-demo-video.release.json`](../../evidence/coston2/judge-demo-video.release.json) |
-| Public evidence ledger | [Coston2 Activity/Evidence view](https://veilbid-flare.vercel.app/?role=evidence) |
-| Buyer workspace | [Coston2 Buyer](https://veilbid-flare.vercel.app/?role=buyer) |
-| Vendor workspace | [Coston2 Vendor](https://veilbid-flare.vercel.app/?role=vendor) |
-| Technical docs | [Flare docs](https://veilbid-flare.vercel.app/docs#flare-coston2) |
+| Public evidence ledger | [Coston2 Activity/Evidence view](https://flare-quorum.vercel.app/flare?role=evidence) |
+| Buyer workspace | [Coston2 Buyer](https://flare-quorum.vercel.app/flare?role=buyer) |
+| Vendor workspace | [Coston2 Vendor](https://flare-quorum.vercel.app/flare?role=vendor) |
+| Technical docs | [Flare docs](https://flare-quorum.vercel.app/docs#flare-coston2) |
 | Integration guide | [`docs/integration-guide.md`](../../docs/integration-guide.md) |
 | Validation protocol | [`VALIDATION-PLAN.md`](VALIDATION-PLAN.md) |
 | Community draft | [`COMMUNITY-UPDATE.md`](COMMUNITY-UPDATE.md) |
-| Source | [github.com/huutrungle2001/veilbid-flare](https://github.com/huutrungle2001/veilbid-flare) |
+| Source | [github.com/huutrungle2001/flare-quorum](https://github.com/huutrungle2001/flare-quorum) |
 | Hosted ingress health | [Railway `/health`](https://veilbid-flare-ingress-production.up.railway.app/health) |
 
 The app and ingress use Coston2 chain ID `114` and test assets only. A wallet is
@@ -50,15 +50,15 @@ FCC is essential: the winner is computed from sealed bid state inside the
 
 ## Judge route (no wallet)
 
-1. Open the [public dossier](https://veilbid-flare.vercel.app/).
+1. Open the [public dossier](https://flare-quorum.vercel.app/).
 2. Read the verified FCC manager, extension `66011`, code version `v0.2.2`,
    three machine fingerprints, FTestXRP, FTSO, FDC, FAssets, and Smart Account
    bindings.
-3. Open [Activity/Evidence](https://veilbid-flare.vercel.app/?role=evidence)
+3. Open [Activity/Evidence](https://flare-quorum.vercel.app/flare?role=evidence)
    and inspect the finalized checkpoint ledger. It exposes rules hash, receipt
    quorum, ordered root, FTSO snapshot, FCC binding, and award/refund state; it
    never fetches bid payloads.
-4. Open the [Buyer workspace](https://veilbid-flare.vercel.app/?role=buyer) to
+4. Open the [Buyer workspace](https://flare-quorum.vercel.app/flare?role=buyer) to
    read current AssetManager fee/address state and prepare the exact
    wallet-ready XRPL Payment draft, then preview the public-safe Smart Account
    `0xFE` job and memo. The optional GemWallet Testnet action verifies the
@@ -70,7 +70,7 @@ FCC is essential: the winner is computed from sealed bid state inside the
    `evidence/coston2/web-xrp-funding-checkpoint.json`.
 5. Open the awarded Coston2 tender and follow the public market and award
    receipt contracts in the explorer.
-6. Use the [Flare docs](https://veilbid-flare.vercel.app/docs#flare-coston2) to
+6. Use the [Flare docs](https://flare-quorum.vercel.app/docs#flare-coston2) to
    distinguish the current release from the historical `/room` Sepolia app.
 
 ## Verified public deployment

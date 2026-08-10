@@ -9,7 +9,7 @@ import (
 	"github.com/flare-foundation/go-flare-common/pkg/tee/instruction"
 	teetypes "github.com/flare-foundation/tee-node/pkg/types"
 
-	"github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/internal/config"
+	"github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/config"
 )
 
 const resultLogOK = "ok"

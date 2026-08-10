@@ -1,6 +1,6 @@
 package server
 
-import extension "github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/internal/extension"
+import extension "github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/extension"
 
 // StartExtension creates and starts the VeilBid extension server in a goroutine.
 // Returns an error channel that receives any ListenAndServe failure (e.g., port already in use).

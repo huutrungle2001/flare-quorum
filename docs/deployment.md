@@ -449,7 +449,7 @@ The championship release provides:
   FAssets, or indexer dependencies fail.
 
 The current v2 judge deployment is the separate Vercel project
-`veilbid-flare.vercel.app`; it is not the historical `veilbid-three` project.
+`flare-quorum.vercel.app`; it is not the historical `veilbid-three` project.
 The ciphertext-only vendor ingress is the separate Railway v2 service at
 `https://veilbid-flare-ingress-production.up.railway.app`. Its `/health` route
 is public and returns only the readiness envelope `{status, service, chainId,

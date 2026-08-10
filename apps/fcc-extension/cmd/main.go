@@ -10,8 +10,8 @@ import (
 
 	"github.com/flare-foundation/go-flare-common/pkg/logger"
 
-	"github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/internal/config"
-	extension "github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/internal/extension"
+	"github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/config"
+	extension "github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/extension"
 )
 
 func main() {

@@ -183,8 +183,8 @@ export function FlareDocsPage() {
             <p>The judge package, release manifest, generated bindings, and sanitized evidence are the authorities for the current release.</p>
             <ul className="docs-checklist">
               <li><a className="text-link" href="/flare?role=evidence">Open the finalized Auditor evidence ↗</a></li>
-              <li><a className="text-link" href="https://github.com/huutrungle2001/veilbid-flare/blob/main/submission/flare/README.md" target="_blank" rel="noreferrer">Read the judge package ↗</a></li>
-              <li><a className="text-link" href="https://github.com/huutrungle2001/veilbid-flare/blob/main/docs/verification.md" target="_blank" rel="noreferrer">Read the verification matrix ↗</a></li>
+              <li><a className="text-link" href="https://github.com/huutrungle2001/flare-quorum/blob/main/submission/flare/README.md" target="_blank" rel="noreferrer">Read the judge package ↗</a></li>
+              <li><a className="text-link" href="https://github.com/huutrungle2001/flare-quorum/blob/main/docs/verification.md" target="_blank" rel="noreferrer">Read the verification matrix ↗</a></li>
               <li>Run <code>pnpm lint</code>, <code>pnpm test</code>, <code>pnpm build</code>, <code>pnpm evidence:validate</code>, and <code>pnpm flare:judge:check</code> from the repository.</li>
             </ul>
           </section>

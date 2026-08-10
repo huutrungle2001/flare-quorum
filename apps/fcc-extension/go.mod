@@ -1,4 +1,4 @@
-module github.com/huutrungle2001/veilbid-flare/apps/fcc-extension
+module github.com/huutrungle2001/flare-quorum/apps/fcc-extension
 
 go 1.25.8
 

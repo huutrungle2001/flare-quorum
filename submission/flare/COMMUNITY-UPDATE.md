@@ -10,8 +10,8 @@ that Flare or a user has endorsed the project.
 > real XRPL testnet payment → FDC `XRPPayment` proof → Smart Account `0xFE`
 > direct mint/fund path, FTSO XRP/USD binding, and an official amount-based
 > FAssets redemption request. Judges can inspect the wallet-free evidence
-> ledger at https://veilbid-flare.vercel.app/?role=evidence and the integration
-> guide at https://veilbid-flare.vercel.app/docs#flare-coston2.
+> ledger at https://flare-quorum.vercel.app/flare?role=evidence and the integration
+> guide at https://flare-quorum.vercel.app/docs#flare-coston2.
 >
 > Current limits are explicit: Coston2/test assets, simulated TEE runtime,
 > unaudited hackathon software, no instant native-XRP payout claim, and

@@ -14,8 +14,8 @@ import (
 	"github.com/flare-foundation/go-flare-common/pkg/logger"
 	teeServer "github.com/flare-foundation/tee-node/pkg/server"
 
-	"github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/internal/config"
-	extserver "github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/pkg/server"
+	"github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/config"
+	extserver "github.com/huutrungle2001/flare-quorum/apps/fcc-extension/pkg/server"
 )
 
 func main() {

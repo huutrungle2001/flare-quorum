@@ -16,11 +16,11 @@ import (
 	teetypes "github.com/flare-foundation/tee-node/pkg/types"
 	teeutils "github.com/flare-foundation/tee-node/pkg/utils"
 
-	"github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/internal/config"
-	"github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/internal/sealedstore"
-	"github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/internal/teeclient"
-	"github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/pkg/protocol"
-	"github.com/huutrungle2001/veilbid-flare/apps/fcc-extension/pkg/types"
+	"github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/config"
+	"github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/sealedstore"
+	"github.com/huutrungle2001/flare-quorum/apps/fcc-extension/internal/teeclient"
+	"github.com/huutrungle2001/flare-quorum/apps/fcc-extension/pkg/protocol"
+	"github.com/huutrungle2001/flare-quorum/apps/fcc-extension/pkg/types"
 )
 
 const (

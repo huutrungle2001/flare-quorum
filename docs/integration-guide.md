@@ -32,7 +32,7 @@ journey.
 - Network: Flare Coston2, chain ID `114`.
 - Market, award receipt, FTestXRP, FCC manager, extension, and feed identifiers
   are maintained in [`packages/flare-contracts/deployments/coston2.release.json`](../packages/flare-contracts/deployments/coston2.release.json).
-- The wallet-free judge route is [`veilbid-flare.vercel.app`](https://veilbid-flare.vercel.app).
+- The wallet-free judge route is [`flare-quorum.vercel.app`](https://flare-quorum.vercel.app).
 - Public evidence is indexed from [`evidence/coston2/`](../evidence/coston2/);
   it contains commitments, hashes, statuses, blocks, and assertion booleans,
   never bids, ciphertext, credentials, or keys.

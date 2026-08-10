@@ -56,8 +56,8 @@ pnpm --filter @veilbid/tender-room dev
 pnpm --filter @veilbid/tender-room test
 pnpm --filter @veilbid/tender-room build
 pnpm test:production https://veilbid-three.vercel.app
-pnpm test:flare:production https://veilbid-flare.vercel.app
-pnpm test:flare:accessibility https://veilbid-flare.vercel.app
+pnpm test:flare:production https://flare-quorum.vercel.app
+pnpm test:flare:accessibility https://flare-quorum.vercel.app
 ```
 
 `VITE_SEPOLIA_RPC_URL` may override the historical public read-only RPC. The Coston2 role
