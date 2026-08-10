@@ -5,12 +5,30 @@ import { createPublicClient, createWalletClient, getAddress, http, parseEventLog
 import { privateKeyToAccount } from "viem/accounts";
 import { setLocalEnvironmentValues } from "../flare/local-fcc-secrets.mjs";
 import { evmKeyType, teeManagerRegistrationAbi } from "../flare/fcc-foundation-registration.mjs";
+import { readV2ReleasePlan } from "../flare/v2-release.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const execute = process.argv.includes("--execute");
-const statePath = resolve(root, ".local/fcc/market-extension-registration.state.json");
-const evidencePath = resolve(root, "evidence/coston2/fcc-market-extension-registration.json");
-const candidate = JSON.parse(readFileSync(resolve(root, "packages/flare-contracts/deployments/coston2.market-candidate.json"), "utf8"));
+const v2 = process.env.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
+const v2Plan = v2 ? readV2ReleasePlan(root) : undefined;
+const profile = v2 ? {
+  label: "V2",
+  contractName: "FlareQuorumMarketV2",
+  state: ".local/fcc/market-v2-extension-registration.state.json",
+  evidence: v2Plan.artifacts.extensionRegistrationEvidence,
+  candidate: v2Plan.artifacts.candidateManifest,
+  extensionEnvironmentName: v2Plan.runtimeEnvironment.extensionId,
+} : {
+  label: "V1",
+  contractName: "VeilBidFlareMarket",
+  state: ".local/fcc/market-extension-registration.state.json",
+  evidence: "evidence/coston2/fcc-market-extension-registration.json",
+  candidate: "packages/flare-contracts/deployments/coston2.market-candidate.json",
+  extensionEnvironmentName: "FCC_MARKET_EXTENSION_ID",
+};
+const statePath = resolve(root, profile.state);
+const evidencePath = resolve(root, profile.evidence);
+const candidate = JSON.parse(readFileSync(resolve(root, profile.candidate), "utf8"));
 const codeVersion = JSON.parse(readFileSync(resolve(root, "evidence/coston2/fcc-code-version.json"), "utf8"));
 const foundations = JSON.parse(readFileSync(resolve(root, "tooling/flare/coston2-foundations.json"), "utf8"));
 const rpcUrl = process.env.COSTON2_RPC_URL?.trim();
@@ -20,15 +38,15 @@ const privateKey = rawKey.startsWith("0x") ? rawKey : `0x${rawKey}`;
 if (!/^0x[0-9a-fA-F]{64}$/.test(privateKey)) throw new Error("FLARE_DEPLOYMENT_PRIVATE_KEY_INVALID");
 const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
 const manager = getAddress(foundations.contracts.flareTeeManager);
-const sender = getAddress(candidate.contracts.VeilBidFlareMarket.address);
+const sender = getAddress(candidate.contracts[profile.contractName].address);
 const account = privateKeyToAccount(privateKey);
 if (account.address !== getAddress(foundations.network.declaredDeployer)) throw new Error("DECLARED_DEPLOYER_MISMATCH");
 try {
   execFileSync("git", ["merge-base", "--is-ancestor", candidate.sourceCommit, sourceCommit], { cwd: root, stdio: "ignore" });
 } catch {
-  throw new Error("MARKET_CANDIDATE_SOURCE_NOT_ANCESTOR");
+  throw new Error(`${profile.label}_MARKET_CANDIDATE_SOURCE_NOT_ANCESTOR`);
 }
-if (existsSync(evidencePath)) throw new Error("FCC_MARKET_EXTENSION_EVIDENCE_ALREADY_EXISTS");
+if (existsSync(evidencePath)) throw new Error(`FCC_MARKET_${profile.label}_EXTENSION_EVIDENCE_ALREADY_EXISTS`);
 
 const chain = {
   id: 114,
@@ -41,7 +59,7 @@ const publicClient = createPublicClient({ chain, transport });
 const walletClient = createWalletClient({ account, chain, transport });
 const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath, "utf8")) : { schemaVersion: 1, sourceCommit, manager, sender };
 if (state.schemaVersion !== 1 || state.sourceCommit !== sourceCommit || getAddress(state.manager) !== manager || getAddress(state.sender) !== sender) {
-  throw new Error("FCC_MARKET_EXTENSION_STATE_MISMATCH");
+  throw new Error(`FCC_MARKET_${profile.label}_EXTENSION_STATE_MISMATCH`);
 }
 const writeState = () => {
   mkdirSync(resolve(root, ".local/fcc"), { recursive: true, mode: 0o700 });
@@ -49,7 +67,7 @@ const writeState = () => {
 };
 const wait = async (hash) => {
   const receipt = await publicClient.waitForTransactionReceipt({ hash, confirmations: 2 });
-  if (receipt.status !== "success") throw new Error("FCC_MARKET_EXTENSION_TRANSACTION_FAILED");
+  if (receipt.status !== "success") throw new Error(`FCC_MARKET_${profile.label}_EXTENSION_TRANSACTION_FAILED`);
   return receipt;
 };
 const send = async (functionName, args) => {
@@ -73,9 +91,9 @@ const preflight = {
   codeHashPresent: /^0x[0-9a-f]{64}$/i.test(codeVersion.publicIdentifiers.codeHash ?? ""),
   platformIsSimulated: codeVersion.publicIdentifiers.platform.toLowerCase() === stringToHex("TEST_PLATFORM", { size: 32 }).toLowerCase(),
 };
-if (!Object.values(preflight).every(Boolean)) throw new Error("FCC_MARKET_EXTENSION_PREFLIGHT_FAILED");
+if (!Object.values(preflight).every(Boolean)) throw new Error(`FCC_MARKET_${profile.label}_EXTENSION_PREFLIGHT_FAILED`);
 if (!execute) {
-  console.log(JSON.stringify({ status: "READY", scope: "preflight only; no transaction sent", manager, sender, nextPublicExtensionId: nextPublicExtensionId.toString(), balanceWei: balance.toString(), preflight }, null, 2));
+  console.log(JSON.stringify({ status: "READY", profile: profile.label, scope: "preflight only; no transaction sent", manager, sender, nextPublicExtensionId: nextPublicExtensionId.toString(), balanceWei: balance.toString(), preflight }, null, 2));
   process.exit(0);
 }
 if (execFileSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" }).trim() !== "") throw new Error("FCC_MARKET_EXTENSION_REQUIRES_CLEAN_WORKTREE");
@@ -99,7 +117,7 @@ if (state.registrationTransaction) {
   state.extensionId = extensionId.toString();
   writeState();
 }
-if (!extensionId || extensionId < 0x10000n) throw new Error("FCC_MARKET_EXTENSION_ID_INVALID");
+if (!extensionId || extensionId < 0x10000n) throw new Error(`FCC_MARKET_${profile.label}_EXTENSION_ID_INVALID`);
 
 const addIfMissing = async (readFunctionName, readArgs, writeFunctionName, writeArgs) => {
   const already = await publicClient.readContract({ address: manager, abi: teeManagerRegistrationAbi, functionName: readFunctionName, args: readArgs });
@@ -148,10 +166,10 @@ const assertions = {
   versionMatches: codeHashInfo[0].toLowerCase() === version.toLowerCase(),
   platformMatches: codeHashInfo[1].length === 1 && codeHashInfo[1][0].toLowerCase() === platform.toLowerCase(),
 };
-if (!Object.values(assertions).every(Boolean)) throw new Error("FCC_MARKET_EXTENSION_VERIFICATION_FAILED");
+if (!Object.values(assertions).every(Boolean)) throw new Error(`FCC_MARKET_${profile.label}_EXTENSION_VERIFICATION_FAILED`);
 const evidence = {
   schemaVersion: 1,
-  gate: "FCC_MARKET_EXTENSION_REGISTRATION",
+  gate: v2 ? "FCC_MARKET_V2_EXTENSION_REGISTRATION" : "FCC_MARKET_EXTENSION_REGISTRATION",
   status: "REGISTERED_BOUND_CONFIGURATION_READY",
   recordedAt: new Date().toISOString(),
   sourceCommit,
@@ -160,11 +178,15 @@ const evidence = {
   assertions,
   blockers: ["PRODUCT_TEE_MACHINES_NOT_REGISTERED", "GATES_C_E_NOT_PASSED"],
   notes: [
-    "The immutable VeilBidFlareMarket is the registered instructions sender for this product extension.",
-    "The three foundation machines remain bound to extension 66007; product machines are registered separately before tender creation.",
+    `The immutable ${profile.contractName} is the registered instructions sender for this product extension.`,
+    v2
+      ? "V2 requires three fresh TEE machine identities; no V1 machine may be reused or retired by this flow."
+      : "The three foundation machines remain separate; product machines are registered independently before tender creation.",
     "No deployment key, proxy credential, attestation body, raw signature, or bid data is recorded.",
   ],
 };
 writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
-setLocalEnvironmentValues(resolve(root, ".env.local"), { FCC_MARKET_EXTENSION_ID: `0x${extensionId.toString(16).padStart(64, "0")}` });
-console.log(JSON.stringify({ gate: evidence.gate, status: evidence.status, extensionId: extensionId.toString(), sender, registrationTransaction: state.registrationTransaction, assertions, evidence: "evidence/coston2/fcc-market-extension-registration.json" }, null, 2));
+setLocalEnvironmentValues(resolve(root, ".env.local"), {
+  [profile.extensionEnvironmentName]: `0x${extensionId.toString(16).padStart(64, "0")}`,
+});
+console.log(JSON.stringify({ gate: evidence.gate, status: evidence.status, profile: profile.label, extensionId: extensionId.toString(), sender, registrationTransaction: state.registrationTransaction, assertions, evidence: profile.evidence }, null, 2));

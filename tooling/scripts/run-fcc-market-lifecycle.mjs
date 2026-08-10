@@ -32,16 +32,21 @@ import {
 import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
 import { lifecyclePathBlocker } from "../flare/market-lifecycle-guards.mjs";
 import { roundMilliseconds, summarizeIngressTimings } from "../flare/ingress-benchmarks.mjs";
+import { readV2ReleasePlan } from "../flare/v2-release.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const execute = process.argv.includes("--execute");
+const v2 = process.env.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
+const v2Plan = v2 ? readV2ReleasePlan(root) : undefined;
 const evidencePath = resolve(
   root,
-  process.env.FCC_MARKET_EVIDENCE_PATH ?? "evidence/coston2/gate-c-e-f-live-lifecycle.json",
+  process.env.FCC_MARKET_EVIDENCE_PATH ??
+    (v2 ? v2Plan.artifacts.successLifecycleEvidence : "evidence/coston2/gate-c-e-f-live-lifecycle.json"),
 );
 const statePath = resolve(
   root,
-  process.env.FCC_MARKET_STATE_PATH ?? ".local/fcc/market-lifecycle.state.json",
+  process.env.FCC_MARKET_STATE_PATH ??
+    (v2 ? ".local/fcc/market-v2-success-lifecycle.state.json" : ".local/fcc/market-lifecycle.state.json"),
 );
 const vendorCount = Number(process.env.FCC_MARKET_VENDOR_COUNT ?? "1");
 if (!Number.isInteger(vendorCount) || vendorCount < 1 || vendorCount > 3) {
@@ -72,7 +77,9 @@ const awardReceiptAbi = parseAbi([
   "function ownerOf(uint256 tokenId) view returns (address)",
 ]);
 const marketAbi = JSON.parse(readFileSync(
-  resolve(root, "packages/flare-bindings/generated/abis/VeilBidFlareMarket.json"),
+  resolve(root, v2
+    ? v2Plan.artifacts.candidateMarketAbi
+    : "packages/flare-bindings/generated/abis/VeilBidFlareMarket.json"),
   "utf8",
 ));
 const chain = {
@@ -100,7 +107,10 @@ function normalizedPrivateKey(value, code) {
 }
 
 function publicUrls() {
-  const urls = required(process.env.FLARE_FCC_PROXY_URLS, "FCC_MARKET_PROXY_URLS_MISSING")
+  const urls = required(
+    v2 ? process.env.FLARE_FCC_V2_PROXY_URLS : process.env.FLARE_FCC_PROXY_URLS,
+    "FCC_MARKET_PROXY_URLS_MISSING",
+  )
     .split(",").map((value) => value.trim().replace(/\/+$/, ""));
   if (urls.length !== 3 || new Set(urls).size !== 3 || urls.some((url) => !/^https:\/\/[^/?#]+$/.test(url))) {
     throw new Error("FCC_MARKET_PROXY_URLS_INVALID");
@@ -109,7 +119,9 @@ function publicUrls() {
 }
 
 function apiKeys() {
-  const keys = [1, 2, 3].map((index) => process.env[`FCC_DIRECT_API_KEY_${index}`]);
+  const keys = [1, 2, 3].map((index) =>
+    process.env[v2 ? `FCC_V2_DIRECT_API_KEY_${index}` : `FCC_DIRECT_API_KEY_${index}`]
+  );
   if (keys.some((value) => typeof value !== "string" || value.length < 32)) {
     throw new Error("FCC_MARKET_DIRECT_API_KEYS_MISSING");
   }
@@ -359,15 +371,25 @@ async function main() {
   const deploymentKey = normalizedPrivateKey(process.env.FLARE_DEPLOYMENT_PRIVATE_KEY, "FCC_MARKET_DEPLOYMENT_KEY_INVALID");
   const account = privateKeyToAccount(deploymentKey);
   const foundations = JSON.parse(readFileSync(resolve(root, "tooling/flare/coston2-foundations.json"), "utf8"));
-  const registration = JSON.parse(readFileSync(resolve(root, "evidence/coston2/fcc-market-extension-registration.json"), "utf8"));
-  const machinesEvidence = JSON.parse(readFileSync(resolve(root, "evidence/coston2/fcc-market-machines.json"), "utf8"));
+  const registration = JSON.parse(readFileSync(resolve(
+    root,
+    v2 ? v2Plan.artifacts.extensionRegistrationEvidence : "evidence/coston2/fcc-market-extension-registration.json",
+  ), "utf8"));
+  const machinesEvidence = JSON.parse(readFileSync(resolve(
+    root,
+    v2 ? v2Plan.artifacts.machineEvidence : "evidence/coston2/fcc-market-machines.json",
+  ), "utf8"));
   const codeVersionEvidence = JSON.parse(readFileSync(resolve(root, "evidence/coston2/fcc-code-version.json"), "utf8"));
-  const candidate = JSON.parse(readFileSync(resolve(root, "packages/flare-contracts/deployments/coston2.market-candidate.json"), "utf8"));
-  const market = getAddress(candidate.contracts.VeilBidFlareMarket.address);
+  const candidate = JSON.parse(readFileSync(resolve(
+    root,
+    v2 ? v2Plan.artifacts.candidateManifest : "packages/flare-contracts/deployments/coston2.market-candidate.json",
+  ), "utf8"));
+  const market = getAddress(candidate.contracts[v2 ? "FlareQuorumMarketV2" : "VeilBidFlareMarket"].address);
   const manager = getAddress(registration.publicIdentifiers.manager);
   const token = getAddress(foundations.contracts.fTestXRP);
   const ftso = getAddress(foundations.contracts.ftsoV2);
-  const awardReceipt = getAddress(candidate.contracts.VeilBidFlareAwardReceipt?.address ?? candidate.contracts.VeilBidFlareAwardReceipt ?? "0x0000000000000000000000000000000000000000");
+  const receiptRecord = candidate.contracts[v2 ? "FlareQuorumAwardReceiptV2" : "VeilBidFlareAwardReceipt"];
+  const awardReceipt = getAddress(receiptRecord?.address ?? receiptRecord ?? zeroAddress);
   const extensionId = BigInt(registration.publicIdentifiers.extensionId);
   const codeHash = codeVersionEvidence.publicIdentifiers.codeHash;
   // The release evidence stores the registry version with a leading `v`,
@@ -632,7 +654,9 @@ async function main() {
   const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
   const evidence = {
     schemaVersion: 1,
-    gate: selectionOutageIndex === null ? "C-E-F" : "C-E-F-RECOVERY",
+    gate: v2
+      ? selectionOutageIndex === null ? "FLARE_V2_SUCCESS_LIFECYCLE" : "FLARE_V2_SUCCESS_RECOVERY"
+      : selectionOutageIndex === null ? "C-E-F" : "C-E-F-RECOVERY",
     status: "PASSED",
     recordedAt: new Date().toISOString(),
     sourceCommit,
@@ -692,6 +716,7 @@ async function main() {
       allSamples: summarizeIngressTimings(bidRecords.flatMap(({ ingressTimings: timings }) => timings)),
     },
     assertions: {
+      ...(v2 ? { fccWinnerSelected: true } : {}),
       marketSenderBoundToExtension: true,
       threeProductionMachinesFrozen: true,
       threeEncryptedBidsAcceptedByDistinctTees: bidRecords.length === vendorCount && bidRecords.every(({ receipts }) => receipts.length === 3),
@@ -705,6 +730,7 @@ async function main() {
         : { oneSelectionResultUnavailableStillFinalized: quorum.signers.length === 2 }),
       selectionResultMatchesCommonRoot: equalHex(quorum.result.orderedBidRoot, context.orderedBidRoot),
       ftestXrpWinnerPayoutConserved: buyerDelta === winningAmount && vendorDeltas[0] === winningAmount && vendorDeltas.slice(1).every((delta) => delta === 0n) && marketTokenAfter === marketTokenBefore,
+      ...(v2 ? { escrowConserved: buyerDelta === winningAmount && vendorDeltas[0] === winningAmount && vendorDeltas.slice(1).every((delta) => delta === 0n) && marketTokenAfter === marketTokenBefore } : {}),
       awardReceiptMintedToWinner: awardOwner === winner,
       finalTenderAwarded: Number(field(finalized, "status", 21)) === 4,
       independentBidIngressLatencyRecorded: bidRecords.every(({ ingressTimings: timings }) => timings.length === 3),

@@ -167,18 +167,24 @@ export async function inspectMachineRegistrationEndpoints({
 }
 
 export function machineRegistrationEnvironment(environment = process.env) {
-  const publicUrls = list(environment.FLARE_FCC_PROXY_URLS).map(normalizeMachineOrigin);
-  const configuredControlUrls = list(environment.FCC_PROXY_CONTROL_URLS).map(normalizeMachineOrigin);
-  const configuredLocalUrls = list(environment.FCC_PROXY_LOCAL_URLS).map(normalizeMachineOrigin);
+  const v2 = environment.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
+  const publicUrls = list(v2 ? environment.FLARE_FCC_V2_PROXY_URLS : environment.FLARE_FCC_PROXY_URLS)
+    .map(normalizeMachineOrigin);
+  const configuredControlUrls = list(v2 ? environment.FCC_V2_PROXY_CONTROL_URLS : environment.FCC_PROXY_CONTROL_URLS)
+    .map(normalizeMachineOrigin);
+  const configuredLocalUrls = list(v2 ? environment.FCC_V2_PROXY_LOCAL_URLS : environment.FCC_PROXY_LOCAL_URLS)
+    .map(normalizeMachineOrigin);
   return {
     publicUrls,
     controlUrls: configuredControlUrls.length > 0
       ? configuredControlUrls
       : configuredLocalUrls.length > 0
         ? configuredLocalUrls
-        : ["http://127.0.0.1:6674", "http://127.0.0.1:6675", "http://127.0.0.1:6676"],
+        : v2 ? [] : ["http://127.0.0.1:6674", "http://127.0.0.1:6675", "http://127.0.0.1:6676"],
     normalProxyUrl:
-      environment.NORMAL_PROXY_URL?.trim() || "https://tee-proxy-coston2-1.flare.rocks/",
+      v2
+        ? environment.FCC_V2_NORMAL_PROXY_URL?.trim() || ""
+        : environment.NORMAL_PROXY_URL?.trim() || "https://tee-proxy-coston2-1.flare.rocks/",
   };
 }
 
@@ -190,8 +196,10 @@ export function machineRegistrationEnvironment(environment = process.env) {
  * operators running a different machine set.
  */
 export function registeredMachineExtensionId(environment = process.env) {
+  const v2 = environment.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
   return String(
     environment.FCC_MACHINES_EXTENSION_ID?.trim() ||
+      (v2 ? environment.FCC_V2_EXTENSION_ID?.trim() : "") ||
       environment.FCC_MARKET_EXTENSION_ID?.trim() ||
       environment.FCC_EXTENSION_ID?.trim() ||
       "",
@@ -201,6 +209,9 @@ export function registeredMachineExtensionId(environment = process.env) {
 export function machineEvidenceRelativePath(environment = process.env) {
   const configured = environment.FCC_MACHINE_EVIDENCE_PATH?.trim();
   if (configured) return configured;
+  if (environment.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2") {
+    return "evidence/coston2/fcc-market-v2-machines.json";
+  }
   const selected = registeredMachineExtensionId(environment).toLowerCase();
   const product = String(environment.FCC_MARKET_EXTENSION_ID ?? "").trim().toLowerCase();
   return product !== "" && selected === product

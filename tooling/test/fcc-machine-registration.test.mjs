@@ -26,6 +26,26 @@ test("routes product and foundation machine evidence to separate canonical files
   }), "evidence/coston2/custom.json");
 });
 
+test("routes V2 machines through isolated IDs, endpoints, and evidence", () => {
+  const v2Id = `0x${"0".repeat(59)}101ff`;
+  const environment = {
+    FCC_RELEASE_PROFILE: "v2",
+    FCC_V2_EXTENSION_ID: v2Id,
+    FCC_MARKET_EXTENSION_ID: `0x${"0".repeat(59)}101db`,
+    FLARE_FCC_V2_PROXY_URLS: "https://v2-1.example,https://v2-2.example,https://v2-3.example",
+    FCC_V2_PROXY_CONTROL_URLS: "https://control-1.example,https://control-2.example,https://control-3.example",
+    FCC_V2_NORMAL_PROXY_URL: "https://normal-v2.example",
+  };
+  assert.equal(registeredMachineExtensionId(environment), v2Id);
+  assert.equal(machineEvidenceRelativePath(environment), "evidence/coston2/fcc-market-v2-machines.json");
+  assert.deepEqual(machineRegistrationEnvironment(environment), {
+    publicUrls: ["https://v2-1.example", "https://v2-2.example", "https://v2-3.example"],
+    controlUrls: ["https://control-1.example", "https://control-2.example", "https://control-3.example"],
+    normalProxyUrl: "https://normal-v2.example",
+  });
+  assert.deepEqual(machineRegistrationEnvironment({ FCC_RELEASE_PROFILE: "v2" }).controlUrls, []);
+});
+
 const expected = {
   extensionId: `0x${"00".repeat(29)}0101d7`,
   initialOwner: "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",

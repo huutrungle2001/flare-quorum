@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import {
   chmodSync,
+  existsSync,
   mkdirSync,
   readFileSync,
   statSync,
@@ -43,6 +44,7 @@ const managerAbi = parseAbi([
   "function updateTeeMachineSettings(address teeId,address teeProxyId,string url)",
 ]);
 const repositoryRoot = resolve(import.meta.dirname, "../..");
+const v2 = process.env.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
 const environmentPath = resolve(repositoryRoot, ".env.local");
 const runtimeDirectory = resolve(repositoryRoot, ".local/fcc/registration");
 const binaryDirectory = resolve(repositoryRoot, ".local/fcc/bin");
@@ -253,6 +255,18 @@ try {
     expected,
     forbiddenHostnameSuffix: manifest.externalRequirements.forbiddenProxyHostnameSuffix,
   });
+  if (v2 && endpointResult.machines.length > 0) {
+    const v1Release = JSON.parse(readFileSync(resolve(
+      repositoryRoot,
+      "packages/flare-contracts/deployments/coston2.release.json",
+    ), "utf8"));
+    const v1MachineIds = new Set(
+      (v1Release.fcc?.teeIds ?? []).map((teeId) => teeId.toLowerCase()),
+    );
+    if (endpointResult.machines.some(({ teeId }) => v1MachineIds.has(teeId.toLowerCase()))) {
+      extraBlockers.push("V2_MACHINE_IDENTITY_REUSES_V1");
+    }
+  }
   let activeSet;
   if (
     secureRpcUrl(rpcUrl) &&
@@ -286,6 +300,15 @@ try {
     console.log(JSON.stringify(preflight, null, 2));
     if (preflight.status !== "READY") process.exitCode = 1;
   } else {
+    if (v2 && execFileSync("git", ["status", "--porcelain"], {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    }).trim()) {
+      throw new Error("FCC_MARKET_V2_MACHINES_REQUIRE_CLEAN_WORKTREE");
+    }
+    if (v2 && existsSync(evidencePath)) {
+      throw new Error("FCC_MARKET_V2_MACHINE_EVIDENCE_ALREADY_EXISTS");
+    }
     mkdirSync(runtimeDirectory, { recursive: true, mode: 0o700 });
     chmodSync(runtimeDirectory, 0o700);
     const addressesPath = resolve(runtimeDirectory, "coston2-addresses.json");
@@ -347,7 +370,7 @@ try {
     });
     const evidence = {
       schemaVersion: 1,
-      gate: "0-fcc-machines",
+      gate: v2 ? "FCC_MARKET_V2_MACHINES" : "0-fcc-machines",
       status: verification.status,
       recordedAt: new Date().toISOString(),
       sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, encoding: "utf8" }).trim(),
@@ -366,6 +389,7 @@ try {
         threeDistinctIdentities: new Set(verification.machines.map(({ teeId }) => teeId)).size === 3,
         exactActiveMachineSet: verification.activeSet.status === "PASSED",
       },
+      blockers: [],
       notes: [
         "This evidence records public Coston2 machine bindings only and does not claim hardware-backed confidentiality.",
         "No deployment key, TEE key, proxy key, direct API key, indexer credential, raw signature, attestation, or bid payload is recorded.",
@@ -373,9 +397,10 @@ try {
     };
     if (verification.status !== "PASSED") throw new Error("FCC_MACHINE_ONCHAIN_VERIFICATION_FAILED");
     mkdirSync(resolve(repositoryRoot, "evidence/coston2"), { recursive: true });
-    writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`);
+    writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, v2 ? { flag: "wx" } : {});
     setLocalEnvironmentValues(environmentPath, {
-      FLAREQUORUM_FCC_TEE_IDS: verification.machines.map(({ teeId }) => teeId).join(","),
+      [v2 ? "FCC_V2_TEE_IDS" : "FLAREQUORUM_FCC_TEE_IDS"]:
+        verification.machines.map(({ teeId }) => teeId).join(","),
     });
     console.log(JSON.stringify({
       gate: evidence.gate,
@@ -387,7 +412,7 @@ try {
   }
 } catch (error) {
   console.error(JSON.stringify({
-    gate: "0-fcc-machines",
+    gate: v2 ? "FCC_MARKET_V2_MACHINES" : "0-fcc-machines",
     status: "FAILED",
     code: error instanceof Error ? error.message : "FCC_MACHINE_REGISTRATION_FAILED",
   }));

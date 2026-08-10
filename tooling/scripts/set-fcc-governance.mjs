@@ -35,6 +35,7 @@ const governanceAbi = parseAbi([
 ]);
 
 const root = resolve(import.meta.dirname, "../..");
+const v2 = process.env.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
 
 function evidenceFilePath(value, fallback, variableName) {
   const relativePath = String(value ?? fallback).trim();
@@ -46,12 +47,14 @@ function evidenceFilePath(value, fallback, variableName) {
 
 const registrationEvidencePath = evidenceFilePath(
   process.env.FCC_GOVERNANCE_REGISTRATION_EVIDENCE_PATH,
-  "evidence/coston2/fcc-extension-registration.json",
+  v2
+    ? "evidence/coston2/fcc-market-v2-extension-registration.json"
+    : "evidence/coston2/fcc-extension-registration.json",
   "FCC_GOVERNANCE_REGISTRATION_EVIDENCE_PATH",
 );
 const evidencePath = evidenceFilePath(
   process.env.FCC_GOVERNANCE_EVIDENCE_PATH,
-  "evidence/coston2/fcc-governance.json",
+  v2 ? "evidence/coston2/fcc-market-v2-governance.json" : "evidence/coston2/fcc-governance.json",
   "FCC_GOVERNANCE_EVIDENCE_PATH",
 );
 const evidenceDisplayPath = evidencePath.startsWith(`${root}/`)
@@ -126,9 +129,9 @@ async function main() {
   const extensionId = BigInt(registration.publicIdentifiers.extensionId);
   const extensionIdHex = registration.publicIdentifiers.extensionIdHex;
   const desired = governanceConfiguration({
-    rawSigners: process.env.GOVERNANCE_SIGNERS,
+    rawSigners: v2 ? process.env.FCC_V2_GOVERNANCE_SIGNERS : process.env.GOVERNANCE_SIGNERS,
     fallbackSigner: declaredDeployer,
-    rawThreshold: process.env.GOVERNANCE_THRESHOLD,
+    rawThreshold: v2 ? process.env.FCC_V2_GOVERNANCE_THRESHOLD : process.env.GOVERNANCE_THRESHOLD,
   });
 
   const chain = {
@@ -169,7 +172,7 @@ async function main() {
     machineHashes: endpoints.machines.map(({ governanceHash }) => governanceHash),
   });
   const publicResult = {
-    gate: "FCC_GOVERNANCE",
+    gate: v2 ? "FCC_MARKET_V2_GOVERNANCE" : "FCC_GOVERNANCE",
     status: preflight.status,
     scope: execute ? "Coston2 governance execution" : "preflight only; no transaction sent",
     extensionId: extensionId.toString(),
@@ -256,7 +259,7 @@ async function main() {
 
   const evidence = {
     schemaVersion: 1,
-    gate: "FCC_GOVERNANCE",
+    gate: v2 ? "FCC_MARKET_V2_GOVERNANCE" : "FCC_GOVERNANCE",
     status: "PASSED",
     recordedAt: new Date().toISOString(),
     sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
@@ -279,7 +282,9 @@ async function main() {
       ...verification.assertions,
       transactionSucceeded: receipt.status === "success",
     },
-    blockers: ["THREE_PRODUCTION_MACHINES_NOT_REGISTERED", "LIVE_FCC_FOUNDATION_ACTION_NOT_VERIFIED"],
+    blockers: v2
+      ? ["V2_THREE_PRODUCTION_MACHINES_NOT_REGISTERED", "V2_LIFECYCLES_NOT_VERIFIED"]
+      : ["THREE_PRODUCTION_MACHINES_NOT_REGISTERED", "LIVE_FCC_FOUNDATION_ACTION_NOT_VERIFIED"],
     notes: [
       "Plain one-signer governance matches the governance hash independently reported by all three simulated Railway TEE machines.",
       "This record does not claim machine production status, a live FCC action result, hardware attestation, or a completed Gate 0/Gate A.",
