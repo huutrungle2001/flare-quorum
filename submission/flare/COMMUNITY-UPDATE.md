@@ -17,9 +17,12 @@ that Flare or a user has endorsed the project.
 > unaudited hackathon software, no instant native-XRP payout claim, and
 > browser-native XRPL interactive recovery is not claimed as complete.
 > Same-identity restoration is unsupported; the organizer-supported rolling
-> replacement and re-registration drill passes for all three machines. The Buyer page can optionally submit the exact
+> replacement and re-registration drill passes for all three machines. The
+> Buyer page can optionally submit the exact
 > Testnet Payment through GemWallet, or prepare a public-safe `0xFE` memo/job
-> preview without custody. I would value
+> preview without custody. The verified submission remains V1; the staged V2
+> market is a planned post-Summer Signal upgrade and no live V2 release is
+> claimed. I would value
 > feedback on the procurement brief, failure-state UX, and the supported FCC
 > production/restart path.
 

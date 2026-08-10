@@ -1,9 +1,9 @@
 # FlareQuorum — before/after work ledger
 
 This ledger separates the pre-existing Sepolia/Nox product from work built for
-Summer Signal. Commit IDs refer to the Flare v2 repository's `main` branch.
+Summer Signal. Commit IDs refer to the FlareQuorum repository's `main` branch.
 
-| Category | Flare v2 work | Evidence / release authority | User benefit |
+| Category | Summer Signal / Flare work | Evidence / release authority | User benefit |
 | --- | --- | --- | --- |
 | Pre-existing baseline | Sepolia/Nox/Safe/ERC-7984 market, app, relay, and historical evidence | `packages/contracts/`, `evidence/sepolia/`, `/room` | Preserves the original procurement thesis without relabeling it as Flare |
 | Newly built | Go FCC extension, ECIES private ingress, signed bid receipts, common quorum, multi-criteria FCC selection, Flare market | `apps/fcc-extension/`, `packages/flare-contracts/`, `evidence/coston2/gate-c-e-f-three-vendor.json` | Keeps vendor prices private while making the result independently verifiable |
@@ -23,11 +23,17 @@ Summer Signal. Commit IDs refer to the Flare v2 repository's `main` branch.
 | Privacy hardening | Browser checks the Coston2 vendor allowlist before fetching TEE keys or sending any encrypted bid, with a clear no-ingress error | `apps/web/src/flare/flareBidIngress.ts`, `evidence/coston2/web-production-smoke.json`, commit `b355ee5` | An unapproved wallet never causes private ciphertext to reach the FCC quorum |
 | Recovery UX | Reload-safe browser checkpoint retains only public XRPL payment recovery fields, offers explicit resume, and supports explicit forget | `apps/web/src/flare/fundingCheckpoint.ts`, `apps/web/src/flare/FlareXrpFundingPanel.tsx`, `apps/web/test/flare-explorer.test.tsx`, `apps/web/scripts/smoke-flare-funding-checkpoint.mjs`, `evidence/coston2/web-xrp-funding-checkpoint.json`, commits `c122392`, `b2311f0`, `3051cde` | A buyer can reopen and explicitly resume the same public payment handoff after a reload without custody or confidential persistence |
 
-## Not claimed as complete
+## Current release boundary and roadmap
 
-Same-identity restoration is unsupported and is not claimed. Browser-native
-XRPL interactive recovery and broader wallet coverage, instant FXRP/XRP payout, broad adversarial live drills, user interviews,
-and pilot evidence remain explicit follow-up work. The checked-in four-minute
-captioned demo is a public smoke-capture walkthrough; it is not evidence of
-those remaining items. The submission must not present them as shipped
-outcomes.
+The supported recovery model is replacement registration rather than
+same-identity restoration. The recorded FAssets lifecycle reaches the official
+redemption-request boundary rather than asserting an instant underlying XRP
+payout. Gate H remains `NOT_RUN`, so interviews and pilot outcomes are absent
+from current claims. The checked-in four-minute captioned demo is a public
+smoke-capture walkthrough and does not replace those records.
+
+Live V2 deployment/promotion, browser-native XRPL recovery and broader wallet
+coverage, and additional stateful live fault drills are planned post-Summer
+Signal upgrades. The local candidate and staged operations do not establish a
+V2 address, fresh FCC machine set, verified manifest, live success/refund
+lifecycle, or consumer release; none is claimed here.

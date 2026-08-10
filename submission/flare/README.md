@@ -1,8 +1,14 @@
 # FlareQuorum — Judge Package
 
-This folder is the Summer Signal submission material for the Flare v2 release.
+This folder is the Summer Signal submission material for the verified Flare
+Coston2 V1 market release and its current judge application.
 The files in the parent `submission/` folder describe the historical
 Ethereum Sepolia/Nox release and must not be used as evidence for this package.
+
+The side-by-side `FlareQuorumMarketV2` candidate is a planned post-Summer
+Signal upgrade. It is staged locally and is not presented here as a deployed or
+verified release. Gate H user validation is also recorded separately as
+`NOT_RUN`; no interview, usability, pilot, or traction outcome is inferred.
 
 ## Start here
 
@@ -92,8 +98,9 @@ than two frozen TEEs remain valid before the first selection dispatch succeeds,
 V1 cannot start its post-dispatch 24-hour refund clock. The repository contains
 a locally tested, side-by-side `FlareQuorumMarketV2` candidate with a bounded
 close-time full-refund path, but no V2 address, success lifecycle, or refund
-evidence is claimed yet. The V1 manifest and evidence remain immutable until a
-separate V2 release passes those gates.
+evidence is claimed. Live V2 deployment and promotion are a planned
+post-Summer Signal upgrade. The V1 manifest and evidence remain immutable until
+a separate V2 release passes its own gates.
 
 The live amount-based FAssets redemption request is recorded in
 [`fassets-redemption.release.json`](../../evidence/coston2/fassets-redemption.release.json)
@@ -197,9 +204,8 @@ smoke/accessibility evidence, and the read-only hosted Railway runtime-log
 review recorded without retaining log bodies. Supported rolling replacement
 recovery also passes for all three product TEE identities.
 
-Still open and deliberately not overstated: browser-native XRP interactive recovery and broader wallet
-coverage, adversarial/recovery breadth beyond the recorded drill, structured
-buyer/vendor interviews, and pilot evidence. The explicit
+Current validation work, deliberately not overstated: structured buyer/vendor
+interviews and pilot evidence. The explicit
 `evidence/coston2/user-validation.release.json` record is `NOT_RUN`; it is not
 traction evidence. The public-safe Buyer
 wallet-ready Payment/job/memo preview and optional GemWallet Testnet
@@ -207,3 +213,10 @@ signing/submission are shipped; the browser does not receive a secret or
 signed private material. The
 redemption request is live; the underlying agent payout remains an external
 FAssets protocol obligation.
+
+Planned post-Summer Signal upgrades: deploy V2 alongside V1 with a fresh FCC
+extension and exactly three fresh machines, verify its own manifest/bindings,
+record one live success and one bounded-refund lifecycle, expand stateful live
+fault coverage, and add browser-native XRP recovery and broader wallet coverage.
+Consumer promotion remains a separate decision. None of those future facts is
+used to support the current V1 submission.
