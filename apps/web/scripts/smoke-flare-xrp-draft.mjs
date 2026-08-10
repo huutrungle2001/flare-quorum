@@ -81,7 +81,10 @@ class CdpSession {
       expression,
       returnByValue: true,
     });
-    if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
+    if (result.exceptionDetails) {
+      const detail = result.exceptionDetails.exception?.description ?? result.exceptionDetails.text;
+      throw new Error(detail);
+    }
     return result.result.value;
   }
 
@@ -160,7 +163,7 @@ try {
     'textarea[placeholder="What outcome should the selected vendor deliver?"]': "Prepare a monthly Coston2 treasury report for a public buyer brief.",
     'textarea[placeholder="How will delivery be checked?"]': "Report includes source links and a review checklist.",
     'textarea[placeholder="What should every vendor answer?"]': "Which review cadence do you support?",
-    'textarea[placeholder="0x… (one or more, comma/newline separated)"]': "0xAecCf8dbe54433060C2BACC6A9289e72E5d12930",
+    'input[aria-label="Approved vendor 1"]': "0xAecCf8dbe54433060C2BACC6A9289e72E5d12930",
   };
   await cdp.evaluate(`(() => {
     const values = ${JSON.stringify(values)};
