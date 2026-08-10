@@ -1,11 +1,12 @@
 # FlareQuorum Championship Contract Specification
 
-> Status: The local Flare market slice implements canonical public scoring
-> policy, receipt quorum, conditional close-time FTSO, canonical FCC
-> action-result verification, and public-token escrow conservation. Private
-> ingress, live FCC deployment, and Smart Account/FDC execution are now
-> recorded on Coston2; restart/recovery limitations remain explicit, including
-> the immutable frozen set of an already-open tender.
+> Status: The verified Coston2 V1 market implements canonical public scoring,
+> receipt quorum, close-time FTSO, FCC result verification, and public-token
+> conservation, but has a known liveness gap when the first selection dispatch
+> cannot start after close. The side-by-side `FlareQuorumMarketV2` candidate
+> adds bounded pre-dispatch recovery and passes local unit, fuzz, reentrancy,
+> and stateful conservation tests. It is not live release authority until its
+> own deployment, bindings, and Coston2 evidence are verified.
 
 ## 1. Core types
 
@@ -33,6 +34,7 @@ ftsoValue
 ftsoDecimals
 ftsoTimestamp
 closeBlock
+closedAt                     // V2 close-time recovery checkpoint
 selectionStartedAt
 selectionAttempt
 requestId
@@ -137,6 +139,8 @@ not a caller-controlled contract state.
   contain every frozen machine and no partial receipt state is stored
 - `closeTender(tenderId)`
 - `requestSelection(tenderId)`
+- `refundUndispatchedTender(tenderId)` in V2 only, for the buyer after the
+  fixed close grace when no first dispatch ever succeeded
 - `retrySelection(tenderId)` only after the signed-result window expires; it
   preserves the close checkpoint and creates a fresh attempt, nonce, and FCC
   request ID
@@ -149,9 +153,10 @@ No write function accepts an independent winner, score, FTSO value, machine
 replacement, or settlement amount.
 
 Retry never changes rules, bids, root, quorum, machines, FTSO snapshot, or close
-block. Timeout refund is a public failure terminal state, not a successful
-selection fallback; it creates no award receipt and pays only the original
-escrow back to the buyer.
+block. Both timeout refunds are public failure terminal states, not successful
+selection fallbacks; they create no award receipt and return only the original
+escrow to the buyer. The verified V1 release implements only the post-dispatch
+refund. The V2 pre-dispatch path remains a local candidate.
 
 ## 4. Creation and funding
 
@@ -204,7 +209,7 @@ early close is enabled. It:
   USD quotes are enabled;
 - enforces positive value and configured freshness;
 - performs no oracle call and stores a zero snapshot for XRP-only policy;
-- advances to `Closed`.
+- records `closedAt` in V2 and advances to `Closed`.
 
 The caller cannot supply the FTSO snapshot.
 
@@ -226,6 +231,20 @@ The caller cannot supply the FTSO snapshot.
 
 Re-requesting after expiry or delivery failure must preserve the same frozen
 inputs and follow the documented FCC fee/replay policy.
+
+### V2 undispatched recovery
+
+`refundUndispatchedTender` requires `Closed`, the canonical buyer, a nonzero
+`closedAt`, no successful request ID, no selection start, and a timestamp later
+than `closedAt + CLOSED_REFUND_GRACE`. It performs no TEE-manager read because
+manager/quorum unavailability is the condition being recovered from. It marks
+`Refunded` before transferring the exact ceiling and emits
+`TenderRefunded(..., UndispatchedTimeout)`.
+
+At the exact grace boundary the refund is still unavailable. A successful
+selection request moves the tender to `ComputePending`, permanently excluding
+the undispatched path; post-dispatch recovery continues to use
+`refundExpiredSelection` and its original fixed clock.
 
 ## 8. Finalization
 
@@ -299,7 +318,7 @@ verification provide implementation evidence, not a zero-knowledge proof.
 - `SelectionRequested`
 - `SelectionRetried`
 - `TenderAwarded`
-- `TenderRefunded`
+- `TenderRefunded` (`RefundReason` is explicit in V2)
 - `TenderCancelled`
 - `AwardReceiptMinted`
 

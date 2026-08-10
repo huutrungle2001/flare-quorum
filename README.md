@@ -26,6 +26,14 @@ The project targets **Flare Summer Signal** with:
 > three-machine rolling Coston2 drill, while the final user-validation gate
 > remains open.
 
+> [!CAUTION]
+> The verified Coston2 V1 market has a known pre-dispatch liveness gap: if a
+> tender is already `Closed` and fewer than two frozen TEEs remain valid before
+> the first selection request succeeds, V1 cannot start its 24-hour refund
+> clock. `FlareQuorumMarketV2` fixes this locally with a close-time bounded
+> refund, but it is not release authority until a separate V2 deployment,
+> manifest, bindings, and live success/refund evidence are verified.
+
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
 > wallets and assets only.
@@ -34,7 +42,8 @@ The project targets **Flare Summer Signal** with:
 > FlareQuorum is the current product and repository brand. Existing `VeilBid*`
 > Solidity identifiers, verified Coston2 deployment artifacts, and the
 > Sepolia/Nox `/room` baseline retain their original names so the rebrand never
-> rewrites historical or on-chain evidence.
+> rewrites historical or on-chain evidence. New candidate contracts use the
+> FlareQuorum name without relabeling those immutable V1 facts.
 
 ## Why FlareQuorum
 

@@ -10,7 +10,9 @@
 > run also finalized with one result endpoint unavailable. The organizer has
 > confirmed that restart recovery uses replacement registration rather than
 > same-identity restoration; the full rolling replacement drill now passes on
-> Coston2. Gate H remains mandatory.
+> Coston2. A newly identified V1 pre-dispatch refund gap is fixed only in the
+> local V2 candidate and requires a separate live release. Gate H remains
+> mandatory.
 
 ## 1. Rules
 
@@ -154,7 +156,9 @@ the request and finalization transactions and the public binding assertions;
 the recovery run also proves that one unavailable result endpoint does not
 prevent threshold finalization. Replacement registration and live two-machine
 loss remain part of release hardening; an active tender never swaps its frozen
-identities.
+identities. The verified V1 market cannot refund if fewer than two identities
+remain valid before its first dispatch succeeds. The local V2 candidate adds
+that path; it is not a live Gate-E recovery pass yet.
 
 Prove:
 
@@ -171,6 +175,8 @@ Prove:
 - retries cannot extend the fixed 24-hour grace measured from the first
   request; after that grace, buyer recovery returns only the original escrow,
   records failed-compute `Refunded`, and creates no winner or award receipt.
+- a closed tender whose first dispatch never succeeds reaches a separate fixed
+  close-time refund in V2 without consulting the unavailable TEE manager.
 
 Kill condition: one machine or an untrusted relay can unilaterally decide the
 championship result, recovery changes the frozen input set, or a timeout path is

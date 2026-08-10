@@ -85,6 +85,16 @@ FCC is essential: the winner is computed from sealed bid state inside the
 | Extension | `66011` · `v0.2.2` · code hash `0x194844cf…10fdc2` |
 | Verified release manifest | [`packages/flare-contracts/deployments/coston2.release.json`](../../packages/flare-contracts/deployments/coston2.release.json) |
 
+### Known V1 liveness limitation
+
+The verified address above is still V1. If a tender reaches `Closed` and fewer
+than two frozen TEEs remain valid before the first selection dispatch succeeds,
+V1 cannot start its post-dispatch 24-hour refund clock. The repository contains
+a locally tested, side-by-side `FlareQuorumMarketV2` candidate with a bounded
+close-time full-refund path, but no V2 address, success lifecycle, or refund
+evidence is claimed yet. The V1 manifest and evidence remain immutable until a
+separate V2 release passes those gates.
+
 The live amount-based FAssets redemption request is recorded in
 [`fassets-redemption.release.json`](../../evidence/coston2/fassets-redemption.release.json)
 with the approval and `RedemptionRequested` transaction hashes. It proves the

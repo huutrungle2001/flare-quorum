@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "suite": "flare-market-v2-liveness-local",
+  "status": "PARTIAL",
+  "recordedAt": "2026-08-10T10:10:07Z",
+  "sourceCommit": "ae049b650ae562807a150e702d18fdf04b18f300",
+  "scope": {
+    "environment": "local-foundry-and-static-analysis",
+    "targetNetwork": "flare-coston2",
+    "chainId": 114,
+    "candidateOnly": true,
+    "liveWritesPerformed": false
+  },
+  "testCommands": [
+    {
+      "name": "forge-test-full-flare-contract-suite",
+      "passed": true,
+      "testCount": 70
+    },
+    {
+      "name": "forge-test-v2-unit-fuzz-and-invariant",
+      "passed": true,
+      "testCount": 36
+    },
+    {
+      "name": "slither-0.11.6-v2-gate",
+      "passed": true,
+      "blockingFindings": 0,
+      "reviewedExactExceptions": 2
+    }
+  ],
+  "assertions": {
+    "failedInitialDispatchHasBoundedRefund": true,
+    "refundIsBuyerOnly": true,
+    "refundRequiresNoSuccessfulDispatch": true,
+    "postDispatchRecoveryRemainsSeparate": true,
+    "terminalPathsAreMutuallyExclusive": true,
+    "failedTransferRollsBack": true,
+    "tokenCallbackReentrancyRejected": true,
+    "escrowConservationHolds": true,
+    "runtimeFitsEip170": true,
+    "unsuppressedMediumOrHighStaticFindingAbsent": true,
+    "verifiedV1ArtifactsUnchanged": true,
+    "noConfidentialPayloadRecorded": true
+  },
+  "blockers": [
+    "V2_NOT_DEPLOYED",
+    "LIVE_SUCCESS_AND_REFUND_EVIDENCE_NOT_RECORDED"
+  ],
+  "notes": [
+    "This record covers the side-by-side V2 candidate only and is not Coston2 deployment or refund evidence.",
+    "A fresh extension, three-machine set, manifest, bindings, success lifecycle, and undispatched-refund lifecycle are required before promotion.",
+    "Foundry coverage instrumentation could not compile this large harness with either the default pipeline or ir-minimum; passing stateful conservation tests are reported instead of a fabricated percentage.",
+    "No bid plaintext, ciphertext, raw signature, credential, private key, provider response, or secret is recorded."
+  ]
+}

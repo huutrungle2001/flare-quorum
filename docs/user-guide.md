@@ -166,6 +166,12 @@ receipt set, or a common 2-machine quorum is unavailable.
    the buyer may recover only the original escrow. This records failed-compute
    `Refunded`, creates no award, and is never displayed as FCC success.
 
+Known V1 limitation: if fewer than two frozen TEEs remain valid before the
+first selection request succeeds, the verified market remains `Closed` and its
+post-dispatch refund clock never starts. The locally tested V2 candidate adds a
+separate close-time refund, but the live app must not expose or imply that
+action until a V2 manifest and bindings are verified.
+
 The Public Finalizer browser intentionally does not request selection or submit
 TEE results itself. Those operations require the relay's public FCC endpoints,
 live instruction fee, exact-result grouping, and canonical rereads; moving them

@@ -732,6 +732,42 @@ digest and binary SHA-256 independently prove which FlareQuorum code was deploye
 This is a limitation of the accepted simulated Coston2 topology and must not be
 described as hardware-backed application measurement.
 
+## ADR-028 — Bounded recovery before the first selection dispatch
+
+**Decision:** Preserve the verified V1 contract and deployment evidence
+unchanged, and introduce a side-by-side immutable `FlareQuorumMarketV2`
+candidate. V2 records `closedAt` when a tender enters `Closed` and lets only the
+buyer call `refundUndispatchedTender` after a fixed 24-hour close grace when no
+selection request has ever succeeded.
+
+The recovery requires `Closed`, nonzero `closedAt`, zero
+`selectionStartedAt`, and zero `requestId`. It performs no TEE-manager read,
+marks the tender `Refunded` before transferring the exact ceiling, and emits an
+explicit `UndispatchedTimeout` reason. A successful request changes the state
+to `ComputePending`, after which only the existing post-dispatch grace and
+`refundExpiredSelection` apply. Retries never reset that first-dispatch clock.
+
+V2 keeps the existing `VEILBID_*` receipt, result, root, and FCC operation
+literals for wire compatibility. Chain ID, market address, extension, code,
+tender, rules, root, nonce, and expiry still prevent cross-release replay. The
+new contract and receipt use FlareQuorum names; no V1 source, manifest,
+address, or historical evidence is relabeled.
+
+**Reason:** In V1, `requestSelection` reverts atomically when fewer than two
+frozen identities are active. The tender remains `Closed`, its
+`selectionStartedAt` remains zero, and neither the open-tender cancellation nor
+post-dispatch refund path applies. External quorum loss can therefore lock the
+escrow indefinitely. The separate V2 path bounds that state without letting a
+buyer choose a winner, weaken the threshold, replace a frozen machine, or
+represent the refund as FCC success.
+
+**Release boundary:** Local unit, fuzz, reentrancy, token-failure, and stateful
+conservation tests pass. V2 remains a candidate until a fresh extension and
+three-machine set, runtime/constructor verification, generated bindings, one
+flagship lifecycle, and one undispatched-refund lifecycle are recorded on
+Coston2. Until then, `coston2.release.json` and its V1 limitation remain the
+authoritative live facts.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:

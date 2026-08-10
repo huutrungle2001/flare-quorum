@@ -242,8 +242,14 @@ selected TEE boundary.
 - TEE sealed-state mismatch: machine refuses to sign; contract never lowers
   threshold.
 - Split TEE result: remain pending; investigate/recompute exact input.
-- Quorum loss: explicit liveness failure; after the fixed 24-hour grace the
-  buyer may recover escrow with no award and no success claim.
+- Quorum loss after a successful dispatch: explicit liveness failure; after
+  the fixed 24-hour selection grace the buyer may recover escrow with no award
+  and no success claim.
+- Quorum loss before the first successful dispatch: the verified V1 market has
+  a known `Closed`-state liveness gap. The local V2 candidate records
+  `closedAt` and permits the same full-escrow failure refund after a separate
+  fixed grace without consulting the unavailable manager. This is not a live
+  release claim until V2 deployment and evidence pass.
 - FTSO unavailable/stale: USD-enabled close pauses; no manual price.
 - FDC/Smart Account failure: use the documented public-safe delayed-mint
   checkpoint/resume; no app custody and no duplicate XRPL payment.

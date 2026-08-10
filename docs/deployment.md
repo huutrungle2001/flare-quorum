@@ -15,9 +15,18 @@ the preserved organizer-group redeploy bulletin and official scaffold sources.
 |---|---|---|
 | Historical Sepolia/Nox | `packages/contracts/deployments/sepolia.release.json` | Verified pre-hackathon baseline |
 | Coston2/FCC championship | `packages/flare-contracts/deployments/coston2.release.json` | Verified live candidate promoted after runtime/wiring/evidence checks |
+| Coston2 liveness V2 | No release manifest yet | Local candidate only; bounded pre-dispatch refund tests pass, deployment and live evidence do not |
 
 Never put Flare addresses into the Sepolia manifest/bindings or reuse historical
 deployment artifacts as Coston2 evidence.
+
+The current verified Coston2 row is V1 and has a known liveness gap when fewer
+than two frozen TEEs remain valid before the first selection dispatch succeeds.
+`FlareQuorumMarketV2` is intentionally side-by-side rather than an upgrade or
+rewrite. It must receive a fresh extension/machine registration, candidate
+manifest, source/runtime verification, generated bindings, flagship lifecycle,
+and undispatched-refund lifecycle before any consumer or judge route points to
+it. V1 artifacts and evidence remain immutable.
 
 ## 2. Phase 0: pin before building
 
