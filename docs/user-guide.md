@@ -2,10 +2,12 @@
 
 > Status: verified Coston2 experience. The checked-in `/` and `/flare` routes
 > provide the fail-closed wallet-free evidence view and explicit Coston2 role
-> routes. The hosted production release now separates Public, XRP Treasury, EVM
-> Buyer, Vendor, Public Finalizer, and Auditor/Evidence; the expanded role shell,
-> mobile layout, keyboard path, XRP draft, and reload checkpoint all pass hosted
-> smoke validation. The XRP-native funding protocol and executor have live Gate G
+> routes. The current source build combines direct Coston2 and XRP-native
+> funding under the Buyer workspace alongside Public, Vendor, Public Finalizer,
+> and Auditor/Evidence. Repository tests cover the unified chooser; hosted
+> redeployment remains pending. The previously recorded role shell, mobile
+> layout, keyboard path, XRP draft, and reload checkpoint pass hosted smoke
+> validation. The XRP-native funding protocol and executor have live Gate G
 > evidence plus a public-safe delayed-mint checkpoint/resume path. The Buyer
 > workspace can also prepare a wallet-ready XRPL Payment draft and public-safe
 > `0xFE` executor job preview from read-only Coston2 state; the live
@@ -54,22 +56,25 @@ public lifecycle queue: permissionless close is available in-browser, while
 FCC dispatch/result grouping stays in the dedicated relay. Buyer-only empty
 cancellation and failed-compute recovery require an explicit confirmation.
 
-The other source routes are `/flare?role=treasury` for the XRPL/FDC/Smart Account
-funding journey, `/flare?role=buyer` for direct EVM funding/recovery, and
-`/flare?role=vendor` for sealed submission and awarded-vendor redemption. The
-header wallet selector follows the active release: Coston2 on Flare routes and
-Sepolia only on the historical `/room` route. Public browsing never requires a
-wallet.
+The Buyer route is `/flare?role=buyer`: it starts with two explicit funding
+choices, defaults to direct Coston2/FTestXRP escrow, and can switch to the
+XRPL/FDC/Smart Account handoff before preparing the same public tender brief.
+The old `/flare?role=treasury` URL remains a compatibility alias that opens Buyer
+with the XRPL choice selected. `/flare?role=vendor` opens sealed submission and
+awarded-vendor redemption. The header wallet selector follows the active release:
+Coston2 on Flare routes and Sepolia only on the historical `/room` route. Public
+browsing never requires a wallet.
 
 The current Flare application is intentionally split into two shells. Clicking
 the `FLAREQUORUM` wordmark returns to the standalone product landing page. Clicking
 `TENDERS` enters `/flare`, where the dossier-style left rail remains visible
-while the right side renders the selected workspace: `PUBLIC`, `BUYER`,
-`PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public finalizer), `XRP TREASURY`,
-and `AUDITOR`. The rail keeps one shared refresh action, help/boundaries, and
-the Coston2 faucet. Wallet connection stays in the global header, while FXRP
-redemption controls appear inside `PRIVATE BIDS` only for the connected public
-winner. Sepolia-only `vcUSDC` wrap/unwrap controls are omitted from Flare.
+while the right side renders the selected workspace: `PUBLIC`, `BUYER` (with
+the two funding choices), `PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public
+finalizer), and `AUDITOR`. The left rail keeps compact wallet assets and the
+Coston2 faucet; refresh is available as the global `↻` control beside Connect
+Wallet. Wallet connection stays in the global header, while FXRP redemption
+controls appear inside `PRIVATE BIDS` only for the connected public winner.
+Sepolia-only `vcUSDC` wrap/unwrap controls are omitted from Flare.
 
 The public path is live and release-labeled. Any missing dependency keeps its
 own operation unavailable; the UI never substitutes Sepolia data or mock
@@ -87,9 +92,11 @@ success. The Sepolia app remains a pre-hackathon baseline.
 - Account, network, market, tender, extension, code, rules, or machine-key
   changes clear all session-only bid input and invalidate an unsent payload.
 
-## 4. XRP treasury buyer flow (executor-backed flagship)
+## 4. XRP-native Buyer funding flow (executor-backed flagship)
 
-1. Derive the deterministic Flare PersonalAccount and read its current nonce
+1. In `BUYER`, choose `XRPL / XRP · ADVANCED` (direct `COSTON2 / FTESTXRP` is
+   the default) and complete the shared public tender brief. Derive the
+   deterministic Flare PersonalAccount and read its current nonce
    from the supported Smart Account controller.
 2. Build the public-safe terms and read the current AssetManager payment
    destination, direct-mint fee, executor fee, PersonalAccount, and nonce. The

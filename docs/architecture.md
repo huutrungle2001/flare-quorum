@@ -264,9 +264,10 @@ escrow, or bypass settlement verification.
 
 ## 12. Applications
 
-- **Web:** wallet-free Public explorer; separate XRP Treasury, EVM Buyer,
-  Vendor, Public Finalizer, and Auditor/Evidence workspaces; and the awarded
-  vendor redemption journey. The Public Finalizer may directly simulate and
+- **Web:** wallet-free Public explorer; one Buyer workspace with direct
+  Coston2/FTestXRP and XRP-native funding choices; Vendor, Public Finalizer,
+  and Auditor/Evidence workspaces; and the awarded vendor redemption journey.
+  The Public Finalizer may directly simulate and
   submit permissionless close plus buyer-authorized cancel/refund calls, but it
   cannot decrypt bids, calculate a winner, dispatch FCC work, or group results.
   The Auditor performs one-checkpoint public reads only and has no signer.

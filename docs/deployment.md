@@ -1,10 +1,11 @@
 # FlareQuorum Championship Deployment Guide
 
-> Status: the canonical Coston2 market release, release smoke, UI, and judge
-> package are live and verified. The organizer-approved rolling replacement-TEE
-> drill passes. Broader browser recovery is planned post-Summer Signal
-> hardening, while Gate H user validation remains `NOT_RUN`; the historical
-> Sepolia/Nox baseline remains separate.
+> Status: the canonical Coston2 market release and existing hosted judge package
+> are live and verified. The unified Buyer source build passes repository
+> test/lint/build; its hosted redeployment remains pending. The
+> organizer-approved rolling replacement-TEE drill passes. Broader browser
+> recovery is planned post-Summer Signal hardening, while Gate H user validation
+> remains `NOT_RUN`; the historical Sepolia/Nox baseline remains separate.
 
 FCC registration and proxy operations must also satisfy the current
 [`FCC Coston2 Operational Baseline`](fcc-coston2-operations.md), derived from
@@ -445,10 +446,11 @@ award-receipt immutable bindings are checked independently on-chain.
 
 ## 7. Web, relay, and ingress deployment
 
-The championship release provides:
+The current source release provides:
 
 - a wallet-free finalized tender/evidence route;
-- XRP Treasury, EVM Buyer, Vendor, Public, Activity, and Evidence journeys;
+- Buyer (with direct Coston2 or XRP-native funding choices), Vendor, Public,
+  Activity, and Evidence journeys;
 - verified extension/code/machine/key/quorum/FTSO/FAssets/FDC/Smart Account
   metadata;
 - a stateless relay that closes, requests, retrieves, groups exact digests, and
