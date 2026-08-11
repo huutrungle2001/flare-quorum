@@ -33,7 +33,6 @@
     "consumerSwitchRequiresPromotion": true
   },
   "blockers": [
-    "V2_INVALID_CREDENTIAL_REJECTION_NOT_VERIFIED",
     "V2_REFUND_LIFECYCLE_NOT_VERIFIED"
   ]
 }
