@@ -7629,7 +7629,179 @@ footer p {
   line-height: 1.45;
 }
 
-/* Vendor eligibility, public context, and private in-session review. */
+/* Vendor eligibility, public context, private review, and wallet-scoped receipts. */
+.vendor-section-nav {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.vendor-section-nav button {
+  background: var(--color-paper-white);
+  border: 2px solid var(--color-ink-black);
+  border-radius: 4px;
+  color: var(--color-ink-black);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  min-height: 42px;
+  padding: 10px 16px;
+}
+
+.vendor-section-nav button:hover,
+.vendor-section-nav button:focus-visible,
+.vendor-section-nav button.active {
+  background: var(--color-brand-accent);
+}
+
+.vendor-section-nav button.active::after {
+  content: " ✓";
+}
+
+.vendor-submissions-panel > .detail-header h2 {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+}
+
+.my-submissions-boundary {
+  align-items: center;
+  background: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-ink-black);
+  border-top: 1px solid var(--color-ink-black);
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 16px 32px;
+}
+
+.my-submissions-boundary strong,
+.my-submissions-boundary span {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.my-submissions-connect,
+.my-submission-list {
+  padding: 24px 32px 32px;
+}
+
+.my-submission-list {
+  display: grid;
+  gap: 14px;
+}
+
+.my-submission-card {
+  border: 1px solid var(--color-ink-black);
+  padding: 22px;
+}
+
+.vendor-submissions-panel > .my-submission-card {
+  margin: 24px 32px 0;
+}
+
+.my-submission-card.pending-finality {
+  border-left: 6px solid var(--color-brand-accent);
+}
+
+.my-submission-card > header {
+  align-items: start;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.my-submission-card h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 300;
+  margin: 5px 0 0;
+}
+
+.submission-facts {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 20px 0 0;
+}
+
+.submission-facts > div {
+  background: var(--color-surface-muted);
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+}
+
+.submission-facts dt,
+.submission-facts dd {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  margin: 0;
+}
+
+.submission-facts dd {
+  font-weight: 700;
+}
+
+.submission-explainer {
+  line-height: 1.5;
+  margin: 18px 0;
+}
+
+.my-submission-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.submission-receipt-details {
+  border-top: 1px solid var(--color-ink-black);
+  margin-top: 20px;
+  padding-top: 14px;
+}
+
+.submission-receipt-details summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  list-style: none;
+}
+
+.submission-receipt-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.submission-receipt-details summary span {
+  float: right;
+}
+
+.submission-receipt-details[open] summary span {
+  transform: rotate(180deg);
+}
+
+.submission-receipt-details dl {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+}
+
+.submission-receipt-details dl > div {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: minmax(130px, 0.35fr) minmax(0, 1fr);
+}
+
+.submission-receipt-details dt,
+.submission-receipt-details dd {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .vendor-eligibility-strip,
 .private-bid-memory-warning {
   align-items: center;
@@ -7731,6 +7903,76 @@ footer p {
 .activity-section-nav a:hover,
 .activity-section-nav a:focus-visible {
   background: var(--color-brand-accent);
+}
+
+.activity-queue-summary {
+  align-items: stretch;
+  background: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-ink-black);
+  border-top: 1px solid var(--color-ink-black);
+  display: grid;
+  grid-template-columns: 150px 150px minmax(0, 1fr);
+}
+
+.activity-queue-summary > div,
+.activity-queue-summary > p {
+  margin: 0;
+  padding: 16px 20px;
+}
+
+.activity-queue-summary > div {
+  border-right: 1px solid var(--color-ink-black);
+  display: grid;
+  gap: 4px;
+}
+
+.activity-queue-summary strong {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 300;
+}
+
+.activity-queue-summary span,
+.activity-queue-summary p {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  line-height: 1.45;
+}
+
+.activity-action-card {
+  padding: 18px 20px;
+}
+
+.activity-action-card[data-lane="action"] {
+  border-left: 6px solid var(--color-brand-accent);
+}
+
+.activity-action-card h3 {
+  font-size: clamp(1.8rem, 3vw, 2.35rem);
+}
+
+.activity-action-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.activity-action-meta span {
+  background: var(--color-surface-muted);
+  border-left: 3px solid var(--color-ink-black);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 8px 10px;
+}
+
+.activity-action-copy {
+  margin-top: 14px;
+}
+
+.activity-action-copy p {
+  margin: 12px 0 14px;
 }
 
 .activity-assets-section {

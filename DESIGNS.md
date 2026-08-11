@@ -380,6 +380,24 @@ The confidential field is visually treated as a sealed dossier:
 The field never echoes a submitted plaintext or ciphertext into durable
 activity, analytics, logs, URLs, calldata, or public evidence.
 
+### Private Bids navigation and My Submissions
+
+- Private Bids has one local two-item navigation: `SUBMIT BID` and
+  `MY SUBMISSIONS`. These are two vendor intents inside the same workspace,
+  not new global roles.
+- After a successful receipt-quorum transaction, move the vendor to
+  `MY SUBMISSIONS`. Until the public reader reaches 12-block finality, show the
+  confirmed transaction as `CONFIRMED · FINALITY PENDING`; never fabricate a
+  finalized bid reference early.
+- The finalized list is derived only by filtering canonical public bid
+  references against the connected vendor address. It shows tender/bid ID,
+  lifecycle state, receipt quorum, accepted block, and a Public dossier link.
+- Commitment, submission nonce, bitmap, and receipt expiry remain inside a
+  collapsed `PUBLIC RECEIPT DETAILS` section at the end of each card.
+- `MY SUBMISSIONS` is a wallet-scoped convenience view, not private retrieval
+  or authentication. It never restores price, delivery, warranty, credentials,
+  salt, plaintext, or ciphertext after submission.
+
 ### XRP treasury custody header
 
 Full-width white panel with black border and 25px radius:
@@ -442,6 +460,22 @@ states:
 - Completed steps: black with check.
 - Future steps: white outline.
 - On mobile it becomes a vertical timeline.
+
+### Activity action center
+
+- Activity is an action and recovery queue, not a second Public explorer.
+- Each non-terminal tender uses one compact action card containing only tender
+  ID/state, the next step, who may act (`ANYONE`, `BUYER ONLY`,
+  `DEDICATED RELAY`, or `NO ACTION REQUIRED`), bid progress, deadline, and the
+  applicable primary action.
+- Rules, scoring, buyer addresses, TEE identities, commitments, and selection
+  codes are not repeated. Every card links to `VIEW PUBLIC DOSSIER` for those
+  facts.
+- The queue summary separates `NEEDS ACTION` from `TRACKING ONLY`; a tender
+  waiting for bids or FCC processing must not visually resemble a clickable
+  action.
+- XRP redemption remains a separate Activity / Assets card and stays locked
+  until the connected wallet is the public winner of an Awarded tender.
 
 ### Winner reveal panel
 

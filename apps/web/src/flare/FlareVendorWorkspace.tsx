@@ -4,8 +4,9 @@ import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
 import { ContextHelp } from "../shell/ContextHelp";
 import { useToasts } from "../shell/ToastProvider";
-import { createPublicClient, formatUnits, http, parseUnits, type Abi } from "viem";
+import { createPublicClient, formatUnits, http, isAddressEqual, parseUnits, type Abi, type Hex } from "viem";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import { submitFlareBid } from "./flareBidIngress";
 import { FlareBuyerBriefPanel } from "./FlareBuyerBriefPanel";
 
@@ -27,6 +28,26 @@ const stageLabels = {
 
 function short(value: string) {
   return `${value.slice(0, 10)}…${value.slice(-8)}`;
+}
+
+function deadline(timestamp: bigint): string {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(Number(timestamp) * 1_000));
+}
+
+function receiptCount(bitmap: number): number {
+  return bitmap.toString(2).split("").filter((bit) => bit === "1").length;
+}
+
+function submissionState(tender: FlarePublicTender, bidId: bigint): string {
+  if (tender.status === "Awarded") {
+    return tender.winnerBidId === bidId ? "WINNER" : "NOT SELECTED";
+  }
+  if (tender.status === "Refunded") return "REFUNDED · NO AWARD";
+  if (tender.status === "Closed" || tender.status === "ComputePending") return "IN SELECTION";
+  return "ACCEPTED";
 }
 
 export function flareVendorBidErrorMessage(cause: unknown): string {
@@ -63,6 +84,8 @@ export function FlareVendorWorkspace({
   onRefresh: () => void;
 }) {
   const toasts = useToasts();
+  const [params, setParams] = useSearchParams();
+  const section = params.get("vendor") === "submissions" ? "submissions" : "submit";
   const openTenders = useMemo(
     () => tenders.filter((tender) => tender.status === "Open"),
     [tenders],
@@ -76,11 +99,40 @@ export function FlareVendorWorkspace({
   const [reviewing, setReviewing] = useState(false);
   const [stage, setStage] = useState<keyof typeof stageLabels | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [last, setLast] = useState<{ hash: string; block: bigint } | null>(null);
+  const [last, setLast] = useState<{
+    tenderId: bigint;
+    hash: Hex;
+    block: bigint;
+    commitment: Hex;
+    submissionNonce: bigint;
+    receiptExpiry: bigint;
+  } | null>(null);
   const connected = wallet.state.status === "connected" && wallet.state.account && wallet.state.walletClient;
   const [eligibility, setEligibility] = useState<Record<string, boolean> | null>(null);
   const [eligibilityLoading, setEligibilityLoading] = useState(false);
   const [eligibilityError, setEligibilityError] = useState<string | null>(null);
+
+  const mySubmissions = useMemo(() => {
+    if (!connected || !wallet.state.account) return [];
+    return tenders
+      .flatMap((tender) => tender.bidReferences
+        .filter((bid) => isAddressEqual(bid.vendor, wallet.state.account!))
+        .map((bid) => ({ tender, bid })))
+      .sort((left, right) => Number(right.bid.acceptedBlock - left.bid.acceptedBlock));
+  }, [connected, tenders, wallet.state.account]);
+  const recentPendingFinality = Boolean(
+    last && !mySubmissions.some(({ tender, bid }) => (
+      tender.tenderId === last.tenderId
+      && bid.plaintextCommitment.toLowerCase() === last.commitment.toLowerCase()
+    )),
+  );
+
+  function selectSection(next: "submit" | "submissions") {
+    const updated = new URLSearchParams(params);
+    if (next === "submit") updated.delete("vendor");
+    else updated.set("vendor", "submissions");
+    setParams(updated);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -180,11 +232,19 @@ export function FlareVendorWorkspace({
           toasts.update(toastId, stageLabels[next]);
         },
       });
-      setLast({ hash: result.transactionHash, block: result.blockNumber });
+      setLast({
+        tenderId: selected.tenderId,
+        hash: result.transactionHash,
+        block: result.blockNumber,
+        commitment: result.commitment,
+        submissionNonce: result.submission.submissionNonce,
+        receiptExpiry: result.submission.receiptExpiry,
+      });
       setPrice("");
       setReviewing(false);
       toasts.succeed(toastId, "Three receipts accepted; bid committed on Coston2.");
       onRefresh();
+      selectSection("submissions");
     } catch (cause) {
       setError(flareVendorBidErrorMessage(cause));
       toasts.fail(toastId, "Bid stopped before an on-chain commitment. Plaintext was not persisted.");
@@ -198,18 +258,108 @@ export function FlareVendorWorkspace({
     <main id="main-content" className="role-workspace flare-vendor-workspace">
       <section className="workspace-intro">
         <p className="eyebrow">COSTON2 VENDOR / PRIVATE INGRESS</p>
-        <h1>Submit a sealed bid.</h1>
-        <p>
-          The bid is encoded and encrypted in this session, forwarded through the
-          authenticated gateway to all three frozen TEEs, and admitted only after
-          three matching signed receipts. This form never writes plaintext to
-          browser storage, calldata, or public logs.
-        </p>
+        <h1>{section === "submit" ? "Submit a sealed bid." : "Track your submissions."}</h1>
+        {section === "submit" ? (
+          <p>
+            The bid is encoded and encrypted in this session, forwarded through the
+            authenticated gateway to all three frozen TEEs, and admitted only after
+            three matching signed receipts. This form never writes plaintext to
+            browser storage, calldata, or public logs.
+          </p>
+        ) : (
+          <p>
+            This wallet-scoped view finds its finalized public bid receipts on Coston2.
+            It proves which tenders you entered without retrieving price, delivery,
+            warranty, ciphertext, or any other private bid payload.
+          </p>
+        )}
       </section>
-      {!selected ? (
+      <nav className="vendor-section-nav" aria-label="Private Bids sections">
+        <button type="button" className={section === "submit" ? "active" : ""} aria-current={section === "submit" ? "page" : undefined} onClick={() => selectSection("submit")}>SUBMIT BID</button>
+        <button type="button" className={section === "submissions" ? "active" : ""} aria-current={section === "submissions" ? "page" : undefined} onClick={() => selectSection("submissions")}>MY SUBMISSIONS{connected && mySubmissions.length > 0 ? ` · ${mySubmissions.length}` : ""}</button>
+      </nav>
+      {section === "submissions" ? (
+        <section className="evidence-panel vendor-submissions-panel" aria-label="My finalized bid submissions">
+          <header className="detail-header">
+            <div><p className="eyebrow">MY SUBMISSIONS / PUBLIC RECEIPTS</p><h2>{connected ? `${mySubmissions.length} finalized submission${mySubmissions.length === 1 ? "" : "s"}` : "Connect to find your submissions"}</h2></div>
+            <span className={`privacy-badge${connected ? " verified" : ""}`}>{connected ? "WALLET FILTER ACTIVE" : "WALLET REQUIRED"}</span>
+          </header>
+          <div className="my-submissions-boundary" role="note">
+            <strong>RECEIPTS, NOT BID CONTENT</strong>
+            <span>Only your public commitment and quorum proof can be recovered. Private terms were deliberately not persisted.</span>
+          </div>
+          {!connected && (
+            <div className="my-submissions-connect">
+              <WalletPanel wallet={wallet} network="coston2" compact />
+            </div>
+          )}
+          {connected && recentPendingFinality && last && (
+            <article className="my-submission-card pending-finality">
+              <header>
+                <div><p className="eyebrow">TENDER {last.tenderId.toString()} · JUST SUBMITTED</p><h3>Receipt quorum committed</h3></div>
+                <span className="privacy-badge encrypted">CONFIRMED · FINALITY PENDING</span>
+              </header>
+              <dl className="submission-facts">
+                <div><dt>Receipt quorum</dt><dd>3 / 3</dd></div>
+                <div><dt>Transaction block</dt><dd>{last.block.toString()}</dd></div>
+                <div><dt>Private terms</dt><dd>Not recoverable</dd></div>
+              </dl>
+              <p className="submission-explainer">The transaction succeeded. This card will become a finalized submission after the public reader reaches 12-block finality.</p>
+              <div className="my-submission-actions">
+                <a className="secondary-button" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">VIEW TRANSACTION ↗</a>
+                <a className="text-link" href={`/flare?status=all&tender=${last.tenderId.toString()}`}>VIEW PUBLIC DOSSIER →</a>
+              </div>
+              <details className="submission-receipt-details">
+                <summary>PUBLIC RECEIPT DETAILS <span aria-hidden="true">⌄</span></summary>
+                <dl>
+                  <div><dt>Commitment</dt><dd><code>{last.commitment}</code></dd></div>
+                  <div><dt>Submission nonce</dt><dd><code>{last.submissionNonce.toString()}</code></dd></div>
+                  <div><dt>Receipt expiry</dt><dd>{deadline(last.receiptExpiry)}</dd></div>
+                </dl>
+              </details>
+            </article>
+          )}
+          {connected && mySubmissions.length === 0 && !recentPendingFinality && (
+            <div className="state-panel compact-state">
+              <span aria-hidden="true">0</span>
+              <div><h3>No finalized submissions for this wallet</h3><p>Use Submit Bid for an eligible open tender. A confirmed submission appears here after 12-block finality.</p></div>
+            </div>
+          )}
+          {connected && mySubmissions.length > 0 && (
+            <div className="my-submission-list">
+              {mySubmissions.map(({ tender, bid }) => (
+                <article className="my-submission-card" key={`${tender.tenderId.toString()}:${bid.bidId.toString()}`}>
+                  <header>
+                    <div><p className="eyebrow">TENDER {tender.tenderId.toString()} · YOUR BID {bid.bidId.toString()}</p><h3>Submission accepted</h3></div>
+                    <span className={`privacy-badge${tender.winnerBidId === bid.bidId ? " verified" : ""}`}>{submissionState(tender, bid.bidId)}</span>
+                  </header>
+                  <dl className="submission-facts">
+                    <div><dt>Tender state</dt><dd>{tender.status}</dd></div>
+                    <div><dt>Receipt quorum</dt><dd>{receiptCount(bid.receiptBitmap)} / 3</dd></div>
+                    <div><dt>Accepted block</dt><dd><a className="text-link" href={`https://coston2-explorer.flare.network/block/${bid.acceptedBlock.toString()}`} target="_blank" rel="noreferrer">{bid.acceptedBlock.toString()} ↗</a></dd></div>
+                  </dl>
+                  <p className="submission-explainer">Your public receipt is finalized. Price, delivery, and warranty remain sealed and cannot be reopened by this interface.</p>
+                  <div className="my-submission-actions">
+                    <a className="secondary-button" href={`/flare?status=all&tender=${tender.tenderId.toString()}`}>VIEW PUBLIC DOSSIER →</a>
+                  </div>
+                  <details className="submission-receipt-details">
+                    <summary>PUBLIC RECEIPT DETAILS <span aria-hidden="true">⌄</span></summary>
+                    <dl>
+                      <div><dt>Commitment</dt><dd><code>{bid.plaintextCommitment}</code></dd></div>
+                      <div><dt>Submission nonce</dt><dd><code>{bid.submissionNonce.toString()}</code></dd></div>
+                      <div><dt>Receipt bitmap</dt><dd><code>{bid.receiptBitmap.toString(2).padStart(3, "0")}</code></dd></div>
+                      <div><dt>Receipt expiry</dt><dd>{deadline(bid.receiptExpiry)}</dd></div>
+                    </dl>
+                  </details>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      ) : !selected ? (
         <section className="state-panel">
           <span aria-hidden="true">0</span>
-          <div><h2>No open Coston2 tenders</h2><p>Wait for a buyer to open a verified tender; no placeholder bid path is shown.</p></div>
+          <div><h2>No open Coston2 tenders</h2><p>Wait for a buyer to open a verified tender, or use My Submissions to inspect this wallet's finalized receipts.</p></div>
         </section>
       ) : (
         <section className="evidence-panel flare-vendor-form" aria-label="Coston2 sealed bid composer">

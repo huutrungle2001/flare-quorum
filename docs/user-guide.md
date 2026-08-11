@@ -176,8 +176,12 @@ forget the checkpoint.
    private-ingress path. Neither plaintext nor ciphertext is written on-chain.
 6. Collect signed receipts and submit the matching set to the market before the
    deadline.
-7. Confirm that the chain shows only vendor participation, commitment, receipt
-   bitmap, and updated common quorum/root.
+7. After confirmation, Private Bids switches to `MY SUBMISSIONS`. The new
+   transaction is labeled `CONFIRMED · FINALITY PENDING` until the finalized
+   public reader can recover its canonical bid reference. The finalized card
+   shows only tender/bid ID, lifecycle state, commitment, receipt bitmap,
+   accepted block, and a Public dossier link; it cannot restore price,
+   delivery, warranty, plaintext, or ciphertext.
 8. If selected, receive the public FTestXRP amount and open Activity / Assets
    with the winning wallet to approve the exact amount
    and submit an official FAssets redemption request to an XRPL address. The
@@ -187,6 +191,11 @@ The submission fails rather than weakening privacy if private ingress, a valid
 receipt set, or a common 2-machine quorum is unavailable.
 
 ## 6. Close, selection, and recovery
+
+Activity is a compact action center rather than a duplicate tender explorer.
+Each non-terminal tender shows its next checkpoint, the authority allowed to
+act, minimal deadline/bid progress, and a link back to the full Public dossier.
+Rules, scoring, commitments, and TEE facts remain in Public and Auditor.
 
 1. Any user or relay calls close when eligible. The market freezes bid root,
    rules, common quorum, close block, and the official XRP/USD FTSO snapshot.

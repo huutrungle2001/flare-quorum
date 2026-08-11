@@ -22,6 +22,20 @@ const wallet = {
   state: { status: "disconnected", providers: [], selectedProvider: null, account: null, chainId: null, walletClient: null, error: null, sessionRevision: 0 },
 } as unknown as WalletController;
 
+const vendorAddress = "0x5000000000000000000000000000000000000005" as const;
+const connectedVendorWallet = {
+  state: {
+    status: "connected",
+    providers: [],
+    selectedProvider: "test",
+    account: vendorAddress,
+    chainId: 114,
+    walletClient: {},
+    error: null,
+    sessionRevision: 1,
+  },
+} as unknown as WalletController;
+
 const publicTender = {
   tenderId: 1n,
   buyer: "0x1000000000000000000000000000000000000001" as const,
@@ -220,21 +234,60 @@ describe("Coston2 public evidence boundary", () => {
       approvedVendorCount: 1,
     }]} onRefresh={() => undefined} />);
     expect(screen.getByRole("heading", { name: "Advance public checkpoints." })).toBeInTheDocument();
+    expect(screen.getByText("ACTION CENTER / CANONICAL CHECKPOINTS")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Ready to close" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "CLOSE & FREEZE FTSO →" })).toBeDisabled();
+    expect(screen.getByRole("link", { name: "VIEW PUBLIC DOSSIER →" })).toHaveAttribute("href", "/flare?status=all&tender=1");
+    expect(screen.queryByText("Selection attempt")).toBeNull();
     expect(screen.getByText(/no bid-decryption capability/i)).toBeInTheDocument();
     expect(screen.queryByText(/client-provided winner accepted/i)).toBeNull();
   });
 
   it("asks the vendor to connect only when an open tender has a bid action", () => {
-    const first = render(<FlareVendorWorkspace wallet={wallet} tenders={[{ ...publicTender, status: "Cancelled" }]} onRefresh={() => undefined} />);
+    const first = render(<MemoryRouter><FlareVendorWorkspace wallet={wallet} tenders={[{ ...publicTender, status: "Cancelled" }]} onRefresh={() => undefined} /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "No open Coston2 tenders" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Connect to submit this action." })).toBeNull();
     first.unmount();
 
-    render(<FlareVendorWorkspace wallet={wallet} tenders={[publicTender]} onRefresh={() => undefined} />);
+    render(<MemoryRouter><FlareVendorWorkspace wallet={wallet} tenders={[publicTender]} onRefresh={() => undefined} /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Connect to submit this action." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "SUBMIT BID" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("button", { name: "MY SUBMISSIONS" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "REVIEW SEALED BID →" })).toBeDisabled();
     expect(screen.queryByText(/&amp;/)).toBeNull();
+  });
+
+  it("shows only wallet-scoped public receipts in My Submissions", () => {
+    const submittedTender = {
+      ...publicTender,
+      status: "Awarded" as const,
+      bidCount: 1n,
+      winnerBidId: 1n,
+      winner: vendorAddress,
+      bidReferences: [{
+        bidId: 1n,
+        vendor: vendorAddress,
+        submissionNonce: 91n,
+        plaintextCommitment: `0x${"88".repeat(32)}` as const,
+        receiptBitmap: 7,
+        receiptExpiry: 2_000_000_000n,
+        acceptedBlock: 123_456n,
+      }],
+    };
+    render(
+      <MemoryRouter initialEntries={["/flare?role=vendor&vendor=submissions"]}>
+        <FlareVendorWorkspace wallet={connectedVendorWallet} tenders={[submittedTender]} onRefresh={() => undefined} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Track your submissions." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "MY SUBMISSIONS · 1" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("heading", { name: "Submission accepted" })).toBeInTheDocument();
+    expect(screen.getByText("WINNER")).toBeInTheDocument();
+    expect(screen.getByText("3 / 3")).toBeInTheDocument();
+    expect(screen.getByText(/Private terms were deliberately not persisted/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "VIEW PUBLIC DOSSIER →" })).toHaveAttribute("href", "/flare?status=all&tender=1");
+    expect(screen.queryByText(/0\.72 XRP|Delivery days|Warranty days/)).toBeNull();
   });
 
   it("keeps FXRP redemption behind the winning wallet and never asks for an XRPL secret", () => {

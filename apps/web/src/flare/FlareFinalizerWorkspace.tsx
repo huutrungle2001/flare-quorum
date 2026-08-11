@@ -17,10 +17,7 @@ const coston2 = {
 
 type DirectAction = "closeTender" | "cancelTender" | "refundExpiredSelection";
 type Confirmation = { tenderId: bigint; action: "cancelTender" | "refundExpiredSelection" };
-
-function short(value: string) {
-  return `${value.slice(0, 8)}…${value.slice(-6)}`;
-}
+type ActivityState = "close" | "cancel-or-wait" | "wait-for-bids" | "request-selection" | "compute-live" | "retry-selection" | "refund-ready" | "terminal";
 
 function deadline(timestamp: bigint) {
   return new Intl.DateTimeFormat(undefined, {
@@ -29,7 +26,7 @@ function deadline(timestamp: bigint) {
   }).format(new Date(Number(timestamp) * 1_000));
 }
 
-function actionState(tender: FlarePublicTender, now: bigint) {
+function actionState(tender: FlarePublicTender, now: bigint): ActivityState {
   if (tender.status === "Open") {
     const canClose = now >= tender.bidDeadline || tender.bidCount >= BigInt(tender.approvedVendorCount);
     return canClose ? "close" : tender.bidCount === 0n ? "cancel-or-wait" : "wait-for-bids";
@@ -42,6 +39,31 @@ function actionState(tender: FlarePublicTender, now: bigint) {
     return "compute-live";
   }
   return "terminal";
+}
+
+function actionPresentation(state: ActivityState, buyerConnected: boolean) {
+  switch (state) {
+    case "close":
+      return { title: "Ready to close", status: "ACTION AVAILABLE", permission: "ANYONE", lane: "action" };
+    case "cancel-or-wait":
+      return buyerConnected
+        ? { title: "Waiting for the first bid", status: "OPTIONAL ACTION", permission: "BUYER ONLY · THIS WALLET", lane: "action" }
+        : { title: "Accepting sealed bids", status: "WAITING", permission: "BUYER MAY CANCEL", lane: "waiting" };
+    case "wait-for-bids":
+      return { title: "Accepting sealed bids", status: "WAITING", permission: "NO ACTION REQUIRED", lane: "waiting" };
+    case "request-selection":
+      return { title: "Relay selection required", status: "RELAY QUEUE", permission: "DEDICATED RELAY", lane: "relay" };
+    case "compute-live":
+      return { title: "FCC computation in progress", status: "PROCESSING", permission: "NO ACTION REQUIRED", lane: "processing" };
+    case "retry-selection":
+      return { title: "Relay retry available", status: "RELAY QUEUE", permission: "DEDICATED RELAY", lane: "relay" };
+    case "refund-ready":
+      return buyerConnected
+        ? { title: "Escrow recovery available", status: "ACTION AVAILABLE", permission: "BUYER ONLY · THIS WALLET", lane: "action" }
+        : { title: "Buyer recovery available", status: "BUYER ACTION", permission: "BUYER ONLY", lane: "waiting" };
+    default:
+      return { title: "No action required", status: "COMPLETE", permission: "PUBLIC RECORD", lane: "complete" };
+  }
 }
 
 export function FlareFinalizerWorkspace({
@@ -72,7 +94,16 @@ export function FlareFinalizerWorkspace({
     () => tenders.filter((tender) => !["Awarded", "Refunded", "Cancelled"].includes(tender.status)),
     [tenders],
   );
-  const hasWalletAction = queue.some((tender) => ["close", "cancel-or-wait", "refund-ready"].includes(actionState(tender, now)));
+  const actionableCount = queue.filter((tender) => {
+    const state = actionState(tender, now);
+    if (state === "close") return true;
+    return Boolean(
+      connected
+      && (state === "cancel-or-wait" || state === "refund-ready")
+      && isAddressEqual(wallet.state.account!, tender.buyer),
+    );
+  }).length;
+  const hasWalletAction = actionableCount > 0;
 
   async function runDirectAction(tender: FlarePublicTender, action: DirectAction) {
     if (!connected) return;
@@ -153,11 +184,16 @@ export function FlareFinalizerWorkspace({
       <section id="lifecycle-queue" className="evidence-panel finalizer-queue" aria-label="Public lifecycle queue">
         <header className="detail-header">
           <div>
-            <p className="eyebrow">CANONICAL ACTION QUEUE</p>
-            <h2>{queue.length} non-terminal tender{queue.length === 1 ? "" : "s"}</h2>
+            <p className="eyebrow">ACTION CENTER / CANONICAL CHECKPOINTS</p>
+            <h2>{queue.length} active checkpoint{queue.length === 1 ? "" : "s"}</h2>
           </div>
           <button className="icon-button" onClick={onRefresh} aria-label="Refresh public lifecycle queue">↻</button>
         </header>
+        <div className="activity-queue-summary" aria-label="Activity action summary">
+          <div><strong>{actionableCount}</strong><span>NEED{actionableCount === 1 ? "S" : ""} ACTION</span></div>
+          <div><strong>{queue.length - actionableCount}</strong><span>TRACKING ONLY</span></div>
+          <p>Activity shows the next step only. Rules and evidence remain in each Public dossier.</p>
+        </div>
         {hasWalletAction && <WalletPanel wallet={wallet} network="coston2" compact />}
         {queue.length === 0 ? (
           <div className="state-panel compact-state">
@@ -175,19 +211,19 @@ export function FlareFinalizerWorkspace({
               const cancelKey = `cancelTender:${tender.tenderId.toString()}`;
               const refundKey = `refundExpiredSelection:${tender.tenderId.toString()}`;
               const isConfirming = confirmation?.tenderId === tender.tenderId;
+              const presentation = actionPresentation(state, buyerConnected);
               return (
-                <article key={tender.tenderId.toString()} className="finalizer-card">
+                <article key={tender.tenderId.toString()} className="finalizer-card activity-action-card" data-lane={presentation.lane}>
                   <header>
-                    <div><p className="eyebrow">TENDER {tender.tenderId.toString()}</p><h3>{tender.status}</h3></div>
-                    <span className="privacy-badge">PUBLIC CHECKPOINT</span>
+                    <div><p className="eyebrow">TENDER {tender.tenderId.toString()} · {tender.status.toUpperCase()}</p><h3>{presentation.title}</h3></div>
+                    <span className={`privacy-badge${presentation.lane === "action" ? " verified" : ""}`}>{presentation.status}</span>
                   </header>
-                  <dl className="term-grid">
-                    <div><dt>Buyer</dt><dd title={tender.buyer}>{short(tender.buyer)}</dd></div>
-                    <div><dt>Deadline</dt><dd>{deadline(tender.bidDeadline)}</dd></div>
-                    <div><dt>Accepted bids</dt><dd>{tender.bidCount.toString()} / {tender.approvedVendorCount}</dd></div>
-                    <div><dt>Selection attempt</dt><dd>{tender.selectionAttempt || "Not requested"}</dd></div>
-                  </dl>
-                  <div className="finalizer-action-copy">
+                  <div className="activity-action-meta">
+                    <span>{presentation.permission}</span>
+                    <span>{tender.bidCount.toString()} / {tender.approvedVendorCount} BIDS</span>
+                    <span>DEADLINE {deadline(tender.bidDeadline)}</span>
+                  </div>
+                  <div className="finalizer-action-copy activity-action-copy">
                     {state === "close" && <p>Deadline/vendor quorum allows a permissionless close. The contract captures the live XRP/USD FTSO snapshot.</p>}
                     {state === "cancel-or-wait" && <p>Still accepting bids. The connected buyer may cancel only while zero bids are accepted.</p>}
                     {state === "wait-for-bids" && <p>Still accepting sealed bids until the deadline or full vendor participation.</p>}
@@ -213,8 +249,9 @@ export function FlareFinalizerWorkspace({
                       </button>
                     )}
                     {(state === "request-selection" || state === "retry-selection" || state === "compute-live") && (
-                      <a className="secondary-button" href="/docs#flare-coston2">OPEN RELAY RUNBOOK →</a>
+                      <a className="text-link" href="/docs#flare-coston2">OPEN RELAY RUNBOOK →</a>
                     )}
+                    <a className="secondary-button" href={`/flare?status=all&tender=${tender.tenderId.toString()}`}>VIEW PUBLIC DOSSIER →</a>
                   </div>
                   {isConfirming && (
                     <div className="finalizer-confirmation" role="alertdialog" aria-labelledby={`confirm-title-${tender.tenderId.toString()}`}>
