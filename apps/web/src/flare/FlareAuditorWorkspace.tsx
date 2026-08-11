@@ -3,6 +3,7 @@ import { formatUnits } from "viem";
 import { useEffect, useMemo, useState } from "react";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";
 import { ContextHelp } from "../shell/ContextHelp";
+import { PublicValue } from "../shell/PublicValue";
 
 function short(value: string) {
   return `${value.slice(0, 10)}…${value.slice(-8)}`;
@@ -19,10 +20,32 @@ export function FlareAuditorWorkspace({
   tenders: readonly FlarePublicTender[];
   finalizedBlock: bigint;
 }) {
-  const [selectedId, setSelectedId] = useState(() => tenders[0]?.tenderId.toString() ?? "");
+  const orderedTenders = useMemo(
+    () => [...tenders].sort((left, right) => left.tenderId > right.tenderId ? -1 : left.tenderId < right.tenderId ? 1 : 0),
+    [tenders],
+  );
+  const preferredTender = orderedTenders.find((tender) => tender.status === "Awarded") ?? orderedTenders[0] ?? null;
+  const [selectedId, setSelectedId] = useState(() => preferredTender?.tenderId.toString() ?? "");
+  const [statusFilter, setStatusFilter] = useState<"all" | "awarded" | "active" | "refunded">("all");
+  const [query, setQuery] = useState("");
+  const filteredTenders = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return orderedTenders.filter((tender) => {
+      const statusMatches = statusFilter === "all"
+        || (statusFilter === "active" && ["Open", "Closed", "ComputePending"].includes(tender.status))
+        || tender.status.toLowerCase() === statusFilter;
+      const queryMatches = !normalized || [
+        tender.tenderId.toString(),
+        `tender ${tender.tenderId.toString()}`,
+        tender.buyer,
+        tender.status,
+      ].some((value) => value.toLowerCase().includes(normalized));
+      return statusMatches && queryMatches;
+    });
+  }, [orderedTenders, query, statusFilter]);
   const selected = useMemo(
-    () => tenders.find((tender) => tender.tenderId.toString() === selectedId) ?? tenders[0] ?? null,
-    [selectedId, tenders],
+    () => filteredTenders.find((tender) => tender.tenderId.toString() === selectedId) ?? filteredTenders[0] ?? null,
+    [filteredTenders, selectedId],
   );
 
   useEffect(() => {
@@ -53,7 +76,7 @@ export function FlareAuditorWorkspace({
           or authority to choose a winner.
         </p>
       </section>
-      {tenders.length === 0 || !selected ? (
+      {tenders.length === 0 ? (
         <section className="state-panel">
           <span aria-hidden="true">0</span>
           <div><h2>No finalized dossier available</h2><p>No placeholder audit record is created.</p></div>
@@ -62,9 +85,23 @@ export function FlareAuditorWorkspace({
         <>
           <section className="audit-selector" aria-label="Select tender to audit">
             <label>
+              Search public state
+              <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tender ID, buyer or status" />
+            </label>
+            <label>
+              Status
+              <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
+                <option value="all">All statuses</option>
+                <option value="awarded">Awarded</option>
+                <option value="active">Open / compute</option>
+                <option value="refunded">Refunded</option>
+              </select>
+            </label>
+            <label>
               Public tender dossier
-              <select value={selected.tenderId.toString()} onChange={(event) => setSelectedId(event.target.value)}>
-                {tenders.map((tender) => (
+              <select value={selected?.tenderId.toString() ?? ""} onChange={(event) => setSelectedId(event.target.value)} disabled={filteredTenders.length === 0}>
+                {filteredTenders.length === 0 && <option value="">No matching dossier</option>}
+                {filteredTenders.map((tender) => (
                   <option key={tender.tenderId.toString()} value={tender.tenderId.toString()}>
                     Tender {tender.tenderId.toString()} · {tender.status}
                   </option>
@@ -74,26 +111,32 @@ export function FlareAuditorWorkspace({
             <span className="privacy-badge verified">FINALIZED BLOCK {finalizedBlock.toString()}</span>
           </section>
 
+          {!selected ? (
+            <section className="state-panel">
+              <span aria-hidden="true">0</span>
+              <div><h2>No dossiers match this view</h2><p>Clear the public search or choose another status. No placeholder audit record is created.</p></div>
+            </section>
+          ) : (
+          <>
           <section className="evidence-panel audit-binding-panel">
             <header className="detail-header">
               <div><p className="eyebrow">TRUST BINDING</p><h2>Three fixed machines. One exact result domain.</h2></div>
               <span className="privacy-badge">2 OF 3 REQUIRED</span>
             </header>
             <dl className="term-grid">
-              <div><dt>Market</dt><dd><a className="text-link" href={explorer("address", coston2FlarePublicRelease.market)} target="_blank" rel="noreferrer">{short(coston2FlarePublicRelease.market)} ↗</a></dd></div>
+              <div><dt>Market</dt><dd><PublicValue value={coston2FlarePublicRelease.market} label="market address" href={explorer("address", coston2FlarePublicRelease.market)} /></dd></div>
               <div><dt>Extension / wire version</dt><dd>{selected.extensionId.toString()} / {coston2FlarePublicRelease.fcc.version}</dd></div>
-              <div><dt>Code version</dt><dd title={selected.codeVersion}>{short(selected.codeVersion)}</dd></div>
-              <div><dt>Rules hash</dt><dd title={selected.rulesHash}>{short(selected.rulesHash)}</dd></div>
-              <div><dt>Ordered bid root</dt><dd title={selected.orderedBidRoot}>{short(selected.orderedBidRoot)}</dd></div>
+              <div><dt>Code version</dt><dd><PublicValue value={selected.codeVersion} label="code version" /></dd></div>
+              <div><dt>Rules hash</dt><dd><PublicValue value={selected.rulesHash} label="rules hash" /></dd></div>
+              <div><dt>Ordered bid root</dt><dd><PublicValue value={selected.orderedBidRoot} label="ordered bid root" /></dd></div>
               <div><dt>Common quorum</dt><dd>{selected.commonQuorumBitmap.toString(2).padStart(3, "0")} / threshold 2</dd></div>
             </dl>
             <div className="audit-machine-grid">
               {selected.teeIds.map((teeId, index) => (
                 <article key={teeId}>
                   <span className="eyebrow">TEE {index + 1}</span>
-                  <strong title={teeId}>{short(teeId)}</strong>
-                  <code title={selected.teeKeyFingerprints[index]}>{short(selected.teeKeyFingerprints[index])}</code>
-                  <a className="text-link" href={explorer("address", teeId)} target="_blank" rel="noreferrer">REGISTERED IDENTITY ↗</a>
+                  <PublicValue value={teeId} label={`TEE ${index + 1} identity`} href={explorer("address", teeId)} />
+                  <PublicValue value={selected.teeKeyFingerprints[index]} label={`TEE ${index + 1} key fingerprint`} />
                 </article>
               ))}
             </div>
@@ -110,9 +153,9 @@ export function FlareAuditorWorkspace({
               <div className="audit-bid-list">
                 {selected.bidReferences.map((bid) => (
                   <article key={bid.bidId.toString()}>
-                    <div><span className="eyebrow">BID {bid.bidId.toString()}</span><strong title={bid.vendor}>{short(bid.vendor)}</strong></div>
+                    <div><span className="eyebrow">BID {bid.bidId.toString()}</span><PublicValue value={bid.vendor} label={`bid ${bid.bidId.toString()} vendor`} href={explorer("address", bid.vendor)} /></div>
                     <dl>
-                      <div><dt>Commitment</dt><dd title={bid.plaintextCommitment}>{short(bid.plaintextCommitment)}</dd></div>
+                      <div><dt>Commitment</dt><dd><PublicValue value={bid.plaintextCommitment} label={`bid ${bid.bidId.toString()} commitment`} /></dd></div>
                       <div><dt>Receipt bitmap</dt><dd>{bid.receiptBitmap.toString(2).padStart(3, "0")}</dd></div>
                       <div><dt>Accepted block</dt><dd><a className="text-link" href={explorer("block", bid.acceptedBlock.toString())} target="_blank" rel="noreferrer">{bid.acceptedBlock.toString()} ↗</a></dd></div>
                     </dl>
@@ -136,7 +179,7 @@ export function FlareAuditorWorkspace({
               <dl>
                 <div><dt>Receipt / tender ID</dt><dd>{selected.award.tenderId.toString()}</dd></div>
                 <div><dt>Winning bid ID</dt><dd>{selected.award.winnerBidId.toString()}</dd></div>
-                <div><dt>Result digest</dt><dd title={selected.award.resultDigest}>{short(selected.award.resultDigest)}</dd></div>
+                <div><dt>Result digest</dt><dd><PublicValue value={selected.award.resultDigest} label="result digest" /></dd></div>
                 <div><dt>Finalized block</dt><dd>{selected.award.finalizedBlock.toString()}</dd></div>
                 <div><dt>Winner payout</dt><dd>{formatUnits(selected.award.amount, 6)} FTestXRP</dd></div>
                 <div><dt>Buyer remainder</dt><dd>{formatUnits(selected.publicCeilingXrp - selected.award.amount, 6)} FTestXRP</dd></div>
@@ -148,6 +191,8 @@ export function FlareAuditorWorkspace({
             <article><span className="privacy-badge verified">PUBLIC</span><h3>What can be checked</h3><p>Rules, participation, commitments, quorum, FTSO snapshot, result binding, winner, payout, remainder, and award receipt.</p></article>
             <article><span className="privacy-badge encrypted">SEALED</span><h3>What is deliberately absent</h3><p>Losing prices, delivery/warranty terms, credentials, salts, ciphertext, TEE working state, and component scores.</p></article>
           </section>
+          </>
+          )}
         </>
       )}
     </main>

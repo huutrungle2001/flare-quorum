@@ -22,6 +22,16 @@
   font-synthesis: none;
 }
 
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .flare-quorum-app {
   --color-brand-accent: #ff8a1f;
   --color-input-surface: #fff8ed;
@@ -1340,6 +1350,33 @@ main {
   margin: 0 4px 4px;
 }
 
+.public-search-control {
+  display: grid;
+  gap: 6px;
+  margin: 0 4px;
+}
+
+.public-search-control span {
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.public-search-control input,
+.audit-selector input {
+  background: var(--color-paper-white);
+  border: 1px solid var(--color-ink-black);
+  border-radius: 25px;
+  color: var(--color-ink-black);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  min-height: 44px;
+  padding: 9px 14px;
+  width: 100%;
+}
+
 .dossier-list h2 {
   font-size: 2rem;
   line-height: 1;
@@ -1414,7 +1451,14 @@ main {
   font-size: 1.7rem;
   font-weight: 500;
   line-height: 1.05;
-  margin-bottom: 24px;
+  margin-bottom: 5px;
+}
+
+.card-buyer {
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  margin-bottom: 22px;
 }
 
 .card-facts {
@@ -1463,6 +1507,27 @@ main {
   font-size: 1.5rem;
 }
 
+.public-pagination {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr auto 1fr;
+  padding: 8px 4px 0;
+}
+
+.public-pagination .secondary-button {
+  font-size: 0.7rem;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 12px;
+}
+
+.public-pagination span {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
 .privacy-badge {
   align-items: center;
   background: var(--color-paper-white);
@@ -1504,6 +1569,41 @@ main {
   border: 1px solid var(--color-ink-black);
   border-radius: 25px;
   overflow: hidden;
+}
+
+.public-value {
+  align-items: center;
+  display: inline-flex;
+  gap: 7px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.public-value-text {
+  font-family: var(--font-mono);
+  font-size: inherit;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.public-value-copy {
+  background: var(--color-paper-white);
+  border: 1px solid var(--color-ink-black);
+  border-radius: 25px;
+  color: var(--color-ink-black);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 7px 9px;
+}
+
+.public-value-copy:hover {
+  background: var(--color-brand-accent);
 }
 
 .detail-header > .context-help {
@@ -2275,8 +2375,9 @@ main {
 .audit-selector {
   align-items: end;
   border-bottom: 1px solid var(--color-ink-black);
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(190px, 1.2fr) minmax(130px, 0.7fr) minmax(200px, 1fr) auto;
   padding: 24px 32px;
 }
 
@@ -2288,7 +2389,8 @@ main {
   letter-spacing: 0.08em;
 }
 
-.audit-selector select {
+.audit-selector select,
+.audit-selector input {
   background: var(--color-paper-white);
   border: 1px solid var(--color-ink-black);
   border-radius: 25px;
@@ -2863,11 +2965,14 @@ main {
 
   .tee-policy-panel > header,
   .public-bid-reference-panel > header,
-  .audit-selector,
   .finalizer-card > header {
     align-items: flex-start;
     flex-direction: column;
     gap: 12px;
+  }
+
+  .audit-selector {
+    grid-template-columns: 1fr;
   }
 
   .tee-policy-grid,
@@ -6186,22 +6291,6 @@ footer p {
 
   .dossier-list {
     align-content: start;
-    max-height: calc(100vh - 180px);
-    overflow-y: auto;
-    padding-right: 6px;
-    position: sticky;
-    top: 96px;
-  }
-
-  .dossier-list-controls {
-    top: 0;
-  }
-
-  .detail-panel {
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
-    position: sticky;
-    top: 96px;
   }
 }
 

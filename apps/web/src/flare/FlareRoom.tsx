@@ -12,13 +12,14 @@ import { FlareAuditorWorkspace } from "./FlareAuditorWorkspace";
 import { FlareFinalizerWorkspace } from "./FlareFinalizerWorkspace";
 import { FlareWalletAssets } from "./FlareWalletAssets";
 import { ContextHelp } from "../shell/ContextHelp";
+import { PublicValue } from "../shell/PublicValue";
 import { refreshStateEvent } from "../shell/refreshState";
 
 type FlareTenderFilter = "current" | "all" | "open" | "compute" | "awarded" | "refunded";
 type FlareTenderSort = "newest" | "oldest";
 
 const flareTenderFilters: readonly { value: FlareTenderFilter; label: string }[] = [
-  { value: "current", label: "Current, awarded & refunded" },
+  { value: "current", label: "All except cancelled" },
   { value: "all", label: "All tenders" },
   { value: "open", label: "Open" },
   { value: "compute", label: "Close / compute pending" },
@@ -30,6 +31,8 @@ const flareTenderSorts: readonly { value: FlareTenderSort; label: string }[] = [
   { value: "newest", label: "Newest first" },
   { value: "oldest", label: "Oldest first" },
 ];
+
+const publicTendersPerPage = 5;
 
 function short(value: string) {
   return `${value.slice(0, 8)}…${value.slice(-6)}`;
@@ -82,6 +85,18 @@ function sortTenders(
       ? (leftComesAfter ? -1 : 1)
       : (leftComesAfter ? 1 : -1);
   });
+}
+
+function searchTenders(tenders: readonly FlarePublicTender[], query: string) {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return tenders;
+  return tenders.filter((tender) => [
+    tender.tenderId.toString(),
+    `tender ${tender.tenderId.toString()}`,
+    tender.buyer,
+    tender.status,
+    tender.metadataHash,
+  ].some((value) => value.toLowerCase().includes(normalized)));
 }
 
 function ProtocolFacts({ compact = false }: { compact?: boolean }) {
@@ -181,18 +196,18 @@ function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
         <div><dt>Public escrow ceiling</dt><dd>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</dd></div>
         <div><dt>Bid deadline</dt><dd>{formatDeadline(tender.bidDeadline)}</dd></div>
         <div><dt>Accepted bids</dt><dd>{tender.bidCount.toString()} / {tender.approvedVendorCount}</dd></div>
-        <div><dt>Buyer / PersonalAccount</dt><dd title={tender.buyer}>{short(tender.buyer)}</dd></div>
+        <div><dt>Buyer / PersonalAccount</dt><dd><PublicValue value={tender.buyer} label="buyer address" href={explorerAddress(tender.buyer)} /></dd></div>
         <div><dt>Common TEE quorum</dt><dd>{quorum} / threshold 2</dd></div>
         <div><dt>Quote currencies</dt><dd>{[tender.scoringPolicy.allowXrp && "XRP", tender.scoringPolicy.allowUsd && "USD"].filter(Boolean).join(" + ")}</dd></div>
         <div><dt>Scoring weights</dt><dd>{tender.scoringPolicy.priceWeightBps / 100}% price / {tender.scoringPolicy.deliveryWeightBps / 100}% delivery / {tender.scoringPolicy.warrantyWeightBps / 100}% warranty</dd></div>
         <div><dt>Service bounds</dt><dd>≤ {tender.scoringPolicy.maxDeliveryDays}d delivery / {tender.scoringPolicy.minWarrantyDays}–{tender.scoringPolicy.maxWarrantyDays}d warranty</dd></div>
         <div><dt>Credential requirements</dt><dd>{tender.scoringPolicy.requiredCredentials.length}</dd></div>
-        <div><dt>Public brief hash</dt><dd title={tender.metadataHash}>{short(tender.metadataHash)}</dd></div>
-        <div><dt>Canonical rules hash</dt><dd title={tender.rulesHash}>{short(tender.rulesHash)}</dd></div>
+        <div><dt>Public brief hash</dt><dd><PublicValue value={tender.metadataHash} label="public brief hash" /></dd></div>
+        <div><dt>Canonical rules hash</dt><dd><PublicValue value={tender.rulesHash} label="canonical rules hash" /></dd></div>
         <div><dt>Extension</dt><dd>{tender.extensionId.toString()}</dd></div>
-        <div><dt>Code version</dt><dd title={tender.codeVersion}>{short(tender.codeVersion)}</dd></div>
+        <div><dt>Code version</dt><dd><PublicValue value={tender.codeVersion} label="code version" /></dd></div>
         <div><dt>Selection attempt</dt><dd>{tender.selectionAttempt || "Not requested"}</dd></div>
-        <div><dt>Request ID</dt><dd title={tender.requestId}>{short(tender.requestId)}</dd></div>
+        <div><dt>Request ID</dt><dd><PublicValue value={tender.requestId} label="request ID" /></dd></div>
       </dl>
       <section className="tee-policy-panel" aria-label="Tender-fixed TEE policy">
         <header><p className="eyebrow">FROZEN MACHINE POLICY</p><span className="privacy-badge verified">3 RECEIPTS / 2 RESULTS</span></header>
@@ -200,8 +215,8 @@ function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
           {tender.teeIds.map((teeId, index) => (
             <article key={teeId}>
               <strong>TEE {index + 1}</strong>
-              <a className="text-link" href={explorerAddress(teeId)} target="_blank" rel="noreferrer" title={teeId}>{short(teeId)} ↗</a>
-              <code title={tender.teeKeyFingerprints[index]}>{short(tender.teeKeyFingerprints[index])}</code>
+              <PublicValue value={teeId} label={`TEE ${index + 1} identity`} href={explorerAddress(teeId)} />
+              <PublicValue value={tender.teeKeyFingerprints[index]} label={`TEE ${index + 1} key fingerprint`} />
             </article>
           ))}
         </div>
@@ -233,8 +248,8 @@ function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
       <section className="evidence-panel">
         <p className="eyebrow">FLARE PROTOCOL BINDING</p>
         <dl>
-          <div><dt>Ordered bid root</dt><dd title={tender.orderedBidRoot}>{short(tender.orderedBidRoot)}</dd></div>
-          <div><dt>FTSO feed</dt><dd title={tender.ftsoFeedId}>{short(tender.ftsoFeedId)}</dd></div>
+          <div><dt>Ordered bid root</dt><dd><PublicValue value={tender.orderedBidRoot} label="ordered bid root" /></dd></div>
+          <div><dt>FTSO feed</dt><dd><PublicValue value={tender.ftsoFeedId} label="FTSO feed ID" /></dd></div>
           <div><dt>FTSO value / decimals</dt><dd>{tender.ftsoValue.toString()} / {tender.ftsoDecimals}</dd></div>
           <div><dt>FTSO timestamp</dt><dd>{tender.ftsoTimestamp.toString()}</dd></div>
           <div><dt>Close block</dt><dd>{tender.closeBlock.toString()}</dd></div>
@@ -251,7 +266,7 @@ function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
           <dl>
             <div><dt>Award receipt</dt><dd>#{tender.award.tenderId.toString()} · NON-TRANSFERABLE</dd></div>
             <div><dt>Winning bid</dt><dd>#{tender.award.winnerBidId.toString()}</dd></div>
-            <div><dt>Result digest</dt><dd title={tender.award.resultDigest}>{short(tender.award.resultDigest)}</dd></div>
+            <div><dt>Result digest</dt><dd><PublicValue value={tender.award.resultDigest} label="result digest" /></dd></div>
             <div><dt>Finalized block</dt><dd>{tender.award.finalizedBlock.toString()}</dd></div>
             <div><dt>Buyer remainder</dt><dd>{formatUnits(tender.publicCeilingXrp - tender.award.amount, 6)} FTestXRP</dd></div>
             <div><dt>Conservation</dt><dd>WINNER + REMAINDER = ESCROW</dd></div>
@@ -439,17 +454,28 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
   const sort = flareTenderSorts.some((option) => option.value === requestedSort)
     ? requestedSort as FlareTenderSort
     : "newest";
-  const visibleTenders = useMemo(() => sortTenders(filterTenders(tenders, filter), sort), [filter, sort, tenders]);
+  const query = params.get("q")?.trim() ?? "";
+  const visibleTenders = useMemo(
+    () => searchTenders(sortTenders(filterTenders(tenders, filter), sort), query),
+    [filter, query, sort, tenders],
+  );
   const selectedId = params.get("tender");
-  const selected = visibleTenders.find((tender) => tender.tenderId.toString() === selectedId) ?? visibleTenders[0] ?? null;
+  const selectedIndex = visibleTenders.findIndex((tender) => tender.tenderId.toString() === selectedId);
+  const requestedPage = Number(params.get("page"));
+  const pageCount = Math.max(1, Math.ceil(visibleTenders.length / publicTendersPerPage));
+  const inferredPage = selectedIndex >= 0 ? Math.floor(selectedIndex / publicTendersPerPage) + 1 : 1;
+  const page = Number.isSafeInteger(requestedPage) && requestedPage >= 1 && requestedPage <= pageCount
+    ? requestedPage
+    : inferredPage;
+  const pageTenders = visibleTenders.slice((page - 1) * publicTendersPerPage, page * publicTendersPerPage);
+  const selected = visibleTenders.find((tender) => tender.tenderId.toString() === selectedId) ?? pageTenders[0] ?? null;
 
   function setFilter(nextFilter: FlareTenderFilter) {
     const updated = new URLSearchParams(params);
     if (nextFilter === "current") updated.delete("status");
     else updated.set("status", nextFilter);
-    if (selectedId && !filterTenders(tenders, nextFilter).some((tender) => tender.tenderId.toString() === selectedId)) {
-      updated.delete("tender");
-    }
+    updated.delete("tender");
+    updated.delete("page");
     setParams(updated);
   }
 
@@ -457,12 +483,43 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
     const updated = new URLSearchParams(params);
     if (nextSort === "newest") updated.delete("sort");
     else updated.set("sort", nextSort);
+    updated.delete("tender");
+    updated.delete("page");
+    setParams(updated);
+  }
+
+  function setQuery(nextQuery: string) {
+    const updated = new URLSearchParams(params);
+    if (nextQuery.trim()) updated.set("q", nextQuery);
+    else updated.delete("q");
+    updated.delete("tender");
+    updated.delete("page");
+    setParams(updated, { replace: true });
+  }
+
+  function setPage(nextPage: number) {
+    const updated = new URLSearchParams(params);
+    if (nextPage <= 1) updated.delete("page");
+    else updated.set("page", nextPage.toString());
+    updated.delete("tender");
+    setParams(updated);
+    window.setTimeout(() => document.getElementById("tenders")?.scrollIntoView?.({ block: "start" }), 0);
+  }
+
+  function clearExplorerFilters() {
+    const updated = new URLSearchParams(params);
+    updated.delete("status");
+    updated.delete("q");
+    updated.delete("tender");
+    updated.delete("page");
     setParams(updated);
   }
 
   function selectTender(tenderId: bigint) {
     const updated = new URLSearchParams(params);
     updated.set("tender", tenderId.toString());
+    if (page <= 1) updated.delete("page");
+    else updated.set("page", page.toString());
     setParams(updated);
     window.setTimeout(() => document.getElementById("tenders")?.scrollIntoView?.({ block: "start" }), 0);
   }
@@ -499,20 +556,31 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
       {state.status === "ready" && state.data && tenders.length > 0 && visibleTenders.length === 0 && (
         <section className="state-panel">
           <span aria-hidden="true">0</span>
-          <div><h2>No tenders match this filter</h2><p>Canonical Coston2 state loaded successfully; choose another public status filter.</p><button className="secondary-button" type="button" onClick={() => setFilter("all")}>SHOW ALL TENDERS →</button></div>
+          <div><h2>No tenders match this view</h2><p>Canonical Coston2 state loaded successfully; clear the search or choose another public status filter.</p><button className="secondary-button" type="button" onClick={clearExplorerFilters}>CLEAR FILTERS →</button></div>
         </section>
       )}
       {state.status === "ready" && state.data && selected && (
-        <section className="explorer-grid">
+        <section id="tenders" className="explorer-grid">
           <aside className="dossier-list">
             <div className="dossier-list-controls">
-              <header><div><p className="eyebrow">COSTON2 DOSSIERS</p><h2>{visibleTenders.length} tenders</h2></div></header>
+              <header><div><p className="eyebrow">COSTON2 DOSSIERS</p><h2>{visibleTenders.length} tender{visibleTenders.length === 1 ? "" : "s"}</h2></div></header>
+              <label className="public-search-control">
+                <span>Search public state</span>
+                <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tender ID, buyer or status" />
+              </label>
               <div className="public-filter-controls">
                 <label className="public-filter-control"><span>Show</span><select aria-label="Filter Coston2 tenders" value={filter} onChange={(event) => setFilter(event.target.value as FlareTenderFilter)}>{flareTenderFilters.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
                 <label className="public-filter-control"><span>Sort by</span><select aria-label="Sort Coston2 tenders" value={sort} onChange={(event) => setSort(event.target.value as FlareTenderSort)}>{flareTenderSorts.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
               </div>
             </div>
-            {visibleTenders.map((tender) => <div className="tender-card-shell" key={tender.tenderId.toString()}><button type="button" onClick={() => selectTender(tender.tenderId)} aria-pressed={selected?.tenderId === tender.tenderId} className={`tender-card ${selected?.tenderId === tender.tenderId ? "selected" : ""}`}><span className="card-kicker">TENDER / {tender.tenderId.toString()}</span><span className="card-title">Flare confidential procurement</span><span className="card-facts"><span><strong>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</strong>Public ceiling</span><span><strong>{tender.bidCount.toString()}/{tender.approvedVendorCount}</strong>TEE receipts</span></span><span className="card-deadline">Deadline · {formatDeadline(tender.bidDeadline)}</span><span className="card-footer"><span className={`privacy-badge ${statusClass(tender.status)}`}>{tender.status.toUpperCase()}</span><span className="card-arrow" aria-hidden="true">→</span></span></button></div>)}
+            {pageTenders.map((tender) => <div className="tender-card-shell" key={tender.tenderId.toString()}><button type="button" onClick={() => selectTender(tender.tenderId)} aria-pressed={selected?.tenderId === tender.tenderId} className={`tender-card ${selected?.tenderId === tender.tenderId ? "selected" : ""}`}><span className="card-kicker">{tender.status.toUpperCase()} / FINALIZED PUBLIC STATE</span><span className="card-title">Tender #{tender.tenderId.toString()}</span><span className="card-buyer">Buyer · {short(tender.buyer)}</span><span className="card-facts"><span><strong>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</strong>Public ceiling</span><span><strong>{tender.bidCount.toString()}/{tender.approvedVendorCount}</strong>Accepted bids</span></span><span className="card-deadline">Deadline · {formatDeadline(tender.bidDeadline)}</span><span className="card-footer"><span className={`privacy-badge ${statusClass(tender.status)}`}>{tender.status.toUpperCase()}</span><span className="card-arrow" aria-hidden="true">→</span></span></button></div>)}
+            {pageCount > 1 && (
+              <nav className="public-pagination" aria-label="Tender list pages">
+                <button className="secondary-button" type="button" onClick={() => setPage(page - 1)} disabled={page === 1}>← PREVIOUS</button>
+                <span>PAGE {page} / {pageCount}</span>
+                <button className="secondary-button" type="button" onClick={() => setPage(page + 1)} disabled={page === pageCount}>NEXT →</button>
+              </nav>
+            )}
           </aside>
           <TenderEvidence tender={selected} />
         </section>

@@ -119,6 +119,35 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("Inspect protocol deployment facts").closest("details")).not.toHaveAttribute("open");
   });
 
+  it("paginates canonical dossiers and searches without fabricating titles", async () => {
+    const tenders = Array.from({ length: 7 }, (_value, index) => ({
+      ...publicTender,
+      tenderId: BigInt(index + 1),
+    }));
+    render(<MemoryRouter><FlareExplorerView state={{
+      status: "ready",
+      error: null,
+      data: {
+        chainId: 114,
+        tenders,
+        indexedBlock: 100n,
+        finalizedBlock: 100n,
+        latestBlock: 112n,
+        deploymentStatus: "verified",
+      },
+    }} onRetry={() => undefined} /></MemoryRouter>);
+
+    expect(screen.getByRole("button", { name: /Tender #7/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Tender #1/i })).toBeNull();
+    expect(screen.queryByText("Flare confidential procurement")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "NEXT →" }));
+    expect(await screen.findByRole("button", { name: /Tender #1/i })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Search public state"), { target: { value: "Tender 4" } });
+    await waitFor(() => expect(screen.getByRole("heading", { name: "1 tender" })).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: /Tender #4/i })).toBeInTheDocument();
+  });
+
   it("restores the Flare product story and keeps signing optional", () => {
     render(<MemoryRouter><FlareLandingPage /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: /Private bids.*Public awards/i })).toBeInTheDocument();
@@ -162,6 +191,21 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText(/NO BID DECRYPTION/i)).toBeInTheDocument();
     expect(screen.getAllByText(/TEE [123]/)).toHaveLength(3);
     expect(screen.queryByRole("button", { name: /reveal|decrypt|finalize/i })).toBeNull();
+  });
+
+  it("opens the newest awarded audit dossier and filters the selector", () => {
+    const tenders = [
+      { ...publicTender, tenderId: 2n, status: "Open" as const },
+      { ...publicTender, tenderId: 8n, status: "Awarded" as const },
+      { ...publicTender, tenderId: 5n, status: "Awarded" as const },
+    ];
+    render(<FlareAuditorWorkspace tenders={tenders} finalizedBlock={100n} />);
+
+    expect(screen.getByLabelText("Public tender dossier")).toHaveValue("8");
+    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "active" } });
+    expect(screen.getByLabelText("Public tender dossier")).toHaveValue("2");
+    fireEvent.change(screen.getByLabelText("Search public state"), { target: { value: "missing" } });
+    expect(screen.getByRole("heading", { name: "No dossiers match this view" })).toBeInTheDocument();
   });
 
   it("shows permissionless close readiness without computing a winner", () => {
