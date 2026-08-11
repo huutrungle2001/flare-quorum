@@ -2244,11 +2244,6 @@ main {
   padding: 36px 4px 24px;
 }
 
-.flare-explorer-heading h2 {
-  font-size: clamp(2rem, 3.5vw, 3rem);
-  line-height: 1;
-}
-
 .flare-explorer-heading h2,
 .flare-visibility-section h2,
 .flare-faq-section h2 {
@@ -2258,6 +2253,11 @@ main {
   letter-spacing: -0.05em;
   line-height: 0.9;
   margin: 16px 0 0;
+}
+
+.flare-explorer-heading h2 {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  line-height: 1;
 }
 
 .flare-explorer-heading > p,
