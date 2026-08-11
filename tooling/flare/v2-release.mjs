@@ -138,6 +138,7 @@ export function evaluateV2PromotionBundle({
   governance,
   machines,
   success,
+  recovery,
   refund,
   v1Release,
 }) {
@@ -151,6 +152,13 @@ export function evaluateV2PromotionBundle({
   const v2Machines = machines?.publicIdentifiers?.machines ?? [];
   const v2MachineIds = v2Machines.map(({ teeId }) => String(teeId).toLowerCase());
   const successVendors = success?.publicIdentifiers?.vendors ?? [];
+  const recoveryTeeIds = (recovery?.publicIdentifiers?.teeIds ?? [])
+    .map((teeId) => String(teeId).toLowerCase());
+  const recoverySigners = (recovery?.publicIdentifiers?.selectionSignerIds ?? [])
+    .map((teeId) => String(teeId).toLowerCase());
+  const outageMachineIndex = Number(
+    recovery?.publicIdentifiers?.selectionResultCollectionOutageMachineIndex,
+  );
   const assertions = {
     candidateIsUnpromotedV2:
       candidate?.kind === "flarequorum-v2-candidate" &&
@@ -178,6 +186,16 @@ export function evaluateV2PromotionBundle({
       success?.publicIdentifiers?.plaintextCommitments?.length === 3 &&
       success?.publicIdentifiers?.bidTransactions?.length === 3 &&
       success?.assertions?.threeEncryptedBidsAcceptedByDistinctTees === true,
+    oneResultOutageRecoveryPassed:
+      recovery?.gate === "FLARE_V2_SUCCESS_RECOVERY" &&
+      recovery?.status === "PASSED" && allAssertionsPass(recovery) &&
+      recovery?.ingressBenchmarks?.vendorCount === 3 &&
+      recoveryTeeIds.length === 3 && new Set(recoveryTeeIds).size === 3 &&
+      recoverySigners.length === 2 && new Set(recoverySigners).size === 2 &&
+      Number.isInteger(outageMachineIndex) && outageMachineIndex >= 1 && outageMachineIndex <= 3 &&
+      recoverySigners.every((teeId) => recoveryTeeIds.includes(teeId)) &&
+      !recoverySigners.includes(recoveryTeeIds[outageMachineIndex - 1]) &&
+      recovery?.assertions?.oneSelectionResultUnavailableStillFinalized === true,
     undispatchedRefundLifecyclePassed:
       refund?.status === "PASSED" && allAssertionsPass(refund) &&
       refund.assertions?.selectionNeverDispatched === true &&
@@ -216,6 +234,7 @@ export function v2ProgressBlockers(assertions) {
       ["successLifecyclePassed", "threeVendorComparisonRecorded"],
       "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
     ],
+    [["oneResultOutageRecoveryPassed"], "V2_ONE_RESULT_OUTAGE_RECOVERY_NOT_VERIFIED"],
     [["undispatchedRefundLifecyclePassed"], "V2_REFUND_LIFECYCLE_NOT_VERIFIED"],
   ];
   return requirements

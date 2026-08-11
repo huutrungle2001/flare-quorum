@@ -74,6 +74,18 @@ function passingBundle() {
       },
       blockers: [],
     },
+    recovery: {
+      gate: "FLARE_V2_SUCCESS_RECOVERY",
+      status: "PASSED",
+      publicIdentifiers: {
+        teeIds: machineIds,
+        selectionResultCollectionOutageMachineIndex: 3,
+        selectionSignerIds: machineIds.slice(0, 2),
+      },
+      ingressBenchmarks: { vendorCount: 3 },
+      assertions: { oneSelectionResultUnavailableStillFinalized: true },
+      blockers: [],
+    },
     refund: {
       status: "PASSED",
       assertions: {
@@ -124,5 +136,19 @@ test("rejects a V2 success lifecycle that does not compare three vendors", () =>
   assert.equal(result.assertions.threeVendorComparisonRecorded, false);
   assert.deepEqual(v2ProgressBlockers(result.assertions), [
     "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
+  ]);
+});
+
+test("rejects outage evidence that counts the unavailable result endpoint", () => {
+  const bundle = passingBundle();
+  bundle.recovery.publicIdentifiers.selectionSignerIds = [
+    bundle.recovery.publicIdentifiers.teeIds[0],
+    bundle.recovery.publicIdentifiers.teeIds[2],
+  ];
+  const result = evaluateV2PromotionBundle(bundle);
+  assert.equal(result.status, "BLOCKED");
+  assert.equal(result.assertions.oneResultOutageRecoveryPassed, false);
+  assert.deepEqual(v2ProgressBlockers(result.assertions), [
+    "V2_ONE_RESULT_OUTAGE_RECOVERY_NOT_VERIFIED",
   ]);
 });

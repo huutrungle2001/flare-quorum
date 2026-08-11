@@ -26,6 +26,8 @@
     "exactActiveMachineSet": true,
     "verifiedRuntimeAndConstructor": true,
     "successLifecycle": true,
+    "threeVendorSuccessLifecycle": true,
+    "oneResultOutageRecovery": true,
     "undispatchedRefundLifecycle": true,
     "consumerSwitchRequiresPromotion": true
   },

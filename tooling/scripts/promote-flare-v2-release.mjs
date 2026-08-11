@@ -29,6 +29,7 @@ const requiredRecords = {
   governance: plan.artifacts.governanceEvidence,
   machines: plan.artifacts.machineEvidence,
   success: plan.artifacts.successLifecycleEvidence,
+  recovery: plan.artifacts.oneResultOutageEvidence,
   refund: plan.artifacts.refundLifecycleEvidence,
   v1Release: v1ReleasePath,
 };

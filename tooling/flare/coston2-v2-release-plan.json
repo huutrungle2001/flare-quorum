@@ -23,6 +23,7 @@
     "governanceEvidence": "evidence/coston2/fcc-market-v2-governance.json",
     "machineEvidence": "evidence/coston2/fcc-market-v2-machines.json",
     "successLifecycleEvidence": "evidence/coston2/market-v2-multi-vendor-success.json",
+    "oneResultOutageEvidence": "evidence/coston2/market-v2-one-result-outage.json",
     "refundLifecycleEvidence": "evidence/coston2/market-v2-undispatched-refund.json",
     "releaseManifest": "packages/flare-contracts/deployments/coston2.v2.release.json",
     "deploymentConsistencyEvidence": "evidence/coston2/market-v2-deployment-consistency.json",
@@ -46,6 +47,7 @@
     "verifiedRuntimeAndConstructor": true,
     "successLifecycle": true,
     "threeVendorSuccessLifecycle": true,
+    "oneResultOutageRecovery": true,
     "undispatchedRefundLifecycle": true,
     "consumerSwitchRequiresPromotion": true
   }
