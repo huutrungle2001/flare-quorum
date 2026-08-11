@@ -6,7 +6,7 @@ V2 is a **live, isolated candidate and not yet a verified release**. Market
 `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, award receipt
 `0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3`, extension `66142`, governance,
 and exactly three fresh production machines are recorded in sanitized Coston2
-evidence. The encrypted-bid success lifecycle passes. Refund tender `2` is
+evidence. The three-vendor encrypted-bid success lifecycle passes. Refund tender `2` is
 closed without a selection dispatch and is waiting until chain timestamp
 `1786538381` (`2026-08-12T12:39:41Z`) before the real refund can execute.
 

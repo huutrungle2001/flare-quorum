@@ -7,7 +7,7 @@
 > browser-native XRP recovery are planned post-Summer Signal hardening; Gate H
 > user validation remains `NOT_RUN`. The isolated V2 candidate is now live with
 > its own market, extension, governance, three fresh machines, and passed
-> success lifecycle. Its refund tender is `WAITING` for the fixed 24-hour grace;
+> three-vendor success lifecycle. Its refund tender is `WAITING` for the fixed 24-hour grace;
 > V2 promotion remains separate from the verified V1 submission release.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
@@ -122,7 +122,7 @@ placeholders are forbidden after that commit.
   machine identities.
 - [x] Verify its candidate manifest and address-free bindings against source,
   runtime, registry, extension, code version, signer, and machine facts.
-- [x] Record one live flagship success lifecycle.
+- [x] Record one live three-vendor flagship success lifecycle.
 - Resume the closed refund tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle before promotion.
 - Expand stateful live fault coverage and browser-native XRP recovery under

@@ -20,7 +20,7 @@
 > when its first selection dispatch cannot obtain two active frozen TEEs. The
 > side-by-side `FlareQuorumMarketV2` candidate now has bounded pre-dispatch
 > recovery, comprehensive contract tests, a verified live deployment, fresh
-> extension `66142`, three fresh production machines, and a passed live success
+> extension `66142`, three fresh production machines, and a passed live three-vendor success
 > lifecycle. Its real undispatched-refund tender is waiting for the fixed
 > on-chain grace before promotion can be verified. V1 remains the canonical
 > Coston2 submission release and consumer default.
@@ -351,7 +351,7 @@ confidential bid or settlement boundary:
   registration; the complete post-registration set must be exactly three.
 - [x] Deploy the isolated V2 candidate side-by-side, register fresh extension
   `66142` and exactly three fresh production machines, verify governance and
-  runtime bindings, and pass the live encrypted-bid success lifecycle without
+  runtime bindings, and pass the live three-vendor encrypted-bid success lifecycle without
   changing V1. The undispatched-refund tender is closed and honestly remains
   `WAITING` until its fixed on-chain grace elapses; promotion and consumer
   switching remain separate gates.
@@ -408,7 +408,7 @@ two minutes, and reproduce the public path from the repository.
 | Gates 0–G | Current Summer Signal technical acceptance | Passed with the cited Coston2 evidence |
 | Gate H | Current product and user-validation gate | `NOT_RUN`; no interview, usability, or traction result is claimed |
 | Organizer submission and bounty-selection actions | External submission actions | Builder-controlled; not an engineering pass/fail result |
-| V2 live release promotion | Isolated current candidate track | Candidate address, extension, three fresh machines, governance, and success lifecycle are live; refund is `WAITING` for its fixed on-chain grace, so no verified release or consumer switch is claimed |
+| V2 live release promotion | Isolated current candidate track | Candidate address, extension, three fresh machines, governance, and three-vendor success lifecycle are live; refund is `WAITING` for its fixed on-chain grace, so no verified release or consumer switch is claimed |
 | Additional live fault breadth and browser-native XRP recovery | Planned post-Summer Signal hardening | The current recorded drills and public-safe wallet handoff remain the submission boundary |
 | Flare Treasury Exchange | Planned post-Summer Signal product expansion | Roadmap only |
 
@@ -426,7 +426,7 @@ Exchange bullets remain a post-competition roadmap.
   without reusing or pausing the V1 machine set.
 - Publish a V2-specific manifest and generated bindings only after source,
   runtime, registry, extension, code-version, machine, and signer checks agree.
-- [x] Record the flagship success lifecycle with public-safe Coston2 evidence.
+- [x] Record the three-vendor flagship success lifecycle with public-safe Coston2 evidence.
 - Resume the already closed tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle.
 - Expand stateful Coston2 fault injection, live two-machine-loss coverage,
@@ -588,7 +588,7 @@ the championship product and requires Product Plan approval.
 | FCC foundation operation | LIVE PASSED — deterministic `PING_V1` result verified on Coston2 with registered signer/domain |
 | FCC private ingress | LIVE PASSED — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, changed-ciphertext rejection, and supported rolling replacement recovery pass |
 | Multi-TEE quorum | LIVE PASSED for one three-bid lifecycle — atomic 3-of-3 receipts, common root, two matching frozen-TEE signatures, and one-machine resilience assertions recorded; replacements never mutate an existing frozen set |
-| Flare contracts | V1 LIVE VERIFIED AND DEFAULT; V2 LIVE CANDIDATE — market `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, extension `66142`, three fresh production machines, governance, runtime/wiring, and success lifecycle pass; refund is time-locked `WAITING`, so V2 is not yet a verified or consumer-selected release |
+| Flare contracts | V1 LIVE VERIFIED AND DEFAULT; V2 LIVE CANDIDATE — market `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, extension `66142`, three fresh production machines, governance, runtime/wiring, and three-vendor success lifecycle pass; refund is time-locked `WAITING`, so V2 is not yet a verified or consumer-selected release |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, official amount-based FTestXRP redemption request, and fail-closed delayed-mint checkpoint/resume are implemented; evidence is recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
 | Coston2 deployment/evidence | CURRENT RELEASE VALIDATED; GATE H IN PROGRESS — Gates 0–G and verified deployment evidence recorded; the unified Buyer deployment, wallet-free judge/role/accessibility/XRP smokes, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; additional live fault breadth and browser-native XRP recovery are planned post-Summer Signal hardening, while Gate H user validation remains `NOT_RUN` |
