@@ -38,7 +38,7 @@ function HeaderWalletMenu({
       ? `SWITCH TO ${coston2 ? "COSTON2" : "SEPOLIA"}`
       : state.status === "connecting"
         ? "CONNECTING WALLET…"
-        : "CONNECT WALLET";
+        : coston2 ? "CONNECT FOR ACTIONS" : "CONNECT WALLET";
 
   useEffect(() => {
     if (!open) return;

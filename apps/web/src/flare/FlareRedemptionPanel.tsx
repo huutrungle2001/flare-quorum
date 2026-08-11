@@ -217,7 +217,7 @@ export function FlareRedemptionPanel({
           </div>
           {error && <p className="inline-error" role="alert">{error}</p>}
           <button className="primary-button" type="button" onClick={() => void redeem()} disabled={busy || loading || !fAsset || balance === null || minimum === null}>
-            {busy ? "WAITING FOR C2FLR…" : "APPROVE &amp; REQUEST XRP REDEMPTION →"}
+            {busy ? "WAITING FOR C2FLR…" : "APPROVE & REQUEST XRP REDEMPTION →"}
           </button>
           {last && <p className="form-hint" aria-live="polite">Request{last.requestIds.length === 1 ? "" : "s"} {last.requestIds.join(", ")} recorded · <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">inspect transaction ↗</a></p>}
         </>

@@ -71,6 +71,7 @@ export function FlareFinalizerWorkspace({
     () => tenders.filter((tender) => !["Awarded", "Refunded", "Cancelled"].includes(tender.status)),
     [tenders],
   );
+  const hasWalletAction = queue.some((tender) => ["close", "cancel-or-wait", "refund-ready"].includes(actionState(tender, now)));
 
   async function runDirectAction(tender: FlarePublicTender, action: DirectAction) {
     if (!connected) return;
@@ -143,7 +144,6 @@ export function FlareFinalizerWorkspace({
           appear only when canonical rules permit them.
         </p>
       </section>
-      <WalletPanel wallet={wallet} network="coston2" />
       {error && <p className="inline-error finalizer-error" role="alert">{error}</p>}
       <section className="evidence-panel finalizer-queue" aria-label="Public lifecycle queue">
         <header className="detail-header">
@@ -153,6 +153,7 @@ export function FlareFinalizerWorkspace({
           </div>
           <button className="icon-button" onClick={onRefresh} aria-label="Refresh public lifecycle queue">↻</button>
         </header>
+        {hasWalletAction && <WalletPanel wallet={wallet} network="coston2" compact />}
         {queue.length === 0 ? (
           <div className="state-panel compact-state">
             <span aria-hidden="true">✓</span>

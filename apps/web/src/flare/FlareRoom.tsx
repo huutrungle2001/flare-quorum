@@ -413,7 +413,15 @@ function FlareAppSidebar({
         <strong>FLARE / COSTON2</strong>
       </div>
       <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
-      {wallet && <FlareWalletAssets wallet={wallet} />}
+      {wallet && ["buyer", "vendor", "finalizer"].includes(activeRole) ? (
+        <FlareWalletAssets wallet={wallet} />
+      ) : (
+        <section className="flare-sidebar-readonly" aria-label="Wallet-free workspace">
+          <p className="eyebrow">WALLET OPTIONAL</p>
+          <strong>PUBLIC READS NEED NO SIGNATURE</strong>
+          <p>Connect only after moving to a workspace with an on-chain action.</p>
+        </section>
+      )}
       <section className="flare-sidebar-assets" aria-label="Coston2 asset actions">
         <p className="eyebrow">COSTON2 ASSETS</p>
         <a className="sidebar-asset-button" href="https://faucet.flare.network/coston2" target="_blank" rel="noreferrer">GET TEST C2FLR &amp; FXRP ↗</a>

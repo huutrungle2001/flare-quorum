@@ -9,9 +9,11 @@ function shortAddress(value: string) {
 export function WalletPanel({
   wallet,
   network = "sepolia",
+  compact = false,
 }: {
   wallet: WalletController;
   network?: WalletNetwork;
+  compact?: boolean;
 }) {
   const { state } = wallet;
   const coston2 = network === "coston2";
@@ -19,7 +21,7 @@ export function WalletPanel({
 
   if (state.status === "connected" && state.account) {
     return (
-      <section className="wallet-panel connected" aria-label="Connected wallet">
+      <section className={`wallet-panel connected${compact ? " compact" : ""}`} aria-label="Connected wallet">
         <div>
           <span className="signal-dot" aria-hidden="true" />
           <div>
@@ -36,7 +38,7 @@ export function WalletPanel({
 
   if (state.status === "wrong-chain") {
     return (
-      <section className="wallet-panel warning" role="alert">
+      <section className={`wallet-panel warning${compact ? " compact" : ""}`} role="alert">
           <div>
             <span aria-hidden="true">!</span>
             <div>
@@ -58,10 +60,10 @@ export function WalletPanel({
   }
 
   return (
-    <section className="wallet-connect" aria-label="Wallet providers">
+    <section className={`wallet-connect${compact ? " compact" : ""}`} aria-label="Wallet providers">
       <div>
-        <p className="eyebrow">EXPLICIT WALLET SELECTION</p>
-        <h2>Connect only when you are ready to sign.</h2>
+        <p className="eyebrow">{compact ? "SIGNING CHECKPOINT" : "EXPLICIT WALLET SELECTION"}</p>
+        <h2>{compact ? "Connect to submit this action." : "Connect only when you are ready to sign."}</h2>
         <p>
           Choose a provider once; FlareQuorum connects it and requests {networkLabel}{" "}
           automatically when needed. Private keys never leave the wallet.

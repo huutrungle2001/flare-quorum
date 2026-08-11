@@ -26,6 +26,7 @@ import { WalletPanel } from "../wallet/WalletPanel";
 import { useToasts } from "../shell/ToastProvider";
 import { useEffect, useState } from "react";
 import { FlareXrpFundingPanel, type XrpFundingPrepareInput, type XrpFundingPreview } from "./FlareXrpFundingPanel";
+import { clearBuyerPublicDraft, readBuyerPublicDraft, saveBuyerPublicDraft } from "./buyerPublicDraft";
 
 const coston2 = {
   id: 114,
@@ -172,6 +173,34 @@ interface BuyerFormValues {
   warrantyWeight: string;
 }
 
+const defaultBuyerFormValues: BuyerFormValues = {
+  title: "",
+  category: "software",
+  objective: "",
+  acceptanceCriteria: "",
+  vendorQuestions: "",
+  ceiling: "1",
+  vendors: [""],
+  deadlineMinutes: "30",
+  priceWeight: "60",
+  deliveryWeight: "25",
+  warrantyWeight: "15",
+};
+
+function hasMeaningfulBuyerDraft(input: BuyerFormValues) {
+  return input.title.trim().length > 0
+    || input.category !== defaultBuyerFormValues.category
+    || input.objective.trim().length > 0
+    || input.acceptanceCriteria.trim().length > 0
+    || input.vendorQuestions.trim().length > 0
+    || input.ceiling !== defaultBuyerFormValues.ceiling
+    || input.vendors.some((vendor) => vendor.trim().length > 0)
+    || input.deadlineMinutes !== defaultBuyerFormValues.deadlineMinutes
+    || input.priceWeight !== defaultBuyerFormValues.priceWeight
+    || input.deliveryWeight !== defaultBuyerFormValues.deliveryWeight
+    || input.warrantyWeight !== defaultBuyerFormValues.warrantyWeight;
+}
+
 type BuyerFieldKey =
   | "title"
   | "ceiling"
@@ -295,17 +324,18 @@ export function FlareBuyerWorkspace({
   initialFundingMethod?: FlareFundingMethod;
 }) {
   const toasts = useToasts();
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<FlareBuyerBriefCategory>("software");
-  const [objective, setObjective] = useState("");
-  const [acceptanceCriteria, setAcceptanceCriteria] = useState("");
-  const [vendorQuestions, setVendorQuestions] = useState("");
-  const [ceiling, setCeiling] = useState("1");
-  const [vendors, setVendors] = useState<string[]>([""]);
-  const [deadlineMinutes, setDeadlineMinutes] = useState("30");
-  const [priceWeight, setPriceWeight] = useState("60");
-  const [deliveryWeight, setDeliveryWeight] = useState("25");
-  const [warrantyWeight, setWarrantyWeight] = useState("15");
+  const [initialDraft] = useState(() => readBuyerPublicDraft());
+  const [title, setTitle] = useState(initialDraft?.title ?? defaultBuyerFormValues.title);
+  const [category, setCategory] = useState<FlareBuyerBriefCategory>(initialDraft?.category ?? defaultBuyerFormValues.category);
+  const [objective, setObjective] = useState(initialDraft?.objective ?? defaultBuyerFormValues.objective);
+  const [acceptanceCriteria, setAcceptanceCriteria] = useState(initialDraft?.acceptanceCriteria ?? defaultBuyerFormValues.acceptanceCriteria);
+  const [vendorQuestions, setVendorQuestions] = useState(initialDraft?.vendorQuestions ?? defaultBuyerFormValues.vendorQuestions);
+  const [ceiling, setCeiling] = useState(initialDraft?.ceiling ?? defaultBuyerFormValues.ceiling);
+  const [vendors, setVendors] = useState<string[]>(initialDraft ? [...initialDraft.vendors] : [...defaultBuyerFormValues.vendors]);
+  const [deadlineMinutes, setDeadlineMinutes] = useState(initialDraft?.deadlineMinutes ?? defaultBuyerFormValues.deadlineMinutes);
+  const [priceWeight, setPriceWeight] = useState(initialDraft?.priceWeight ?? defaultBuyerFormValues.priceWeight);
+  const [deliveryWeight, setDeliveryWeight] = useState(initialDraft?.deliveryWeight ?? defaultBuyerFormValues.deliveryWeight);
+  const [warrantyWeight, setWarrantyWeight] = useState(initialDraft?.warrantyWeight ?? defaultBuyerFormValues.warrantyWeight);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<BuyerFieldErrors>({});
@@ -319,10 +349,48 @@ export function FlareBuyerWorkspace({
   const weightError = weightValidationMessage(weightValues);
   const vendorCount = vendors.filter((vendor) => vendor.trim()).length;
   const usingXrplFunding = fundingMethod === "xrpl";
+  const currentFormValues: BuyerFormValues = {
+    title,
+    category,
+    objective,
+    acceptanceCriteria,
+    vendorQuestions,
+    ceiling,
+    vendors,
+    deadlineMinutes,
+    priceWeight,
+    deliveryWeight,
+    warrantyWeight,
+  };
+  const hasSavedDraft = hasMeaningfulBuyerDraft(currentFormValues);
 
   useEffect(() => {
     setFundingMethod(initialFundingMethod);
   }, [initialFundingMethod]);
+
+  useEffect(() => {
+    if (hasMeaningfulBuyerDraft(currentFormValues)) saveBuyerPublicDraft(currentFormValues);
+    else clearBuyerPublicDraft();
+  }, [acceptanceCriteria, category, ceiling, deadlineMinutes, deliveryWeight, objective, priceWeight, title, vendorQuestions, vendors, warrantyWeight]);
+
+  function clearPublicDraft() {
+    setTitle(defaultBuyerFormValues.title);
+    setCategory(defaultBuyerFormValues.category);
+    setObjective(defaultBuyerFormValues.objective);
+    setAcceptanceCriteria(defaultBuyerFormValues.acceptanceCriteria);
+    setVendorQuestions(defaultBuyerFormValues.vendorQuestions);
+    setCeiling(defaultBuyerFormValues.ceiling);
+    setVendors([...defaultBuyerFormValues.vendors]);
+    setDeadlineMinutes(defaultBuyerFormValues.deadlineMinutes);
+    setPriceWeight(defaultBuyerFormValues.priceWeight);
+    setDeliveryWeight(defaultBuyerFormValues.deliveryWeight);
+    setWarrantyWeight(defaultBuyerFormValues.warrantyWeight);
+    setError(null);
+    setFieldErrors({});
+    setVendorErrors([""]);
+    setVendorValidationAttempted(false);
+    clearBuyerPublicDraft();
+  }
 
   function chooseFundingMethod(nextMethod: FlareFundingMethod) {
     if (busy || nextMethod === fundingMethod) return;
@@ -636,17 +704,20 @@ export function FlareBuyerWorkspace({
           </button>
         </div>
       </section>
-      {!usingXrplFunding && <WalletPanel wallet={wallet} network="coston2" />}
       <section id="buyer-brief" className="evidence-panel flare-buyer-form" aria-label="Buyer tender composer">
         <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>{usingXrplFunding ? "Prepare an XRP-funded tender" : "Open a Coston2 tender"}</h2></div><span className="privacy-badge verified">{usingXrplFunding ? "XRPL → FTESTXRP" : "FTESTXRP / TESTNET"}</span></header>
-        <label>Public title<input aria-invalid={Boolean(fieldErrors.title)} aria-describedby={fieldErrors.title ? "buyer-title-error" : undefined} value={title} onChange={(event) => { setTitle(event.target.value); clearFieldError("title"); }} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small>The public brief is hashed into immutable metadata; bids remain outside the contract.</small>{fieldErrors.title && <small id="buyer-title-error" className="field-error" role="alert">{fieldErrors.title}</small>}</label>
+        <div className="buyer-draft-bar" aria-live="polite">
+          <div><strong>{hasSavedDraft ? "PUBLIC DRAFT SAVED IN THIS TAB" : "PUBLIC DRAFT AUTO-SAVE READY"}</strong><span>Only the public Buyer Brief fields below use session storage. Bid data is never stored here.</span></div>
+          <button className="secondary-button" type="button" onClick={clearPublicDraft} disabled={busy || !hasSavedDraft}>CLEAR PUBLIC DRAFT</button>
+        </div>
+        <label>Public title<input aria-label="Public title" required minLength={3} aria-invalid={Boolean(fieldErrors.title)} aria-describedby={`buyer-title-hint${fieldErrors.title ? " buyer-title-error" : ""}`} value={title} onChange={(event) => { setTitle(event.target.value); clearFieldError("title"); }} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small id="buyer-title-hint" className="field-guidance"><span>Public and immutable by hash · 3–160 characters</span><span>{title.length}/160</span></small>{fieldErrors.title && <small id="buyer-title-error" className="field-error" role="alert">{fieldErrors.title}</small>}</label>
         <div className="form-grid-two">
           <label>Category<select value={category} onChange={(event) => setCategory(event.target.value as FlareBuyerBriefCategory)} disabled={busy}><option value="software">Software</option><option value="design">Design</option><option value="marketing">Marketing</option><option value="operations">Operations</option><option value="research">Research</option></select></label>
-          <label>Escrow ceiling (FTestXRP)<input aria-invalid={Boolean(fieldErrors.ceiling)} aria-describedby={fieldErrors.ceiling ? "buyer-ceiling-error" : undefined} inputMode="decimal" value={ceiling} onChange={(event) => { setCeiling(event.target.value); clearFieldError("ceiling"); }} disabled={busy} />{fieldErrors.ceiling && <small id="buyer-ceiling-error" className="field-error" role="alert">{fieldErrors.ceiling}</small>}</label>
-          <label>Bid deadline (minutes)<input aria-invalid={Boolean(fieldErrors.deadlineMinutes)} aria-describedby={fieldErrors.deadlineMinutes ? "buyer-deadline-error" : undefined} type="number" min={5} max={43200} value={deadlineMinutes} onChange={(event) => { setDeadlineMinutes(event.target.value); clearFieldError("deadlineMinutes"); }} disabled={busy} />{fieldErrors.deadlineMinutes && <small id="buyer-deadline-error" className="field-error" role="alert">{fieldErrors.deadlineMinutes}</small>}</label>
-          <label>Public objective<textarea aria-invalid={Boolean(fieldErrors.objective)} aria-describedby={fieldErrors.objective ? "buyer-objective-error" : undefined} value={objective} onChange={(event) => { setObjective(event.target.value); clearFieldError("objective"); }} rows={4} maxLength={1200} placeholder="What outcome should the selected vendor deliver?" disabled={busy} />{fieldErrors.objective && <small id="buyer-objective-error" className="field-error" role="alert">{fieldErrors.objective}</small>}</label>
-          <label>Acceptance criteria<textarea aria-invalid={Boolean(fieldErrors.acceptanceCriteria)} aria-describedby={fieldErrors.acceptanceCriteria ? "buyer-acceptance-error" : undefined} value={acceptanceCriteria} onChange={(event) => { setAcceptanceCriteria(event.target.value); clearFieldError("acceptanceCriteria"); }} rows={4} maxLength={1200} placeholder="How will delivery be checked?" disabled={busy} />{fieldErrors.acceptanceCriteria && <small id="buyer-acceptance-error" className="field-error" role="alert">{fieldErrors.acceptanceCriteria}</small>}</label>
-          <label>Optional vendor questions<textarea value={vendorQuestions} onChange={(event) => setVendorQuestions(event.target.value)} rows={3} maxLength={1200} placeholder="What should every vendor answer?" disabled={busy} /></label>
+          <label>Escrow ceiling (FTestXRP)<input aria-label="Escrow ceiling (FTestXRP)" required aria-invalid={Boolean(fieldErrors.ceiling)} aria-describedby={`buyer-ceiling-hint${fieldErrors.ceiling ? " buyer-ceiling-error" : ""}`} inputMode="decimal" value={ceiling} onChange={(event) => { setCeiling(event.target.value); clearFieldError("ceiling"); }} disabled={busy} /><small id="buyer-ceiling-hint" className="field-guidance"><span>Positive amount · maximum 6 decimal places</span></small>{fieldErrors.ceiling && <small id="buyer-ceiling-error" className="field-error" role="alert">{fieldErrors.ceiling}</small>}</label>
+          <label>Bid deadline (minutes)<input aria-label="Bid deadline (minutes)" required aria-invalid={Boolean(fieldErrors.deadlineMinutes)} aria-describedby={`buyer-deadline-hint${fieldErrors.deadlineMinutes ? " buyer-deadline-error" : ""}`} type="number" min={5} max={43200} value={deadlineMinutes} onChange={(event) => { setDeadlineMinutes(event.target.value); clearFieldError("deadlineMinutes"); }} disabled={busy} /><small id="buyer-deadline-hint" className="field-guidance"><span>5 minutes–30 days (43,200 minutes)</span></small>{fieldErrors.deadlineMinutes && <small id="buyer-deadline-error" className="field-error" role="alert">{fieldErrors.deadlineMinutes}</small>}</label>
+          <label>Public objective<textarea aria-label="Public objective" required minLength={20} aria-invalid={Boolean(fieldErrors.objective)} aria-describedby={`buyer-objective-hint${fieldErrors.objective ? " buyer-objective-error" : ""}`} value={objective} onChange={(event) => { setObjective(event.target.value); clearFieldError("objective"); }} rows={4} maxLength={1200} placeholder="What outcome should the selected vendor deliver?" disabled={busy} /><small id="buyer-objective-hint" className="field-guidance"><span>Public outcome · 20–1,200 characters</span><span>{objective.length}/1200</span></small>{fieldErrors.objective && <small id="buyer-objective-error" className="field-error" role="alert">{fieldErrors.objective}</small>}</label>
+          <label>Acceptance criteria<textarea aria-label="Acceptance criteria" required minLength={10} aria-invalid={Boolean(fieldErrors.acceptanceCriteria)} aria-describedby={`buyer-acceptance-hint${fieldErrors.acceptanceCriteria ? " buyer-acceptance-error" : ""}`} value={acceptanceCriteria} onChange={(event) => { setAcceptanceCriteria(event.target.value); clearFieldError("acceptanceCriteria"); }} rows={4} maxLength={1200} placeholder="How will delivery be checked?" disabled={busy} /><small id="buyer-acceptance-hint" className="field-guidance"><span>Public checks · 10–1,200 characters</span><span>{acceptanceCriteria.length}/1200</span></small>{fieldErrors.acceptanceCriteria && <small id="buyer-acceptance-error" className="field-error" role="alert">{fieldErrors.acceptanceCriteria}</small>}</label>
+          <label>Optional vendor questions<textarea aria-label="Optional vendor questions" aria-describedby="buyer-questions-hint" value={vendorQuestions} onChange={(event) => setVendorQuestions(event.target.value)} rows={3} maxLength={1200} placeholder="What should every vendor answer?" disabled={busy} /><small id="buyer-questions-hint" className="field-guidance"><span>Public and optional · maximum 1,200 characters</span><span>{vendorQuestions.length}/1200</span></small></label>
           <fieldset className="vendor-fieldset" aria-invalid={Boolean(fieldErrors.vendors || vendorErrors.some(Boolean))} aria-describedby={fieldErrors.vendors ? "buyer-vendors-error" : undefined}>
             <legend>Approved vendor addresses <span className="vendor-count">{vendorCount}/{maxApprovedVendors}</span></legend>
             <div className="vendor-input-list">
@@ -683,7 +754,8 @@ export function FlareBuyerWorkspace({
           {weightError ?? `Total weight: ${weightTotal}% ✓`}
         </p>
         {error && <p className="inline-error" role="alert">{error}</p>}
-        {!usingXrplFunding && <button className="primary-button" type="button" onClick={() => void createTender()} disabled={busy || !connected || Boolean(weightError)}>{busy ? "WAITING FOR C2FLR…" : "APPROVE &amp; OPEN TENDER →"}</button>}
+        {!usingXrplFunding && <WalletPanel wallet={wallet} network="coston2" compact />}
+        {!usingXrplFunding && <button className="primary-button" type="button" onClick={() => void createTender()} disabled={busy || !connected || Boolean(weightError)}>{busy ? "WAITING FOR C2FLR…" : "APPROVE & OPEN TENDER →"}</button>}
         {last && <p className="form-hint" aria-live="polite">Tender #{last.tenderId} created · <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">inspect transaction ↗</a></p>}
       </section>
       {usingXrplFunding && <FlareXrpFundingPanel onPrepare={prepareXrpFunding} />}

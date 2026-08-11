@@ -160,7 +160,7 @@ export function FlareVendorWorkspace({
           {error && <p className="inline-error" role="alert">{error}</p>}
           {stage && <p className="form-hint" aria-live="polite">{stageLabels[stage]}</p>}
           <button className="primary-button" type="button" onClick={() => void submit()} disabled={busy || !connected || Boolean(selected.scoringPolicy.requiredCredentials.length)}>
-            {busy ? "ENCRYPTING / WAITING…" : "ENCRYPT &amp; SUBMIT BID →"}
+            {busy ? "ENCRYPTING / WAITING…" : "ENCRYPT & SUBMIT BID →"}
           </button>
           {last && (
             <section className="readiness-strip" aria-live="polite">

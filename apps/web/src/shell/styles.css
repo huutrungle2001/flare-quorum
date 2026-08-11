@@ -490,13 +490,13 @@ textarea:focus-visible {
 }
 
 .flare-wallet-assets header strong {
-  font-size: 0.58rem;
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
 }
 
 .flare-wallet-assets .privacy-badge {
-  font-size: 0.48rem;
-  padding: 4px 5px;
+  font-size: 0.6rem;
+  padding: 5px 7px;
 }
 
 .flare-wallet-assets dl {
@@ -514,7 +514,7 @@ textarea:focus-visible {
 
 .flare-wallet-assets dt,
 .flare-wallet-assets dd {
-  font-size: 0.66rem;
+  font-size: 0.74rem;
   margin: 0;
 }
 
@@ -532,7 +532,7 @@ textarea:focus-visible {
 .flare-wallet-assets-message,
 .flare-wallet-assets-note {
   color: var(--color-ink-muted);
-  font-size: 0.52rem;
+  font-size: 0.68rem;
   line-height: 1.4;
   margin: 0;
 }
@@ -580,15 +580,15 @@ textarea:focus-visible {
 
 .flare-sidebar-assets .sidebar-asset-button {
   border-radius: 0;
-  font-size: 0.58rem;
-  min-height: 34px;
+  font-size: 0.68rem;
+  min-height: 40px;
 }
 
 .sidebar-asset-note,
 .flare-sidebar-footnote {
   color: var(--color-ink-muted);
   font-family: var(--font-mono);
-  font-size: 0.56rem;
+  font-size: 0.68rem;
   line-height: 1.45;
   margin: 0;
 }
@@ -597,6 +597,31 @@ textarea:focus-visible {
   align-self: end;
   border-top: 1px solid var(--color-ink-black);
   padding: 14px 4px 0;
+}
+
+.flare-sidebar-readonly {
+  border-top: 1px solid var(--color-ink-black);
+  display: grid;
+  gap: 8px;
+  padding: 16px 4px 0;
+}
+
+.flare-sidebar-readonly .eyebrow,
+.flare-sidebar-readonly strong,
+.flare-sidebar-readonly p {
+  font-family: var(--font-mono);
+  margin: 0;
+}
+
+.flare-sidebar-readonly strong {
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.flare-sidebar-readonly p:last-child {
+  color: var(--color-ink-muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
 }
 
 .flare-app-main {
@@ -2673,6 +2698,43 @@ main {
   letter-spacing: -0.04em;
 }
 
+.buyer-draft-bar {
+  align-items: center;
+  border-bottom: 1px solid var(--color-ink-black);
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 16px 32px;
+}
+
+.buyer-draft-bar > div {
+  display: grid;
+  gap: 4px;
+}
+
+.buyer-draft-bar strong,
+.buyer-draft-bar span {
+  font-family: var(--font-mono);
+}
+
+.buyer-draft-bar strong {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+
+.buyer-draft-bar span {
+  color: var(--color-ink-muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.buyer-draft-bar .secondary-button {
+  flex: 0 0 auto;
+  font-size: 0.68rem;
+  min-height: 40px;
+  padding: 8px 14px;
+}
+
 .flare-buyer-form > label,
 .flare-buyer-form .form-grid-two > label,
 .flare-buyer-form .form-grid-three > label,
@@ -2744,11 +2806,21 @@ main {
 .flare-redemption-panel label small {
   color: var(--color-ink-muted);
   font-family: var(--font-mono);
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1.45;
   text-transform: none;
+}
+
+.field-guidance {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.field-guidance > span:last-child:not(:first-child) {
+  flex: 0 0 auto;
 }
 
 .flare-buyer-form label small.field-error {
@@ -3103,6 +3175,47 @@ main {
   gap: 48px;
   grid-template-columns: 1fr 1fr;
   padding: 32px;
+}
+
+.wallet-panel.compact,
+.wallet-connect.compact {
+  margin-top: 20px;
+}
+
+.wallet-panel.compact {
+  padding: 14px 18px;
+}
+
+.wallet-connect.compact {
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.7fr);
+  padding: 20px 24px;
+}
+
+.wallet-connect.compact h2 {
+  font-family: var(--font-ui);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.wallet-connect.compact p {
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.wallet-connect.compact .provider-button {
+  min-height: 44px;
+}
+
+.flare-buyer-form > :is(.wallet-panel, .wallet-connect) {
+  margin-left: 32px;
+  margin-right: 32px;
+}
+
+.finalizer-queue > :is(.wallet-panel, .wallet-connect) {
+  margin: 0 32px 24px;
 }
 
 .wallet-connect h2 {
@@ -6662,6 +6775,23 @@ footer p {
   .wallet-connect {
     gap: 24px;
     padding: 24px 20px;
+  }
+
+  .wallet-connect.compact {
+    grid-template-columns: 1fr;
+  }
+
+  .flare-buyer-form > :is(.wallet-panel, .wallet-connect),
+  .finalizer-queue > :is(.wallet-panel, .wallet-connect) {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .buyer-draft-bar {
+    align-items: stretch;
+    flex-direction: column;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .funding-handoff-form {

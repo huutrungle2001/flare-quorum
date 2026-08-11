@@ -12,7 +12,10 @@ import { readPublicFlareFundingCheckpoint, savePublicFlareFundingCheckpoint } fr
 import { PrimaryNavigation } from "../src/shell/PrimaryNavigation";
 import type { WalletController } from "../src/wallet/WalletPanel";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  sessionStorage.clear();
+});
 
 const wallet = {
   state: { status: "disconnected", providers: [], selectedProvider: null, account: null, chainId: null, walletClient: null, error: null, sessionRevision: 0 },
@@ -97,7 +100,7 @@ describe("Coston2 public evidence boundary", () => {
   it("offers an optional Coston2 wallet without gating the read-only Flare route", () => {
     render(<MemoryRouter initialEntries={["/flare"]}><PrimaryNavigation wallet={wallet} /></MemoryRouter>);
     expect(screen.getByText("COSTON2")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "CONNECT WALLET" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "CONNECT FOR ACTIONS" })).toBeInTheDocument();
   });
 
   it("renders the contract-canonical public scoring policy", () => {
@@ -236,6 +239,24 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByLabelText("Acceptance criteria")).toBeInTheDocument();
     expect(screen.getByLabelText("Optional vendor questions")).toBeInTheDocument();
     expect(screen.getByText(/Brief and rules are public; bids are sealed/)).toBeInTheDocument();
+    expect(screen.getByText("0/160")).toBeInTheDocument();
+    expect(screen.getByText(/5 minutes–30 days/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Connect to submit this action." })).toBeInTheDocument();
+  });
+
+  it("restores and explicitly clears the public-only Buyer Brief session draft", () => {
+    const first = render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} />);
+    fireEvent.change(screen.getByLabelText(/Public title/), { target: { value: "Treasury reporting" } });
+    fireEvent.change(screen.getByLabelText("Public objective"), { target: { value: "Deliver a monthly XRP treasury report." } });
+    expect(screen.getByText("18/160")).toBeInTheDocument();
+    first.unmount();
+
+    render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} />);
+    expect(screen.getByLabelText(/Public title/)).toHaveValue("Treasury reporting");
+    expect(screen.getByText("PUBLIC DRAFT SAVED IN THIS TAB")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "CLEAR PUBLIC DRAFT" }));
+    expect(screen.getByLabelText(/Public title/)).toHaveValue("");
+    expect(screen.getByRole("button", { name: "CLEAR PUBLIC DRAFT" })).toBeDisabled();
   });
 
   it("defaults to Coston2 funding and lets the buyer switch to the XRP-native path", () => {
