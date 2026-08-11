@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-xrp-funding-draft",
-  "recordedAt": "2026-08-10T17:16:29.229Z",
+  "recordedAt": "2026-08-11T09:14:20.290Z",
   "publicIdentifiers": {
-    "sourceCommit": "23e12bf24da02ab3f1892347fc63f499df000a44",
+    "sourceCommit": "2c25c24eab36e61b64dc29eceb1a596448057f4d",
     "provider": "vercel",
     "project": "flare-quorum",
     "canonicalUrl": "https://flare-quorum.vercel.app",
