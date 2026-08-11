@@ -4,9 +4,10 @@
 > receipt quorum, close-time FTSO, FCC result verification, and public-token
 > conservation, but has a known liveness gap when the first selection dispatch
 > cannot start after close. The side-by-side `FlareQuorumMarketV2` candidate
-> adds bounded pre-dispatch recovery and passes local unit, fuzz, reentrancy,
-> and stateful conservation tests. It is not live release authority until its
-> own deployment, bindings, and Coston2 evidence are verified.
+> adds bounded pre-dispatch recovery, passes local unit/fuzz/reentrancy/stateful
+> conservation tests, and now has live deployment, fresh FCC authority, and
+> success-lifecycle evidence. It is not release authority until the real
+> time-locked refund lifecycle and promotion verification pass.
 
 ## 1. Core types
 
@@ -156,8 +157,9 @@ Retry never changes rules, bids, root, quorum, machines, FTSO snapshot, or close
 block. Both timeout refunds are public failure terminal states, not successful
 selection fallbacks; they create no award receipt and return only the original
 escrow to the buyer. The verified V1 release implements only the post-dispatch
-refund. The V2 pre-dispatch path remains a local candidate.
-Its live deployment and promotion are planned post-Summer Signal upgrades.
+refund. The V2 pre-dispatch path is a live candidate whose refund tender is
+closed and waiting for the fixed grace; it remains unavailable to consumers
+until promotion and a separate migration decision.
 
 ## 4. Creation and funding
 

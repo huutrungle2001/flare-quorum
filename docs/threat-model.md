@@ -2,8 +2,9 @@
 
 > Status: accepted security model with live Coston2 FCC, ingress, market, and
 > XRP-native evidence recorded. The verified V1 market has a known
-> pre-dispatch closed-tender liveness gap; a side-by-side V2 candidate fixes it
-> locally but is not yet Coston2 release authority. Adversarial/restart
+> pre-dispatch closed-tender liveness gap; a side-by-side live V2 candidate
+> fixes it but is not yet Coston2 release authority because its real refund
+> lifecycle and promotion are still pending. Adversarial/restart
 > hardening remains in progress, and historical Sepolia/Nox evidence does not
 > establish the security of this architecture.
 
@@ -120,7 +121,7 @@ verifiable.
 | Wrong machine key | Verified release data, fingerprint confirmation, tender-fixed key set | Compromised UI or registry discovery can mislead the user |
 | Cross-tender receipt replay | Full receipt domain, vendor nonce, expiry, signer registration | Encoding or verifier defect |
 | One machine acknowledges a different bid | Receipts must preserve a common 2-machine quorum over the same commitment | Two colluding/identically faulty machines |
-| TEE state rollback or omission | All-three atomic receipt custody, ordered chain root, sequence/checkpoint validation before scoring | Loss of two frozen machines halts selection; verified V1 can refund only after dispatch, while the local V2 candidate also bounds the pre-dispatch `Closed` state |
+| TEE state rollback or omission | All-three atomic receipt custody, ordered chain root, sequence/checkpoint validation before scoring | Loss of two frozen machines halts selection; verified V1 can refund only after dispatch, while the live V2 candidate bounds the pre-dispatch `Closed` state after its fixed grace |
 | Buyer/client supplies favored winner | Market accepts only threshold signatures over its reconstructed result domain | Correlated TEE/code/governance compromise |
 | Split TEE outcomes | Group exact digest and require two distinct common-quorum signers | Liveness failure when no digest reaches threshold |
 | Result replay or rebinding | Tender nonce, expiry, terminal guard, full domain including root and FTSO snapshot | Contract or domain implementation defect |
@@ -132,7 +133,7 @@ verifiable.
 | Underfunded or unusual token | FTestXRP-only release, exact balance-delta and conservation checks | FAssets/protocol failure |
 | Double settlement/reentrancy | Nonce and terminal state before transfers, guard, no arbitrary token allowlist | Unaudited market defect |
 | Public award leaks commercial price | Winning amount explicitly classified as public before submission | Winner's commercial price is disclosed by design |
-| Proxy/RPC/relay outage | Public checkpoints, fresh attempt nonce/request after expiry, competing relay/browser recovery; V2 close-time refund after no successful dispatch | Extended FCC or quorum outage prevents award; the V2 mitigation is local until redeployed |
+| Proxy/RPC/relay outage | Public checkpoints, fresh attempt nonce/request after expiry, competing relay/browser recovery; V2 close-time refund after no successful dispatch | Extended FCC or quorum outage prevents award; the live V2 mitigation remains candidate-only until its refund proof and promotion pass |
 | Buyer exploits outage for refund | Public proxies, permissionless finalization/retry, fixed post-dispatch grace, and V2 fixed pre-dispatch grace | If no threshold result becomes publicly retrievable before the applicable grace, fairness yields to public full-escrow recovery |
 | Admin changes live policy | Immutable tender binding and governance without live-tender/escrow authority | Deployment key can still misconfigure future tenders |
 | Fake evidence or mock fallback | Schema-validated public evidence tied to real Coston2 IDs; unavailable state on dependency failure | Review process can still miss an omission |

@@ -5,9 +5,10 @@
 > lifecycle. The public release hardening and product UX are recorded; the
 > supported replacement-TEE drill passes. Additional stateful fault breadth and
 > browser-native XRP recovery are planned post-Summer Signal hardening; Gate H
-> user validation remains `NOT_RUN`. The isolated V2 release kit is staged
-> locally, and its live deployment/promotion is part of the same post-Summer
-> roadmap rather than a blocker for the verified V1 submission release.
+> user validation remains `NOT_RUN`. The isolated V2 candidate is now live with
+> its own market, extension, governance, three fresh machines, and passed
+> success lifecycle. Its refund tender is `WAITING` for the fixed 24-hour grace;
+> V2 promotion remains separate from the verified V1 submission release.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.
@@ -115,14 +116,15 @@ placeholders are forbidden after that commit.
   secret review; user-validation and organizer submission decisions remain
   external.
 
-### Post-Summer roadmap — not a current submission milestone
+### Isolated V2 promotion and later hardening
 
-- Deploy V2 alongside V1 with a fresh extension and exactly three fresh
+- [x] Deploy V2 alongside V1 with a fresh extension and exactly three fresh
   machine identities.
-- Verify a V2-only manifest and bindings against source, runtime, registry,
-  extension, code version, signer, and machine facts.
-- Record one live flagship success lifecycle and one bounded pre-dispatch
-  full-refund lifecycle before any consumer promotion.
+- [x] Verify its candidate manifest and address-free bindings against source,
+  runtime, registry, extension, code version, signer, and machine facts.
+- [x] Record one live flagship success lifecycle.
+- Resume the closed refund tender after its real 24-hour grace and record the
+  bounded pre-dispatch full-refund lifecycle before promotion.
 - Expand stateful live fault coverage and browser-native XRP recovery under
   the same public-safe, fail-closed release policy.
 - Keep V1 consumer-selectable until the separate V2 promotion decision is

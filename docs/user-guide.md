@@ -189,9 +189,10 @@ receipt set, or a common 2-machine quorum is unavailable.
 
 Known V1 limitation: if fewer than two frozen TEEs remain valid before the
 first selection request succeeds, the verified market remains `Closed` and its
-post-dispatch refund clock never starts. The locally tested V2 candidate adds a
-separate close-time refund, but the live app must not expose or imply that
-action until a V2 manifest and bindings are verified.
+post-dispatch refund clock never starts. The live side-by-side V2 candidate adds
+a separate close-time refund, but the live app must not expose or imply that
+action until its real refund lifecycle and promotion verification pass and a
+separate consumer migration is approved.
 
 The Public Finalizer browser intentionally does not request selection or submit
 TEE results itself. Those operations require the relay's public FCC endpoints,

@@ -30,16 +30,19 @@ The project targets **Flare Summer Signal** with:
 > The verified Coston2 V1 market has a known pre-dispatch liveness gap: if a
 > tender is already `Closed` and fewer than two frozen TEEs remain valid before
 > the first selection request succeeds, V1 cannot start its 24-hour refund
-> clock. `FlareQuorumMarketV2` fixes this locally with a close-time bounded
-> refund. Its live deployment and promotion are a planned post-Summer Signal
-> upgrade requiring a separate manifest, bindings, fresh FCC identity set, and
-> verified success/refund evidence. V1 remains the current submission release.
+> clock. The side-by-side `FlareQuorumMarketV2` candidate adds a close-time
+> bounded refund and is now live with a fresh extension, three fresh production
+> machines, verified runtime/wiring, and a passed success lifecycle. Its real
+> undispatched-refund tender is closed and waiting for the fixed 24-hour
+> on-chain grace; the candidate is not a verified release or consumer default
+> until that lifecycle and promotion verification pass. V1 remains the current
+> submission release.
 
 > [!NOTE]
-> **Judging boundary:** only the verified V1 release and its cited Coston2
-> evidence count as delivered implementation. The post-Summer Signal roadmap is
-> included for the organizer's clarity-and-future-potential criterion; its
-> promotion criteria are not unfinished gates for the current submission.
+> **Judging boundary:** V1 remains the verified consumer-selectable release.
+> V2 artifacts count only as candidate engineering evidence until the separate
+> refund and promotion gates pass; they do not silently replace V1 or inflate
+> the current release claim.
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet

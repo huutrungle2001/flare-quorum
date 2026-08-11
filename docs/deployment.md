@@ -18,7 +18,7 @@ the preserved organizer-group redeploy bulletin and official scaffold sources.
 |---|---|---|
 | Historical Sepolia/Nox | `packages/contracts/deployments/sepolia.release.json` | Verified pre-hackathon baseline |
 | Coston2/FCC championship | `packages/flare-contracts/deployments/coston2.release.json` | Verified live candidate promoted after runtime/wiring/evidence checks |
-| Coston2 liveness V2 | No release manifest yet | Planned post-Summer Signal upgrade; the local bounded pre-dispatch refund tests pass without creating live release authority |
+| Coston2 liveness V2 | `packages/flare-contracts/deployments/coston2.v2-candidate.json` | Live isolated candidate: deployment, fresh extension/governance/three-machine set, and success lifecycle pass; refund is `WAITING`, so no verified release manifest or consumer switch exists yet |
 
 Never put Flare addresses into the Sepolia manifest/bindings or reuse historical
 deployment artifacts as Coston2 evidence.
@@ -26,11 +26,11 @@ deployment artifacts as Coston2 evidence.
 The current verified Coston2 row is V1 and has a known liveness gap when fewer
 than two frozen TEEs remain valid before the first selection dispatch succeeds.
 `FlareQuorumMarketV2` is intentionally side-by-side rather than an upgrade or
-rewrite. Its planned post-Summer Signal promotion requires a fresh
-extension/machine registration, candidate manifest, source/runtime verification,
-generated bindings, flagship lifecycle, and undispatched-refund lifecycle
-before any consumer route points to it. V1 artifacts and evidence remain
-immutable.
+rewrite. Its fresh extension/machine registration, candidate manifest,
+source/runtime verification, generated candidate bindings, and flagship
+lifecycle are recorded. The undispatched-refund lifecycle is waiting for its
+real fixed grace, after which promotion must recheck the complete bundle before
+any consumer route can point to it. V1 artifacts and evidence remain immutable.
 
 ## 2. Phase 0: pin before building
 

@@ -2,15 +2,16 @@
 
 ## Current status
 
-V2 is **prepared locally and not deployed**. Its source, bytecode, candidate
-ABIs, deployment tooling, FCC registration profile, machine/governance profile,
-success lifecycle, bounded-refund lifecycle, and promotion gate are available.
-No V2 address, extension ID, TEE identity, lifecycle result, or verified-release
-claim exists yet.
+V2 is a **live, isolated candidate and not yet a verified release**. Market
+`0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, award receipt
+`0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3`, extension `66142`, governance,
+and exactly three fresh production machines are recorded in sanitized Coston2
+evidence. The encrypted-bid success lifecycle passes. Refund tender `2` is
+closed without a selection dispatch and is waiting until chain timestamp
+`1786538381` (`2026-08-12T12:39:41Z`) before the real refund can execute.
 
-Live V2 deployment and promotion are a planned post-Summer Signal upgrade. They
-are not an acceptance criterion or blocker for the current verified V1
-submission release.
+Promotion therefore remains blocked only by the refund lifecycle. This is a
+real time-lock, not a failed or fabricated gate.
 
 The verified V1 Coston2 release remains the only consumer-selectable release.
 Web, relay, console, and `@flarequorum/flare-bindings` continue to use V1. The
@@ -105,23 +106,31 @@ Use each preflight first.
    pnpm flare:v2:extension:register
    ```
 
-3. Bring up and register exactly three fresh V2 machines with `rRap`. The
-   preflight rejects any identity already frozen in V1:
+3. Bring up exactly three fresh V2 machines and run the endpoint preflight. It
+   rejects any identity already frozen in V1:
 
    ```bash
    pnpm flare:v2:machines:preflight
-   pnpm flare:v2:machines:register
    ```
 
-4. Bind governance only after all three `/info` envelopes report the same
-   expected policy:
+4. Bind governance after all three `/info` envelopes report the same expected
+   policy and before `rRap`; otherwise registration correctly reverts with
+   `InvalidGovernanceHash`:
 
    ```bash
    pnpm flare:v2:governance:preflight
    pnpm flare:v2:governance:set
    ```
 
-5. Prove the live success path with encrypted ingress, three receipts, FCC
+5. Register exactly the three preflighted machines with `rRap` and require the
+   complete active set to reach status `2`:
+
+   ```bash
+   pnpm flare:v2:machines:preflight
+   pnpm flare:v2:machines:register
+   ```
+
+6. Prove the live success path with encrypted ingress, three receipts, FCC
    selection, two matching result signers, FTestXRP settlement, and award mint:
 
    ```bash
@@ -129,7 +138,7 @@ Use each preflight first.
    pnpm flare:v2:success
    ```
 
-6. Prove the closed-but-undispatched refund path. This is intentionally
+7. Prove the closed-but-undispatched refund path. This is intentionally
    resumable and never fabricates elapsed time:
 
    ```bash
@@ -143,7 +152,7 @@ Use each preflight first.
    chain timestamp at which it can resume. `PASSED` requires full escrow return,
    `UndispatchedTimeout`, no request ID, and no award receipt.
 
-7. Recheck the complete bundle and record a verified side-by-side V2 release:
+8. Recheck the complete bundle and record a verified side-by-side V2 release:
 
    ```bash
    pnpm flare:v2:promotion:check
@@ -163,6 +172,6 @@ web, relay, console, or the public binding manifest requires a separate user
 approval, consumer migration, full validation, and rollback review. Do not
 silently rewrite the existing V1 manifest.
 
-Until every live stage passes, describe V2 as **planned**, **local candidate**,
-or **not yet verified**. A `NOT RUN`, `BLOCKED`, or `WAITING` result is evidence
-of the actual state and must not be replaced with a synthetic success.
+Until every live stage passes, describe V2 as a **live candidate** or **not yet
+verified**. A `NOT RUN`, `BLOCKED`, or `WAITING` result is evidence of the actual
+state and must not be replaced with a synthetic success.

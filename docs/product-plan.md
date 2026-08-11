@@ -213,11 +213,12 @@ All formerly open choices are accepted in
 ## 13. Post-Summer Signal upgrades
 
 Two independent tracks follow the current verified V1 submission. First, the
-staged `FlareQuorumMarketV2` candidate can be promoted only after a separate
-side-by-side Coston2 release, fresh FCC extension and three-machine set,
-verified bindings, and live success/refund evidence. Second, product discovery
-can expand the proven procurement foundation into Flare Treasury Exchange.
-Neither track is claimed as part of the current V1 release.
+live side-by-side `FlareQuorumMarketV2` candidate already has a fresh FCC
+extension and three-machine set, verified candidate bindings, and live success
+evidence; promotion still requires the time-locked refund evidence and final
+bundle verification. Second, product discovery can expand the proven
+procurement foundation into Flare Treasury Exchange. Neither track changes the
+current V1 release claim until its separate gate passes.
 
 This roadmap supports the hackathon's clarity-and-future-potential criterion.
 Its bullets are release or discovery criteria for later work, not incomplete
@@ -225,10 +226,11 @@ acceptance gates for the current submission.
 
 ### 13.1 V2 release promotion
 
-The repository already contains the address-free staged-release kit and local
-V2 liveness evidence. The post-Summer Signal release must preserve V1, create
-new FCC identities, verify the complete V2 authority chain, execute both live
-lifecycle cases, and make consumer promotion a separate explicit decision.
+The repository contains the address-free staged-release kit, local V2 liveness
+evidence, live candidate deployment, new FCC identities, verified authority
+chain, and success lifecycle. The closed refund tender must complete after its
+real grace, then promotion must reverify the bundle. Consumer promotion remains
+a separate explicit decision.
 
 ### 13.2 Flare Treasury Exchange
 

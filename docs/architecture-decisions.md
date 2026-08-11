@@ -762,12 +762,12 @@ buyer choose a winner, weaken the threshold, replace a frozen machine, or
 represent the refund as FCC success.
 
 **Release boundary:** Local unit, fuzz, reentrancy, token-failure, and stateful
-conservation tests pass. V2 live promotion is a planned post-Summer Signal
-upgrade requiring a fresh extension and three-machine set,
-runtime/constructor verification, generated bindings, one flagship lifecycle,
-and one undispatched-refund lifecycle on Coston2. Until promotion,
-`coston2.release.json` and its V1 limitation remain the authoritative live
-facts.
+conservation tests pass. The side-by-side V2 candidate, fresh extension and
+three-machine set, runtime/constructor verification, candidate bindings, and
+flagship lifecycle are live and verified as candidate evidence. Its
+undispatched-refund tender is waiting for the real fixed grace. Until that
+lifecycle and promotion pass, `coston2.release.json` and its V1 limitation
+remain the authoritative consumer facts.
 
 ## ADR-029 — Live registry and exact active-machine preflight
 
