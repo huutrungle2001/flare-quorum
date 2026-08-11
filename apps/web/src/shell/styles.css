@@ -3209,7 +3209,8 @@ main {
   min-height: 44px;
 }
 
-.flare-buyer-form > :is(.wallet-panel, .wallet-connect) {
+.flare-buyer-form > :is(.wallet-panel, .wallet-connect),
+.flare-vendor-form > :is(.wallet-panel, .wallet-connect) {
   margin-left: 32px;
   margin-right: 32px;
 }
@@ -6782,6 +6783,7 @@ footer p {
   }
 
   .flare-buyer-form > :is(.wallet-panel, .wallet-connect),
+  .flare-vendor-form > :is(.wallet-panel, .wallet-connect),
   .finalizer-queue > :is(.wallet-panel, .wallet-connect) {
     margin-left: 20px;
     margin-right: 20px;

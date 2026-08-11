@@ -5,6 +5,7 @@ import { FlareEvidenceWorkspace, FlareExplorerView, FlareRoleBar } from "../src/
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareAuditorWorkspace } from "../src/flare/FlareAuditorWorkspace";
 import { FlareFinalizerWorkspace } from "../src/flare/FlareFinalizerWorkspace";
+import { FlareVendorWorkspace } from "../src/flare/FlareVendorWorkspace";
 import { FlareLandingPage } from "../src/flare/FlareLandingPage";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
 import { FlareXrpFundingPanel } from "../src/flare/FlareXrpFundingPanel";
@@ -193,6 +194,7 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByRole("heading", { name: "Inspect the binding, not the bids." })).toBeInTheDocument();
     expect(screen.getByText(/NO BID DECRYPTION/i)).toBeInTheDocument();
     expect(screen.getAllByText(/TEE [123]/)).toHaveLength(3);
+    expect(screen.getByRole("button", { name: "Copy market address" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /reveal|decrypt|finalize/i })).toBeNull();
   });
 
@@ -221,6 +223,18 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByRole("button", { name: "CLOSE & FREEZE FTSO →" })).toBeDisabled();
     expect(screen.getByText(/no bid-decryption capability/i)).toBeInTheDocument();
     expect(screen.queryByText(/client-provided winner accepted/i)).toBeNull();
+  });
+
+  it("asks the vendor to connect only when an open tender has a bid action", () => {
+    const first = render(<FlareVendorWorkspace wallet={wallet} tenders={[{ ...publicTender, status: "Cancelled" }]} onRefresh={() => undefined} />);
+    expect(screen.getByRole("heading", { name: "No open Coston2 tenders" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Connect to submit this action." })).toBeNull();
+    first.unmount();
+
+    render(<FlareVendorWorkspace wallet={wallet} tenders={[publicTender]} onRefresh={() => undefined} />);
+    expect(screen.getByRole("heading", { name: "Connect to submit this action." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "ENCRYPT & SUBMIT BID →" })).toBeDisabled();
+    expect(screen.queryByText(/&amp;/)).toBeNull();
   });
 
   it("keeps FXRP redemption behind the winning wallet and never asks for an XRPL secret", () => {

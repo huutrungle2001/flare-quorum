@@ -51,7 +51,9 @@ Use `/flare?role=evidence` (or the `/flare?role=auditor` alias) for the dedicate
 workspace. It re-reads the same finalized market snapshot and presents each
 tender's public rules hash, per-bid receipt quorum, ordered root, machine
 binding, result digest, award payout/remainder, and refund state. It never
-unlocks bid data or requires a wallet. Use `/flare?role=finalizer` for the separate
+unlocks bid data or requires a wallet. It opens the newest awarded dossier by
+default, supports public ID/buyer/status filtering, and provides labelled copy
+controls for long public identifiers. Use `/flare?role=finalizer` for the separate
 public lifecycle queue: permissionless close is available in-browser, while
 FCC dispatch/result grouping stays in the dedicated relay. Buyer-only empty
 cancellation and failed-compute recovery require an explicit confirmation.
@@ -70,9 +72,15 @@ the `FLAREQUORUM` wordmark returns to the standalone product landing page. Click
 `TENDERS` enters `/flare`, where the dossier-style left rail remains visible
 while the right side renders the selected workspace: `PUBLIC`, `BUYER` (with
 the two funding choices), `PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public
-finalizer), and `AUDITOR`. The left rail keeps compact wallet assets and the
-Coston2 faucet; refresh is available as the global `↻` control beside Connect
-Wallet. Wallet connection stays in the global header, while FXRP redemption
+finalizer), and `AUDITOR`. Public uses canonical tender IDs, status, buyer, and
+on-chain facts rather than fabricating titles when only a metadata hash exists.
+Its desktop list provides search and five-item pagination, and the list/detail
+canvas uses one document scroll instead of nested scroll panes. The left rail
+shows compact wallet assets only in Buyer, Vendor, and Activity; Public and
+Auditor explicitly mark the wallet optional. The Coston2 faucet remains
+available, and refresh is the global `↻` control beside `CONNECT FOR ACTIONS`.
+Wallet connection stays in the global header and appears again as a compact
+checkpoint next to a relevant transaction, while FXRP redemption
 controls appear inside `PRIVATE BIDS` only for the connected public winner.
 Sepolia-only `vcUSDC` wrap/unwrap controls are omitted from Flare.
 
@@ -121,6 +129,12 @@ success. The Sepolia app remains a pre-hackathon baseline.
 
 The app never asks for the buyer's XRPL secret and never holds an autonomous
 buyer signer. Direct EVM funding is a clearly labeled recovery/developer route.
+The source UI auto-saves only the public Buyer Brief fields in tab-scoped
+`sessionStorage`, shows the contract length/range constraints while composing,
+and provides `CLEAR PUBLIC DRAFT`. The versioned allowlist includes no bid,
+ciphertext, credential, salt, signature, wallet material, or FDC proof; any
+unknown stored key invalidates the draft. The Coston2 wallet checkpoint appears
+after the brief, immediately before the direct transaction action.
 After a public payment hash is known, the browser may retain only the owner,
 transaction hash, Smart Account wallet ID, and executor fee as a reload-safe
 checkpoint. On reload, the Buyer route offers an explicit public-checkpoint

@@ -193,7 +193,9 @@ Desktop:
 
 - Fixed horizontal product bar.
 - Fixed left workspace rail beneath the product bar.
-- Public explorer: four-column tender list plus eight-column detail canvas.
+- Public explorer: four-column, five-item paginated tender list plus eight-column
+  detail canvas. Search, filters, list, and detail share the document scroll;
+  the list and detail must not create competing viewport-height scroll panes.
 - Buyer/Vendor task view: seven-column primary workflow plus five-column
   privacy/evidence rail.
 - Activity: timeline first, evidence detail second.
@@ -335,6 +337,12 @@ Required hierarchy:
 6. Privacy badges.
 7. One primary next action.
 
+When the verified contract exposes only a public metadata hash—not the original
+brief text—the card title is the canonical `Tender #<id>` plus status and buyer.
+Do not invent or reuse a generic procurement title. A human-authored title may
+replace it only after a separately trusted public-metadata resolver verifies the
+content against the contract hash.
+
 Selected card uses an orange edge marker or fill block—not a shadow.
 
 ### Bid composer
@@ -369,6 +377,21 @@ Full-width white panel with black border and 25px radius:
 - FCC extension/code version, three machine fingerprints, and 2-of-3 policy.
 
 Copy must state: `THE TREASURY OWNS THE FUNDS. THE TEE SELECTS; THE CONTRACT SETTLES.`
+
+### Public Buyer Brief draft
+
+- The long public Buyer Brief auto-saves only in tab-scoped `sessionStorage`.
+- The storage schema is versioned and allowlists title, category, objective,
+  acceptance criteria, public vendor questions, ceiling, approved vendor
+  addresses, deadline, and public scoring weights.
+- Unknown keys invalidate the stored record. Bid plaintext, ciphertext,
+  credentials, salts, signatures, wallet material, and FDC proofs are never
+  accepted by this draft store.
+- Show character/range guidance before submission and an explicit
+  `CLEAR PUBLIC DRAFT` action.
+- Compose first; place the compact wallet connection checkpoint immediately
+  before the transaction action. Public and Auditor workspaces label the wallet
+  optional and do not show wallet balances in the workspace rail.
 
 ### Lifecycle strip
 
@@ -536,6 +559,8 @@ privacy/status badges.
 - Animated marquee/illustration/proof pulses respect reduced motion.
 - Commitment, digest, and address truncation always exposes a labelled copy/full-value
   control.
+- Desktop Public and Auditor lists provide search and bounded pagination, and
+  default Auditor inspection to the newest awarded dossier when one exists.
 - The interface supports 320px without horizontal page overflow.
 
 ## 11. Do

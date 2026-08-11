@@ -113,7 +113,6 @@ export function FlareVendorWorkspace({
           browser storage, calldata, or public logs.
         </p>
       </section>
-      <WalletPanel wallet={wallet} network="coston2" />
       {selected?.scoringPolicy.requiredCredentials.length ? (
         <section className="state-panel error" role="alert">
           <span aria-hidden="true">!</span>
@@ -159,6 +158,7 @@ export function FlareVendorWorkspace({
           </div>
           {error && <p className="inline-error" role="alert">{error}</p>}
           {stage && <p className="form-hint" aria-live="polite">{stageLabels[stage]}</p>}
+          {!selected.scoringPolicy.requiredCredentials.length && <WalletPanel wallet={wallet} network="coston2" compact />}
           <button className="primary-button" type="button" onClick={() => void submit()} disabled={busy || !connected || Boolean(selected.scoringPolicy.requiredCredentials.length)}>
             {busy ? "ENCRYPTING / WAITING…" : "ENCRYPT & SUBMIT BID →"}
           </button>
