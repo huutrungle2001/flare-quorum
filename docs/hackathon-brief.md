@@ -111,7 +111,10 @@ improved work to commits, deployments, and sanitized evidence.
 A judge should understand the product in 30 seconds, verify the Flare path in
 two minutes, and reproduce the public lifecycle from the repository. The
 roadmap must describe credible audit, liveness, pilot, and mainnet work without
-claiming those outcomes already exist.
+claiming those outcomes already exist. Roadmap items may support future-
+potential scoring, but only the verified V1 artifacts and evidence count as
+delivered implementation; post-Summer promotion criteria are not current
+acceptance gates.
 
 ## 7. Submission readiness checklist
 
@@ -120,7 +123,7 @@ claiming those outcomes already exist.
   knowledge.
 - [x] Live app, wallet-free demo, public evidence links, and the checked-in
   captioned demo video work; remaining user-validation evidence is tracked in
-  `PLAN.md` Phase 8.
+  `PLAN.md` Phase 7.
 - [x] GitHub repository and technical materials are accessible to judges.
 - [x] Every Flare integration is explained by user value and live evidence.
 - [x] Existing/new/ported/integrated/improved work is separated in

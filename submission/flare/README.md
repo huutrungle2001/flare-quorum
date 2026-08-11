@@ -215,9 +215,12 @@ signed private material. The
 redemption request is live; the underlying agent payout remains an external
 FAssets protocol obligation.
 
+## Roadmap / future potential — not current delivery
+
 Planned post-Summer Signal upgrades: deploy V2 alongside V1 with a fresh FCC
 extension and exactly three fresh machines, verify its own manifest/bindings,
 record one live success and one bounded-refund lifecycle, expand stateful live
 fault coverage, and add browser-native XRP recovery and broader wallet coverage.
 Consumer promotion remains a separate decision. None of those future facts is
-used to support the current V1 submission.
+used to support the current V1 submission or treated as an unpassed current
+gate.

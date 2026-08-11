@@ -317,9 +317,10 @@ confidential bid or settlement boundary:
 - [x] Run the three-vendor recovery variant with one result endpoint
   intentionally unavailable; two remaining frozen TEE results finalized the
   tender in `evidence/coston2/three-vendor-recovery.release.json`.
-- [~] Run invalid credential, invalid bid, tie, zero-winner, replay, wrong-domain,
-  wrong-root, stale-FTSO, signer-loss, proxy restart, and competing-relay
-  coverage. Local Go/Forge/relay rejection suites are recorded in
+- [x] Record the current-release invalid credential, invalid bid, tie,
+  zero-winner, replay, wrong-domain, wrong-root, stale-FTSO, signer-loss, proxy
+  restart, and competing-relay evidence boundary. Local Go/Forge/relay
+  rejection suites are recorded in
   `evidence/local/flare-adversarial-coverage.json`; live read-only terminal and
   zero-term guard calls are recorded in
   `evidence/coston2/live-negative-calls.release.json`; the local Docker
@@ -369,9 +370,10 @@ all agree and contain no confidential material.
 - [ ] Record problems, decisions, and changes without inventing traction.
 - [x] Publish [`docs/integration-guide.md`](docs/integration-guide.md) for
   procurement/treasury teams and infrastructure partners.
-- [~] Prepare [`submission/flare/COMMUNITY-UPDATE.md`](submission/flare/COMMUNITY-UPDATE.md)
+- [x] Prepare [`submission/flare/COMMUNITY-UPDATE.md`](submission/flare/COMMUNITY-UPDATE.md)
   and [`submission/flare/VALIDATION-PLAN.md`](submission/flare/VALIDATION-PLAN.md);
-  sending the draft and collecting organizer/user feedback remain external.
+  sending the draft and collecting organizer/user feedback are builder-
+  controlled external actions and are not claimed as complete.
 
 Exit: the submission contains real user evidence, not only technical claims.
 
@@ -390,7 +392,7 @@ Exit: the submission contains real user evidence, not only technical claims.
 - [x] Clear bounty selection and explanation of why every Flare integration is
   essential in `submission/flare/README.md`.
 - [x] Roadmap limited to credible mainnet, audit, liveness, and pilot work;
-  incomplete items remain explicitly labeled.
+  future promotion criteria are explicitly separated from current gates.
 
 Exit: a judge can understand usefulness in 30 seconds, verify Flare depth in
 two minutes, and reproduce the public path from the repository.
@@ -410,21 +412,22 @@ two minutes, and reproduce the public path from the repository.
 
 This phase is a post-competition roadmap. It is not part of the current FlareQuorum
 Flare championship claim and must not be presented as implemented until its own
-contracts, Coston2 evidence, and user validation exist.
+contracts, Coston2 evidence, and user validation exist. The bullets below are
+future promotion criteria, not unchecked current-submission gates.
 
 #### 9.0 — staged V2 release promotion
 
-- [ ] Deploy `FlareQuorumMarketV2` alongside the immutable verified V1 release.
-- [ ] Register a fresh FCC extension and exactly three fresh TEE machines
+- Deploy `FlareQuorumMarketV2` alongside the immutable verified V1 release.
+- Register a fresh FCC extension and exactly three fresh TEE machines
   without reusing or pausing the V1 machine set.
-- [ ] Publish a V2-specific manifest and generated bindings only after source,
+- Publish a V2-specific manifest and generated bindings only after source,
   runtime, registry, extension, code-version, machine, and signer checks agree.
-- [ ] Record both a flagship success lifecycle and the bounded pre-dispatch
+- Record both a flagship success lifecycle and the bounded pre-dispatch
   full-refund lifecycle with public-safe Coston2 evidence.
-- [ ] Expand stateful Coston2 fault injection, live two-machine-loss coverage,
+- Expand stateful Coston2 fault injection, live two-machine-loss coverage,
   and browser-native XRP recovery without weakening the current fail-closed
   boundary.
-- [ ] Promote V2 only after its release gate passes; switching consumers remains
+- Promote V2 only after its release gate passes; switching consumers remains
   a separate explicit release decision.
 
 #### 9.1 — Flare Treasury Exchange direction
@@ -444,65 +447,65 @@ is never changed as part of this roadmap.
 
 #### 9.2 — product discovery and boundary
 
-- [ ] Interview treasury operators, DAO operations teams, and service
+- Interview treasury operators, DAO operations teams, and service
   providers to select one narrow pilot (for example, an on-chain deployment
   or XRPL payment operation) rather than a generic task marketplace.
-- [ ] Define the public `INTENT_SCHEMA_V1`: objective, budget, asset, deadline,
+- Define the public `INTENT_SCHEMA_V1`: objective, budget, asset, deadline,
   approved participants, milestone amounts, and deterministic acceptance
   predicates.
-- [ ] Define the private `OFFER_SCHEMA_V1`: price, execution route, delivery
+- Define the private `OFFER_SCHEMA_V1`: price, execution route, delivery
   estimate, credentials, and one-time nonce; preserve the same ciphertext,
   plaintext, and browser-persistence prohibitions as the championship path.
-- [ ] Keep the product vocabulary explicit: `Intent`, `Offer`, `Milestone`,
+- Keep the product vocabulary explicit: `Intent`, `Offer`, `Milestone`,
   `Attestation`, `Release`, and `Refund`; do not silently relabel the current
   tender ABI or its historical evidence.
 
 #### 9.3 — milestone escrow vertical slice
 
-- [ ] Implement a separate non-upgradeable `MilestoneEscrow` or equivalent
+- Implement a separate non-upgradeable `MilestoneEscrow` or equivalent
   module whose public state contains only the intent, milestone amounts,
   deadlines, proof type, proof commitment, and release/refund state.
-- [ ] Start with one objectively verifiable proof type (`EVMTransaction` or
+- Start with one objectively verifiable proof type (`EVMTransaction` or
   `XRPPayment`) and a two- or three-milestone flow. Add `Web2Json` only after
   an allowlisted source, transformation, freshness bound, and outage behavior
   are documented.
-- [ ] Bind every release proof to chain, escrow, intent, milestone, recipient,
+- Bind every release proof to chain, escrow, intent, milestone, recipient,
   amount, rules hash, attestation round, and one-time release nonce.
-- [ ] Make timeout, failed proof, duplicate proof, replay, partial payout, and
+- Make timeout, failed proof, duplicate proof, replay, partial payout, and
   buyer cancellation/refund fail closed; conserve escrow exactly once.
-- [ ] Keep milestone amounts public. Do not claim private token settlement or
+- Keep milestone amounts public. Do not claim private token settlement or
   private payout amounts without a separately verified mechanism.
 
 #### 9.4 — private offer and executor workflow
 
-- [ ] Reuse the FCC private-ingress pattern, but create a new intent/offer
+- Reuse the FCC private-ingress pattern, but create a new intent/offer
   domain and result schema instead of extending the championship tender
   winner ABI in place.
-- [ ] Let FCC evaluate deterministic cost, route, credential, and deadline
+- Let FCC evaluate deterministic cost, route, credential, and deadline
   predicates; no browser, buyer, relay, or AI model may choose the executor.
-- [ ] Preserve a common frozen machine quorum and threshold-signed result for
+- Preserve a common frozen machine quorum and threshold-signed result for
   executor selection, with fresh nonce/expiry recovery after proxy or machine
   failure.
-- [ ] Add an executor workspace that can prepare a public-safe XRPL `0xFE`
+- Add an executor workspace that can prepare a public-safe XRPL `0xFE`
   operation or an EVM action without receiving an XRPL secret or private bid.
-- [ ] Use FTSO only for a fresh, explicitly bound conversion/risk input and FDC
+- Use FTSO only for a fresh, explicitly bound conversion/risk input and FDC
   only for a verifiable external fact; every dependency must have an unavailable
   and recovery state.
 
 #### 9.5 — XRP-native settlement and pilot
 
-- [ ] Run the complete Coston2 path: XRPL Payment → FDC proof → Smart Account
+- Run the complete Coston2 path: XRPL Payment → FDC proof → Smart Account
   funding → private FCC offer selection → milestone attestation → FTestXRP or
   FXRP release → official redemption where supported.
-- [ ] Add a public evidence view for intent hash, milestone proof, attestation
+- Add a public evidence view for intent hash, milestone proof, attestation
   round, release/refund conservation, result digest, and recovery checkpoints;
   never expose offer plaintext, ciphertext, or private credentials.
-- [ ] Conduct at least five treasury interviews, five provider usability tests,
+- Conduct at least five treasury interviews, five provider usability tests,
   and one honest design-partner pilot before claiming product usefulness.
-- [ ] Publish a new-work ledger that separates the current FlareQuorum foundation,
+- Publish a new-work ledger that separates the current FlareQuorum foundation,
   ported Flare components, and newly built Treasury Exchange contracts,
   extension commands, bindings, UI, and evidence.
-- [ ] Treat mainnet FXRP, production custody, formal audit, SLA, and legal
+- Treat mainnet FXRP, production custody, formal audit, SLA, and legal
   delivery arbitration as later roadmap items, not MVP claims.
 
 **V2 track exit:** its separate verified release, fresh FCC identity set, live

@@ -35,6 +35,12 @@ The project targets **Flare Summer Signal** with:
 > upgrade requiring a separate manifest, bindings, fresh FCC identity set, and
 > verified success/refund evidence. V1 remains the current submission release.
 
+> [!NOTE]
+> **Judging boundary:** only the verified V1 release and its cited Coston2
+> evidence count as delivered implementation. The post-Summer Signal roadmap is
+> included for the organizer's clarity-and-future-potential criterion; its
+> promotion criteria are not unfinished gates for the current submission.
+
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
 > wallets and assets only.

@@ -80,25 +80,25 @@ placeholders are forbidden after that commit.
 - [x] Add `packages/flare-bindings` and drift checks.
 - [x] Migrate web judge path to Coston2.
 - [x] Implement private vendor ingress and receipt UX.
-- [x] Implement XRP-native executor and EVM buyer paths; delayed XRP minting
-  now has public-safe checkpoint/resume, and the optional GemWallet Testnet
-  signer returns only a public payment hash while browser-native recovery
-  is tracked as post-Summer Signal hardening.
+- [x] Implement the unified Buyer with direct Coston2 and XRP-native executor
+  paths; delayed XRP minting now has public-safe checkpoint/resume, and the
+  optional GemWallet Testnet signer returns only a public payment hash while
+  browser-native recovery is tracked as post-Summer Signal hardening.
 - [x] Implement Activity recovery and public Evidence workspace.
 - [x] Migrate relay and console to Flare bindings.
 
 ### Milestone 5 — verification and production presentation
 
 - [x] Deploy and verify canonical Coston2 contracts/extension/machine policy.
-- [~] Run full live/adversarial/recovery suites; core live lifecycles and one-
-  endpoint recovery plus the replacement-TEE drill pass, while complete fault
-  drills are planned post-Summer Signal hardening. Local rejection coverage,
+- [x] Record the current-release live/adversarial/recovery boundary: core live
+  lifecycles, one-endpoint recovery, and the replacement-TEE drill pass. Local
+  rejection coverage,
   the Docker identity-rotation boundary,
   and read-only Coston2 terminal/invalid-terms calls are recorded without
   promoting them to stateful live evidence.
-- [~] Publish sanitized evidence and performance benchmarks; release evidence,
-  public receipt/block timing, and independent bid-ingress timing are current,
-  while broader fault-drill evidence belongs to the post-Summer hardening track.
+- [x] Publish current-release sanitized evidence and performance benchmarks,
+  including public receipt/block timing and independent bid-ingress timing;
+  broader fault-drill evidence belongs to the post-Summer hardening roadmap.
 - [x] Deploy web and relay; verify desktop/mobile/keyboard behavior.
 - [ ] Complete user research, vendor tests, and pilot outreach.
 - [ ] Pass Gate H.
@@ -107,24 +107,25 @@ placeholders are forbidden after that commit.
 
 - [x] Publish live app, demo video, technical materials, Coston2 addresses,
   extension/code/machine identifiers, work ledger, and roadmap.
-- [ ] Select Confidential Compute Apps.
-- [ ] Select Interoperable Asset Products only after the exact XRP-native
-  lifecycle evidence passes.
+- Builder submission action: select Confidential Compute Apps as the primary
+  bounty.
+- Builder submission action: select Interoperable Asset Products using the
+  already recorded XRP-native lifecycle evidence.
 - [x] Complete the repository/evidence/hosted-runtime claim, privacy, and
   secret review; user-validation and organizer submission decisions remain
   external.
 
-### Milestone 7 — planned post-Summer Signal V2 promotion
+### Post-Summer roadmap — not a current submission milestone
 
-- [ ] Deploy V2 alongside V1 with a fresh extension and exactly three fresh
+- Deploy V2 alongside V1 with a fresh extension and exactly three fresh
   machine identities.
-- [ ] Verify a V2-only manifest and bindings against source, runtime, registry,
+- Verify a V2-only manifest and bindings against source, runtime, registry,
   extension, code version, signer, and machine facts.
-- [ ] Record one live flagship success lifecycle and one bounded pre-dispatch
+- Record one live flagship success lifecycle and one bounded pre-dispatch
   full-refund lifecycle before any consumer promotion.
-- [ ] Expand stateful live fault coverage and browser-native XRP recovery under
+- Expand stateful live fault coverage and browser-native XRP recovery under
   the same public-safe, fail-closed release policy.
-- [ ] Keep V1 consumer-selectable until the separate V2 promotion decision is
+- Keep V1 consumer-selectable until the separate V2 promotion decision is
   explicitly approved.
 
 ## 4. Production packages

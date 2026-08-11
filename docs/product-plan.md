@@ -219,6 +219,10 @@ verified bindings, and live success/refund evidence. Second, product discovery
 can expand the proven procurement foundation into Flare Treasury Exchange.
 Neither track is claimed as part of the current V1 release.
 
+This roadmap supports the hackathon's clarity-and-future-potential criterion.
+Its bullets are release or discovery criteria for later work, not incomplete
+acceptance gates for the current submission.
+
 ### 13.1 V2 release promotion
 
 The repository already contains the address-free staged-release kit and local
