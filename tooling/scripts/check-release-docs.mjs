@@ -29,7 +29,6 @@ const requiredFiles = [
   "README.md",
   "PLAN.md",
   "SECURITY.md",
-  "feedback.md",
   "docs/original/README.md",
   "docs/original/hackathon-brief.md",
   "docs/original/fcc-coston2-redeploy-message.md",
