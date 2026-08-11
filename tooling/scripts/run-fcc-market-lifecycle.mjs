@@ -401,8 +401,11 @@ async function main() {
   if (machineIds.length !== 3 || new Set(machineIds.map((id) => id.toLowerCase())).size !== 3) throw new Error("FCC_MARKET_MACHINE_EVIDENCE_INVALID");
   if (!execute) {
     const client = createPublicClient({ chain, transport: http(rpcUrl, { timeout: 20_000, retryCount: 2 }) });
+    currentPhase = "machine-preflight";
     const machines = await readTeeSet({ client, manager, urls, extensionId, codeHash });
+    currentPhase = "ftso-preflight";
     const { feed } = await readFreshFtso(client, ftso);
+    currentPhase = "balance-preflight";
     const balance = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [account.address] });
     console.log(safeJson({
       status: "READY",
