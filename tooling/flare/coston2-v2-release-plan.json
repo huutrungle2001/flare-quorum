@@ -26,6 +26,7 @@
     "oneResultOutageEvidence": "evidence/coston2/market-v2-one-result-outage.json",
     "invalidCredentialEvidence": "evidence/coston2/market-v2-invalid-credential.json",
     "refundLifecycleEvidence": "evidence/coston2/market-v2-undispatched-refund.json",
+    "postDispatchRefundEvidence": "evidence/coston2/market-v2-selection-expired-refund.json",
     "releaseManifest": "packages/flare-contracts/deployments/coston2.v2.release.json",
     "deploymentConsistencyEvidence": "evidence/coston2/market-v2-deployment-consistency.json",
     "localReadinessEvidence": "evidence/local/flare-v2-release-readiness.json",

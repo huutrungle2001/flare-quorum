@@ -20,8 +20,21 @@ import { readV2ReleasePlan } from "../flare/v2-release.mjs";
 const root = resolve(import.meta.dirname, "../..");
 const plan = readV2ReleasePlan(root);
 const execute = process.argv.includes("--execute");
-const statePath = resolve(root, ".local/fcc/market-v2-refund-lifecycle.state.json");
-const evidencePath = resolve(root, plan.artifacts.refundLifecycleEvidence);
+const mode = process.env.FCC_V2_REFUND_MODE?.trim() || "undispatched";
+if (!new Set(["undispatched", "selection-expired"]).has(mode)) {
+  throw new Error("FLARE_V2_REFUND_MODE_INVALID");
+}
+const selectionExpired = mode === "selection-expired";
+const statePath = resolve(
+  root,
+  selectionExpired
+    ? ".local/fcc/market-v2-selection-refund-lifecycle.state.json"
+    : ".local/fcc/market-v2-refund-lifecycle.state.json",
+);
+const evidenceArtifact = selectionExpired
+  ? plan.artifacts.postDispatchRefundEvidence
+  : plan.artifacts.refundLifecycleEvidence;
+const evidencePath = resolve(root, evidenceArtifact);
 const zeroHash = `0x${"00".repeat(32)}`;
 const zeroFeedId = `0x${"00".repeat(21)}`;
 const ceiling = 1_000_000n;
@@ -60,8 +73,8 @@ function writeState(value, exclusive = false) {
   });
 }
 
-async function send({ client, wallet, account, address, abi, functionName, args }) {
-  const simulation = await client.simulateContract({ account, address, abi, functionName, args });
+async function send({ client, wallet, account, address, abi, functionName, args, value }) {
+  const simulation = await client.simulateContract({ account, address, abi, functionName, args, value });
   const hash = await wallet.writeContract(simulation.request);
   const receipt = await client.waitForTransactionReceipt({ hash, confirmations: 1 });
   if (receipt.status !== "success") throw new Error(`FLARE_V2_REFUND_${functionName.toUpperCase()}_FAILED`);
@@ -115,13 +128,14 @@ const chain = {
 const transport = http(rpcUrl, { timeout: 20_000, retryCount: 2 });
 const client = createPublicClient({ chain, transport });
 const wallet = createWalletClient({ account, chain, transport });
-const [chainId, block, tokenBalance, marketCode, receiptCode, closedRefundGrace] = await Promise.all([
+const [chainId, block, tokenBalance, marketCode, receiptCode, closedRefundGrace, selectionRefundGrace] = await Promise.all([
   client.getChainId(),
   client.getBlock(),
   client.readContract({ address: token, abi: tokenAbi, functionName: "balanceOf", args: [account.address] }),
   client.getCode({ address: market }),
   client.getCode({ address: awardReceipt }),
   client.readContract({ address: market, abi: marketAbi, functionName: "CLOSED_REFUND_GRACE" }),
+  client.readContract({ address: market, abi: marketAbi, functionName: "SELECTION_REFUND_GRACE" }),
 ]);
 const machineBindings = await Promise.all(machines.map(async ({ teeId }) => {
   const id = getAddress(teeId);
@@ -148,6 +162,7 @@ const preflight = {
   extensionSenderMatchesV2: getAddress(registration.publicIdentifiers.sender) === market,
   threeProductionMachinesBound: machineBindings.length === 3 && machineBindings.every(({ valid }) => valid),
   closedRefundGraceIs24Hours: closedRefundGrace === 86_400n,
+  selectionRefundGraceIs24Hours: selectionRefundGrace === 86_400n,
 };
 if (!Object.values(preflight).every(Boolean)) throw new Error("FLARE_V2_REFUND_PREFLIGHT_FAILED");
 
@@ -156,9 +171,11 @@ if (!execute) {
   let waitingUntil = null;
   if (state?.phase === "OPEN") waitingUntil = state.bidDeadline;
   if (state?.phase === "CLOSED") waitingUntil = state.refundAvailableAt;
+  if (state?.phase === "COMPUTE_PENDING") waitingUntil = state.refundAvailableAt;
   console.log(JSON.stringify({
     status: waitingUntil && block.timestamp < BigInt(waitingUntil) ? "WAITING" : "READY",
-    scope: "V2 undispatched-refund preflight only; no transaction sent",
+    scope: `V2 ${selectionExpired ? "post-dispatch selection-expired" : "undispatched"} refund preflight only; no transaction sent`,
+    mode,
     phase: state?.phase ?? "NOT_STARTED",
     market,
     extensionId: extensionId.toString(),
@@ -180,7 +197,9 @@ if (!state) {
   });
   const bidDeadline = block.timestamp + 120n;
   const terms = {
-    metadataHash: keccak256(stringToHex(`FLAREQUORUM_V2_UNDISPATCHED_REFUND_${Date.now()}`)),
+    metadataHash: keccak256(stringToHex(
+      `FLAREQUORUM_V2_${selectionExpired ? "SELECTION_EXPIRED" : "UNDISPATCHED"}_REFUND_${Date.now()}`,
+    )),
     scoringPolicy: {
       schemaVersion: 1,
       ceilingXrpMicros: ceiling,
@@ -212,6 +231,7 @@ if (!state) {
   writeState({
     schemaVersion: 1,
     phase: "OPEN",
+    mode,
     market,
     tenderId: tenderId.toString(),
     bidDeadline: bidDeadline.toString(),
@@ -222,15 +242,17 @@ if (!state) {
   console.log(JSON.stringify({
     status: "WAITING",
     phase: "OPEN",
+    mode,
     tenderId: tenderId.toString(),
     resumeAfterChainTimestamp: bidDeadline.toString(),
-    nextCommand: "pnpm flare:v2:refund",
+    nextCommand: selectionExpired ? "pnpm flare:v2:selection-refund" : "pnpm flare:v2:refund",
   }, null, 2));
   process.exit(0);
 }
 
 const tenderId = BigInt(state.tenderId);
 if (state.market !== market) throw new Error("FLARE_V2_REFUND_STATE_MARKET_MISMATCH");
+if ((state.mode ?? "undispatched") !== mode) throw new Error("FLARE_V2_REFUND_STATE_MODE_MISMATCH");
 if (state.phase === "OPEN") {
   if (block.timestamp <= BigInt(state.bidDeadline)) {
     console.log(JSON.stringify({ status: "WAITING", phase: "OPEN", tenderId: state.tenderId, resumeAfterChainTimestamp: state.bidDeadline }, null, 2));
@@ -242,6 +264,43 @@ if (state.phase === "OPEN") {
   });
   const tender = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
   const closedAt = BigInt(tuple(tender, "closedAt", 6));
+  if (selectionExpired) {
+    const instructionFee = BigInt(process.env.FLARE_FCC_INSTRUCTION_FEE_WEI ?? "1000000");
+    if (instructionFee <= 0n) throw new Error("FLARE_V2_REFUND_INSTRUCTION_FEE_INVALID");
+    const requested = await send({
+      client, wallet, account, address: market, abi: marketAbi,
+      functionName: "requestSelection", args: [tenderId], value: instructionFee,
+    });
+    const pending = await client.readContract({
+      address: market, abi: marketAbi, functionName: "getTender", args: [tenderId],
+    });
+    const selectionStartedAt = BigInt(tuple(pending, "selectionStartedAt", 17));
+    const requestId = tuple(pending, "requestId", 21);
+    if (Number(tuple(pending, "status", 22)) !== 3 || selectionStartedAt === 0n || requestId === zeroHash) {
+      throw new Error("FLARE_V2_SELECTION_REFUND_DISPATCH_INVALID");
+    }
+    const refundAvailableAt = selectionStartedAt + selectionRefundGrace + 1n;
+    writeState({
+      ...state,
+      phase: "COMPUTE_PENDING",
+      closeTransaction: closed.hash,
+      requestTransaction: requested.hash,
+      closedAt: closedAt.toString(),
+      selectionStartedAt: selectionStartedAt.toString(),
+      requestId,
+      refundAvailableAt: refundAvailableAt.toString(),
+    });
+    console.log(JSON.stringify({
+      status: "WAITING",
+      phase: "COMPUTE_PENDING",
+      mode,
+      tenderId: state.tenderId,
+      requestId,
+      resumeAfterChainTimestamp: refundAvailableAt.toString(),
+      nextCommand: "pnpm flare:v2:selection-refund",
+    }, null, 2));
+    process.exit(0);
+  }
   const refundAvailableAt = closedAt + closedRefundGrace + 1n;
   writeState({
     ...state,
@@ -253,15 +312,23 @@ if (state.phase === "OPEN") {
   console.log(JSON.stringify({
     status: "WAITING",
     phase: "CLOSED",
+    mode,
     tenderId: state.tenderId,
     resumeAfterChainTimestamp: refundAvailableAt.toString(),
     nextCommand: "pnpm flare:v2:refund",
   }, null, 2));
   process.exit(0);
 }
-if (state.phase !== "CLOSED") throw new Error("FLARE_V2_REFUND_STATE_INVALID");
+const expectedPhase = selectionExpired ? "COMPUTE_PENDING" : "CLOSED";
+if (state.phase !== expectedPhase) throw new Error("FLARE_V2_REFUND_STATE_INVALID");
 if (block.timestamp < BigInt(state.refundAvailableAt)) {
-  console.log(JSON.stringify({ status: "WAITING", phase: "CLOSED", tenderId: state.tenderId, resumeAfterChainTimestamp: state.refundAvailableAt }, null, 2));
+  console.log(JSON.stringify({
+    status: "WAITING",
+    phase: expectedPhase,
+    mode,
+    tenderId: state.tenderId,
+    resumeAfterChainTimestamp: state.refundAvailableAt,
+  }, null, 2));
   process.exit(0);
 }
 
@@ -274,7 +341,7 @@ const [buyerBefore, marketBefore, awardBefore] = await Promise.all([
 ]);
 const refunded = await send({
   client, wallet, account, address: market, abi: marketAbi,
-  functionName: "refundUndispatchedTender", args: [tenderId],
+  functionName: selectionExpired ? "refundExpiredSelection" : "refundUndispatchedTender", args: [tenderId],
 });
 const [afterTender, buyerAfter, marketAfter, awardAfter] = await Promise.all([
   client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId], blockNumber: refunded.receipt.blockNumber }),
@@ -290,22 +357,33 @@ const events = parseEventLogs({
 });
 const assertions = {
   ...preflight,
-  selectionNeverDispatched:
-    BigInt(tuple(beforeTender, "selectionStartedAt", 17)) === 0n &&
-    tuple(beforeTender, "requestId", 21) === zeroHash,
-  closedGraceElapsed:
-    block.timestamp > BigInt(tuple(beforeTender, "closedAt", 6)) + closedRefundGrace,
+  ...(selectionExpired
+    ? {
+        selectionWasDispatched:
+          BigInt(tuple(beforeTender, "selectionStartedAt", 17)) > 0n &&
+          tuple(beforeTender, "requestId", 21) !== zeroHash,
+        firstDispatchGraceElapsed:
+          block.timestamp > BigInt(tuple(beforeTender, "selectionStartedAt", 17)) + selectionRefundGrace,
+      }
+    : {
+        selectionNeverDispatched:
+          BigInt(tuple(beforeTender, "selectionStartedAt", 17)) === 0n &&
+          tuple(beforeTender, "requestId", 21) === zeroHash,
+        closedGraceElapsed:
+          block.timestamp > BigInt(tuple(beforeTender, "closedAt", 6)) + closedRefundGrace,
+      }),
   refundTransactionSucceeded: refunded.receipt.status === "success",
   tenderStatusRefunded: Number(tuple(afterTender, "status", 22)) === 5,
   fullEscrowReturned: buyerAfter - buyerBefore === ceiling && marketBefore - marketAfter === ceiling,
   noAwardMinted: awardBefore === false && awardAfter === false,
-  refundReasonUndispatchedTimeout:
-    events.length === 1 && Number(events[0].args.reason) === 2 && events[0].args.tenderId === tenderId,
+  [selectionExpired ? "refundReasonSelectionExpired" : "refundReasonUndispatchedTimeout"]:
+    events.length === 1 && Number(events[0].args.reason) === (selectionExpired ? 1 : 2) &&
+    events[0].args.tenderId === tenderId,
 };
 if (!Object.values(assertions).every(Boolean)) throw new Error("FLARE_V2_REFUND_VERIFICATION_FAILED");
 const evidence = {
   schemaVersion: 1,
-  gate: "FLARE_V2_UNDISPATCHED_REFUND",
+  gate: selectionExpired ? "FLARE_V2_SELECTION_EXPIRED_REFUND" : "FLARE_V2_UNDISPATCHED_REFUND",
   status: "PASSED",
   recordedAt: new Date().toISOString(),
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
@@ -320,14 +398,21 @@ const evidence = {
     approvalTransaction: state.approvalTransaction,
     createTransaction: state.createTransaction,
     closeTransaction: state.closeTransaction,
+    ...(selectionExpired ? {
+      requestTransaction: state.requestTransaction,
+      requestId: state.requestId,
+      selectionStartedAt: state.selectionStartedAt,
+    } : {}),
     refundTransaction: refunded.hash,
-    refundReason: "UndispatchedTimeout",
+    refundReason: selectionExpired ? "SelectionExpired" : "UndispatchedTimeout",
     escrowAmount: ceiling.toString(),
   },
   assertions,
   blockers: [],
   notes: [
-    "The tender was closed and never dispatched to FCC before the bounded refund grace elapsed.",
+    selectionExpired
+      ? "The tender entered ComputePending through a real FCC dispatch and remained unresolved until the fixed first-dispatch grace elapsed."
+      : "The tender was closed and never dispatched to FCC before the bounded refund grace elapsed.",
     "The full public FTestXRP escrow returned to the buyer and no award receipt was minted.",
     "No bid, TEE result, proxy credential, private key, or fabricated lifecycle value is recorded.",
   ],
@@ -340,5 +425,5 @@ console.log(JSON.stringify({
   status: evidence.status,
   tenderId: state.tenderId,
   refundTransaction: refunded.hash,
-  evidence: plan.artifacts.refundLifecycleEvidence,
+  evidence: evidenceArtifact,
 }, null, 2));

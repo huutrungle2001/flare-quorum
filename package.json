@@ -88,6 +88,8 @@
     "flare:v2:credential-negative": "pnpm --filter @flarequorum/flare-bindings build && FCC_RELEASE_PROFILE=v2 FCC_PRIVATE_INGRESS_NEGATIVE=invalid-credential node --env-file-if-exists=.env.local tooling/scripts/run-fcc-private-ingress.mjs",
     "flare:v2:refund:preflight": "FCC_RELEASE_PROFILE=v2 node --env-file-if-exists=.env.local tooling/scripts/run-flare-v2-refund-lifecycle.mjs",
     "flare:v2:refund": "FCC_RELEASE_PROFILE=v2 node --env-file-if-exists=.env.local tooling/scripts/run-flare-v2-refund-lifecycle.mjs --execute",
+    "flare:v2:selection-refund:preflight": "FCC_RELEASE_PROFILE=v2 FCC_V2_REFUND_MODE=selection-expired node --env-file-if-exists=.env.local tooling/scripts/run-flare-v2-refund-lifecycle.mjs",
+    "flare:v2:selection-refund": "FCC_RELEASE_PROFILE=v2 FCC_V2_REFUND_MODE=selection-expired node --env-file-if-exists=.env.local tooling/scripts/run-flare-v2-refund-lifecycle.mjs --execute",
     "flare:v2:promotion:check": "node --env-file-if-exists=.env.local tooling/scripts/promote-flare-v2-release.mjs",
     "flare:v2:promotion:require-ready": "node --env-file-if-exists=.env.local tooling/scripts/promote-flare-v2-release.mjs --require-ready",
     "flare:v2:promote": "node --env-file-if-exists=.env.local tooling/scripts/promote-flare-v2-release.mjs --execute",

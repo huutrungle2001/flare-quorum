@@ -20,6 +20,11 @@ test("keeps the V2 release plan in a separate, complete namespace", () => {
   assert.ok(Object.values(plan.artifacts).every((path) => path.includes("v2") || path.includes("V2")));
   assert.equal(plan.runtimeEnvironment.extensionId, "FCC_V2_EXTENSION_ID");
   assert.equal(plan.promotionRequirements.consumerSwitchRequiresPromotion, true);
+  assert.equal(
+    plan.artifacts.postDispatchRefundEvidence,
+    "evidence/coston2/market-v2-selection-expired-refund.json",
+  );
+  assert.equal(plan.promotionRequirements.postDispatchRefundLifecycle, undefined);
 });
 
 test("passes local V2 source, artifact, refund, and V1 preservation checks", () => {
