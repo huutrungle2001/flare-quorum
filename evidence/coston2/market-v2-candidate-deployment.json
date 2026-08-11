@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "gate": "FLARE_V2_CANDIDATE_DEPLOYMENT",
+  "status": "IN_PROGRESS",
+  "recordedAt": "2026-08-11T12:09:21.107Z",
+  "sourceCommit": "d16f26debb25cf04f4536c67263e6f05bd31dd9f",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33919464"
+  },
+  "publicIdentifiers": {
+    "FlareQuorumMarketV2": {
+      "address": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+      "deploymentTransaction": "0x95557afc8aa5d042849de119ea4a28aec5cc6f749957e4a1f4d971fee9984e38",
+      "deploymentBlock": "33919464",
+      "runtimeHash": "0x2ecfef4943e1dc772f7d5bb1db47415c9d4b037532aca0630c0450479e86d563",
+      "maskedRuntimeHash": "0xeaa1c5bc81e5fa617e4215914a7408922cbb2add63094f61ab020f0a8f3d0153",
+      "artifactMaskedRuntimeHash": "0xeaa1c5bc81e5fa617e4215914a7408922cbb2add63094f61ab020f0a8f3d0153"
+    },
+    "FlareQuorumAwardReceiptV2": {
+      "address": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3"
+    }
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "deployerMatchesDeclaredAccount": true,
+    "balanceSufficient": true,
+    "foundationsPassed": true,
+    "ftsoRegistryBindingFresh": true,
+    "dependenciesHaveCode": true,
+    "verifiedV1RuntimePreserved": true,
+    "localV2ReadinessPassed": true,
+    "runtimeFitsEip170": true,
+    "candidatePathsUnused": true,
+    "transactionSucceeded": true,
+    "constructorTransactionDecoded": true,
+    "constructorArgumentsMatch": true,
+    "runtimeSizeMatches": true,
+    "runtimeLogicMatchesArtifact": true,
+    "liveBindingsMatch": true,
+    "awardReceiptCodePresent": true,
+    "awardReceiptMarketBindingMatches": true,
+    "addressDiffersFromV1": true
+  },
+  "blockers": [
+    "V2_EXTENSION_NOT_REGISTERED",
+    "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
+    "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
+    "V2_REFUND_LIFECYCLE_NOT_VERIFIED",
+    "V2_CONSUMER_PROMOTION_NOT_APPROVED"
+  ],
+  "notes": [
+    "This immutable V2 candidate is not a verified release and is not exported to consumers.",
+    "The verified V1 release and its registered machines remain untouched.",
+    "No private key, proxy credential, TEE key, bid payload, or confidential result is recorded."
+  ]
+}
