@@ -198,8 +198,8 @@ export function machineRegistrationEnvironment(environment = process.env) {
 export function registeredMachineExtensionId(environment = process.env) {
   const v2 = environment.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
   return String(
-    environment.FCC_MACHINES_EXTENSION_ID?.trim() ||
-      (v2 ? environment.FCC_V2_EXTENSION_ID?.trim() : "") ||
+    (v2 ? environment.FCC_V2_EXTENSION_ID?.trim() : "") ||
+      environment.FCC_MACHINES_EXTENSION_ID?.trim() ||
       environment.FCC_MARKET_EXTENSION_ID?.trim() ||
       environment.FCC_EXTENSION_ID?.trim() ||
       "",

@@ -31,6 +31,7 @@ test("routes V2 machines through isolated IDs, endpoints, and evidence", () => {
   const environment = {
     FCC_RELEASE_PROFILE: "v2",
     FCC_V2_EXTENSION_ID: v2Id,
+    FCC_MACHINES_EXTENSION_ID: `0x${"0".repeat(59)}101d9`,
     FCC_MARKET_EXTENSION_ID: `0x${"0".repeat(59)}101db`,
     FLARE_FCC_V2_PROXY_URLS: "https://v2-1.example,https://v2-2.example,https://v2-3.example",
     FCC_V2_PROXY_CONTROL_URLS: "https://control-1.example,https://control-2.example,https://control-3.example",
