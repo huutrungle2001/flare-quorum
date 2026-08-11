@@ -5,7 +5,9 @@ import { dirname, resolve } from "node:path";
 
 import {
   artifactAbiDigest,
+  evaluateV2PromotionBundle,
   inspectV2LocalReadiness,
+  v2ProgressBlockers,
 } from "../flare/v2-release.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
@@ -18,6 +20,20 @@ if (readiness.status !== "PASSED") {
 const { plan } = readiness;
 const marketArtifact = JSON.parse(readFileSync(resolve(root, plan.contracts.market.artifact), "utf8"));
 const receiptArtifact = JSON.parse(readFileSync(resolve(root, plan.contracts.awardReceipt.artifact), "utf8"));
+const optionalJson = (path) => existsSync(resolve(root, path))
+  ? JSON.parse(readFileSync(resolve(root, path), "utf8"))
+  : undefined;
+const progress = evaluateV2PromotionBundle({
+  candidate: optionalJson(plan.artifacts.candidateManifest),
+  candidateDeployment: optionalJson(plan.artifacts.candidateDeploymentEvidence),
+  extension: optionalJson(plan.artifacts.extensionRegistrationEvidence),
+  governance: optionalJson(plan.artifacts.governanceEvidence),
+  machines: optionalJson(plan.artifacts.machineEvidence),
+  success: optionalJson(plan.artifacts.successLifecycleEvidence),
+  refund: optionalJson(plan.artifacts.refundLifecycleEvidence),
+  v1Release: optionalJson("packages/flare-contracts/deployments/coston2.release.json"),
+});
+const progressBlockers = v2ProgressBlockers(progress.assertions);
 const sourceDigest = (path) => createHash("sha256")
   .update(readFileSync(resolve(root, path)))
   .digest("hex");
@@ -49,13 +65,7 @@ const manifest = {
     },
   },
   promotionRequirements: plan.promotionRequirements,
-  blockers: [
-    "V2_CANDIDATE_NOT_DEPLOYED",
-    "V2_EXTENSION_NOT_REGISTERED",
-    "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
-    "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
-    "V2_REFUND_LIFECYCLE_NOT_VERIFIED",
-  ],
+  blockers: progressBlockers,
 };
 files.set(plan.artifacts.candidateBindingsManifest, json(manifest));
 
@@ -80,16 +90,19 @@ const evidencePath = resolve(root, plan.artifacts.localReadinessEvidence);
 const evidence = {
   schemaVersion: 1,
   gate: "FLARE_V2_LOCAL_RELEASE_READINESS",
-  status: "PARTIAL",
-  scope: "local source, bytecode, ABI, and release-boundary checks only",
+  status: progressBlockers.length === 0 ? "READY" : "PARTIAL",
+  scope: "local release readiness and committed live V2 progress; no consumer switch",
   recordedAt: new Date().toISOString(),
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
   network: { name: "flare-coston2", chainId: 114 },
-  publicIdentifiers: readiness.publicFacts,
+  publicIdentifiers: {
+    ...readiness.publicFacts,
+    liveProgressAssertions: progress.assertions,
+  },
   assertions: readiness.assertions,
   blockers: manifest.blockers,
   notes: [
-    "No Coston2 transaction was sent and no V2 address, extension ID, machine identity, or live lifecycle result is claimed.",
+    "This readiness command sends no Coston2 transaction; live progress is derived only from committed sanitized artifacts.",
     "Candidate ABIs are intentionally excluded from the public @flarequorum/flare-bindings exports until promotion.",
     "The verified V1 release remains the only consumer-selectable Coston2 release.",
   ],

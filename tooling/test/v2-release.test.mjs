@@ -7,6 +7,7 @@ import {
   inspectV2LocalReadiness,
   readV2ReleasePlan,
   validateV2ReleasePlan,
+  v2ProgressBlockers,
 } from "../flare/v2-release.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
@@ -81,10 +82,16 @@ function passingBundle() {
 
 test("promotes only a fresh V2 extension with three fresh machines and both lifecycles", () => {
   const bundle = passingBundle();
-  assert.equal(evaluateV2PromotionBundle(bundle).status, "READY");
+  const ready = evaluateV2PromotionBundle(bundle);
+  assert.equal(ready.status, "READY");
+  assert.deepEqual(v2ProgressBlockers(ready.assertions), []);
 
   bundle.refund.assertions.fullEscrowReturned = false;
-  assert.equal(evaluateV2PromotionBundle(bundle).status, "BLOCKED");
+  const blocked = evaluateV2PromotionBundle(bundle);
+  assert.equal(blocked.status, "BLOCKED");
+  assert.deepEqual(v2ProgressBlockers(blocked.assertions), [
+    "V2_REFUND_LIFECYCLE_NOT_VERIFIED",
+  ]);
 });
 
 test("rejects reuse of a verified V1 machine identity", () => {

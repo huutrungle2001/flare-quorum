@@ -191,3 +191,23 @@ export function evaluateV2PromotionBundle({
     assertions,
   };
 }
+
+export function v2ProgressBlockers(assertions) {
+  const requirements = [
+    [
+      ["candidateIsUnpromotedV2", "candidateRuntimeRecorded", "candidateDeploymentVerified"],
+      "V2_CANDIDATE_NOT_DEPLOYED_OR_VERIFIED",
+    ],
+    [["freshExtensionBoundToV2"], "V2_EXTENSION_NOT_REGISTERED"],
+    [["governanceVerified"], "V2_GOVERNANCE_NOT_VERIFIED"],
+    [
+      ["threeFreshMachines", "machineEvidencePassed"],
+      "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
+    ],
+    [["successLifecyclePassed"], "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED"],
+    [["undispatchedRefundLifecyclePassed"], "V2_REFUND_LIFECYCLE_NOT_VERIFIED"],
+  ];
+  return requirements
+    .filter(([names]) => names.some((name) => assertions?.[name] !== true))
+    .map(([, blocker]) => blocker);
+}

@@ -30,10 +30,6 @@
     "consumerSwitchRequiresPromotion": true
   },
   "blockers": [
-    "V2_CANDIDATE_NOT_DEPLOYED",
-    "V2_EXTENSION_NOT_REGISTERED",
-    "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
-    "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
     "V2_REFUND_LIFECYCLE_NOT_VERIFIED"
   ]
 }
