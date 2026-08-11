@@ -18,7 +18,7 @@ the preserved organizer-group redeploy bulletin and official scaffold sources.
 |---|---|---|
 | Historical Sepolia/Nox | `packages/contracts/deployments/sepolia.release.json` | Verified pre-hackathon baseline |
 | Coston2/FCC championship | `packages/flare-contracts/deployments/coston2.release.json` | Verified live candidate promoted after runtime/wiring/evidence checks |
-| Coston2 liveness V2 | `packages/flare-contracts/deployments/coston2.v2-candidate.json` | Live isolated candidate: deployment, fresh extension/governance/three-machine set, and three-vendor success lifecycle pass; refund is `WAITING`, so no verified release manifest or consumer switch exists yet |
+| Coston2 liveness V2 | `packages/flare-contracts/deployments/coston2.v2-candidate.json` | Live isolated candidate: deployment, fresh extension/governance/three-machine set, three-vendor success, and one-result-endpoint outage recovery pass; refund is `WAITING`, so no verified release manifest or consumer switch exists yet |
 
 Never put Flare addresses into the Sepolia manifest/bindings or reuse historical
 deployment artifacts as Coston2 evidence.

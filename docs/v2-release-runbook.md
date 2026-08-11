@@ -6,7 +6,8 @@ V2 is a **live, isolated candidate and not yet a verified release**. Market
 `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, award receipt
 `0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3`, extension `66142`, governance,
 and exactly three fresh production machines are recorded in sanitized Coston2
-evidence. The three-vendor encrypted-bid success lifecycle passes. Refund tender `2` is
+evidence. The three-vendor encrypted-bid success lifecycle and a second
+one-result-endpoint outage recovery both pass. Refund tender `2` is
 closed without a selection dispatch and is waiting until chain timestamp
 `1786538381` (`2026-08-12T12:39:41Z`) before the real refund can execute.
 
@@ -138,7 +139,16 @@ Use each preflight first.
    pnpm flare:v2:success
    ```
 
-7. Prove the closed-but-undispatched refund path. This is intentionally
+7. Prove one-result-endpoint recovery. The command excludes machine 3 only from
+   result collection; the other two frozen identities must still agree and
+   finalize the three-vendor tender:
+
+   ```bash
+   pnpm flare:v2:recovery:preflight
+   pnpm flare:v2:recovery
+   ```
+
+8. Prove the closed-but-undispatched refund path. This is intentionally
    resumable and never fabricates elapsed time:
 
    ```bash
@@ -152,7 +162,7 @@ Use each preflight first.
    chain timestamp at which it can resume. `PASSED` requires full escrow return,
    `UndispatchedTimeout`, no request ID, and no award receipt.
 
-8. Recheck the complete bundle and record a verified side-by-side V2 release:
+9. Recheck the complete bundle and record a verified side-by-side V2 release:
 
    ```bash
    pnpm flare:v2:promotion:check
@@ -162,7 +172,8 @@ Use each preflight first.
 
    Promotion rechecks runtime bytecode, constructor arguments, live getters,
    the registry-resolved FTSO address, extension sender, exact active machines,
-   and both lifecycle records. It sends no on-chain transaction.
+   the success, outage-recovery, and refund lifecycle records. It sends no
+   on-chain transaction.
 
 ## Consumer switch is a separate decision
 

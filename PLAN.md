@@ -20,8 +20,9 @@
 > when its first selection dispatch cannot obtain two active frozen TEEs. The
 > side-by-side `FlareQuorumMarketV2` candidate now has bounded pre-dispatch
 > recovery, comprehensive contract tests, a verified live deployment, fresh
-> extension `66142`, three fresh production machines, and a passed live three-vendor success
-> lifecycle. Its real undispatched-refund tender is waiting for the fixed
+> extension `66142`, three fresh production machines, a passed live three-vendor
+> success lifecycle, and a passed one-result-endpoint outage recovery. Its real
+> undispatched-refund tender is waiting for the fixed
 > on-chain grace before promotion can be verified. V1 remains the canonical
 > Coston2 submission release and consumer default.
 >
@@ -351,8 +352,9 @@ confidential bid or settlement boundary:
   registration; the complete post-registration set must be exactly three.
 - [x] Deploy the isolated V2 candidate side-by-side, register fresh extension
   `66142` and exactly three fresh production machines, verify governance and
-  runtime bindings, and pass the live three-vendor encrypted-bid success lifecycle without
-  changing V1. The undispatched-refund tender is closed and honestly remains
+  runtime bindings, pass the live three-vendor encrypted-bid success lifecycle,
+  and prove two remaining result endpoints still finalize when one is excluded,
+  without changing V1. The undispatched-refund tender is closed and honestly remains
   `WAITING` until its fixed on-chain grace elapses; promotion and consumer
   switching remain separate gates.
 - [x] Generate Flare bindings and reject all drift.
@@ -408,7 +410,7 @@ two minutes, and reproduce the public path from the repository.
 | Gates 0–G | Current Summer Signal technical acceptance | Passed with the cited Coston2 evidence |
 | Gate H | Current product and user-validation gate | `NOT_RUN`; no interview, usability, or traction result is claimed |
 | Organizer submission and bounty-selection actions | External submission actions | Builder-controlled; not an engineering pass/fail result |
-| V2 live release promotion | Isolated current candidate track | Candidate address, extension, three fresh machines, governance, and three-vendor success lifecycle are live; refund is `WAITING` for its fixed on-chain grace, so no verified release or consumer switch is claimed |
+| V2 live release promotion | Isolated current candidate track | Candidate address, extension, three fresh machines, governance, three-vendor success, and one-result-endpoint outage recovery are live; refund is `WAITING` for its fixed on-chain grace, so no verified release or consumer switch is claimed |
 | Additional live fault breadth and browser-native XRP recovery | Planned post-Summer Signal hardening | The current recorded drills and public-safe wallet handoff remain the submission boundary |
 | Flare Treasury Exchange | Planned post-Summer Signal product expansion | Roadmap only |
 
@@ -427,6 +429,8 @@ Exchange bullets remain a post-competition roadmap.
 - Publish a V2-specific manifest and generated bindings only after source,
   runtime, registry, extension, code-version, machine, and signer checks agree.
 - [x] Record the three-vendor flagship success lifecycle with public-safe Coston2 evidence.
+- [x] Record a second three-vendor lifecycle where one result endpoint is
+  excluded and the other two frozen identities still finalize the exact digest.
 - Resume the already closed tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle.
 - Expand stateful Coston2 fault injection, live two-machine-loss coverage,
