@@ -3,8 +3,8 @@
   "gate": "FLARE_V2_LOCAL_RELEASE_READINESS",
   "status": "PARTIAL",
   "scope": "local source, bytecode, ABI, and release-boundary checks only",
-  "recordedAt": "2026-08-10T11:36:03.463Z",
-  "sourceCommit": "76a2f019014756f1e86918b59492049f19b142f9",
+  "recordedAt": "2026-08-11T12:06:55.311Z",
+  "sourceCommit": "3d877105b102eb7b3db4a59986d640a1f24711cf",
   "network": {
     "name": "flare-coston2",
     "chainId": 114
