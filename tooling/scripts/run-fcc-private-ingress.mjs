@@ -1,32 +1,50 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   createPublicClient,
   getAddress,
+  hashMessage,
   http,
   keccak256,
+  recoverAddress,
   stringToHex,
 } from "viem";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
+  credentialDigest,
   decodeBidReceipt,
   directBidInstruction,
   encodePrivateBidSubmission,
   encryptPrivateBidForTee,
+  fccActionResultHash,
+  fccSigningDigest,
   parseFccActionResponse,
   privateBidCommitment,
   recoverBidReceiptSigner,
+  teeActionResultPrefix,
   teeIdentityFromPublicKey,
   flareQuorumDirectOpType,
   flareQuorumDirectSubmitCommand,
 } from "../../packages/flare-bindings/dist/index.js";
 import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
+import { readV2ReleasePlan } from "../flare/v2-release.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
-const evidencePath = resolve(root, "evidence/coston2/gate-b-private-ingress.json");
-const registrationPath = resolve(root, "evidence/coston2/fcc-extension-registration.json");
+const v2InvalidCredential =
+  process.env.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2" &&
+  process.env.FCC_PRIVATE_INGRESS_NEGATIVE === "invalid-credential";
+const v2Plan = v2InvalidCredential ? readV2ReleasePlan(root) : undefined;
+const evidencePath = resolve(root, v2InvalidCredential
+  ? v2Plan.artifacts.invalidCredentialEvidence
+  : "evidence/coston2/gate-b-private-ingress.json");
+const registrationPath = resolve(root, v2InvalidCredential
+  ? v2Plan.artifacts.extensionRegistrationEvidence
+  : "evidence/coston2/fcc-extension-registration.json");
 const codeVersionPath = resolve(root, "evidence/coston2/fcc-code-version.json");
-const machinesPath = resolve(root, "evidence/coston2/fcc-machines.json");
+const machinesPath = resolve(root, v2InvalidCredential
+  ? v2Plan.artifacts.machineEvidence
+  : "evidence/coston2/fcc-machines.json");
 const replacementPath = resolve(root, "evidence/coston2/fcc-replacement-recovery.json");
 const currentLifecyclePath = resolve(root, "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json");
 
@@ -74,7 +92,9 @@ function sameHex(left, right) {
 
 function requiredApiKeys() {
   return [1, 2, 3].map((index) => {
-    const value = process.env[`FCC_DIRECT_API_KEY_${index}`];
+    const value = process.env[v2InvalidCredential
+      ? `FCC_V2_DIRECT_API_KEY_${index}`
+      : `FCC_DIRECT_API_KEY_${index}`];
     if (typeof value !== "string" || value.length < 32) throw new Error("FCC_GATE_B_API_KEY_MISSING");
     return value;
   });
@@ -166,19 +186,215 @@ async function verifyReceipt(value, context, teeId) {
   return { response, receipt, assertions };
 }
 
+async function verifyRejectedAction(value, actionId, teeId) {
+  const response = parseFccActionResponse(value);
+  const resultHash = fccActionResultHash(response.result);
+  const signingDigest = fccSigningDigest(teeActionResultPrefix, 114n, resultHash);
+  const signer = getAddress(await recoverAddress({
+    hash: hashMessage({ raw: signingDigest }),
+    signature: response.signature,
+  }));
+  const assertions = {
+    actionIdMatches: response.result.id.toLowerCase() === actionId.toLowerCase(),
+    submissionTagMatches: response.result.submissionTag === "submit",
+    operationMatches:
+      response.result.opType === flareQuorumDirectOpType &&
+      response.result.opCommand === flareQuorumDirectSubmitCommand,
+    invalidCredentialRejected:
+      response.result.status === 0 &&
+      response.result.log === "error: PRIVATE_BID_REJECTED" &&
+      response.result.data === "0x",
+    rejectionSignedByExpectedTee: signer.toLowerCase() === teeId.toLowerCase(),
+  };
+  if (!Object.values(assertions).every(Boolean)) {
+    throw new Error("FCC_V2_INVALID_CREDENTIAL_REJECTION_INVALID");
+  }
+  return assertions;
+}
+
+async function runV2InvalidCredentialProbe({
+  proxyUrls,
+  apiKeys,
+  teeMachines,
+  chainMachines,
+  blockNumber,
+  manager,
+  market,
+  extensionId,
+  codeHash,
+}) {
+  if (execFileSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" }).trim()) {
+    throw new Error("FCC_V2_INVALID_CREDENTIAL_REQUIRES_CLEAN_WORKTREE");
+  }
+  if (existsSync(evidencePath)) throw new Error("FCC_V2_INVALID_CREDENTIAL_EVIDENCE_EXISTS");
+
+  const now = BigInt(Math.floor(Date.now() / 1000));
+  const tenderId = BigInt(Date.now());
+  const bidDeadline = now + 3_600n;
+  const issuer = privateKeyToAccount(generatePrivateKey());
+  const wrongSigner = privateKeyToAccount(generatePrivateKey());
+  const vendor = privateKeyToAccount(generatePrivateKey());
+  const credentialType = keccak256(stringToHex("FLAREQUORUM_VENDOR_ELIGIBILITY_V1"));
+  const credential = {
+    credentialType,
+    issuer: issuer.address,
+    validUntil: bidDeadline + 600n,
+    nonce: keccak256(stringToHex(`FLAREQUORUM_V2_CREDENTIAL_${Date.now()}`)),
+  };
+  const submission = {
+    schemaVersion: 1,
+    chainId: 114n,
+    market,
+    extensionId,
+    codeVersion: codeHash,
+    tenderId,
+    vendor: vendor.address,
+    submissionNonce: BigInt(Date.now()),
+    rules: {
+      schemaVersion: 1,
+      ceilingXrpMicros: 1_000_000n,
+      bidDeadline,
+      allowXrp: true,
+      allowUsd: false,
+      ftsoFeedId: `0x${"00".repeat(21)}`,
+      maxDeliveryDays: 30,
+      minWarrantyDays: 12,
+      maxWarrantyDays: 36,
+      priceWeightBps: 6_000,
+      deliveryWeightBps: 2_500,
+      warrantyWeightBps: 1_500,
+      requiredCredentials: [{ credentialType, issuer: issuer.address }],
+    },
+    receiptExpiry: bidDeadline - 300n,
+    quoteCurrency: 0,
+    priceMicros: 400_000n,
+    deliveryDays: 5,
+    warrantyDays: 24,
+    credentials: [],
+    salt: keccak256(stringToHex(`FLAREQUORUM_V2_INVALID_CREDENTIAL_SALT_${Date.now()}`)),
+  };
+  const digest = credentialDigest({ submission, credential });
+  const invalidSignature = await wrongSigner.signMessage({ message: { raw: digest } });
+  submission.credentials = [{ ...credential, signature: invalidSignature }];
+  const invalidPlaintext = encodePrivateBidSubmission(submission);
+  const invalidCiphertexts = await Promise.all(teeMachines.map(({ publicKey }) =>
+    encryptPrivateBidForTee(
+      Uint8Array.from(Buffer.from(invalidPlaintext.slice(2), "hex")),
+      publicKey,
+    )));
+  const rejected = [];
+  for (let index = 0; index < 3; index += 1) {
+    const actionId = await sendDirect(proxyUrls[index], apiKeys[index], invalidCiphertexts[index]);
+    const result = await readResult(proxyUrls[index], actionId);
+    const assertions = await verifyRejectedAction(result, actionId, teeMachines[index].teeId);
+    rejected.push({ actionId, assertions });
+  }
+
+  const validSignature = await issuer.signMessage({ message: { raw: digest } });
+  submission.credentials = [{ ...credential, signature: validSignature }];
+  const validPlaintext = encodePrivateBidSubmission(submission);
+  const commitment = privateBidCommitment(submission);
+  const rulesHash = calculateFlareRulesHash(submission.rules);
+  const validCiphertexts = await Promise.all(teeMachines.map(({ publicKey }) =>
+    encryptPrivateBidForTee(
+      Uint8Array.from(Buffer.from(validPlaintext.slice(2), "hex")),
+      publicKey,
+    )));
+  const accepted = [];
+  for (let index = 0; index < 3; index += 1) {
+    const actionId = await sendDirect(proxyUrls[index], apiKeys[index], validCiphertexts[index]);
+    const result = await readResult(proxyUrls[index], actionId);
+    const verified = await verifyReceipt(result, {
+      actionId,
+      submission,
+      commitment,
+      rulesHash,
+    }, teeMachines[index].teeId);
+    accepted.push({ actionId, verified });
+  }
+
+  const assertions = {
+    threeProductionMachinesBound:
+      chainMachines.every(({ status, registeredExtensionId }) =>
+        status === 2 && registeredExtensionId === extensionId),
+    wrongIssuerSignatureRejectedByAllThree:
+      rejected.length === 3 && rejected.every(({ assertions: item }) =>
+        Object.values(item).every(Boolean)),
+    rejectedPayloadCreatedNoReceipt:
+      rejected.every(({ assertions: item }) => item.invalidCredentialRejected),
+    correctedCredentialAcceptedByAllThree:
+      accepted.length === 3 && accepted.every(({ verified }) =>
+        verified.response.result.status === 1),
+    rejectedAttemptDidNotConsumeCanonicalSlot:
+      accepted.every(({ verified }) => verified.assertions.receiptCommitmentMatches),
+    threeDistinctReceiptSigners:
+      new Set(accepted.map(({ verified }) => verified.receipt.teeId.toLowerCase())).size === 3,
+    noCredentialOrSignatureRecorded: true,
+    noPlaintextOrCiphertextRecorded: true,
+  };
+  if (!Object.values(assertions).every(Boolean)) {
+    throw new Error("FCC_V2_INVALID_CREDENTIAL_ASSERTIONS_FAILED");
+  }
+  const evidence = {
+    schemaVersion: 1,
+    gate: "FLARE_V2_INVALID_CREDENTIAL_REJECTION",
+    status: "PASSED",
+    recordedAt: new Date().toISOString(),
+    sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
+    network: { name: "flare-coston2", chainId: 114, blockNumber: blockNumber.toString() },
+    publicIdentifiers: {
+      manager,
+      market,
+      extensionId: extensionId.toString(),
+      codeHash,
+      machineIds: teeMachines.map(({ teeId }) => teeId),
+      rejectedActionIds: rejected.map(({ actionId }) => actionId),
+      acceptedActionIds: accepted.map(({ actionId }) => actionId),
+      acceptedPlaintextCommitment: commitment,
+      rejectionCode: "PRIVATE_BID_REJECTED",
+    },
+    assertions,
+    rejectionAssertions: rejected.map(({ assertions: item }, index) => ({
+      machine: index + 1,
+      ...item,
+    })),
+    blockers: [],
+    notes: [
+      "Each V2 TEE rejected a domain-shaped encrypted bid whose credential signature recovered to the wrong issuer.",
+      "A corrected credential for the exact canonical slot was then accepted by all three machines, proving the rejected attempt did not consume sealed bid state.",
+      "Only public action IDs, machine IDs, a commitment, and assertion booleans are recorded; no credential, signature, bid plaintext, ciphertext, key, or proxy secret is recorded.",
+    ],
+  };
+  writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
+  console.log(JSON.stringify({
+    gate: evidence.gate,
+    status: evidence.status,
+    machines: teeMachines.length,
+    rejected: rejected.length,
+    accepted: accepted.length,
+    evidence: v2Plan.artifacts.invalidCredentialEvidence,
+  }, null, 2));
+}
+
 async function main() {
   const rpcUrl = process.env.COSTON2_RPC_URL?.trim();
   if (!rpcUrl || !/^https:\/\//.test(rpcUrl)) throw new Error("FCC_GATE_B_RPC_INVALID");
-  const proxyUrls = String(process.env.FLARE_FCC_PROXY_URLS ?? "").split(",").map((value) => value.trim()).filter(Boolean);
+  const proxyUrls = String(process.env[
+    v2InvalidCredential ? "FLARE_FCC_V2_PROXY_URLS" : "FLARE_FCC_PROXY_URLS"
+  ] ?? "").split(",").map((value) => value.trim()).filter(Boolean);
   if (proxyUrls.length !== 3 || new Set(proxyUrls).size !== 3) throw new Error("FCC_GATE_B_PROXY_SET_INVALID");
   const apiKeys = requiredApiKeys();
   const registration = JSON.parse(readFileSync(registrationPath, "utf8"));
   const codeVersion = JSON.parse(readFileSync(codeVersionPath, "utf8"));
   const machinesEvidence = JSON.parse(readFileSync(machinesPath, "utf8"));
   const manager = getAddress(registration.publicIdentifiers.manager);
-  const market = getAddress(registration.publicIdentifiers.foundationSender);
+  const market = getAddress(registration.publicIdentifiers[
+    v2InvalidCredential ? "sender" : "foundationSender"
+  ]);
   const extensionId = BigInt(registration.publicIdentifiers.extensionId);
-  const codeHash = codeVersion.publicIdentifiers.codeHash;
+  const codeHash = v2InvalidCredential
+    ? registration.publicIdentifiers.codeHash
+    : codeVersion.publicIdentifiers.codeHash;
   const teeMachines = await Promise.all(proxyUrls.map(readMachineInfo));
   if (new Set(teeMachines.map(({ teeId }) => teeId.toLowerCase())).size !== 3) throw new Error("FCC_GATE_B_TEE_IDENTITIES_NOT_DISTINCT");
 
@@ -194,6 +410,21 @@ async function main() {
   }));
   if (chainMachines.some((machine) => machine.status !== 2 || machine.registeredExtensionId !== extensionId)) {
     throw new Error("FCC_GATE_B_MACHINE_BINDING_INVALID");
+  }
+
+  if (v2InvalidCredential) {
+    await runV2InvalidCredentialProbe({
+      proxyUrls,
+      apiKeys,
+      teeMachines,
+      chainMachines,
+      blockNumber,
+      manager,
+      market,
+      extensionId,
+      codeHash,
+    });
+    return;
   }
 
   const now = BigInt(Math.floor(Date.now() / 1000));

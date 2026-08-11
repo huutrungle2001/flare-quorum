@@ -30,6 +30,7 @@ const requiredRecords = {
   machines: plan.artifacts.machineEvidence,
   success: plan.artifacts.successLifecycleEvidence,
   recovery: plan.artifacts.oneResultOutageEvidence,
+  invalidCredential: plan.artifacts.invalidCredentialEvidence,
   refund: plan.artifacts.refundLifecycleEvidence,
   v1Release: v1ReleasePath,
 };

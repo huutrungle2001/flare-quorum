@@ -3,8 +3,8 @@
   "gate": "FLARE_V2_LOCAL_RELEASE_READINESS",
   "status": "PARTIAL",
   "scope": "local release readiness and committed live V2 progress; no consumer switch",
-  "recordedAt": "2026-08-11T16:17:49.918Z",
-  "sourceCommit": "f11d8906cbbfc2617a12731498235ff4cd535285",
+  "recordedAt": "2026-08-11T16:29:43.520Z",
+  "sourceCommit": "e4c3d9cca6e5272131ca4a8ce749fbafa28857d0",
   "network": {
     "name": "flare-coston2",
     "chainId": 114
@@ -25,6 +25,7 @@
       "successLifecyclePassed": true,
       "threeVendorComparisonRecorded": true,
       "oneResultOutageRecoveryPassed": true,
+      "invalidCredentialRejectionPassed": false,
       "undispatchedRefundLifecyclePassed": false,
       "candidateRuntimeRecorded": true,
       "candidateDeploymentVerified": true,
@@ -42,6 +43,7 @@
     "v2ArtifactsCannotClaimReleaseWithoutPromotion": true
   },
   "blockers": [
+    "V2_INVALID_CREDENTIAL_REJECTION_NOT_VERIFIED",
     "V2_REFUND_LIFECYCLE_NOT_VERIFIED"
   ],
   "notes": [

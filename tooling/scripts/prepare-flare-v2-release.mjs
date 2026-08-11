@@ -31,6 +31,7 @@ const progress = evaluateV2PromotionBundle({
   machines: optionalJson(plan.artifacts.machineEvidence),
   success: optionalJson(plan.artifacts.successLifecycleEvidence),
   recovery: optionalJson(plan.artifacts.oneResultOutageEvidence),
+  invalidCredential: optionalJson(plan.artifacts.invalidCredentialEvidence),
   refund: optionalJson(plan.artifacts.refundLifecycleEvidence),
   v1Release: optionalJson("packages/flare-contracts/deployments/coston2.release.json"),
 });

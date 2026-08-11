@@ -86,6 +86,17 @@ function passingBundle() {
       assertions: { oneSelectionResultUnavailableStillFinalized: true },
       blockers: [],
     },
+    invalidCredential: {
+      gate: "FLARE_V2_INVALID_CREDENTIAL_REJECTION",
+      status: "PASSED",
+      assertions: {
+        wrongIssuerSignatureRejectedByAllThree: true,
+        rejectedAttemptDidNotConsumeCanonicalSlot: true,
+        correctedCredentialAcceptedByAllThree: true,
+        noCredentialOrSignatureRecorded: true,
+      },
+      blockers: [],
+    },
     refund: {
       status: "PASSED",
       assertions: {
@@ -150,5 +161,16 @@ test("rejects outage evidence that counts the unavailable result endpoint", () =
   assert.equal(result.assertions.oneResultOutageRecoveryPassed, false);
   assert.deepEqual(v2ProgressBlockers(result.assertions), [
     "V2_ONE_RESULT_OUTAGE_RECOVERY_NOT_VERIFIED",
+  ]);
+});
+
+test("rejects V2 promotion without three-machine invalid credential evidence", () => {
+  const bundle = passingBundle();
+  bundle.invalidCredential.assertions.wrongIssuerSignatureRejectedByAllThree = false;
+  const result = evaluateV2PromotionBundle(bundle);
+  assert.equal(result.status, "BLOCKED");
+  assert.equal(result.assertions.invalidCredentialRejectionPassed, false);
+  assert.deepEqual(v2ProgressBlockers(result.assertions), [
+    "V2_INVALID_CREDENTIAL_REJECTION_NOT_VERIFIED",
   ]);
 });

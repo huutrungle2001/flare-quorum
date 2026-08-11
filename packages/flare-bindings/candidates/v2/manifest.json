@@ -28,10 +28,12 @@
     "successLifecycle": true,
     "threeVendorSuccessLifecycle": true,
     "oneResultOutageRecovery": true,
+    "invalidCredentialRejection": true,
     "undispatchedRefundLifecycle": true,
     "consumerSwitchRequiresPromotion": true
   },
   "blockers": [
+    "V2_INVALID_CREDENTIAL_REJECTION_NOT_VERIFIED",
     "V2_REFUND_LIFECYCLE_NOT_VERIFIED"
   ]
 }

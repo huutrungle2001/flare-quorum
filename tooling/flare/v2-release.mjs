@@ -139,6 +139,7 @@ export function evaluateV2PromotionBundle({
   machines,
   success,
   recovery,
+  invalidCredential,
   refund,
   v1Release,
 }) {
@@ -196,6 +197,13 @@ export function evaluateV2PromotionBundle({
       recoverySigners.every((teeId) => recoveryTeeIds.includes(teeId)) &&
       !recoverySigners.includes(recoveryTeeIds[outageMachineIndex - 1]) &&
       recovery?.assertions?.oneSelectionResultUnavailableStillFinalized === true,
+    invalidCredentialRejectionPassed:
+      invalidCredential?.gate === "FLARE_V2_INVALID_CREDENTIAL_REJECTION" &&
+      invalidCredential?.status === "PASSED" && allAssertionsPass(invalidCredential) &&
+      invalidCredential?.assertions?.wrongIssuerSignatureRejectedByAllThree === true &&
+      invalidCredential?.assertions?.rejectedAttemptDidNotConsumeCanonicalSlot === true &&
+      invalidCredential?.assertions?.correctedCredentialAcceptedByAllThree === true &&
+      invalidCredential?.assertions?.noCredentialOrSignatureRecorded === true,
     undispatchedRefundLifecyclePassed:
       refund?.status === "PASSED" && allAssertionsPass(refund) &&
       refund.assertions?.selectionNeverDispatched === true &&
@@ -235,6 +243,7 @@ export function v2ProgressBlockers(assertions) {
       "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
     ],
     [["oneResultOutageRecoveryPassed"], "V2_ONE_RESULT_OUTAGE_RECOVERY_NOT_VERIFIED"],
+    [["invalidCredentialRejectionPassed"], "V2_INVALID_CREDENTIAL_REJECTION_NOT_VERIFIED"],
     [["undispatchedRefundLifecyclePassed"], "V2_REFUND_LIFECYCLE_NOT_VERIFIED"],
   ];
   return requirements
