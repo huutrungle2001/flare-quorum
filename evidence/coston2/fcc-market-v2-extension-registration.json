@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "gate": "FCC_MARKET_V2_EXTENSION_REGISTRATION",
+  "status": "REGISTERED_BOUND_CONFIGURATION_READY",
+  "recordedAt": "2026-08-11T12:12:04.996Z",
+  "sourceCommit": "adee29d317f7eb8738132204ea829419000cc211",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33919551"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "sender": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+    "extensionId": "66142",
+    "extensionIdHex": "0x000000000000000000000000000000000000000000000000000000000001025e",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "platform": "0x544553545f504c4154464f524d00000000000000000000000000000000000000",
+    "version": "v0.2.2",
+    "registrationTransaction": "0x17c71617bfe1f320f291cedc8f09943da04fbe4f588cadbab8367c27c5d54622"
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "managerCodePresent": true,
+    "marketCodePresent": true,
+    "deployerMayRegister": true,
+    "publicExtensionRangeActive": true,
+    "codeHashPresent": true,
+    "platformIsSimulated": true,
+    "registrationSucceeded": true,
+    "extensionIdPublic": true,
+    "senderMatchesMarket": true,
+    "stateVerifierIsZero": true,
+    "machineOwnerAllowed": true,
+    "walletProjectOwnerAllowed": true,
+    "keyTypeSupported": true,
+    "codeHashPlatformSupported": true,
+    "versionMatches": true,
+    "platformMatches": true
+  },
+  "blockers": [
+    "PRODUCT_TEE_MACHINES_NOT_REGISTERED",
+    "GATES_C_E_NOT_PASSED"
+  ],
+  "notes": [
+    "The immutable FlareQuorumMarketV2 is the registered instructions sender for this product extension.",
+    "V2 requires three fresh TEE machine identities; no V1 machine may be reused or retired by this flow.",
+    "No deployment key, proxy credential, attestation body, raw signature, or bid data is recorded."
+  ]
+}
