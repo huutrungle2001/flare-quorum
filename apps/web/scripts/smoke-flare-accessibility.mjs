@@ -192,7 +192,10 @@ try {
     const unnamed = interactive.filter((element) => {
       const labelledBy = element.getAttribute("aria-labelledby");
       const labelledText = labelledBy ? document.getElementById(labelledBy)?.textContent : "";
-      return !(element.getAttribute("aria-label") || labelledText || element.textContent.trim() || element.getAttribute("title"));
+      const associatedLabelText = "labels" in element
+        ? [...(element.labels ?? [])].map((label) => label.textContent?.trim() ?? "").join(" ")
+        : "";
+      return !(element.getAttribute("aria-label") || labelledText || associatedLabelText || element.textContent.trim() || element.getAttribute("title"));
     });
     return {
       skipLink: Boolean(document.querySelector('a.skip-link[href="#main-content"]')),
@@ -200,6 +203,13 @@ try {
       activeTenderNavigation: document.querySelector('[aria-current="page"]')?.textContent.trim() === "TENDERS",
       interactiveCount: interactive.length,
       unnamedInteractive: unnamed.length,
+      unnamedInteractiveElements: unnamed.slice(0, 12).map((element) => ({
+        tag: element.tagName,
+        className: typeof element.className === "string" ? element.className.slice(0, 120) : "",
+        type: element.getAttribute("type"),
+        href: element.getAttribute("href"),
+        placeholder: element.getAttribute("placeholder"),
+      })),
       focusSequence: observedFocus,
       focusIndicatorSeen: observedFocus.some((entry) => entry.focusIndicator),
       noHorizontalOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
@@ -265,6 +275,7 @@ try {
     },
     measurements: {
       desktopInteractiveCount: desktop.interactiveCount,
+      desktopUnnamedInteractiveElements: desktop.unnamedInteractiveElements,
       mobileViewportWidth: mobile.width,
       mobileScrollWidth: mobile.scrollWidth,
       mobileOverflowingElements: mobile.overflowingElements,
