@@ -28,6 +28,7 @@ import {
   flareQuorumDirectSubmitCommand,
 } from "../../packages/flare-bindings/dist/index.js";
 import { calculateFlareRulesHash } from "../../packages/flare-bindings/dist/smart-account.js";
+import { normalizeCredentialSignature } from "../flare/credential-signature.mjs";
 import { readV2ReleasePlan } from "../flare/v2-release.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
@@ -274,7 +275,9 @@ async function runV2InvalidCredentialProbe({
     salt: keccak256(stringToHex(`FLAREQUORUM_V2_INVALID_CREDENTIAL_SALT_${Date.now()}`)),
   };
   const digest = credentialDigest({ submission, credential });
-  const invalidSignature = await wrongSigner.signMessage({ message: { raw: digest } });
+  const invalidSignature = normalizeCredentialSignature(
+    await wrongSigner.signMessage({ message: { raw: digest } }),
+  );
   submission.credentials = [{ ...credential, signature: invalidSignature }];
   const invalidPlaintext = encodePrivateBidSubmission(submission);
   const invalidCiphertexts = await Promise.all(teeMachines.map(({ publicKey }) =>
@@ -290,7 +293,9 @@ async function runV2InvalidCredentialProbe({
     rejected.push({ actionId, assertions });
   }
 
-  const validSignature = await issuer.signMessage({ message: { raw: digest } });
+  const validSignature = normalizeCredentialSignature(
+    await issuer.signMessage({ message: { raw: digest } }),
+  );
   submission.credentials = [{ ...credential, signature: validSignature }];
   const validPlaintext = encodePrivateBidSubmission(submission);
   const commitment = privateBidCommitment(submission);
