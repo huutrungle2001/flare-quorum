@@ -150,6 +150,7 @@ export function evaluateV2PromotionBundle({
   );
   const v2Machines = machines?.publicIdentifiers?.machines ?? [];
   const v2MachineIds = v2Machines.map(({ teeId }) => String(teeId).toLowerCase());
+  const successVendors = success?.publicIdentifiers?.vendors ?? [];
   const assertions = {
     candidateIsUnpromotedV2:
       candidate?.kind === "flarequorum-v2-candidate" &&
@@ -170,6 +171,13 @@ export function evaluateV2PromotionBundle({
       success?.status === "PASSED" && allAssertionsPass(success) &&
       success.assertions?.fccWinnerSelected === true &&
       success.assertions?.escrowConserved === true,
+    threeVendorComparisonRecorded:
+      success?.ingressBenchmarks?.vendorCount === 3 &&
+      successVendors.length === 3 &&
+      new Set(successVendors.map((vendor) => String(vendor).toLowerCase())).size === 3 &&
+      success?.publicIdentifiers?.plaintextCommitments?.length === 3 &&
+      success?.publicIdentifiers?.bidTransactions?.length === 3 &&
+      success?.assertions?.threeEncryptedBidsAcceptedByDistinctTees === true,
     undispatchedRefundLifecyclePassed:
       refund?.status === "PASSED" && allAssertionsPass(refund) &&
       refund.assertions?.selectionNeverDispatched === true &&
@@ -204,7 +212,10 @@ export function v2ProgressBlockers(assertions) {
       ["threeFreshMachines", "machineEvidencePassed"],
       "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
     ],
-    [["successLifecyclePassed"], "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED"],
+    [
+      ["successLifecyclePassed", "threeVendorComparisonRecorded"],
+      "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
+    ],
     [["undispatchedRefundLifecyclePassed"], "V2_REFUND_LIFECYCLE_NOT_VERIFIED"],
   ];
   return requirements

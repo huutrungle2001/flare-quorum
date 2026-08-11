@@ -61,7 +61,17 @@ function passingBundle() {
     },
     success: {
       status: "PASSED",
-      assertions: { fccWinnerSelected: true, escrowConserved: true },
+      publicIdentifiers: {
+        vendors: [address("9"), address("a"), address("b")],
+        plaintextCommitments: [hash("1"), hash("2"), hash("3")],
+        bidTransactions: [hash("4"), hash("5"), hash("6")],
+      },
+      ingressBenchmarks: { vendorCount: 3 },
+      assertions: {
+        fccWinnerSelected: true,
+        escrowConserved: true,
+        threeEncryptedBidsAcceptedByDistinctTees: true,
+      },
       blockers: [],
     },
     refund: {
@@ -100,4 +110,19 @@ test("rejects reuse of a verified V1 machine identity", () => {
   const result = evaluateV2PromotionBundle(bundle);
   assert.equal(result.status, "BLOCKED");
   assert.equal(result.assertions.threeFreshMachines, false);
+});
+
+test("rejects a V2 success lifecycle that does not compare three vendors", () => {
+  const bundle = passingBundle();
+  bundle.success.ingressBenchmarks.vendorCount = 1;
+  bundle.success.publicIdentifiers.vendors = [bundle.success.publicIdentifiers.vendors[0]];
+  bundle.success.publicIdentifiers.plaintextCommitments = [bundle.success.publicIdentifiers.plaintextCommitments[0]];
+  bundle.success.publicIdentifiers.bidTransactions = [bundle.success.publicIdentifiers.bidTransactions[0]];
+  const result = evaluateV2PromotionBundle(bundle);
+  assert.equal(result.status, "BLOCKED");
+  assert.equal(result.assertions.successLifecyclePassed, true);
+  assert.equal(result.assertions.threeVendorComparisonRecorded, false);
+  assert.deepEqual(v2ProgressBlockers(result.assertions), [
+    "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
+  ]);
 });
