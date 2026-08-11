@@ -21,7 +21,8 @@
 > side-by-side `FlareQuorumMarketV2` candidate now has bounded pre-dispatch
 > recovery, comprehensive contract tests, a verified live deployment, fresh
 > extension `66142`, three fresh production machines, a passed live three-vendor
-> success lifecycle, and a passed one-result-endpoint outage recovery. Its real
+> success lifecycle, a passed one-result-endpoint outage recovery, and a passed
+> live invalid-credential rejection/retry drill. Its real
 > undispatched-refund tender is waiting for the fixed
 > on-chain grace before promotion can be verified. V1 remains the canonical
 > Coston2 submission release and consumer default.
@@ -357,6 +358,10 @@ confidential bid or settlement boundary:
   without changing V1. The undispatched-refund tender is closed and honestly remains
   `WAITING` until its fixed on-chain grace elapses; promotion and consumer
   switching remain separate gates.
+- [x] Prove all three V2 machines reject a sealed bid signed by the wrong
+  credential issuer, verify each signed rejection against its expected TEE,
+  then accept the corrected credential on the same canonical slot without
+  persisting credential, signature, plaintext, or ciphertext evidence.
 - [x] Generate Flare bindings and reject all drift.
 - [x] Deploy the current Flare web judge and record desktop/mobile/keyboard smoke evidence;
   the separate Coston2 write-relay deployment remains gated on its dedicated
@@ -410,7 +415,7 @@ two minutes, and reproduce the public path from the repository.
 | Gates 0–G | Current Summer Signal technical acceptance | Passed with the cited Coston2 evidence |
 | Gate H | Current product and user-validation gate | `NOT_RUN`; no interview, usability, or traction result is claimed |
 | Organizer submission and bounty-selection actions | External submission actions | Builder-controlled; not an engineering pass/fail result |
-| V2 live release promotion | Isolated current candidate track | Candidate address, extension, three fresh machines, governance, three-vendor success, and one-result-endpoint outage recovery are live; refund is `WAITING` for its fixed on-chain grace, so no verified release or consumer switch is claimed |
+| V2 live release promotion | Isolated current candidate track | Candidate address, extension, three fresh machines, governance, three-vendor success, one-result-endpoint outage recovery, and invalid-credential rejection/retry are live; refund is `WAITING` for its fixed on-chain grace, so no verified release or consumer switch is claimed |
 | Additional live fault breadth and browser-native XRP recovery | Planned post-Summer Signal hardening | The current recorded drills and public-safe wallet handoff remain the submission boundary |
 | Flare Treasury Exchange | Planned post-Summer Signal product expansion | Roadmap only |
 
@@ -431,6 +436,8 @@ Exchange bullets remain a post-competition roadmap.
 - [x] Record the three-vendor flagship success lifecycle with public-safe Coston2 evidence.
 - [x] Record a second three-vendor lifecycle where one result endpoint is
   excluded and the other two frozen identities still finalize the exact digest.
+- [x] Record a live sealed-bid invalid-credential drill across all three fresh
+  machines and prove a rejected attempt does not consume its canonical slot.
 - Resume the already closed tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle.
 - Expand stateful Coston2 fault injection, live two-machine-loss coverage,

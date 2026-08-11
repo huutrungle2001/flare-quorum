@@ -12,7 +12,8 @@
 > pattern matches. A review identified a V1 pre-dispatch closed-tender liveness
 > gap; the live side-by-side V2 candidate now has verified deployment,
 > governance, three fresh production machines, a passed three-vendor success
-> lifecycle, and a passed one-result-endpoint outage recovery.
+> lifecycle, a passed one-result-endpoint outage recovery, and a passed live
+> invalid-credential rejection/retry drill across all three machines.
 > Its real undispatched-refund lifecycle remains `WAITING` for the fixed grace,
 > so no V2 release or consumer switch is claimed. Historical Sepolia/Nox
 > artifacts are pre-hackathon baseline only. Local adversarial coverage is
@@ -74,7 +75,7 @@ sessions occur.
 | Quorum continuity | Every accepted bid preserves a common 2-of-3 machine set; weaker receipt sets fail | PASSED for result collection and supported replacement — live `three-vendor-recovery.release.json` finalizes with one unavailable result endpoint, and all three identities were safely replaced for new tenders; simultaneous two-machine loss remains fail-closed |
 | State integrity | TEE rebuilds ordered root; omitted, duplicated, reordered, and rolled-back state fails | PARTIAL — Go sealed-store/selection, Solidity fuzz/invariant, and TypeScript root tests pass; additional live rollback/restart evidence is planned post-Summer Signal hardening |
 | Static analysis | Release-facing Solidity has no unexplained medium/high analyzer finding | PASSED for the V2 candidate — CI pins Slither `0.11.6`, targets `FlareQuorumMarketV2.sol`, and permits only two exact detector/function exceptions documented in `tooling/flare/slither-v2-allowlist.json`; live runtime matching is recorded separately in candidate deployment evidence |
-| Eligibility | Missing/forged/duplicate/unsupported credential and every public bound fails closed | PARTIAL — FCC/contract invalid-credential and public-bound tests pass; live invalid-credential policy/zero-term `eth_call` guards are recorded; an additional live sealed-bid credential drill is planned post-Summer Signal hardening |
+| Eligibility | Missing/forged/duplicate/unsupported credential and every public bound fails closed | PASSED for the V2 candidate — FCC/contract negative suites cover the credential and public-bound matrix; [`market-v2-invalid-credential.json`](../evidence/coston2/market-v2-invalid-credential.json) records all three live TEEs rejecting a wrong-issuer sealed bid with verified signed rejections, then accepting the corrected credential on the same canonical slot |
 | Scoring | XRP/USD conversion, price/delivery/warranty penalties, rounding, bounds, tie, and no-valid cases match golden vectors | PARTIAL — shared Go/Solidity/TypeScript vectors and live multi-criteria selection pass; a full live boundary drill is planned post-Summer Signal hardening |
 | FTSO | Unsupported, zero, malformed, or stale feed data cannot close a USD-enabled tender | PARTIAL — contract negative tests, live unsupported-feed policy guard, and live XRP/USD snapshot pass; stale-feed close fault injection is planned post-Summer Signal hardening |
 | Result threshold | Two distinct approved common-quorum signers agree; one signer, duplicate signer, and split digests fail | PARTIAL — live two-signature finalization plus local duplicate/split/wrong-domain tests pass; a full live negative drill is planned post-Summer Signal hardening |
@@ -119,6 +120,9 @@ evidence/coston2/web-keyboard-accessibility.json
 evidence/coston2/web-xrp-funding-draft.json
 evidence/coston2/hosted-runtime-log-review.json
 evidence/coston2/fcc-market-machine-preflight.json
+evidence/coston2/market-v2-multi-vendor-success.json
+evidence/coston2/market-v2-one-result-outage.json
+evidence/coston2/market-v2-invalid-credential.json
 evidence/coston2/web-role-workspaces.json
 evidence/coston2/flare-ingress-production.json
 evidence/coston2/user-validation.release.json

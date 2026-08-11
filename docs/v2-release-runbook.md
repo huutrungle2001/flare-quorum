@@ -7,7 +7,10 @@ V2 is a **live, isolated candidate and not yet a verified release**. Market
 `0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3`, extension `66142`, governance,
 and exactly three fresh production machines are recorded in sanitized Coston2
 evidence. The three-vendor encrypted-bid success lifecycle and a second
-one-result-endpoint outage recovery both pass. Refund tender `2` is
+one-result-endpoint outage recovery both pass. A live credential-negative drill
+also proves all three machines reject the wrong issuer signature, sign those
+rejections, and accept the corrected credential without consuming the sealed
+slot. Refund tender `2` is
 closed without a selection dispatch and is waiting until chain timestamp
 `1786538381` (`2026-08-12T12:39:41Z`) before the real refund can execute.
 
@@ -44,7 +47,8 @@ pnpm flare:slither:v2
 
 The generated candidate manifest is address-free and records
 `consumerSelectable: false`. Local readiness is recorded as `PARTIAL`, because
-live facts are intentionally absent.
+the committed live candidate facts pass while promotion remains time-locked by
+the refund lifecycle.
 
 ## Live prerequisites
 
@@ -148,7 +152,20 @@ Use each preflight first.
    pnpm flare:v2:recovery
    ```
 
-8. Prove the closed-but-undispatched refund path. This is intentionally
+8. Prove credential rejection at private ingress. The command sends one
+   domain-bound encrypted bid with the wrong issuer signature to each machine,
+   verifies all three signed rejections, then retries the same canonical slot
+   with the correct issuer signature and requires three signed receipts:
+
+   ```bash
+   pnpm flare:v2:credential-negative
+   ```
+
+   Evidence contains only public action IDs, machine IDs, the accepted
+   commitment, and assertion booleans. It never records the credential,
+   signature, plaintext, ciphertext, or service secret.
+
+9. Prove the closed-but-undispatched refund path. This is intentionally
    resumable and never fabricates elapsed time:
 
    ```bash
@@ -162,7 +179,7 @@ Use each preflight first.
    chain timestamp at which it can resume. `PASSED` requires full escrow return,
    `UndispatchedTimeout`, no request ID, and no award receipt.
 
-9. Recheck the complete bundle and record a verified side-by-side V2 release:
+10. Recheck the complete bundle and record a verified side-by-side V2 release:
 
    ```bash
    pnpm flare:v2:promotion:check
@@ -172,8 +189,8 @@ Use each preflight first.
 
    Promotion rechecks runtime bytecode, constructor arguments, live getters,
    the registry-resolved FTSO address, extension sender, exact active machines,
-   the success, outage-recovery, and refund lifecycle records. It sends no
-   on-chain transaction.
+   the success, outage-recovery, credential-negative, and refund lifecycle
+   records. It sends no on-chain transaction.
 
 ## Consumer switch is a separate decision
 

@@ -7,7 +7,8 @@
 > browser-native XRP recovery are planned post-Summer Signal hardening; Gate H
 > user validation remains `NOT_RUN`. The isolated V2 candidate is now live with
 > its own market, extension, governance, three fresh machines, and passed
-> three-vendor success lifecycle and one-result-endpoint outage recovery. Its
+> three-vendor success lifecycle, one-result-endpoint outage recovery, and
+> three-machine invalid-credential rejection/retry drill. Its
 > refund tender is `WAITING` for the fixed 24-hour grace;
 > V2 promotion remains separate from the verified V1 submission release.
 
@@ -126,6 +127,9 @@ placeholders are forbidden after that commit.
 - [x] Record one live three-vendor flagship success lifecycle.
 - [x] Record one live three-vendor lifecycle that finalizes with one result
   endpoint intentionally unavailable to the collector.
+- [x] Record one live sealed-bid credential-negative lifecycle in which all
+  three TEEs reject the wrong issuer and accept the corrected credential on the
+  same canonical slot.
 - Resume the closed refund tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle before promotion.
 - Expand stateful live fault coverage and browser-native XRP recovery under

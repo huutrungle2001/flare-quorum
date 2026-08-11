@@ -18,7 +18,7 @@ the preserved organizer-group redeploy bulletin and official scaffold sources.
 |---|---|---|
 | Historical Sepolia/Nox | `packages/contracts/deployments/sepolia.release.json` | Verified pre-hackathon baseline |
 | Coston2/FCC championship | `packages/flare-contracts/deployments/coston2.release.json` | Verified live candidate promoted after runtime/wiring/evidence checks |
-| Coston2 liveness V2 | `packages/flare-contracts/deployments/coston2.v2-candidate.json` | Live isolated candidate: deployment, fresh extension/governance/three-machine set, three-vendor success, and one-result-endpoint outage recovery pass; refund is `WAITING`, so no verified release manifest or consumer switch exists yet |
+| Coston2 liveness V2 | `packages/flare-contracts/deployments/coston2.v2-candidate.json` | Live isolated candidate: deployment, fresh extension/governance/three-machine set, three-vendor success, one-result-endpoint outage recovery, and invalid-credential rejection/retry pass; refund is `WAITING`, so no verified release manifest or consumer switch exists yet |
 
 Never put Flare addresses into the Sepolia manifest/bindings or reuse historical
 deployment artifacts as Coston2 evidence.
@@ -28,7 +28,9 @@ than two frozen TEEs remain valid before the first selection dispatch succeeds.
 `FlareQuorumMarketV2` is intentionally side-by-side rather than an upgrade or
 rewrite. Its fresh extension/machine registration, candidate manifest,
 source/runtime verification, generated candidate bindings, and flagship
-lifecycle are recorded. The undispatched-refund lifecycle is waiting for its
+lifecycle are recorded. A separate sealed-bid drill proves all three candidate
+TEEs reject the wrong credential issuer and still accept the corrected
+credential on the same canonical slot. The undispatched-refund lifecycle is waiting for its
 real fixed grace, after which promotion must recheck the complete bundle before
 any consumer route can point to it. V1 artifacts and evidence remain immutable.
 

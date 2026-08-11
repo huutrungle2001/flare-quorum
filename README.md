@@ -33,7 +33,8 @@ The project targets **Flare Summer Signal** with:
 > clock. The side-by-side `FlareQuorumMarketV2` candidate adds a close-time
 > bounded refund and is now live with a fresh extension, three fresh production
 > machines, verified runtime/wiring, a passed three-vendor success lifecycle,
-> and a one-result-endpoint outage recovery. Its real
+> a one-result-endpoint outage recovery, and a live three-machine credential
+> rejection/retry drill. Its real
 > undispatched-refund tender is closed and waiting for the fixed 24-hour
 > on-chain grace; the candidate is not a verified release or consumer default
 > until that lifecycle and promotion verification pass. V1 remains the current

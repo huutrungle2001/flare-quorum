@@ -4,7 +4,8 @@
 > XRP-native evidence recorded. The verified V1 market has a known
 > pre-dispatch closed-tender liveness gap; a side-by-side live V2 candidate
 > fixes it but is not yet Coston2 release authority because its real refund
-> lifecycle and promotion are still pending. Adversarial/restart
+> lifecycle and promotion are still pending. Its fresh three-machine quorum has
+> also passed a live invalid-credential rejection/retry drill. Adversarial/restart
 > hardening remains in progress, and historical Sepolia/Nox evidence does not
 > establish the security of this architecture.
 
@@ -125,7 +126,7 @@ verifiable.
 | Buyer/client supplies favored winner | Market accepts only threshold signatures over its reconstructed result domain | Correlated TEE/code/governance compromise |
 | Split TEE outcomes | Group exact digest and require two distinct common-quorum signers | Liveness failure when no digest reaches threshold |
 | Result replay or rebinding | Tender nonce, expiry, terminal guard, full domain including root and FTSO snapshot | Contract or domain implementation defect |
-| Invalid credential/bid wins | Versioned schema, issuer domains, fixed bounds, golden vectors and adversarial tests | Extension defect or compromised trusted issuer |
+| Invalid credential/bid wins | Versioned schema, issuer domains, fixed bounds, golden vectors, adversarial tests, and live three-machine wrong-issuer rejection/retry evidence | Extension defect or compromised trusted issuer |
 | FTSO stale/manipulated quote | Contract-read official feed, positive/freshness checks, fixed decimals/rounding, signed snapshot | Oracle/protocol risk and close-time volatility |
 | Smart Account/FDC replay | Exact user-op hash in XRPL memo, sender/account/nonce checks, official proof verification | Underlying protocol/executor availability or implementation defect |
 | Malicious or over-broad funding executor | Dedicated key; exact public job schema; deterministic approve/create batch; proofOwner, XRPL-source/PersonalAccount, nonce, fee, round, memo, and contract-address-bound receipt checks | Dedicated executor key can delay or waste its own gas; protocol defects remain |
