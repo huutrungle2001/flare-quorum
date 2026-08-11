@@ -132,6 +132,10 @@ placeholders are forbidden after that commit.
   same canonical slot.
 - Resume the closed refund tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle before promotion.
+- Resume optional post-dispatch tender `5` after chain timestamp `1786553311`
+  and record the fixed-first-dispatch refund path. It is additional fault
+  breadth and does not delay promotion once the required undispatched refund
+  passes.
 - Expand stateful live fault coverage and browser-native XRP recovery under
   the same public-safe, fail-closed release policy.
 - Keep V1 consumer-selectable until the separate V2 promotion decision is

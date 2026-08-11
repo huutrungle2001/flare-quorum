@@ -17,6 +17,13 @@ closed without a selection dispatch and is waiting until chain timestamp
 Promotion therefore remains blocked only by the refund lifecycle. This is a
 real time-lock, not a failed or fabricated gate.
 
+An additional non-blocking recovery drill is also active. Tender `5` reached
+`ComputePending` through a real FCC dispatch with request ID
+`0x080ce5ba3a636cd2e6abce426a0a1f57e26d4e09dfc6341b3b5727b48cf3ba12`.
+Its fixed first-dispatch refund becomes eligible after chain timestamp
+`1786553311` (`2026-08-12T16:48:31Z`). This drill remains `WAITING` and is not a
+promotion requirement.
+
 The verified V1 Coston2 release remains the only consumer-selectable release.
 Web, relay, console, and `@flarequorum/flare-bindings` continue to use V1. The
 V2 candidate directory is intentionally not exported from that package.
@@ -191,6 +198,23 @@ Use each preflight first.
    the registry-resolved FTSO address, extension sender, exact active machines,
    the success, outage-recovery, credential-negative, and refund lifecycle
    records. It sends no on-chain transaction.
+
+### Optional post-dispatch refund drill
+
+The post-dispatch drill uses a separate ignored state file and a separate
+evidence target. It creates a short-deadline tender, closes it, performs a real
+FCC selection dispatch, deliberately submits no result, then waits for the
+fixed first-dispatch grace. Retries cannot extend this clock.
+
+```bash
+pnpm flare:v2:selection-refund:preflight
+pnpm flare:v2:selection-refund
+```
+
+`PASSED` requires `ComputePending` before refund, a nonzero request ID,
+`SelectionExpired`, exact FTestXRP escrow return, and no award mint. This proof
+adds stateful fault breadth but never becomes a substitute for the mandatory
+undispatched-refund lifecycle.
 
 ## Consumer switch is a separate decision
 

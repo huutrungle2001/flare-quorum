@@ -25,7 +25,10 @@
 > live invalid-credential rejection/retry drill. Its real
 > undispatched-refund tender is waiting for the fixed
 > on-chain grace before promotion can be verified. V1 remains the canonical
-> Coston2 submission release and consumer default.
+> Coston2 submission release and consumer default. A separate optional
+> post-dispatch recovery tender (`5`) is also live in `ComputePending` and is
+> honestly `WAITING` for its own fixed first-dispatch grace; it adds fault
+> breadth but is not a new promotion blocker.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -440,6 +443,9 @@ Exchange bullets remain a post-competition roadmap.
   machines and prove a rejected attempt does not consume its canonical slot.
 - Resume the already closed tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle.
+- Complete the separate post-dispatch tender `5` after chain timestamp
+  `1786553311` and record `SelectionExpired`, exact escrow return, and no award;
+  this optional fault proof is `WAITING`, not a V2 promotion requirement.
 - Expand stateful Coston2 fault injection, live two-machine-loss coverage,
   and browser-native XRP recovery without weakening the current fail-closed
   boundary.

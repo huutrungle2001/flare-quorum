@@ -17,7 +17,10 @@
 > Its real undispatched-refund lifecycle remains `WAITING` for the fixed grace,
 > so no V2 release or consumer switch is claimed. Historical Sepolia/Nox
 > artifacts are pre-hackathon baseline only. Local adversarial coverage is
-> recorded separately and is not promoted to live Coston2 evidence.
+> recorded separately and is not promoted to live Coston2 evidence. An
+> additional post-dispatch tender is live in `ComputePending` and remains
+> `WAITING` for its own fixed grace; it is optional fault breadth, not a new
+> promotion requirement.
 
 ## 1. Evidence policy
 
@@ -84,7 +87,7 @@ sessions occur.
 | FAssets redemption | Awarded vendor can request an official amount-based FTestXRP/FXRP redemption without FlareQuorum custody | PASSED — live Coston2 approval and `RedemptionRequested` evidence in `fassets-redemption.release.json` |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | PARTIAL — public binding, quote, nonce, proof-domain, and checkpoint-drift tests pass; full live fault-drill evidence is planned post-Summer Signal hardening |
 | Closed-state liveness | Escrow has a bounded failure terminal path even when the first FCC dispatch cannot start | PARTIAL — `FlareQuorumMarketV2` passes local adversarial/conservation coverage, is deployed with fresh live FCC authority, and has a real closed undispatched tender; the final full-refund assertion remains `WAITING` until the fixed on-chain grace, while V1 stays the verified default |
-| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage and organizer-supported three-machine replacement recovery are live; XRP funding checkpoint/resume, public-safe browser job preview, reload-safe public checkpoint with an explicit resume control, and GemWallet hash handoff are implemented and tested (`evidence/coston2/web-xrp-funding-checkpoint.json`); browser-native executor recovery and additional stateful fault breadth remain post-Summer Signal upgrades, while V2 promotion is waiting only for its fixed on-chain refund grace |
+| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage and organizer-supported three-machine replacement recovery are live; XRP funding checkpoint/resume, public-safe browser job preview, reload-safe public checkpoint with an explicit resume control, and GemWallet hash handoff are implemented and tested (`evidence/coston2/web-xrp-funding-checkpoint.json`); optional V2 tender `5` has a real dispatch and is `WAITING` for the fixed post-dispatch refund grace; browser-native executor recovery remains post-Summer Signal hardening, while V2 promotion is waiting only for its required undispatched-refund lifecycle |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED for the expanded hosted release — `evidence/coston2/web-production-smoke.json`, `evidence/coston2/web-role-workspaces.json`, and `evidence/coston2/flare-ingress-production.json` record the wallet-free role shell, finalized tender, trust boundary, and fail-closed ingress |
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PASSED for the hosted current-release path in `evidence/coston2/web-keyboard-accessibility.json`; browser-native signing/recovery remains a separate post-Summer Signal hardening track |
 | Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; 602 latest hosted Railway JSON log records were inspected in memory with zero forbidden-material pattern matches; longer-retention and stateful fault coverage are planned post-Summer Signal hardening |
@@ -123,6 +126,7 @@ evidence/coston2/fcc-market-machine-preflight.json
 evidence/coston2/market-v2-multi-vendor-success.json
 evidence/coston2/market-v2-one-result-outage.json
 evidence/coston2/market-v2-invalid-credential.json
+evidence/coston2/market-v2-selection-expired-refund.json
 evidence/coston2/web-role-workspaces.json
 evidence/coston2/flare-ingress-production.json
 evidence/coston2/user-validation.release.json
