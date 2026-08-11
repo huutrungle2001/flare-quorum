@@ -1,0 +1,51 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { canonicalFlarePublicBuyerBrief, hashFlarePublicBuyerBrief } from "@flarequorum/flare-bindings";
+import {
+  clearFlarePublicBriefCache,
+  loadFlarePublicBrief,
+  publishFlarePublicBrief,
+} from "../src/flare/flarePublicBriefRegistry";
+
+const brief = canonicalFlarePublicBuyerBrief({
+  title: "Verified public procurement brief",
+  category: "research",
+  objective: "Deliver the requested public research procurement outcome.",
+  acceptanceCriteria: "Meet every published acceptance criterion.",
+  vendorQuestions: "Describe the proposed research method.",
+  bidDeadline: 1_800_000_000n,
+  approvedVendors: ["0x2000000000000000000000000000000000000002"],
+});
+const hash = hashFlarePublicBuyerBrief(brief);
+const env = { VITE_FLARE_PUBLIC_BRIEF_URL: "https://briefs.example" };
+
+afterEach(() => {
+  clearFlarePublicBriefCache();
+  vi.unstubAllGlobals();
+});
+
+describe("Flare public Buyer Brief registry client", () => {
+  it("publishes and verifies the content-addressed brief", async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ schemaVersion: 1, metadataHash: hash, brief }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(publishFlarePublicBrief(brief, env)).resolves.toEqual({ metadataHash: hash, brief });
+    expect(fetchMock).toHaveBeenCalledWith(
+      `https://briefs.example/flare/public-briefs/${hash}`,
+      expect.objectContaining({ method: "PUT", credentials: "omit", redirect: "error" }),
+    );
+  });
+
+  it("fails closed for missing and hash-mismatched content", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("{}", { status: 404 })));
+    await expect(loadFlarePublicBrief(hash, env)).resolves.toEqual({ status: "missing", brief: null });
+
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({
+      schemaVersion: 1,
+      metadataHash: hash,
+      brief: { ...brief, category: "software" },
+    }), { status: 200, headers: { "Content-Type": "application/json" } })));
+    await expect(loadFlarePublicBrief(hash, env)).resolves.toEqual({ status: "invalid", brief: null });
+  });
+});

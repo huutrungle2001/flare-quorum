@@ -10,6 +10,7 @@ export * from "./fassets.js";
 export * from "./fcc-result.js";
 export * from "./public-market.js";
 export * from "./private-bid.js";
+export * from "./public-brief.js";
 
 export const coston2ChainId = 114;
 export const flareQuorumFlareMarketAbi = marketAbiJson as Abi;

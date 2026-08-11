@@ -233,14 +233,14 @@ describe("Coston2 public evidence boundary", () => {
 
     render(<FlareVendorWorkspace wallet={wallet} tenders={[publicTender]} onRefresh={() => undefined} />);
     expect(screen.getByRole("heading", { name: "Connect to submit this action." })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "ENCRYPT & SUBMIT BID →" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "REVIEW SEALED BID →" })).toBeDisabled();
     expect(screen.queryByText(/&amp;/)).toBeNull();
   });
 
   it("keeps FXRP redemption behind the winning wallet and never asks for an XRPL secret", () => {
     render(<FlareRedemptionPanel wallet={wallet} tenders={[publicTender]} />);
-    expect(screen.getByRole("heading", { name: "Request XRP redemption" })).toBeInTheDocument();
-    expect(screen.getByText(/Connect the winning Coston2 wallet/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Redeem awarded FTestXRP." })).toBeInTheDocument();
+    expect(screen.getByText(/Available after your wallet wins an awarded tender/)).toBeInTheDocument();
     expect(screen.getByText(/never asks for an XRPL secret/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /APPROVE & REQUEST XRP REDEMPTION/i })).toBeNull();
   });
@@ -281,15 +281,15 @@ describe("Coston2 public evidence boundary", () => {
     expect(xrplOption).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(xrplOption);
     expect(xrplOption).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("heading", { name: "Keep the XRPL signature outside FlareQuorum" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Fund with XRP without sharing your wallet key." })).toBeInTheDocument();
   });
 
   it("keeps the XRP-native funding signature outside the browser", () => {
     render(<FlareBuyerWorkspace wallet={wallet} onRefresh={() => undefined} initialFundingMethod="xrpl" />);
-    expect(screen.getByRole("heading", { name: "Keep the XRPL signature outside FlareQuorum" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Fund with XRP without sharing your wallet key." })).toBeInTheDocument();
     expect(screen.getByText(/never asks for a seed/)).toBeInTheDocument();
-    expect(screen.getByText(/DirectMintingDelayed/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "READ FUNDING RUNBOOK ↗" })).toHaveAttribute("href", "/docs#flare-coston2");
+    expect(screen.getByText(/dedicated executor remains responsible for FDC and minting/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "VIEW TECHNICAL FUNDING GUIDE ↗" })).toHaveAttribute("href", "/docs#xrp-funding");
   });
 
   it("prepares only a public XRP funding handoff", async () => {
@@ -309,13 +309,13 @@ describe("Coston2 public evidence boundary", () => {
     render(<FlareXrpFundingPanel onPrepare={onPrepare} />);
     expect(screen.getByLabelText(/XRPL owner address/)).toBeInTheDocument();
     expect(screen.getByText(/never asks for a seed/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "PREPARE PUBLIC 0xFE JOB →" }));
+    fireEvent.click(screen.getByRole("button", { name: "REVIEW XRP PAYMENT →" }));
     await waitFor(() => expect(onPrepare).toHaveBeenCalledTimes(1));
-    expect(screen.getByText("PUBLIC-SAFE HANDOFF READY")).toBeInTheDocument();
+    expect(screen.getByText("AWAITING SIGNATURE")).toBeInTheDocument();
     expect(screen.getByText("PersonalAccount", { exact: true })).toBeInTheDocument();
-    expect(screen.getByText("WALLET-READY XRPL PAYMENT DRAFT")).toBeInTheDocument();
+    expect(screen.getByText(/Approve the exact XRP payment in your wallet/)).toBeInTheDocument();
     expect(screen.getByText("Payment destination", { exact: true })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /SIGN & SUBMIT WITH GEMWALLET/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /PAY XRP WITH GEMWALLET/i })).toBeInTheDocument();
   });
 
   it("checkpoints an externally entered payment before RPC preparation", () => {
@@ -359,15 +359,16 @@ describe("Coston2 public evidence boundary", () => {
       jobJson: '{"kind":"public-safe"}',
     }));
     render(<FlareXrpFundingPanel onPrepare={onPrepare} />);
-    expect(screen.getByRole("button", { name: "RESUME PUBLIC CHECKPOINT →" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "RESUME PUBLIC CHECKPOINT →" }));
+    expect(screen.getByRole("button", { name: "RESTORE PAYMENT HANDOFF →" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "RESTORE PAYMENT HANDOFF →" }));
     await waitFor(() => expect(onPrepare).toHaveBeenCalledWith({
       xrplOwner: "rDhpmiPq4BVBDWMVdSrmkgt8thKyRzGV1p",
       xrplTransactionId: `0x${"cd".repeat(32)}`,
       walletId: "3",
       executorFeeUBA: "",
     }));
-    expect(screen.getByText("PUBLIC-SAFE HANDOFF READY")).toBeInTheDocument();
+    expect(screen.getByText("PAYMENT RECEIVED / HANDOFF READY")).toBeInTheDocument();
+    expect(screen.getByText("Executor handoff ready — tender not opened yet.")).toBeInTheDocument();
     localStorage.clear();
   });
 });

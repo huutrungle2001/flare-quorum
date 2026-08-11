@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";
 import { ContextHelp } from "../shell/ContextHelp";
 import { PublicValue } from "../shell/PublicValue";
+import { FlareBuyerBriefPanel } from "./FlareBuyerBriefPanel";
 
 function short(value: string) {
   return `${value.slice(0, 10)}…${value.slice(-8)}`;
@@ -118,9 +119,15 @@ export function FlareAuditorWorkspace({
             </section>
           ) : (
           <>
-          <section className="evidence-panel audit-binding-panel">
-            <header className="detail-header">
-              <div><p className="eyebrow">TRUST BINDING</p><h2>Three fixed machines. One exact result domain.</h2></div>
+          <section className="evidence-panel audit-dossier-panel" aria-label={`Tender ${selected.tenderId.toString()} audit dossier`}>
+            <header className="detail-header audit-dossier-header">
+              <div><p className="eyebrow">TENDER {selected.tenderId.toString()} · AUDIT DOSSIER</p><h2>Binding → receipts → public outcome</h2></div>
+              <span className="privacy-badge verified">{selected.status.toUpperCase()} · BLOCK {finalizedBlock.toString()}</span>
+            </header>
+          <FlareBuyerBriefPanel tender={selected} compact />
+          <section className="audit-dossier-section audit-binding-panel">
+            <header className="audit-section-header">
+              <div><p className="eyebrow">01 / TRUST BINDING</p><h3>Three fixed machines. One exact result domain.</h3></div>
               <span className="privacy-badge">2 OF 3 REQUIRED</span>
             </header>
             <dl className="term-grid">
@@ -142,9 +149,9 @@ export function FlareAuditorWorkspace({
             </div>
           </section>
 
-          <section className="evidence-panel audit-receipt-panel">
-            <header className="detail-header">
-              <div><p className="eyebrow">PUBLIC BID RECEIPTS</p><h2>{selected.bidReferences.length} accepted commitment{selected.bidReferences.length === 1 ? "" : "s"}</h2></div>
+          <section className="audit-dossier-section audit-receipt-panel">
+            <header className="audit-section-header">
+              <div><p className="eyebrow">02 / ACCEPTED BID RECEIPTS</p><h3>{selected.bidReferences.length} accepted commitment{selected.bidReferences.length === 1 ? "" : "s"} for Tender #{selected.tenderId.toString()}</h3></div>
               <span className="privacy-badge encrypted">NO PAYLOAD ACCESS</span>
             </header>
             {selected.bidReferences.length === 0 ? (
@@ -165,10 +172,10 @@ export function FlareAuditorWorkspace({
             )}
           </section>
 
-          <section className={`award-proof-panel${selected.award ? " awarded" : ""}`}>
+          <section className={`audit-dossier-section audit-outcome-section${selected.award ? " awarded" : ""}`}>
             <div>
-              <p className="eyebrow">TEE-SIGNED RESULT / PUBLIC SETTLEMENT</p>
-              <h2>{selected.award ? "AWARDED" : selected.status.toUpperCase()}</h2>
+              <p className="eyebrow">03 / PUBLIC OUTCOME</p>
+              <h3>{selected.award ? "AWARDED" : selected.status.toUpperCase()}</h3>
               <p>
                 {selected.award
                   ? `Winner ${short(selected.award.winner)} received ${formatUnits(selected.award.amount, 6)} FTestXRP.`
@@ -185,6 +192,7 @@ export function FlareAuditorWorkspace({
                 <div><dt>Buyer remainder</dt><dd>{formatUnits(selected.publicCeilingXrp - selected.award.amount, 6)} FTestXRP</dd></div>
               </dl>
             )}
+          </section>
           </section>
 
           <section className="audit-boundary-grid" aria-label="Audit visibility boundary">

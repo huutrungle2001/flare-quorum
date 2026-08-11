@@ -791,6 +791,30 @@ the indexer-backed proxy is routing against the intended active set. These two
 pre-write checks turn silent dependency drift into explicit blockers without
 weakening FCC thresholds or changing a frozen tender.
 
+## ADR-030 — Keep public Buyer Brief preimages off-chain but hash-verified
+
+**Decision:** Keep the existing market `metadataHash` contract interface. Before
+any buyer approval, XRP payment, or tender-creation request, the browser
+canonicalizes the public Buyer Brief, publishes its exact preimage to an
+immutable content-addressed ingress registry, and checks the returned hash. A
+consumer displays the human-readable brief only after parsing the strict schema
+and independently recomputing the on-chain hash.
+
+The registry is public availability infrastructure, not canonical procurement
+state. It accepts only title, category, objective, acceptance criteria,
+optional vendor questions, asset, deadline, and approved vendor addresses. It
+rejects unknown and bid-shaped fields. Missing, corrupt, unavailable, or
+mismatched content produces an explicit hash-only/failure state; no client may
+invent or recover text from the hash.
+
+**Reason:** Vendors need the complete public requirements without requiring the
+buyer wallet or a contract expansion. The existing content commitment already
+provides integrity, while a small persistent registry provides readable
+availability without putting long text on-chain or weakening bid privacy. This
+does not require a market redeployment. It does require the registry to be
+deployed before the publishing web build and its storage directory to use a
+persistent hosted volume.
+
 ## Official reference basis
 
 These decisions must be revalidated against the pinned versions in Gate 0:

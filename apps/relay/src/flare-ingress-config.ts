@@ -1,4 +1,5 @@
 import { getAddress, isAddress, zeroAddress, type Address } from "viem";
+import { resolve } from "node:path";
 
 export interface FlareIngressConfig {
   rpcUrl: string;
@@ -11,6 +12,7 @@ export interface FlareIngressConfig {
   webOrigin: string;
   host: string;
   port: number;
+  publicBriefDirectory: string;
 }
 
 export class FlareIngressConfigError extends Error {
@@ -107,5 +109,6 @@ export function loadFlareIngressConfig(env: NodeJS.ProcessEnv): FlareIngressConf
     webOrigin,
     host,
     port: port(env.FLARE_INGRESS_PORT ?? env.PORT),
+    publicBriefDirectory: resolve(env.FLARE_PUBLIC_BRIEF_DIR?.trim() || ".local/flare-public-briefs"),
   };
 }

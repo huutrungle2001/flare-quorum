@@ -6,7 +6,11 @@ import {
   quoteSmartAccountDirectMinting,
   smartAccountReaderAbi,
   flareQuorumFlareMarketAbi,
+  canonicalFlarePublicBuyerBrief,
+  hashFlarePublicBuyerBrief,
   type FlareTenderTerms,
+  type FlarePublicBuyerBrief,
+  type FlarePublicBuyerBriefCategory,
 } from "@flarequorum/flare-bindings";
 import {
   createPublicClient,
@@ -14,19 +18,19 @@ import {
   getAddress,
   http,
   isAddress,
-  keccak256,
   parseUnits,
-  stringToHex,
   type Abi,
   type Address,
   type Hex,
 } from "viem";
 import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
+import { ContextHelp } from "../shell/ContextHelp";
 import { useToasts } from "../shell/ToastProvider";
 import { useEffect, useState } from "react";
 import { FlareXrpFundingPanel, type XrpFundingPrepareInput, type XrpFundingPreview } from "./FlareXrpFundingPanel";
 import { clearBuyerPublicDraft, readBuyerPublicDraft, saveBuyerPublicDraft } from "./buyerPublicDraft";
+import { publishFlarePublicBrief } from "./flarePublicBriefRegistry";
 
 const coston2 = {
   id: 114,
@@ -123,6 +127,12 @@ function flareTenderErrorMessage(cause: unknown): string {
   if (raw.includes("InvalidCodeVersion")) return "The Coston2 FCC extension binding is stale. Refresh state and try again.";
   if (raw.includes("InvalidScoringPolicy")) return "The tender scoring rules were rejected. Check the deadline and weight total.";
   if (raw.includes("InvalidTender")) return "The tender rules were rejected. Check the required fields and vendor list.";
+  if (raw.includes("FLARE_PUBLIC_BRIEF_REGISTRY")) {
+    return "The public Buyer Brief registry is unavailable. No approval or tender transaction was requested.";
+  }
+  if (raw.includes("FLARE_PUBLIC_BRIEF_VERIFICATION_FAILED")) {
+    return "The public Buyer Brief could not be verified. No approval or tender transaction was requested.";
+  }
   if (normalized.includes("http request failed") || normalized.includes("failed to fetch") || normalized.includes("rpcrequesterror")) {
     return "Coston2 RPC is temporarily unavailable. Try again in a moment.";
   }
@@ -130,7 +140,7 @@ function flareTenderErrorMessage(cause: unknown): string {
   return message.length > 280 ? `${message.slice(0, 277)}…` : message || "Tender creation failed on Coston2.";
 }
 
-export type FlareBuyerBriefCategory = "software" | "design" | "marketing" | "operations" | "research";
+export type FlareBuyerBriefCategory = FlarePublicBuyerBriefCategory;
 type FlareFundingMethod = "coston2" | "xrpl";
 
 export interface FlareBuyerBriefInput {
@@ -145,18 +155,7 @@ export interface FlareBuyerBriefInput {
 
 /** Hash the public brief deterministically; the brief itself never contains bid data. */
 export function hashFlareBuyerBrief(input: FlareBuyerBriefInput) {
-  const canonical = JSON.stringify({
-    schemaVersion: 1,
-    title: input.title.trim(),
-    category: input.category,
-    objective: input.objective.trim().replace(/\r\n/g, "\n"),
-    acceptanceCriteria: input.acceptanceCriteria.trim().replace(/\r\n/g, "\n"),
-    vendorQuestions: input.vendorQuestions.trim().replace(/\r\n/g, "\n"),
-    asset: "FTestXRP",
-    bidDeadline: input.bidDeadline.toString(),
-    approvedVendors: input.approvedVendors.map((vendor) => vendor.toLowerCase()),
-  });
-  return keccak256(stringToHex(canonical));
+  return hashFlarePublicBuyerBrief(input);
 }
 
 interface BuyerFormValues {
@@ -228,7 +227,10 @@ function requiredFieldErrors(input: BuyerFormValues): BuyerFieldErrors {
   return errors;
 }
 
-function buildFlareTenderTerms(input: BuyerFormValues, blockTimestamp: bigint): FlareTenderTerms {
+function buildFlareTenderTerms(input: BuyerFormValues, blockTimestamp: bigint): {
+  terms: FlareTenderTerms;
+  publicBrief: FlarePublicBuyerBrief;
+} {
   const minutes = Number(input.deadlineMinutes);
   if (!Number.isSafeInteger(minutes) || minutes < 5 || minutes > 30 * 24 * 60) throw new Error("Deadline must be between 5 minutes and 30 days.");
   const price = parseWeight(input.priceWeight, "Price");
@@ -260,8 +262,7 @@ function buildFlareTenderTerms(input: BuyerFormValues, blockTimestamp: bigint): 
     warrantyWeightBps: warranty,
     requiredCredentials: [],
   } as const;
-  return {
-    metadataHash: hashFlareBuyerBrief({
+  const publicBrief = canonicalFlarePublicBuyerBrief({
       title: metadata,
       category: input.category,
       objective: briefObjective,
@@ -269,13 +270,18 @@ function buildFlareTenderTerms(input: BuyerFormValues, blockTimestamp: bigint): 
       vendorQuestions: briefQuestions,
       bidDeadline: scoringPolicy.bidDeadline,
       approvedVendors,
-    }),
-    scoringPolicy,
-    approvedVendors,
-    extensionId: BigInt(coston2FlarePublicRelease.fcc.extensionId),
-    codeVersion: coston2FlarePublicRelease.fcc.codeHash,
-    teeIds: coston2FlarePublicRelease.fcc.teeIds as [Address, Address, Address],
-    teeKeyFingerprints: coston2FlarePublicRelease.fcc.teeKeyFingerprints as [Hex, Hex, Hex],
+    });
+  return {
+    publicBrief,
+    terms: {
+      metadataHash: hashFlarePublicBuyerBrief(publicBrief),
+      scoringPolicy,
+      approvedVendors,
+      extensionId: BigInt(coston2FlarePublicRelease.fcc.extensionId),
+      codeVersion: coston2FlarePublicRelease.fcc.codeHash,
+      teeIds: coston2FlarePublicRelease.fcc.teeIds as [Address, Address, Address],
+      teeKeyFingerprints: coston2FlarePublicRelease.fcc.teeKeyFingerprints as [Hex, Hex, Hex],
+    },
   };
 }
 
@@ -474,7 +480,7 @@ export function FlareBuyerWorkspace({
       if (!rpcUrl) throw new Error("COSTON2_RPC_URL_MISSING");
       const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl) });
       const block = await publicClient.getBlock({ blockTag: "latest" });
-      const terms = buildFlareTenderTerms({
+      const { terms, publicBrief } = buildFlareTenderTerms({
         title,
         category,
         objective,
@@ -487,6 +493,11 @@ export function FlareBuyerWorkspace({
         deliveryWeight,
         warrantyWeight,
       }, block.timestamp);
+      toasts.update(toastId, "Publishing the hash-verified public Buyer Brief…");
+      const published = await publishFlarePublicBrief(publicBrief);
+      if (published.metadataHash.toLowerCase() !== terms.metadataHash.toLowerCase()) {
+        throw new Error("FLARE_PUBLIC_BRIEF_VERIFICATION_FAILED");
+      }
       const amount = terms.scoringPolicy.ceilingXrpMicros;
       if (terms.teeKeyFingerprints.length !== 3) throw new Error("COSTON2_FCC_KEYS_UNAVAILABLE");
       const approval = await publicClient.simulateContract({ account: wallet.state.account!, address: token, abi: erc20Abi, functionName: "approve", args: [market, amount] });
@@ -559,7 +570,7 @@ export function FlareBuyerWorkspace({
     const walletId = parseWalletId(input.walletId);
     const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl) });
     const block = await publicClient.getBlock({ blockTag: "latest" });
-    const terms = buildFlareTenderTerms({
+    const { terms, publicBrief } = buildFlareTenderTerms({
       title,
       category,
       objective,
@@ -572,6 +583,10 @@ export function FlareBuyerWorkspace({
       deliveryWeight,
       warrantyWeight,
     }, block.timestamp);
+    const published = await publishFlarePublicBrief(publicBrief);
+    if (published.metadataHash.toLowerCase() !== terms.metadataHash.toLowerCase()) {
+      throw new Error("FLARE_PUBLIC_BRIEF_VERIFICATION_FAILED");
+    }
     const personalAccount = await publicClient.readContract({
       address: coston2FlarePublicRelease.protocols.masterAccountController,
       abi: smartAccountReaderAbi,
@@ -704,15 +719,46 @@ export function FlareBuyerWorkspace({
           </button>
         </div>
       </section>
-      <section id="buyer-brief" className="evidence-panel flare-buyer-form" aria-label="Buyer tender composer">
-        <header className="detail-header"><div><p className="eyebrow">PUBLIC PROCUREMENT RULES</p><h2>{usingXrplFunding ? "Prepare an XRP-funded tender" : "Open a Coston2 tender"}</h2></div><span className="privacy-badge verified">{usingXrplFunding ? "XRPL → FTESTXRP" : "FTESTXRP / TESTNET"}</span></header>
+      <div className={usingXrplFunding ? "evidence-panel xrp-native-tender-card" : "direct-tender-card"}>
+      {usingXrplFunding && <>
+        <header className="detail-header xrp-native-header">
+          <div><p className="eyebrow">FLAGSHIP FUNDING / XRPL → FDC → SMART ACCOUNT</p><h2>Fund with XRP without sharing your wallet key.</h2></div>
+          <span className="privacy-badge verified">NON-CUSTODIAL</span>
+        </header>
+        <p className="xrp-native-lede">Define the tender first, then approve the exact XRP Testnet payment in GemWallet. FlareQuorum never receives your seed or private key.</p>
+        <ol className="xrp-journey-map" aria-label="XRP-native tender journey">
+          <li><span>1</span><strong>DEFINE RULES</strong></li>
+          <li><span>2</span><strong>CONNECT &amp; PAY</strong></li>
+          <li><span>3</span><strong>FDC &amp; MINT</strong></li>
+          <li><span>4</span><strong>TENDER OPENED</strong></li>
+        </ol>
+      </>}
+      <section id="buyer-brief" className={`${usingXrplFunding ? "xrp-native-rules-section" : "evidence-panel"} flare-buyer-form`} aria-label="Buyer tender composer">
+        <header className="detail-header input-card-header">
+          <div><p className="eyebrow">{usingXrplFunding ? "STEP 01 / DEFINE TENDER RULES" : "PUBLIC PROCUREMENT RULES"}</p><h2>{usingXrplFunding ? "Define your tender rules." : "Open a Coston2 tender"}</h2></div>
+          <div className="input-card-tools">
+            <ContextHelp
+              compact
+              label="Help for Buyer tender rules"
+              title="HOW TO DEFINE THIS TENDER"
+              steps={[
+                "Describe the public outcome, acceptance checks, deadline, and maximum escrow.",
+                "Add only vendor wallet addresses that may submit a sealed bid.",
+                "Set price, delivery, and warranty weights so the total is exactly 100%.",
+                usingXrplFunding ? "Continue to XRP payment after every required rule is valid." : "Connect a Coston2 wallet only when you are ready to approve and open the tender.",
+              ]}
+              note="These rules are public and immutable by hash. Vendor commercial bids remain sealed."
+            />
+            <span className="privacy-badge verified">{usingXrplFunding ? "XRPL → FTESTXRP" : "FTESTXRP / TESTNET"}</span>
+          </div>
+        </header>
         <div className="buyer-draft-bar" aria-live="polite">
           <div><strong>{hasSavedDraft ? "PUBLIC DRAFT SAVED IN THIS TAB" : "PUBLIC DRAFT AUTO-SAVE READY"}</strong><span>Only the public Buyer Brief fields below use session storage. Bid data is never stored here.</span></div>
           <button className="secondary-button" type="button" onClick={clearPublicDraft} disabled={busy || !hasSavedDraft}>CLEAR PUBLIC DRAFT</button>
         </div>
         <label>Public title<input aria-label="Public title" required minLength={3} aria-invalid={Boolean(fieldErrors.title)} aria-describedby={`buyer-title-hint${fieldErrors.title ? " buyer-title-error" : ""}`} value={title} onChange={(event) => { setTitle(event.target.value); clearFieldError("title"); }} maxLength={160} placeholder="e.g. XRP treasury reporting" disabled={busy} autoComplete="off" /><small id="buyer-title-hint" className="field-guidance"><span>Public and immutable by hash · 3–160 characters</span><span>{title.length}/160</span></small>{fieldErrors.title && <small id="buyer-title-error" className="field-error" role="alert">{fieldErrors.title}</small>}</label>
         <div className="form-grid-two">
-          <label>Category<select value={category} onChange={(event) => setCategory(event.target.value as FlareBuyerBriefCategory)} disabled={busy}><option value="software">Software</option><option value="design">Design</option><option value="marketing">Marketing</option><option value="operations">Operations</option><option value="research">Research</option></select></label>
+          <label>Category<select required value={category} onChange={(event) => setCategory(event.target.value as FlareBuyerBriefCategory)} disabled={busy}><option value="software">Software</option><option value="design">Design</option><option value="marketing">Marketing</option><option value="operations">Operations</option><option value="research">Research</option></select></label>
           <label>Escrow ceiling (FTestXRP)<input aria-label="Escrow ceiling (FTestXRP)" required aria-invalid={Boolean(fieldErrors.ceiling)} aria-describedby={`buyer-ceiling-hint${fieldErrors.ceiling ? " buyer-ceiling-error" : ""}`} inputMode="decimal" value={ceiling} onChange={(event) => { setCeiling(event.target.value); clearFieldError("ceiling"); }} disabled={busy} /><small id="buyer-ceiling-hint" className="field-guidance"><span>Positive amount · maximum 6 decimal places</span></small>{fieldErrors.ceiling && <small id="buyer-ceiling-error" className="field-error" role="alert">{fieldErrors.ceiling}</small>}</label>
           <label>Bid deadline (minutes)<input aria-label="Bid deadline (minutes)" required aria-invalid={Boolean(fieldErrors.deadlineMinutes)} aria-describedby={`buyer-deadline-hint${fieldErrors.deadlineMinutes ? " buyer-deadline-error" : ""}`} type="number" min={5} max={43200} value={deadlineMinutes} onChange={(event) => { setDeadlineMinutes(event.target.value); clearFieldError("deadlineMinutes"); }} disabled={busy} /><small id="buyer-deadline-hint" className="field-guidance"><span>5 minutes–30 days (43,200 minutes)</span></small>{fieldErrors.deadlineMinutes && <small id="buyer-deadline-error" className="field-error" role="alert">{fieldErrors.deadlineMinutes}</small>}</label>
           <label>Public objective<textarea aria-label="Public objective" required minLength={20} aria-invalid={Boolean(fieldErrors.objective)} aria-describedby={`buyer-objective-hint${fieldErrors.objective ? " buyer-objective-error" : ""}`} value={objective} onChange={(event) => { setObjective(event.target.value); clearFieldError("objective"); }} rows={4} maxLength={1200} placeholder="What outcome should the selected vendor deliver?" disabled={busy} /><small id="buyer-objective-hint" className="field-guidance"><span>Public outcome · 20–1,200 characters</span><span>{objective.length}/1200</span></small>{fieldErrors.objective && <small id="buyer-objective-error" className="field-error" role="alert">{fieldErrors.objective}</small>}</label>
@@ -760,6 +806,7 @@ export function FlareBuyerWorkspace({
         {last && <p className="form-hint" aria-live="polite">Tender #{last.tenderId} created · <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">inspect transaction ↗</a></p>}
       </section>
       {usingXrplFunding && <FlareXrpFundingPanel onPrepare={prepareXrpFunding} />}
+      </div>
     </main>
   );
 }

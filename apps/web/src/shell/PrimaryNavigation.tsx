@@ -4,7 +4,6 @@ import type { WalletController } from "../wallet/WalletPanel";
 import type { WalletNetwork } from "../wallet/useWallet";
 import { scrollToPageTop } from "./navigationScroll";
 import { requestRefreshState } from "./refreshState";
-import { isFlareReleaseEnabled } from "../public-market/loadFlareMarket";
 
 type NavigationItem = {
   label: string;
@@ -180,33 +179,21 @@ function HeaderWalletMenu({
 
 export function PrimaryNavigation({
   wallet,
-  flareWallet,
 }: {
   wallet: WalletController;
-  flareWallet?: WalletController;
 }) {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const legacyTenderRoute =
     searchParams.has("role") || searchParams.has("tender");
   const isHome = location.pathname === "/" && !legacyTenderRoute;
-  const flareReleaseEnabled = isFlareReleaseEnabled();
-  const tenderPath = flareReleaseEnabled ? "/flare" : "/room";
+  const tenderPath = "/flare";
   const isTenders =
-    location.pathname === tenderPath || (!flareReleaseEnabled && legacyTenderRoute);
+    location.pathname === tenderPath || legacyTenderRoute;
   const isDocs = location.pathname === "/docs";
-  const isFlare = location.pathname === "/flare" || (
-    flareReleaseEnabled && (
-      location.pathname === "/" ||
-      location.pathname === "/docs"
-    )
-  );
   const productName = "FlareQuorum";
   const items: NavigationItem[] = [
     { label: "TENDERS", to: tenderPath, active: isTenders },
-    ...(!flareReleaseEnabled && import.meta.env.VITE_FLARE_MARKET_ADDRESS
-      ? [{ label: "FLARE", to: "/flare", active: isFlare }]
-      : []),
     { label: "DOCS", to: "/docs", active: isDocs },
   ];
 
@@ -266,9 +253,9 @@ export function PrimaryNavigation({
         ))}
       </nav>
       <div className="topbar-actions">
-        <div className="network-pill" aria-label={`Network: ${isFlare ? "Flare Coston2" : "Ethereum Sepolia"}`}>
+        <div className="network-pill" aria-label="Network: Flare Coston2">
           <span aria-hidden="true" />
-          <span className="network-label">{isFlare ? "COSTON2" : "SEPOLIA"}</span>
+          <span className="network-label">COSTON2</span>
         </div>
         {isTenders && (
           <button
@@ -281,7 +268,7 @@ export function PrimaryNavigation({
             ↻
           </button>
         )}
-        <HeaderWalletMenu wallet={isFlare && flareWallet ? flareWallet : wallet} network={isFlare ? "coston2" : "sepolia"} />
+        <HeaderWalletMenu wallet={wallet} network="coston2" />
       </div>
     </header>
   );

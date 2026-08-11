@@ -6,6 +6,7 @@ import { ContextHelp } from "../shell/ContextHelp";
 import { useToasts } from "../shell/ToastProvider";
 import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
+import { FlareRedemptionPanel } from "./FlareRedemptionPanel";
 
 const coston2 = {
   id: 114,
@@ -144,8 +145,12 @@ export function FlareFinalizerWorkspace({
           appear only when canonical rules permit them.
         </p>
       </section>
+      <nav className="activity-section-nav" aria-label="Activity sections">
+        <a href="#lifecycle-queue">LIFECYCLE QUEUE</a>
+        <a href="#assets-redemption">ASSETS &amp; REDEMPTION</a>
+      </nav>
       {error && <p className="inline-error finalizer-error" role="alert">{error}</p>}
-      <section className="evidence-panel finalizer-queue" aria-label="Public lifecycle queue">
+      <section id="lifecycle-queue" className="evidence-panel finalizer-queue" aria-label="Public lifecycle queue">
         <header className="detail-header">
           <div>
             <p className="eyebrow">CANONICAL ACTION QUEUE</p>
@@ -238,6 +243,9 @@ export function FlareFinalizerWorkspace({
           </div>
         )}
       </section>
+      <div id="assets-redemption" className="activity-assets-section">
+        <FlareRedemptionPanel wallet={wallet} tenders={tenders} />
+      </div>
     </main>
   );
 }

@@ -8,6 +8,7 @@ export * from "./flare-live.js";
 export * from "./flare-health-server.js";
 export * from "./flare-lifecycle.js";
 export * from "./flare-results.js";
+export * from "./flare-public-brief-store.js";
 export * from "./flare-ingress.js";
 export * from "./flare-ingress-config.js";
 export * from "./flare-ingress-http.js";

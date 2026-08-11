@@ -38,6 +38,7 @@ FlareQuorum aims to:
 | Salted commitment, vendor, receipt bitmap, timing | Public | Canonical market contract |
 | TEE encryption/signing secrets | Private | FCC-attested TEE boundary |
 | Rules, ceiling, deadline, issuer policy, machine fingerprints | Public | Canonical market contract |
+| Buyer Brief title, category, objective, acceptance criteria, vendor questions, asset, deadline, approved vendors | Public | Registry preimage checked against the market `metadataHash` |
 | FTSO XRP/USD close snapshot | Public | Canonical market contract |
 | Winner and winning FTestXRP amount | Public after finalization | Canonical market contract |
 | Losing bid values and score components | Private by default | TEE runtime and original vendor only |
@@ -113,6 +114,13 @@ indexers can omit, delay, or misreport data to a client; release bytecode,
 events, transactions, and multiple public checkpoints remain independently
 verifiable.
 
+The ingress deployment may persist public Buyer Brief preimages by content
+hash. A malicious or unavailable registry can withhold a brief, but a browser
+must recompute the exact canonical hash before displaying it and must show a
+hash-only/unavailable state on absence or mismatch. Registry writes use a
+strict versioned allowlist and reject bid-shaped, credential, ciphertext,
+signature, proof, and wallet-secret fields.
+
 ## 4. Threats and mitigations
 
 | Threat | Required mitigation | Residual risk |
@@ -138,6 +146,8 @@ verifiable.
 | Buyer exploits outage for refund | Public proxies, permissionless finalization/retry, fixed post-dispatch grace, and V2 fixed pre-dispatch grace | If no threshold result becomes publicly retrievable before the applicable grace, fairness yields to public full-escrow recovery |
 | Admin changes live policy | Immutable tender binding and governance without live-tender/escrow authority | Deployment key can still misconfigure future tenders |
 | Fake evidence or mock fallback | Schema-validated public evidence tied to real Coston2 IDs; unavailable state on dependency failure | Review process can still miss an omission |
+| Public brief tampering or omission | Canonical serialization, contract `metadataHash` recheck, immutable content-addressed writes, explicit unavailable/mismatch UI | Registry can censor availability; old hash-only tenders cannot have their text reconstructed |
+| Public brief storage abuse | Small strict schema, request-size/rate bounds, isolated persistent volume, service monitoring | A public writer can still consume bounded operational capacity over time |
 
 ## 5. Compromise impact
 
@@ -156,6 +166,8 @@ verifiable.
   TEE key. Body logging or key substitution is a critical failure.
 - **Relay:** attacker can delay only its own runner or submit data the contract
   rejects.
+- **Public brief registry:** attacker can delay or withhold human-readable
+  public metadata, but cannot make altered text pass the on-chain hash check.
 - **Market contract:** a defect may lock or misdirect all test escrow governed
   by that deployment.
 - **FDC/FAssets/FTSO/Smart Account infrastructure:** the dependent XRP-native,

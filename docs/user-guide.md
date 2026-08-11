@@ -4,9 +4,8 @@
 > provide the fail-closed wallet-free evidence view and explicit Coston2 role
 > routes. The current source build combines direct Coston2 and XRP-native
 > funding under the Buyer workspace alongside Public, Vendor, Public Finalizer,
-> and Auditor/Evidence. Repository tests and the current hosted deployment cover
-> the unified chooser. The role shell, mobile/320px layout, keyboard path, XRP
-> draft, and reload checkpoint pass hosted smoke validation. The XRP-native
+> and Auditor/Evidence. The current desktop refinement is implemented locally
+> and awaits final repository/hosted validation. The XRP-native
 > funding protocol and executor have live Gate G
 > evidence plus a public-safe delayed-mint checkpoint/resume path. The Buyer
 > workspace can also prepare a wallet-ready XRPL Payment draft and public-safe
@@ -14,8 +13,9 @@
 > wallet-ready draft smoke is recorded in
 > `evidence/coston2/web-xrp-funding-draft.json`. Optional GemWallet Testnet
 > signing/submission is available without custody; browser-native recovery
-> remains outside the browser custody boundary. `/room` remains the historical
-> Sepolia baseline.
+> remains outside the browser custody boundary. `/room` now redirects to the
+> canonical Coston2 application; historical Sepolia artifacts remain
+> repository-only regression material.
 
 ## 1. What the product will do
 
@@ -60,19 +60,19 @@ cancellation and failed-compute recovery require an explicit confirmation.
 
 The Buyer route is `/flare?role=buyer`: it starts with two explicit funding
 choices, defaults to direct Coston2/FTestXRP escrow, and can switch to the
-XRPL/FDC/Smart Account handoff before preparing the same public tender brief.
+XRPL/FDC/Smart Account journey inside one guided tender card. The public Rules
+form is shared across both choices and never creates a second draft.
 The old `/flare?role=treasury` URL remains a compatibility alias that opens Buyer
-with the XRPL choice selected. `/flare?role=vendor` opens sealed submission and
-awarded-vendor redemption. The header wallet selector follows the active release:
-Coston2 on Flare routes and Sepolia only on the historical `/room` route. Public
-browsing never requires a wallet.
+with the XRPL choice selected. `/flare?role=vendor` opens sealed submission;
+post-award redemption lives under Activity / Assets. The header wallet selector
+is Coston2-only. Public browsing never requires a wallet.
 
 The current Flare application is intentionally split into two shells. Clicking
 the `FLAREQUORUM` wordmark returns to the standalone product landing page. Clicking
 `TENDERS` enters `/flare`, where the dossier-style left rail remains visible
 while the right side renders the selected workspace: `PUBLIC`, `BUYER` (with
 the two funding choices), `PRIVATE BIDS` (vendor ingress), `ACTIVITY` (public
-finalizer), and `AUDITOR`. Public uses canonical tender IDs, status, buyer, and
+finalizer plus Assets/Redemption), and `AUDITOR`. Public uses canonical tender IDs, status, buyer, and
 on-chain facts rather than fabricating titles when only a metadata hash exists.
 Its desktop list provides search and five-item pagination, and the list/detail
 canvas uses one document scroll instead of nested scroll panes. The left rail
@@ -80,8 +80,9 @@ shows compact wallet assets only in Buyer, Vendor, and Activity; Public and
 Auditor explicitly mark the wallet optional. The Coston2 faucet remains
 available, and refresh is the global `↻` control beside `CONNECT FOR ACTIONS`.
 Wallet connection stays in the global header and appears again as a compact
-checkpoint next to a relevant transaction, while FXRP redemption
-controls appear inside `PRIVATE BIDS` only for the connected public winner.
+checkpoint next to a relevant transaction, while FXRP redemption shows a compact
+locked state under Activity / Assets until the connected public winner has an
+eligible balance.
 Sepolia-only `vcUSDC` wrap/unwrap controls are omitted from Flare.
 
 The public path is live and release-labeled. Any missing dependency keeps its
@@ -103,20 +104,25 @@ success. The Sepolia app remains a pre-hackathon baseline.
 ## 4. XRP-native Buyer funding flow (executor-backed flagship)
 
 1. In `BUYER`, choose `XRPL / XRP · ADVANCED` (direct `COSTON2 / FTESTXRP` is
-   the default) and complete the shared public tender brief. Derive the
+   the default) and complete Step 1, `DEFINE TENDER RULES`, inside the single
+   XRP-native card. Derive the
    deterministic Flare PersonalAccount and read its current nonce
    from the supported Smart Account controller.
 2. Build the public-safe terms and read the current AssetManager payment
    destination, direct-mint fee, executor fee, PersonalAccount, and nonce. The
-   Buyer workspace then shows the exact UBA amount, destination, and 42-byte
-   `0xFE` memo in a wallet-ready Payment draft. It does not request an XRPL
-   secret.
+   Buyer workspace's `REVIEW XRP PAYMENT` action then shows the exact UBA amount
+   and destination. The 42-byte `0xFE` memo, manual transaction ID, wallet ID,
+   executor fee, and JSON remain under `Advanced funding details`. It does not
+   request an XRPL secret.
 3. Send that XRP testnet Payment from the buyer's own XRPL wallet (the optional
    GemWallet button can verify Testnet and submit the exact draft), enter its
    public transaction ID, and prepare the strict `FlareFundingJob`; then run
    the dedicated `flare:funding:execute` executor with local
    credentials. The executor waits for XRPL finality, requests the official FDC
-   `XRPPayment` proof, and calls `executeDirectMintingWithData`.
+   `XRPPayment` proof, and calls `executeDirectMintingWithData`. Until a
+   supported executor API is connected, the browser truthfully stops at
+   `Executor handoff ready — tender not opened yet` and never presents a fake
+   final action.
 4. Accept the funding result only when the direct-mint, user-operation, and
    `TenderCreated` events prove one atomic Coston2 tender. Delayed minting is a
    public pending checkpoint, never a success fallback. Save the JSON result
@@ -135,6 +141,14 @@ and provides `CLEAR PUBLIC DRAFT`. The versioned allowlist includes no bid,
 ciphertext, credential, salt, signature, wallet material, or FDC proof; any
 unknown stored key invalidates the draft. The Coston2 wallet checkpoint appears
 after the brief, immediately before the direct transaction action.
+After local validation, the browser publishes that same canonical public brief
+to the content-addressed registry and verifies its returned hash before asking
+for token approval, payment, or tender creation. Public, Private Bids, and
+Auditor views fetch the preimage and recompute the tender's on-chain
+`metadataHash` before showing it. A missing, unavailable, or mismatched response
+is labeled explicitly; the UI never reconstructs or guesses the brief. Earlier
+tenders without an available preimage remain inspectable through their
+contract facts and metadata hash.
 After a public payment hash is known, the browser may retain only the owner,
 transaction hash, Smart Account wallet ID, and executor fee as a reload-safe
 checkpoint. On reload, the Buyer route offers an explicit public-checkpoint
@@ -144,23 +158,28 @@ forget the checkpoint.
 
 ## 5. Vendor flow
 
-1. Connect the approved Coston2 address and open an `Open` tender.
-2. Verify market, buyer, deadline, ceiling, rules, extension/code, three machine
+1. Connect a Coston2 address. The browser checks `isApprovedVendor` for every
+   open tender, prioritizes eligible tenders, and locks private entry if the
+   canonical eligibility read is unavailable.
+2. Read the automatically loaded, hash-verified public Buyer Brief, then verify
+   market, buyer, deadline, ceiling, rules, extension/code, three machine
    fingerprints, common threshold, and official release status.
-3. In the current browser role route, enter an XRP quote, delivery days, and
+3. Read the selected tender's public ceiling, deadline, service bounds, and
+   scoring weights, then enter an XRP quote, delivery days, and
    warranty days. Credential-gated tenders are rejected by this composer until
    an explicit issuer-credential UX is added; the underlying protocol still
    validates credential requirements inside FCC.
-4. Review the canonical commitment locally; the random salt prevents practical
-   enumeration of low-range values.
+4. Keep the visible no-persistence warning in mind: private fields are lost on
+   refresh. Review price, delivery, and warranty in-session before encryption;
+   the random salt prevents practical enumeration of low-range values.
 5. Encrypt separately to each selected TEE key and send through the authenticated
    private-ingress path. Neither plaintext nor ciphertext is written on-chain.
 6. Collect signed receipts and submit the matching set to the market before the
    deadline.
 7. Confirm that the chain shows only vendor participation, commitment, receipt
    bitmap, and updated common quorum/root.
-8. Clear the local draft. If selected, receive the public FTestXRP amount and
-   open the Vendor workspace with the winning wallet to approve the exact amount
+8. If selected, receive the public FTestXRP amount and open Activity / Assets
+   with the winning wallet to approve the exact amount
    and submit an official FAssets redemption request to an XRPL address. The
    request creates an agent payout obligation; it is not an instant XRP payout.
 

@@ -43,7 +43,7 @@ function ProtocolLink({ label, address, description }: { label: string; address:
   );
 }
 
-/** Current Flare documentation. The historical Nox guide stays on /room. */
+/** Current Flare documentation for the public judge experience. */
 export function FlareDocsPage() {
   const release = coston2FlarePublicRelease;
   return (
@@ -56,6 +56,7 @@ export function FlareDocsPage() {
             ["quick-start", "JUDGE QUICK START"],
             ["integrations", "FLARE INTEGRATIONS"],
             ["buyer", "BUYER"],
+            ["xrp-funding", "XRP FUNDING"],
             ["vendor", "VENDOR"],
             ["recovery", "RECOVERY"],
             ["privacy", "PRIVACY"],
@@ -137,6 +138,26 @@ export function FlareDocsPage() {
             ]} />
           </section>
 
+          <section id="xrp-funding">
+            <p className="eyebrow">XRP-NATIVE FUNDING / TECHNICAL GUIDE</p>
+            <h2>One payment. One public checkpoint.</h2>
+            <p>
+              The buyer defines immutable tender rules before the browser reads
+              the official AssetManager destination and calculates the exact XRPL
+              Testnet Payment and 0xFE memo. GemWallet signs outside FlareQuorum.
+            </p>
+            <StepList steps={[
+              { title: "Define the tender rules", copy: "The ceiling, approved vendors, deadline, scoring policy, FCC binding, and Smart Account plan determine the payment amount and memo." },
+              { title: "Review and pay once", copy: "Approve the exact destination, amount, and memo in an XRPL Testnet wallet. FlareQuorum receives only the public transaction ID." },
+              { title: "Prepare the executor handoff", copy: "A confirmed transaction ID produces the public job used by the dedicated executor for FDC proof, Smart Account minting, and tender creation." },
+              { title: "Treat delayed as pending", copy: "DirectMintingDelayed is not success. Preserve the same payment, nonce, and checkpoint; never ask the buyer to pay a second time." },
+            ]} />
+            <div className="docs-callout">
+              <strong>CURRENT BROWSER BOUNDARY</strong>
+              <p>The current UI prepares the public executor handoff. It does not claim that FDC verification, minting, or tender creation has completed until a real Coston2 tender can be read back.</p>
+            </div>
+          </section>
+
           <section id="vendor">
             <p className="eyebrow">VENDOR / PRIVATE BID INGRESS</p>
             <h2>Encrypt locally. Prove receipt quorum publicly.</h2>
@@ -201,7 +222,7 @@ export function FlareDocsPage() {
             </ul>
             <div className="docs-actions">
               <Link className="primary-button" to="/flare">OPEN THE CURRENT APP →</Link>
-              <Link className="secondary-button" to="/room">OPEN HISTORICAL SEPOLIA BASELINE →</Link>
+              <Link className="secondary-button" to="/flare?role=auditor">OPEN AUDITOR DOSSIER →</Link>
             </div>
           </section>
         </article>

@@ -461,6 +461,10 @@ The current source release provides:
 - an ingress service whose health rereads one finalized public tender and
   validates its three frozen machine bindings, while logs contain no body,
   ciphertext, credential, or plaintext;
+- an immutable public Buyer Brief registry under
+  `/flare/public-briefs/:metadataHash`; the browser publishes the public-safe
+  preimage before requesting a funding transaction and independently
+  recomputes the hash before rendering it;
 - explicit unavailable/recovery states when RPC, proxy, FCC, FDC, FTSO,
   FAssets, or indexer dependencies fail.
 
@@ -472,7 +476,13 @@ is public and returns only the readiness envelope `{status, service, chainId,
 schemaVersion, tenderId, machineBindingsValid, tenderStatus}`; browser builds
 receive this origin through `VITE_FLARE_INGRESS_URL`, while all direct proxy
 keys remain server-only. The service does not persist bid bodies or proxy
-envelopes. A successful ingress action is not by itself a settlement;
+envelopes. It does persist only allowlisted public Buyer Brief JSON in the
+directory configured by `FLARE_PUBLIC_BRIEF_DIR`. Hosted deployments must mount
+that directory on a persistent volume; an ephemeral filesystem would make new
+brief text disappear after a restart even though contract hashes remain safe.
+The web may use a separate `VITE_FLARE_PUBLIC_BRIEF_URL`; when omitted it uses
+`VITE_FLARE_INGRESS_URL`. Both variables are public origins, not credentials.
+A successful ingress action is not by itself a settlement;
 the receipt quorum still must be submitted to the frozen Coston2 market.
 The Flare relay includes a read-only `health-server` mode (`/live` and
 `/health`) that needs no signer. Settlement polling must be deployed only as a
@@ -483,6 +493,13 @@ The browser deployment gets no relay signer, TEE secret, proxy database, XRPL
 secret, or infrastructure credential. An optional GemWallet integration runs
 only in the user's browser, checks XRPL Testnet and the entered owner, and
 receives the public payment hash rather than wallet material.
+
+Roll out the ingress registry before the web build that publishes briefs. A
+buyer transaction is not requested when brief publication or returned-hash
+verification fails. Existing tenders created before registry support remain
+valid and appear as `BRIEF UNAVAILABLE · HASH ONLY`; operators must not invent
+or backfill text unless the exact original preimage is available and hashes to
+the on-chain value.
 
 ## 8. Rollback and incident recovery
 

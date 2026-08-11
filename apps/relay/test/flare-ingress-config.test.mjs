@@ -31,6 +31,7 @@ test("ingress config requires an explicit verified three-machine deployment", ()
   assert.equal(config.webOrigin, "https://app.example");
   assert.equal(config.host, "127.0.0.1");
   assert.equal(config.port, 8788);
+  assert.match(config.publicBriefDirectory, /\.local\/flare-public-briefs$/);
 });
 
 test("ingress config fails closed on unverified or incomplete chain bindings", () => {

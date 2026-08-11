@@ -4,13 +4,14 @@
 > as an institutional bidding interface.
 >
 > Status: Canonical visual, interaction, responsive, and privacy-language
-> specification. The implemented app now defaults to the verified Coston2/FCC
-> product; the Sepolia compatibility workspace remains available as a clearly
-> labeled, lazy-loaded route with the current product branding.
+> specification. The implemented judge app is locked to the verified
+> Coston2/FCC product. Historical Sepolia source, tests, manifests, and evidence
+> remain repository-only regression material and are not exposed by the browser
+> router or current product navigation.
 >
-> Rebrand boundary: the FlareQuorum name and orange tokens apply to every web
-> route, including `/room`. The route keeps its existing Sepolia behavior; only
-> its presentation and product naming change.
+> Route boundary: `/flare` is the canonical tender application. Old `/room` and
+> root role/tender links redirect to `/flare`; missing Coston2 configuration
+> fails closed and never restores a Sepolia or mock UI.
 
 **Theme:** mixed
 
@@ -22,9 +23,11 @@ gradients or dashboard chrome.
 The product must still behave like serious financial software. Display serif
 type carries brand moments; condensed sans-serif carries navigation and actions;
 monospace carries commitments, extension IDs, signatures, blocks, and timestamps. Surfaces remain
-flat. Cards and controls use ink outlines, generous 25px corners, and no
-elevation shadows. Vivid orange appears only when the interface is inviting an
-action, marking a selected state, or confirming verified evidence.
+flat. Structural cards use generous 25px corners; action controls, editable
+fields, and flat status labels use deliberately different shapes and outlines
+so interaction is visible without elevation shadows. Vivid orange appears only
+when the interface is inviting an action, marking a selected state, identifying
+an editable field edge, or confirming verified evidence.
 
 ## 1. Experience principles
 
@@ -145,17 +148,19 @@ Named radii:
 | Element | Radius |
 |---|---:|
 | Cards and panels | 25px |
-| Buttons and badges | 25px |
-| Compact status pills | 25px |
+| Action buttons | 7px |
+| Editable inputs | 4px |
+| Compact status labels | 0 |
 | Full nav/role pills | 100px |
 | Illustration circles | 100% |
 
 Rules:
 
 - Standard structural border: `1px solid #000`.
-- Hovered actionable border: `2px solid #000` without changing outer size.
+- Action and editable-control border: `2px solid #000`.
 - Focus ring: `3px solid #ff8a1f` plus a 1px black outer outline.
-- No 4px, 8px, or 12px component radii.
+- Reserve 25px for cards, 7px for actions, 4px for fields, square corners for
+  status labels, and 100px for navigation pills.
 - No card/button drop shadows.
 - An orange blurred halo is allowed only behind a verified winner/proof spotlight;
   it is decorative, never an elevation cue.
@@ -269,14 +274,14 @@ be presented as Flare implementation evidence.
 
 ## 7. Core components
 
-### Primary pill button
+### Primary action button
 
 - Veil Green fill.
-- Ink Black text and 1px border.
+- Ink Black text and 2px border.
 - Barlow Condensed 500, 16px, uppercase, `0.1em`.
 - Padding `10px 24px`.
-- Radius `25px`.
-- Hover changes border to 2px and uses a subtle black inset line; no shadow.
+- Radius `7px`.
+- Hover preserves the outline, changes position slightly, and uses no shadow.
 
 Examples:
 
@@ -285,10 +290,10 @@ Examples:
 - `FINALIZE AWARD`
 - `REDEEM FXRP`
 
-### Secondary pill button
+### Secondary action button
 
 - Paper White fill.
-- Ink Black text and 1px border.
+- Ink Black text and 2px border.
 - Same typography and geometry as primary.
 - Optional trailing arrow `→`.
 
@@ -298,7 +303,7 @@ Examples:
 - `VIEW PROOF →`
 - `OPEN IN EXPLORER →`
 
-### Destructive pill button
+### Destructive action button
 
 - Ink Black fill and Paper White text.
 - Warning icon and explicit destructive verb.
@@ -315,13 +320,25 @@ Examples:
 
 | State | Visual |
 |---|---|
-| `PUBLIC` | White pill, black border, globe icon |
-| `ENCRYPTED` | Black pill, white lock icon/text |
-| `AUTHORIZED` | Green pill, black key icon/text |
-| `PROOF READY` | Green pill, check icon, mono label |
-| `PENDING` | White pill, black progress glyph |
+| `PUBLIC` | Flat pale label, black left rule, globe icon |
+| `ENCRYPTED` | Flat black label, orange left rule, white lock icon/text |
+| `AUTHORIZED` | Flat orange-tinted label, black left rule, key icon/text |
+| `PROOF READY` | Flat orange-tinted label, black left rule, check icon |
+| `PENDING` | Flat pale label, black left rule, progress glyph |
 
-Badges always include text.
+Badges always include text, remain square and flat, and never receive hover,
+pointer, or pressed behavior.
+
+### Editable and read-only fields
+
+- Editable fields use a pale-orange surface, 2px black border, 4px radius, and
+  orange left edge. Focus makes the edge stronger without adding elevation.
+- Required fields expose a visible `REQUIRED` label; optional fields are named
+  optional in their field label or guidance.
+- Disabled fields use a muted dashed border and `not-allowed` cursor.
+- Generated/read-only fields use a dashed patterned surface and visible
+  `READ ONLY` label. Static evidence values use text or definition lists rather
+  than input styling.
 
 ### Tender dossier card
 
@@ -392,6 +409,17 @@ Copy must state: `THE TREASURY OWNS THE FUNDS. THE TEE SELECTS; THE CONTRACT SET
 - Compose first; place the compact wallet connection checkpoint immediately
   before the transaction action. Public and Auditor workspaces label the wallet
   optional and do not show wallet balances in the workspace rail.
+- On create, publish the canonical public-safe preimage to an immutable,
+  content-addressed registry before any approval/payment/create transaction is
+  requested. The returned content must hash to the same `metadataHash` passed
+  to the market.
+- Public, Private Bids, and Auditor dossiers automatically render one shared
+  `PUBLIC BUYER BRIEF / HASH VERIFIED` panel. It shows title, category, asset,
+  objective, acceptance criteria, optional vendor questions, and approved
+  vendors without requiring a wallet.
+- Render explicit `VERIFYING`, `HASH ONLY`, `REGISTRY UNAVAILABLE`, and
+  `VERIFICATION FAILED` states. Never infer text from the hash or silently use
+  a stale draft/cache after verification fails.
 
 ### Lifecycle strip
 
@@ -559,6 +587,14 @@ privacy/status badges.
 - Animated marquee/illustration/proof pulses respect reduced motion.
 - Commitment, digest, and address truncation always exposes a labelled copy/full-value
   control.
+- Collapsed evidence headers state that they are interactive, include a chevron,
+  and expose matching hover, focus, keyboard, expanded, and collapsed states.
+- Every card that collects input has an accessible `?` task guide. Essential
+  validation, privacy, payment, and irreversible-action warnings remain visible
+  outside the help popup.
+- Buttons, editable fields, static status labels, read-only values, links, and
+  clickable cards remain visibly distinct without requiring hover to identify
+  their role.
 - Desktop Public and Auditor lists provide search and bounded pagination, and
   default Auditor inspection to the newest awarded dossier when one exists.
 - The interface supports 320px without horizontal page overflow.
@@ -569,7 +605,8 @@ privacy/status badges.
 - Use display serif sparingly for brand and award moments.
 - Keep operational UI in Barlow Condensed and evidence in Space Mono.
 - Pair orange primary and white outlined secondary actions.
-- Use 25px component corners and 100px role/nav pills.
+- Use 25px card corners, 7px action corners, 4px field corners, square status
+  labels, and 100px role/nav pills.
 - Give major landing sections at least 80px vertical separation.
 - Explain privacy and authority next to every confidential transaction.
 - Show public, encrypted, authorized, and proof-ready states explicitly.
@@ -654,7 +691,9 @@ as the championship hero or primary demo.
 
   /* Shape and layout */
   --radius-card: 25px;
-  --radius-control: 25px;
+  --radius-control: 7px;
+  --radius-input: 4px;
+  --radius-status: 0;
   --radius-pill: 100px;
   --page-max: 1200px;
   --section-gap: 80px;
@@ -670,9 +709,10 @@ as the championship hero or primary demo.
 
 > Build a FlareQuorum interface using only `#ff8a1f`, `#000000`, and `#ffffff`.
 > Use Cormorant Garamond 300 for sparse display moments, Barlow Condensed for
-> operational UI, and Space Mono for privacy/evidence metadata. All cards and
-> buttons use 25px corners, role pills use 100px corners, structural borders are
-> 1px black, and there are no shadows or gradients. Show Public, Encrypted in
+> operational UI, and Space Mono for privacy/evidence metadata. Cards use 25px
+> corners, action buttons 7px, editable fields 4px, status labels square, and
+> role pills 100px. Structural borders are 1px, action/input borders are 2px,
+> and there are no shadows or gradients. Show Public, Encrypted in
 > Transit, Sealed in TEE, Authorized, Pending, and Proof Ready states with text
 > and icons. Preserve the distinction between connected wallet, XRP treasury,
 > Flare Smart Account, buyer, vendor, finalizer, each registered TEE, common

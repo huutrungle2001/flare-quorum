@@ -78,22 +78,16 @@ describe("standalone public routes", () => {
         <App />
       </MemoryRouter>,
     );
-    expect(container.querySelectorAll(".landing-mascot-svg")).toHaveLength(3);
+    expect(container.querySelectorAll(".flare-signal-illustration")).toHaveLength(1);
     expect(
-      screen.getByRole("heading", { name: /Lowest valid bid/i }),
+      screen.getByRole("heading", { name: /Private bids.*Public awards/i }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /explore tenders/i }),
-    ).toHaveAttribute("href", "/room");
+    ).toHaveAttribute("href", "/flare");
     expect(
-      screen.getByRole("link", { name: /open eoa buyer/i }),
-    ).toHaveAttribute("href", "/room?role=buyer");
-    expect(
-      screen.getByRole("link", { name: /open safe buyer/i }),
-    ).toHaveAttribute("href", "/room?role=buyer&buyer=safe");
-    expect(
-      screen.getByRole("link", { name: /open private bids/i }),
-    ).toHaveAttribute("href", "/room?role=private-bids");
+      screen.getByRole("link", { name: /start with the guide/i }),
+    ).toHaveAttribute("href", "/docs");
     expect(
       screen.getByRole("link", { name: /skip to content/i }),
     ).toHaveAttribute("href", "#main-content");
@@ -106,7 +100,7 @@ describe("standalone public routes", () => {
         .getAllByRole("link")
         .map((link) => link.textContent),
     ).toEqual(["TENDERS", "DOCS"]);
-    expect(screen.getByRole("button", { name: "CONNECT WALLET" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "CONNECT FOR ACTIONS" })).toBeVisible();
     expect(
       screen.getByRole("link", { name: "FlareQuorum home" }),
     ).toHaveAttribute("aria-current", "page");
@@ -120,13 +114,13 @@ describe("standalone public routes", () => {
     );
     expect(
       screen.getByRole("heading", {
-        name: /Use FlareQuorum from tender to settlement/i,
+        name: /Public evidence.*Private computation/i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/does not verify delivered service quality/i)).toBeInTheDocument();
+    expect(screen.getByText(/does not verify off-chain service delivery/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /inspect public state/i }),
-    ).toHaveAttribute("href", "/room");
+      screen.getByRole("link", { name: /open coston2 dossiers/i }),
+    ).toHaveAttribute("href", "/flare");
     expect(screen.getByRole("link", { name: "DOCS" })).toHaveAttribute(
       "aria-current",
       "page",
@@ -226,7 +220,7 @@ describe("standalone public routes", () => {
 
   it("marks Tenders active on the canonical tender route", () => {
     render(
-      <MemoryRouter initialEntries={["/room"]}>
+      <MemoryRouter initialEntries={["/flare"]}>
         <PrimaryNavigation wallet={disconnectedWallet} />
       </MemoryRouter>,
     );
@@ -247,9 +241,9 @@ describe("standalone public routes", () => {
       announceWallet("beta", "Beta Wallet");
     });
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "CONNECT WALLET" })).toBeEnabled(),
+      expect(screen.getByRole("button", { name: "CONNECT FOR ACTIONS" })).toBeEnabled(),
     );
-    fireEvent.click(screen.getByRole("button", { name: "CONNECT WALLET" }));
+    fireEvent.click(screen.getByRole("button", { name: "CONNECT FOR ACTIONS" }));
     expect(screen.getByRole("button", { name: /Alpha Wallet/ })).toBeVisible();
     expect(screen.getByRole("button", { name: /Beta Wallet/ })).toBeVisible();
   });

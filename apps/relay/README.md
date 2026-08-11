@@ -43,8 +43,8 @@ three authenticated FCC `/direct` endpoints. `GET
 /flare/ingress/tenders/:tenderId/machines` publishes only the three public
 encryption keys after rereading one Coston2 block and matching the market's
 immutable manager, production status, extension ID, code hash, registered
-proxy URL, TEE identity, and frozen key fingerprint. `POST
-POST `/flare/ingress/bids` accepts only the strict EIP-712-authorized ciphertext
+proxy URL, TEE identity, and frozen key fingerprint.
+`POST /flare/ingress/bids` accepts only the strict EIP-712-authorized ciphertext
 envelope and returns only the public action ID, target TEE ID, and expiry.
 `GET /flare/ingress/tenders/:tenderId/machines/:machineIndex/results/:actionId`
 polls one action and returns only a verified, TEE-signed bid receipt payload;
@@ -63,6 +63,20 @@ and strips the proxy response that contains the ciphertext. It never persists
 or logs a request body. A vendor calls the endpoint separately for all three
 tender-frozen machines, obtains three TEE-signed receipts through the result
 flow, and submits the atomic receipt set on-chain.
+
+### Hash-verified public Buyer Brief registry
+
+`PUT /flare/public-briefs/:metadataHash` accepts only the versioned public
+Buyer Brief schema and only from the configured browser origin (or server-side
+tooling without an `Origin` header). It recomputes the canonical hash before an
+atomic, immutable write. `GET` returns the same public-safe preimage. The
+browser independently parses and hashes the response before displaying it.
+
+The schema contains title, category, objective, acceptance criteria, optional
+vendor questions, asset, deadline, and approved vendor addresses. Unknown
+keys—including bid values, ciphertext, credentials, salts, signatures, wallet
+material, and FDC proofs—are rejected. Missing or corrupt entries fail closed;
+no content is inferred from the hash.
 
 ## Commands
 
@@ -115,9 +129,11 @@ FLARE_INGRESS_WEB_ORIGIN                # exact HTTPS web origin
 FLARE_INGRESS_HOST                      # loopback by default
 FLARE_INGRESS_PORT                      # 8788 by default; PORT is fallback
 FLARE_INGRESS_HEALTH_TENDER_ID          # finalized public tender for fail-closed health checks
+FLARE_PUBLIC_BRIEF_DIR                  # persistent public-safe registry directory
 ```
 
-The browser receives only the public `VITE_FLARE_INGRESS_URL` origin. It never
+The browser receives only the public `VITE_FLARE_INGRESS_URL` origin and may
+optionally receive a separate `VITE_FLARE_PUBLIC_BRIEF_URL` origin. It never
 receives the direct proxy API keys, indexer credentials, or any TEE secret.
 
 `health` and `dry-run` remain read-only. `once` and `poll` are intentionally

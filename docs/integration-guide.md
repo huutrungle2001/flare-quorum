@@ -46,6 +46,8 @@ VITE_COSTON2_RPC_URL=https://coston2-api.flare.network/ext/C/rpc
 VITE_FLARE_MARKET_ADDRESS=0x<verified-market>
 VITE_FLARE_MARKET_DEPLOYMENT_BLOCK=<verified-block>
 VITE_FLARE_INGRESS_URL=https://<verified-ingress-origin>
+# Optional when public briefs are served from a separate public origin:
+VITE_FLARE_PUBLIC_BRIEF_URL=https://<verified-public-brief-origin>
 ```
 
 `VITE_FLARE_INGRESS_URL` is an origin, not a proxy credential. The browser

@@ -14,6 +14,7 @@ import { FlareWalletAssets } from "./FlareWalletAssets";
 import { ContextHelp } from "../shell/ContextHelp";
 import { PublicValue } from "../shell/PublicValue";
 import { refreshStateEvent } from "../shell/refreshState";
+import { FlareBuyerBriefPanel, useVerifiedFlareBuyerBrief } from "./FlareBuyerBriefPanel";
 
 type FlareTenderFilter = "current" | "all" | "open" | "compute" | "awarded" | "refunded";
 type FlareTenderSort = "newest" | "oldest";
@@ -140,7 +141,12 @@ function ProtocolFacts({ compact = false }: { compact?: boolean }) {
             <span className="eyebrow">VERIFIED FLARE INTEGRATIONS</span>
             <strong>Inspect protocol deployment facts</strong>
           </span>
-          <span className="privacy-badge verified">COSTON2 / 114</span>
+          <span className="protocol-facts-disclosure-action">
+            <span className="privacy-badge verified">COSTON2 / 114</span>
+            <span className="protocol-facts-disclosure-label when-closed">8 INTEGRATIONS · CLICK TO EXPAND</span>
+            <span className="protocol-facts-disclosure-label when-open">CLICK TO COLLAPSE</span>
+            <span className="protocol-facts-chevron" aria-hidden="true">⌄</span>
+          </span>
         </summary>
         <div className="protocol-facts-body">{facts}</div>
       </details>
@@ -192,69 +198,28 @@ function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
           </li>
         ))}
       </ol>
+      <FlareBuyerBriefPanel tender={tender} />
       <dl className="term-grid">
         <div><dt>Public escrow ceiling</dt><dd>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</dd></div>
         <div><dt>Bid deadline</dt><dd>{formatDeadline(tender.bidDeadline)}</dd></div>
         <div><dt>Accepted bids</dt><dd>{tender.bidCount.toString()} / {tender.approvedVendorCount}</dd></div>
-        <div><dt>Buyer / PersonalAccount</dt><dd><PublicValue value={tender.buyer} label="buyer address" href={explorerAddress(tender.buyer)} /></dd></div>
         <div><dt>Common TEE quorum</dt><dd>{quorum} / threshold 2</dd></div>
         <div><dt>Quote currencies</dt><dd>{[tender.scoringPolicy.allowXrp && "XRP", tender.scoringPolicy.allowUsd && "USD"].filter(Boolean).join(" + ")}</dd></div>
         <div><dt>Scoring weights</dt><dd>{tender.scoringPolicy.priceWeightBps / 100}% price / {tender.scoringPolicy.deliveryWeightBps / 100}% delivery / {tender.scoringPolicy.warrantyWeightBps / 100}% warranty</dd></div>
         <div><dt>Service bounds</dt><dd>≤ {tender.scoringPolicy.maxDeliveryDays}d delivery / {tender.scoringPolicy.minWarrantyDays}–{tender.scoringPolicy.maxWarrantyDays}d warranty</dd></div>
         <div><dt>Credential requirements</dt><dd>{tender.scoringPolicy.requiredCredentials.length}</dd></div>
-        <div><dt>Public brief hash</dt><dd><PublicValue value={tender.metadataHash} label="public brief hash" /></dd></div>
-        <div><dt>Canonical rules hash</dt><dd><PublicValue value={tender.rulesHash} label="canonical rules hash" /></dd></div>
-        <div><dt>Extension</dt><dd>{tender.extensionId.toString()}</dd></div>
-        <div><dt>Code version</dt><dd><PublicValue value={tender.codeVersion} label="code version" /></dd></div>
-        <div><dt>Selection attempt</dt><dd>{tender.selectionAttempt || "Not requested"}</dd></div>
-        <div><dt>Request ID</dt><dd><PublicValue value={tender.requestId} label="request ID" /></dd></div>
       </dl>
-      <section className="tee-policy-panel" aria-label="Tender-fixed TEE policy">
-        <header><p className="eyebrow">FROZEN MACHINE POLICY</p><span className="privacy-badge verified">3 RECEIPTS / 2 RESULTS</span></header>
-        <div className="tee-policy-grid">
-          {tender.teeIds.map((teeId, index) => (
-            <article key={teeId}>
-              <strong>TEE {index + 1}</strong>
-              <PublicValue value={teeId} label={`TEE ${index + 1} identity`} href={explorerAddress(teeId)} />
-              <PublicValue value={tender.teeKeyFingerprints[index]} label={`TEE ${index + 1} key fingerprint`} />
-            </article>
-          ))}
-        </div>
-      </section>
-      {tender.bidReferences.length > 0 && (
-        <section className="public-bid-reference-panel" aria-label="Public accepted bid commitments">
-          <header><p className="eyebrow">ACCEPTED COMMITMENTS</p><span>{tender.bidReferences.length} PUBLIC REFERENCES</span></header>
-          <div>
-            {tender.bidReferences.map((bid) => (
-              <article key={bid.bidId.toString()}>
-                <strong>BID {bid.bidId.toString()}</strong>
-                <span title={bid.vendor}>{short(bid.vendor)}</span>
-                <code title={bid.plaintextCommitment}>{short(bid.plaintextCommitment)}</code>
-                <span>RECEIPTS {bid.receiptBitmap.toString(2).padStart(3, "0")}</span>
-                <a className="text-link" href={explorerBlock(bid.acceptedBlock)} target="_blank" rel="noreferrer">BLOCK {bid.acceptedBlock.toString()} ↗</a>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
       <section className="privacy-panel">
         <div className="aperture" aria-hidden="true"><span /></div>
         <div>
           <p className="eyebrow">PUBLIC CHECKPOINT / PRIVATE LOSING BIDS</p>
-          <h3>{tender.winner ? `Awarded to ${short(tender.winner)}` : "No threshold result published yet"}</h3>
+          <h3>{tender.status === "Awarded"
+            ? "Winner published — losing bids remain private"
+            : tender.status === "Refunded"
+              ? "Tender refunded — bid details remain private"
+              : "Result pending — losing bids remain private"}</h3>
           <p>Only commitments, receipt quorum, FTSO snapshot, and the threshold-signed public outcome appear here. Bid payloads are never fetched by this view.</p>
         </div>
-      </section>
-      <section className="evidence-panel">
-        <p className="eyebrow">FLARE PROTOCOL BINDING</p>
-        <dl>
-          <div><dt>Ordered bid root</dt><dd><PublicValue value={tender.orderedBidRoot} label="ordered bid root" /></dd></div>
-          <div><dt>FTSO feed</dt><dd><PublicValue value={tender.ftsoFeedId} label="FTSO feed ID" /></dd></div>
-          <div><dt>FTSO value / decimals</dt><dd>{tender.ftsoValue.toString()} / {tender.ftsoDecimals}</dd></div>
-          <div><dt>FTSO timestamp</dt><dd>{tender.ftsoTimestamp.toString()}</dd></div>
-          <div><dt>Close block</dt><dd>{tender.closeBlock.toString()}</dd></div>
-          <div><dt>Result expiry</dt><dd>{tender.resultExpiry.toString()}</dd></div>
-        </dl>
       </section>
       {tender.award && (
         <section className="award-proof-panel awarded" aria-label="Public award receipt">
@@ -266,15 +231,96 @@ function TenderEvidence({ tender }: { tender: FlarePublicTender }) {
           <dl>
             <div><dt>Award receipt</dt><dd>#{tender.award.tenderId.toString()} · NON-TRANSFERABLE</dd></div>
             <div><dt>Winning bid</dt><dd>#{tender.award.winnerBidId.toString()}</dd></div>
-            <div><dt>Result digest</dt><dd><PublicValue value={tender.award.resultDigest} label="result digest" /></dd></div>
-            <div><dt>Finalized block</dt><dd>{tender.award.finalizedBlock.toString()}</dd></div>
             <div><dt>Buyer remainder</dt><dd>{formatUnits(tender.publicCeilingXrp - tender.award.amount, 6)} FTestXRP</dd></div>
             <div><dt>Conservation</dt><dd>WINNER + REMAINDER = ESCROW</dd></div>
           </dl>
           <a className="secondary-button" href={explorerAddress(coston2FlarePublicRelease.awardReceipt)} target="_blank" rel="noreferrer">INSPECT AWARD CONTRACT →</a>
         </section>
       )}
+      <details className="technical-verification-details">
+        <summary>
+          <span>
+            <span className="eyebrow">TECHNICAL VERIFICATION DETAILS</span>
+            <strong>Hashes, TEE identities, receipts &amp; protocol binding</strong>
+          </span>
+          <span className="technical-disclosure-action"><span>CLICK TO EXPAND</span><span aria-hidden="true">⌄</span></span>
+        </summary>
+        <div className="technical-verification-body">
+          <dl className="term-grid">
+            <div><dt>Buyer / PersonalAccount</dt><dd><PublicValue value={tender.buyer} label="buyer address" href={explorerAddress(tender.buyer)} /></dd></div>
+            <div><dt>Public brief hash</dt><dd><PublicValue value={tender.metadataHash} label="public brief hash" /></dd></div>
+            <div><dt>Canonical rules hash</dt><dd><PublicValue value={tender.rulesHash} label="canonical rules hash" /></dd></div>
+            <div><dt>Extension</dt><dd>{tender.extensionId.toString()}</dd></div>
+            <div><dt>Code version</dt><dd><PublicValue value={tender.codeVersion} label="code version" /></dd></div>
+            <div><dt>Selection attempt</dt><dd>{tender.selectionAttempt || "Not requested"}</dd></div>
+            <div><dt>Request ID</dt><dd><PublicValue value={tender.requestId} label="request ID" /></dd></div>
+          </dl>
+          <section className="tee-policy-panel" aria-label="Tender-fixed TEE policy">
+            <header><p className="eyebrow">FROZEN MACHINE POLICY</p><span className="privacy-badge verified">3 RECEIPTS / 2 RESULTS</span></header>
+            <div className="tee-policy-grid">
+              {tender.teeIds.map((teeId, index) => (
+                <article key={teeId}>
+                  <strong>TEE {index + 1}</strong>
+                  <PublicValue value={teeId} label={`TEE ${index + 1} identity`} href={explorerAddress(teeId)} />
+                  <PublicValue value={tender.teeKeyFingerprints[index]} label={`TEE ${index + 1} key fingerprint`} />
+                </article>
+              ))}
+            </div>
+          </section>
+          {tender.bidReferences.length > 0 && (
+            <section className="public-bid-reference-panel" aria-label="Public accepted bid commitments">
+              <header><p className="eyebrow">ACCEPTED COMMITMENTS</p><span>{tender.bidReferences.length} PUBLIC REFERENCES</span></header>
+              <div>
+                {tender.bidReferences.map((bid) => (
+                  <article key={bid.bidId.toString()}>
+                    <strong>BID {bid.bidId.toString()}</strong>
+                    <span title={bid.vendor}>{short(bid.vendor)}</span>
+                    <code title={bid.plaintextCommitment}>{short(bid.plaintextCommitment)}</code>
+                    <span>RECEIPTS {bid.receiptBitmap.toString(2).padStart(3, "0")}</span>
+                    <a className="text-link" href={explorerBlock(bid.acceptedBlock)} target="_blank" rel="noreferrer">BLOCK {bid.acceptedBlock.toString()} ↗</a>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+          <section className="technical-protocol-binding">
+            <p className="eyebrow">FLARE PROTOCOL BINDING</p>
+            <dl>
+              <div><dt>Ordered bid root</dt><dd><PublicValue value={tender.orderedBidRoot} label="ordered bid root" /></dd></div>
+              <div><dt>FTSO feed</dt><dd><PublicValue value={tender.ftsoFeedId} label="FTSO feed ID" /></dd></div>
+              <div><dt>FTSO value / decimals</dt><dd>{tender.ftsoValue.toString()} / {tender.ftsoDecimals}</dd></div>
+              <div><dt>FTSO timestamp</dt><dd>{tender.ftsoTimestamp.toString()}</dd></div>
+              <div><dt>Close block</dt><dd>{tender.closeBlock.toString()}</dd></div>
+              <div><dt>Result expiry</dt><dd>{tender.resultExpiry.toString()}</dd></div>
+              {tender.award && <div><dt>Winner address</dt><dd><PublicValue value={tender.award.winner} label="winner address" href={explorerAddress(tender.award.winner)} /></dd></div>}
+              {tender.award && <div><dt>Result digest</dt><dd><PublicValue value={tender.award.resultDigest} label="result digest" /></dd></div>}
+              {tender.award && <div><dt>Finalized block</dt><dd>{tender.award.finalizedBlock.toString()}</dd></div>}
+            </dl>
+          </section>
+        </div>
+      </details>
     </article>
+  );
+}
+
+function PublicTenderCard({ tender, selected, onSelect }: {
+  tender: FlarePublicTender;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const briefState = useVerifiedFlareBuyerBrief(tender.metadataHash);
+  const title = briefState.status === "verified" ? briefState.brief.title : `Tender #${tender.tenderId.toString()}`;
+  return (
+    <div className="tender-card-shell">
+      <button type="button" onClick={onSelect} aria-pressed={selected} className={`tender-card ${selected ? "selected" : ""}`}>
+        <span className="card-kicker">{tender.status.toUpperCase()} / TENDER #{tender.tenderId.toString()}</span>
+        <span className="card-title">{title}</span>
+        <span className="card-buyer">Buyer · {short(tender.buyer)}</span>
+        <span className="card-facts"><span><strong>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</strong>Public ceiling</span><span><strong>{tender.bidCount.toString()}/{tender.approvedVendorCount}</strong>Accepted bids</span></span>
+        <span className="card-deadline">Deadline · {formatDeadline(tender.bidDeadline)}</span>
+        <span className="card-footer"><span className={`privacy-badge ${statusClass(tender.status)}`}>{tender.status.toUpperCase()}</span><span className="card-arrow" aria-hidden="true">→</span></span>
+      </button>
+    </div>
   );
 }
 
@@ -425,7 +471,7 @@ function FlareAppSidebar({
       <section className="flare-sidebar-assets" aria-label="Coston2 asset actions">
         <p className="eyebrow">COSTON2 ASSETS</p>
         <a className="sidebar-asset-button" href="https://faucet.flare.network/coston2" target="_blank" rel="noreferrer">GET TEST C2FLR &amp; FXRP ↗</a>
-        <p className="sidebar-asset-note">Funding options are inside BUYER. FXRP redemption controls appear in PRIVATE BIDS only for a connected winning vendor. FTestXRP settlement amounts are public.</p>
+        <p className="sidebar-asset-note">Funding options are inside BUYER. XRP redemption eligibility appears under ACTIVITY / ASSETS for a connected winning vendor. FTestXRP settlement amounts are public.</p>
       </section>
       <p className="flare-sidebar-footnote">PUBLIC READS · 12-BLOCK FINALITY · NO BID PAYLOADS</p>
     </aside>
@@ -581,7 +627,7 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
                 <label className="public-filter-control"><span>Sort by</span><select aria-label="Sort Coston2 tenders" value={sort} onChange={(event) => setSort(event.target.value as FlareTenderSort)}>{flareTenderSorts.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
               </div>
             </div>
-            {pageTenders.map((tender) => <div className="tender-card-shell" key={tender.tenderId.toString()}><button type="button" onClick={() => selectTender(tender.tenderId)} aria-pressed={selected?.tenderId === tender.tenderId} className={`tender-card ${selected?.tenderId === tender.tenderId ? "selected" : ""}`}><span className="card-kicker">{tender.status.toUpperCase()} / FINALIZED PUBLIC STATE</span><span className="card-title">Tender #{tender.tenderId.toString()}</span><span className="card-buyer">Buyer · {short(tender.buyer)}</span><span className="card-facts"><span><strong>{formatUnits(tender.publicCeilingXrp, 6)} FTestXRP</strong>Public ceiling</span><span><strong>{tender.bidCount.toString()}/{tender.approvedVendorCount}</strong>Accepted bids</span></span><span className="card-deadline">Deadline · {formatDeadline(tender.bidDeadline)}</span><span className="card-footer"><span className={`privacy-badge ${statusClass(tender.status)}`}>{tender.status.toUpperCase()}</span><span className="card-arrow" aria-hidden="true">→</span></span></button></div>)}
+            {pageTenders.map((tender) => <PublicTenderCard key={tender.tenderId.toString()} tender={tender} selected={selected?.tenderId === tender.tenderId} onSelect={() => selectTender(tender.tenderId)} />)}
             {pageCount > 1 && (
               <nav className="public-pagination" aria-label="Tender list pages">
                 <button className="secondary-button" type="button" onClick={() => setPage(page - 1)} disabled={page === 1}>← PREVIOUS</button>

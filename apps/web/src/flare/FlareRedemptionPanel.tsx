@@ -14,6 +14,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";
 import type { WalletController } from "../wallet/WalletPanel";
+import { ContextHelp } from "../shell/ContextHelp";
 import { useToasts } from "../shell/ToastProvider";
 
 const coston2 = {
@@ -91,6 +92,9 @@ export function FlareRedemptionPanel({
       : [],
     [connected, tenders, wallet.state.account],
   );
+  const winningWallet = connected && awarded.length > 0;
+  const eligibleBalance = balance !== null && minimum !== null && balance >= minimum;
+  const redemptionEligible = winningWallet && eligibleBalance;
 
   useEffect(() => {
     let cancelled = false;
@@ -196,9 +200,22 @@ export function FlareRedemptionPanel({
 
   return (
     <section className="evidence-panel flare-redemption-panel" aria-label="Official FXRP redemption">
-      <header className="detail-header">
-        <div><p className="eyebrow">FASSETS EXIT / COSTON2 TESTNET</p><h2>Request XRP redemption</h2></div>
-        <span className="privacy-badge verified">OFFICIAL MANAGER</span>
+      <header className="detail-header input-card-header">
+        <div><p className="eyebrow">ACTIVITY / ASSETS · FASSETS EXIT</p><h2>Redeem awarded FTestXRP.</h2></div>
+        <div className="input-card-tools">
+          <ContextHelp
+            compact
+            label="How XRP redemption works"
+            title="HOW REDEMPTION WORKS"
+            steps={[
+              "Win an Awarded tender with the connected Coston2 wallet.",
+              "Hold at least the official minimum FTestXRP balance, then enter an XRPL Testnet payout address.",
+              "Approve the exact amount and submit the official AssetManager redemption request.",
+            ]}
+            note="A recorded request is not an instant XRP payout. The FAssets agent pays the XRPL address later."
+          />
+          <span className="privacy-badge verified">OFFICIAL MANAGER</span>
+        </div>
       </header>
       <p>
         An awarded vendor may request redemption of public FTestXRP through the
@@ -206,14 +223,28 @@ export function FlareRedemptionPanel({
         never asks for an XRPL secret. The agent pays the XRPL address later, so a
         submitted request is not an instant payout.
       </p>
-      {!connected ? <p className="form-hint">Connect the winning Coston2 wallet to request a redemption.</p> : null}
-      {connected && awarded.length === 0 ? <p className="form-hint">This wallet is not the public winner of a finalized tender. Redemption controls appear only for the awarded vendor.</p> : null}
-      {connected && awarded.length > 0 ? (
+      {!redemptionEligible ? (
+        <section className="redemption-locked-state" aria-label="XRP redemption requirements">
+          <span className="redemption-lock" aria-hidden="true">◇</span>
+          <div>
+            <p className="eyebrow">XRP REDEMPTION · LOCKED</p>
+            <h3>Available after your wallet wins an awarded tender.</h3>
+            <ul>
+              <li className={connected ? "complete" : ""}>{connected ? "✓" : "1"} Connected Coston2 wallet</li>
+              <li className={winningWallet ? "complete" : ""}>{winningWallet ? "✓" : "2"} Winning wallet · Awarded tender</li>
+              <li className={eligibleBalance ? "complete" : ""}>{eligibleBalance ? "✓" : "3"} Eligible FTestXRP balance</li>
+            </ul>
+            {connected && !loading && !winningWallet && <p>This wallet is not the public winner of an Awarded tender.</p>}
+            {winningWallet && !loading && !eligibleBalance && <p>The current balance is below the protocol minimum of {minimum?.toString() ?? "—"} UBA.</p>}
+            {loading && <p>Reading the official FAssets balance and redemption minimum…</p>}
+          </div>
+        </section>
+      ) : (
         <>
           <p className="form-hint">Eligible award{awarded.length === 1 ? "" : "s"}: {awarded.map((tender) => `#${tender.tenderId.toString()} · ${tender.winningAmountXrp === null ? "—" : `${tender.winningAmountXrp.toString()} UBA`}`).join("; ")}</p>
           <div className="form-grid-two">
-            <label>FTestXRP amount<input inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} disabled={busy || loading} /><small>{minimum === null ? "Reading protocol minimum…" : `Minimum ${minimum.toString()} UBA`} · balance {balance === null ? "—" : balance.toString()} UBA</small></label>
-            <label>XRPL payout address<input value={xrplAddress} onChange={(event) => setXrplAddress(event.target.value)} placeholder="r…" autoComplete="off" disabled={busy || loading} /><small>Use an XRPL testnet address you control.</small></label>
+            <label>FTestXRP amount<input required inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} disabled={busy || loading} /><small>{minimum === null ? "Reading protocol minimum…" : `Minimum ${minimum.toString()} UBA`} · balance {balance === null ? "—" : balance.toString()} UBA</small></label>
+            <label>XRPL payout address<input required value={xrplAddress} onChange={(event) => setXrplAddress(event.target.value)} placeholder="r…" autoComplete="off" disabled={busy || loading} /><small>Use an XRPL testnet address you control.</small></label>
           </div>
           {error && <p className="inline-error" role="alert">{error}</p>}
           <button className="primary-button" type="button" onClick={() => void redeem()} disabled={busy || loading || !fAsset || balance === null || minimum === null}>
@@ -221,7 +252,8 @@ export function FlareRedemptionPanel({
           </button>
           {last && <p className="form-hint" aria-live="polite">Request{last.requestIds.length === 1 ? "" : "s"} {last.requestIds.join(", ")} recorded · <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">inspect transaction ↗</a></p>}
         </>
-      ) : null}
+      )}
+      {error && !redemptionEligible && <p className="inline-error" role="alert">{error}</p>}
       <p className="form-hint">Official guide: <a className="text-link" href="https://dev.flare.network/fassets/developer-guides/fassets-redeem-amount" target="_blank" rel="noreferrer">redeem FXRP by amount ↗</a> · manager <a className="text-link" href={`https://coston2-explorer.flare.network/address/${coston2FlarePublicRelease.protocols.assetManagerFXRP}`} target="_blank" rel="noreferrer">{short(coston2FlarePublicRelease.protocols.assetManagerFXRP)} ↗</a></p>
     </section>
   );

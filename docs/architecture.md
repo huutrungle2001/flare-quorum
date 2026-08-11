@@ -51,6 +51,9 @@ flowchart LR
     Market -->|public payout/refund| FXRP[FTestXRP / FXRP]
     FXRP -->|official redemption| XRP[XRP recipient]
     Web[Web and Evidence UI] --> Market
+    Buyer -->|public-safe brief preimage| BriefRegistry[Content-addressed public brief registry]
+    BriefRegistry -->|brief + metadata hash| Web
+    Market -->|canonical metadata hash| Web
 ```
 
 ## 3. Canonical authorities
@@ -66,9 +69,14 @@ flowchart LR
 | Result acceptance | Market threshold signature verification |
 | Escrow and settlement | Market plus official FTestXRP/FXRP |
 | XRPL authorization | XRPL signature, FDC proof, Smart Account nonce/hash checks |
+| Public Buyer Brief integrity | Market `metadataHash`, recomputed by every client |
+| Public Buyer Brief availability | Content-addressed ingress registry; non-canonical and replaceable |
 | Public index | Rebuildable generated event index |
 
-No application database or relay cache is canonical.
+No application database or relay cache is canonical. The public brief registry
+stores only the human-readable preimage of the contract's `metadataHash`; it
+may make that preimage available or unavailable, but it cannot change a brief
+without clients detecting a hash mismatch.
 
 ## 4. Private bid intake
 
@@ -272,7 +280,10 @@ escrow, or bypass settlement verification.
   submit permissionless close plus buyer-authorized cancel/refund calls, but it
   cannot decrypt bids, calculate a winner, dispatch FCC work, or group results.
   The Auditor performs one-checkpoint public reads only and has no signer.
-- **Relay:** public close/request/result aggregation/finalize only.
+- **Relay:** stateless settlement close/request/result aggregation/finalize;
+  the separately bounded ingress process also serves an immutable,
+  content-addressed public Buyer Brief registry. That registry accepts no bid,
+  credential, ciphertext, proof, wallet material, or private scoring field.
 - **Console:** isolated read-only Coston2 contract/FCC/FTSO inspection at one
   finalized checkpoint; FAssets redemption is exposed through the awarded
   vendor browser path and public FDC/FAssets facts remain read-only.

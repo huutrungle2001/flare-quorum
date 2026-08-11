@@ -1,14 +1,17 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { Address } from "viem";
+import type { Hex } from "viem";
 import {
   parseFlareBidIngressRequest,
   type FlareBidIngressAccepted,
   type FlareBidIngressGateway,
 } from "./flare-ingress.js";
+import type { FlarePublicBriefStore } from "./flare-public-brief-store.js";
 
 const maximumRequestBytes = 600 * 1024;
 const machineRoute = /^\/flare\/ingress\/tenders\/([1-9][0-9]*)\/machines$/;
 const resultRoute = /^\/flare\/ingress\/tenders\/([1-9][0-9]*)\/machines\/([0-2])\/results\/(0x[0-9a-fA-F]{64})$/;
+const publicBriefRoute = /^\/flare\/public-briefs\/(0x[0-9a-fA-F]{64})$/;
 const rateLimitWindowMs = 60_000;
 const rateLimitRequests = 120;
 const maximumRateLimitEntries = 10_000;
@@ -71,7 +74,7 @@ function json(response: ServerResponse, status: number, value: unknown): void {
   response.end(`${JSON.stringify(value)}\n`);
 }
 
-async function jsonBody(request: IncomingMessage): Promise<unknown> {
+async function jsonBody(request: IncomingMessage, invalidCode = "INVALID_BID_INGRESS_REQUEST"): Promise<unknown> {
   const contentType = scalarHeader(request.headers["content-type"]);
   if (contentType?.split(";", 1)[0].trim().toLowerCase() !== "application/json") {
     throw new HttpIngressError(415, "UNSUPPORTED_CONTENT_TYPE");
@@ -88,11 +91,11 @@ async function jsonBody(request: IncomingMessage): Promise<unknown> {
     if (total > maximumRequestBytes) throw new HttpIngressError(413, "REQUEST_TOO_LARGE");
     chunks.push(bytes);
   }
-  if (total === 0) throw new HttpIngressError(400, "INVALID_BID_INGRESS_REQUEST");
+  if (total === 0) throw new HttpIngressError(400, invalidCode);
   try {
     return JSON.parse(Buffer.concat(chunks, total).toString("utf8"));
   } catch {
-    throw new HttpIngressError(400, "INVALID_BID_INGRESS_REQUEST");
+    throw new HttpIngressError(400, invalidCode);
   }
 }
 
@@ -101,6 +104,15 @@ function mappedError(error: unknown): HttpIngressError {
   const code = error instanceof Error ? error.message : "";
   if (code === "INVALID_BID_INGRESS_REQUEST" || code === "INVALID_FLARE_TENDER_ID") {
     return new HttpIngressError(400, code);
+  }
+  if (code === "INVALID_FLARE_PUBLIC_BRIEF" || code === "INVALID_FLARE_PUBLIC_BRIEF_HASH") {
+    return new HttpIngressError(400, code);
+  }
+  if (code === "FLARE_PUBLIC_BRIEF_HASH_MISMATCH" || code === "FLARE_PUBLIC_BRIEF_IMMUTABLE") {
+    return new HttpIngressError(409, code);
+  }
+  if (code === "FLARE_PUBLIC_BRIEF_STORE_CORRUPT") {
+    return new HttpIngressError(503, code);
   }
   if (code === "BID_INGRESS_AUTHORIZATION_INVALID") {
     return new HttpIngressError(401, code);
@@ -131,6 +143,7 @@ function requestPath(request: IncomingMessage): string {
 export function createFlareIngressHandler(
   gateway: PublicIngressGateway,
   webOrigin: string,
+  publicBriefStore?: FlarePublicBriefStore,
 ): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
   const limiter = new FixedWindowRateLimiter();
   return async (request, response) => {
@@ -140,13 +153,14 @@ export function createFlareIngressHandler(
       const path = requestPath(request);
       const machineMatch = machineRoute.exec(path);
       const resultMatch = resultRoute.exec(path);
-      const knownRoute = machineMatch !== null || resultMatch !== null || path === "/flare/ingress/bids" || path === healthRoute;
+      const publicBriefMatch = publicBriefRoute.exec(path);
+      const knownRoute = machineMatch !== null || resultMatch !== null || publicBriefMatch !== null || path === "/flare/ingress/bids" || path === healthRoute;
       if (request.method === "OPTIONS" && knownRoute) {
         if (origin !== webOrigin) throw new HttpIngressError(403, "ORIGIN_NOT_ALLOWED");
         response.statusCode = 204;
         response.setHeader(
           "Access-Control-Allow-Methods",
-          machineMatch || resultMatch || path === healthRoute ? "GET, OPTIONS" : "POST, OPTIONS",
+          publicBriefMatch ? "GET, PUT, OPTIONS" : machineMatch || resultMatch || path === healthRoute ? "GET, OPTIONS" : "POST, OPTIONS",
         );
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setHeader("Access-Control-Max-Age", "600");
@@ -186,6 +200,26 @@ export function createFlareIngressHandler(
         });
         return;
       }
+      if (request.method === "GET" && publicBriefMatch !== null) {
+        if (!publicBriefStore) throw new HttpIngressError(503, "FLARE_PUBLIC_BRIEF_REGISTRY_UNAVAILABLE");
+        const metadataHash = publicBriefMatch[1].toLowerCase() as Hex;
+        const brief = await publicBriefStore.get(metadataHash);
+        if (brief === null) throw new HttpIngressError(404, "FLARE_PUBLIC_BRIEF_NOT_FOUND");
+        response.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+        json(response, 200, { schemaVersion: 1, metadataHash, brief });
+        return;
+      }
+      if (request.method === "PUT" && publicBriefMatch !== null) {
+        if (origin !== undefined && origin !== webOrigin) throw new HttpIngressError(403, "ORIGIN_NOT_ALLOWED");
+        if (!publicBriefStore) throw new HttpIngressError(503, "FLARE_PUBLIC_BRIEF_REGISTRY_UNAVAILABLE");
+        const metadataHash = publicBriefMatch[1].toLowerCase() as Hex;
+        const brief = await publicBriefStore.put(
+          metadataHash,
+          await jsonBody(request, "INVALID_FLARE_PUBLIC_BRIEF"),
+        );
+        json(response, 201, { schemaVersion: 1, metadataHash, brief });
+        return;
+      }
       if (request.method === "GET" && path === healthRoute) {
         const health = gateway.health
           ? await gateway.health()
@@ -220,8 +254,9 @@ export function createFlareIngressHandler(
 export function createFlareIngressServer(
   gateway: PublicIngressGateway,
   webOrigin: string,
+  publicBriefStore?: FlarePublicBriefStore,
 ): Server {
-  const handler = createFlareIngressHandler(gateway, webOrigin);
+  const handler = createFlareIngressHandler(gateway, webOrigin, publicBriefStore);
   return createServer((request, response) => {
     void handler(request, response);
   });

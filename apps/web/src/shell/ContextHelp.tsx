@@ -25,6 +25,7 @@ export function ContextHelp({
   const [portalStyle, setPortalStyle] = useState<CSSProperties | null>(
     null,
   );
+  const [pinned, setPinned] = useState(false);
   const closeTimer = useRef<number | null>(null);
 
   function helpCard(className = "context-help-card"): ReactNode {
@@ -92,6 +93,7 @@ export function ContextHelp({
   }
 
   function closeCompactHelpAfterHover() {
+    if (pinned) return;
     if (document.activeElement !== triggerRef.current) {
       closeTimer.current = window.setTimeout(() => {
         setPortalStyle(null);
@@ -115,13 +117,29 @@ export function ContextHelp({
         type="button"
         aria-label={label}
         aria-describedby={tooltipId}
+        aria-controls={compact ? tooltipId : undefined}
+        aria-expanded={compact ? Boolean(portalStyle) : undefined}
         onMouseEnter={openCompactHelp}
         onMouseLeave={closeCompactHelpAfterHover}
         onFocus={openCompactHelp}
-        onBlur={() => setPortalStyle(null)}
+        onBlur={() => {
+          if (!pinned) setPortalStyle(null);
+        }}
+        onClick={() => {
+          if (!compact) return;
+          if (pinned) {
+            setPinned(false);
+            setPortalStyle(null);
+            return;
+          }
+          setPinned(true);
+          openCompactHelp();
+        }}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
-            triggerRef.current?.blur();
+            setPinned(false);
+            setPortalStyle(null);
+            triggerRef.current?.focus();
           }
         }}
       >

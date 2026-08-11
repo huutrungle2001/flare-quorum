@@ -4,6 +4,7 @@ import { FlareIngressConfigError, loadFlareIngressConfig } from "./flare-ingress
 import { createFlareIngressServer } from "./flare-ingress-http.js";
 import { LiveFlareBidIngressChain, LiveFlareBidIngressProxy } from "./flare-ingress-live.js";
 import { FlareBidIngressGateway } from "./flare-ingress.js";
+import { FileFlarePublicBriefStore } from "./flare-public-brief-store.js";
 
 function output(value: Record<string, boolean | number | string>): void {
   process.stdout.write(`${JSON.stringify(value)}\n`);
@@ -15,12 +16,13 @@ async function main(): Promise<void> {
     new LiveFlareBidIngressChain(config),
     new LiveFlareBidIngressProxy(config),
   );
+  const publicBriefStore = new FileFlarePublicBriefStore(config.publicBriefDirectory);
   const server = createFlareIngressServer({
     machineKeys: (tenderId) => gateway.machineKeys(tenderId),
     submit: (request) => gateway.submit(request),
     result: (tenderId, machineIndex, actionId) => gateway.result(tenderId, machineIndex, actionId),
     health: () => gateway.health(config.healthTenderId),
-  }, config.webOrigin);
+  }, config.webOrigin, publicBriefStore);
   server.listen(config.port, config.host);
   await once(server, "listening");
   output({

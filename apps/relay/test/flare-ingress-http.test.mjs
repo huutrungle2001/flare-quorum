@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { once } from "node:events";
 import test from "node:test";
 import { createFlareIngressServer } from "../dist/flare-ingress-http.js";
+import { MemoryFlarePublicBriefStore } from "../dist/flare-public-brief-store.js";
+import { canonicalFlarePublicBuyerBrief, hashFlarePublicBuyerBrief } from "@flarequorum/flare-bindings";
 
 const ciphertext = `0x${"11".repeat(114)}`;
 const authorization = `0x${"22".repeat(65)}`;
@@ -18,8 +20,8 @@ const request = {
   authorization,
 };
 
-async function fixture(gateway) {
-  const server = createFlareIngressServer(gateway, "https://app.example");
+async function fixture(gateway, publicBriefStore) {
+  const server = createFlareIngressServer(gateway, "https://app.example", publicBriefStore);
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
   const address = server.address();
@@ -32,6 +34,63 @@ async function fixture(gateway) {
     },
   };
 }
+
+test("HTTP ingress stores and serves only hash-matched public Buyer Briefs", async () => {
+  const gateway = {
+    async machineKeys() { throw new Error("not called"); },
+    async submit() { throw new Error("not called"); },
+    async result() { throw new Error("not called"); },
+  };
+  const brief = canonicalFlarePublicBuyerBrief({
+    title: "Public procurement brief",
+    category: "software",
+    objective: "Deliver a public procurement reporting interface.",
+    acceptanceCriteria: "The published acceptance checks must pass.",
+    vendorQuestions: "Describe the delivery plan.",
+    bidDeadline: 1_800_000_000n,
+    approvedVendors: ["0x2000000000000000000000000000000000000002"],
+  });
+  const metadataHash = hashFlarePublicBuyerBrief(brief);
+  const app = await fixture(gateway, new MemoryFlarePublicBriefStore());
+  try {
+    const missing = await fetch(`${app.baseUrl}/flare/public-briefs/${metadataHash}`);
+    assert.equal(missing.status, 404);
+    assert.deepEqual(await missing.json(), { error: "FLARE_PUBLIC_BRIEF_NOT_FOUND" });
+
+    const published = await fetch(`${app.baseUrl}/flare/public-briefs/${metadataHash}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Origin: "https://app.example" },
+      body: JSON.stringify(brief),
+    });
+    assert.equal(published.status, 201);
+    assert.deepEqual(await published.json(), { schemaVersion: 1, metadataHash, brief });
+
+    const loaded = await fetch(`${app.baseUrl}/flare/public-briefs/${metadataHash}`, {
+      headers: { Origin: "https://app.example" },
+    });
+    assert.equal(loaded.status, 200);
+    assert.equal(loaded.headers.get("access-control-allow-origin"), "https://app.example");
+    assert.deepEqual(await loaded.json(), { schemaVersion: 1, metadataHash, brief });
+
+    const mismatched = await fetch(`${app.baseUrl}/flare/public-briefs/0x${"99".repeat(32)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Origin: "https://app.example" },
+      body: JSON.stringify(brief),
+    });
+    assert.equal(mismatched.status, 409);
+    assert.deepEqual(await mismatched.json(), { error: "FLARE_PUBLIC_BRIEF_HASH_MISMATCH" });
+
+    const bidShaped = await fetch(`${app.baseUrl}/flare/public-briefs/${metadataHash}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Origin: "https://app.example" },
+      body: JSON.stringify({ ...brief, priceMicros: "100" }),
+    });
+    assert.equal(bidShaped.status, 400);
+    assert.deepEqual(await bidShaped.json(), { error: "INVALID_FLARE_PUBLIC_BRIEF" });
+  } finally {
+    await app.close();
+  }
+});
 
 test("HTTP ingress publishes public machine keys and never echoes bid material", async () => {
   const calls = [];
