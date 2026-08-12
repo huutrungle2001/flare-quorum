@@ -175,7 +175,7 @@ try {
   await waitFor(cdp, `document.readyState === "complete" && document.body.innerText.includes("Public payment checkpoint restored after reload")`, "the reload-safe checkpoint");
   const reload = await cdp.evaluate(`(() => ({
     restoredNotice: document.body.innerText.includes("Public payment checkpoint restored after reload"),
-    resumeControl: Array.from(document.querySelectorAll("button")).some((button) => button.textContent?.includes("RESUME PUBLIC CHECKPOINT")),
+    resumeControl: Array.from(document.querySelectorAll("button")).some((button) => button.textContent?.includes("RESTORE PAYMENT HANDOFF")),
     owner: document.querySelector("#xrpl-owner-address")?.value,
     transaction: document.querySelector("#xrpl-payment-transaction-id")?.value,
     walletId: document.querySelector("#smart-account-wallet-id")?.value,

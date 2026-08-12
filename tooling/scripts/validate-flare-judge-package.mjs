@@ -59,6 +59,10 @@ const credentialNegative = readJson(resolve(root, "evidence/coston2/market-v2-re
 const undispatchedRefund = readJson(resolve(root, "evidence/coston2/market-v2-undispatched-refund.json"), "JUDGE_PACKAGE_V2_UNDISPATCHED_REFUND_INVALID");
 const selectionRefund = readJson(resolve(root, "evidence/coston2/market-v2-selection-expired-refund.json"), "JUDGE_PACKAGE_V2_SELECTION_REFUND_INVALID");
 const ingress = readJson(resolve(root, "evidence/coston2/flare-ingress-v2-production.json"), "JUDGE_PACKAGE_INGRESS_EVIDENCE_INVALID");
+const web = readJson(resolve(root, "evidence/coston2/web-v2-production-smoke.json"), "JUDGE_PACKAGE_V2_WEB_INVALID");
+const accessibility = readJson(resolve(root, "evidence/coston2/web-v2-keyboard-accessibility.json"), "JUDGE_PACKAGE_V2_ACCESSIBILITY_INVALID");
+const xrpDraft = readJson(resolve(root, "evidence/coston2/web-v2-xrp-funding-draft.json"), "JUDGE_PACKAGE_V2_XRP_DRAFT_INVALID");
+const xrpCheckpoint = readJson(resolve(root, "evidence/coston2/web-v2-xrp-funding-checkpoint.json"), "JUDGE_PACKAGE_V2_XRP_CHECKPOINT_INVALID");
 const recoveryAssertions = recovery.assertions ?? {};
 const normalizeSet = (values) => [...(values ?? [])].map((value) => String(value).toLowerCase()).sort();
 const releaseTeeIds = normalizeSet(release.fcc?.teeIds);
@@ -96,6 +100,15 @@ const assertions = {
   hostedIngressBoundToCurrentTender: ingress.assertions?.healthTenderBound === true
     && [success.publicIdentifiers?.tenderId, recovery.publicIdentifiers?.tenderId].includes(ingress.publicIdentifiers?.healthTenderId)
     && ingress.publicIdentifiers?.healthTenderStatus === "Awarded",
+  hostedV2WebPassed: web.blockers?.length === 0
+    && web.publicIdentifiers?.market === release.contracts?.FlareQuorumMarketV2?.address
+    && Object.values(web.assertions ?? {}).every(Boolean),
+  hostedAccessibilityPassed: accessibility.blockers?.length === 0
+    && Object.values(accessibility.assertions ?? {}).every(Boolean),
+  hostedXrpFundingUxPassed: xrpDraft.blockers?.length === 0
+    && xrpCheckpoint.blockers?.length === 0
+    && Object.values(xrpDraft.assertions ?? {}).every(Boolean)
+    && Object.values(xrpCheckpoint.assertions ?? {}).every(Boolean),
 };
 for (const [name, passed] of Object.entries(assertions)) {
   if (!passed && !blockers.includes(`JUDGE_PACKAGE_${name.toUpperCase()}`)) blockers.push(`JUDGE_PACKAGE_${name.toUpperCase()}`);

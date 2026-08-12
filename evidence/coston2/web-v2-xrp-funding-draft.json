@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-frontend-xrp-funding-draft",
+  "recordedAt": "2026-08-12T19:17:30.608Z",
+  "publicIdentifiers": {
+    "sourceCommit": "831db6400b09f6f1cf74cb6473eeb326fdae73ff",
+    "provider": "vercel",
+    "project": "flare-quorum",
+    "canonicalUrl": "https://flare-quorum.vercel.app",
+    "network": "flare-coston2",
+    "chainId": 114,
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC"
+  },
+  "assertions": {
+    "buyerBriefPreparedFromLiveCoston2Reads": true,
+    "draftShape": true,
+    "memoBytes": 42,
+    "paymentBoundaryRendered": true,
+    "jobDeferredUntilTransactionId": true,
+    "noSecretMaterialRendered": true
+  },
+  "blockers": [],
+  "notes": [
+    "This browser smoke used a public XRPL testnet owner and a known public vendor address only; it performed Coston2 reads and no wallet, XRPL, FDC, or EVM write.",
+    "The draft and memo are inspected in memory and are not written to evidence; only shape, byte length, boundary, and redaction assertions are recorded.",
+    "A transaction ID is deliberately omitted so the browser produces a payment draft first; the optional GemWallet action is not clicked in this wallet-free smoke, and the strict executor job remains deferred until a wallet supplies the public transaction ID."
+  ]
+}

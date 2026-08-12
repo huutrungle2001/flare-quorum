@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-frontend-keyboard-accessibility",
+  "recordedAt": "2026-08-12T19:16:18.414Z",
+  "publicIdentifiers": {
+    "sourceCommit": "831db6400b09f6f1cf74cb6473eeb326fdae73ff",
+    "provider": "vercel",
+    "project": "flare-quorum",
+    "canonicalUrl": "https://flare-quorum.vercel.app",
+    "network": "flare-coston2",
+    "chainId": 114,
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC"
+  },
+  "measurements": {
+    "desktopInteractiveCount": 56,
+    "desktopUnnamedInteractiveElements": [],
+    "mobileViewportWidth": 320,
+    "mobileScrollWidth": 321,
+    "mobileOverflowingElements": [
+      {
+        "tag": "BUTTON",
+        "className": "",
+        "ariaLabel": null,
+        "left": 270,
+        "right": 343,
+        "width": 73
+      },
+      {
+        "tag": "BUTTON",
+        "className": "",
+        "ariaLabel": null,
+        "left": 351,
+        "right": 420,
+        "width": 69
+      }
+    ],
+    "focusSequence": [
+      {
+        "tag": "A",
+        "text": "SKIP TO CONTENT",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "A",
+        "text": "FLAREQUORUM",
+        "ariaLabel": "FlareQuorum home",
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "A",
+        "text": "TENDERS",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "A",
+        "text": "DOCS",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
+        "text": "↻",
+        "ariaLabel": "Refresh state",
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
+        "text": "◇CONNECT FOR ACTIONS",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
+        "text": "PUBLIC",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      },
+      {
+        "tag": "BUTTON",
+        "text": "BUYER",
+        "ariaLabel": null,
+        "visible": true,
+        "focusIndicator": true
+      }
+    ]
+  },
+  "assertions": {
+    "skipLinkAndPrimaryNavigation": true,
+    "activeCoston2TenderNavigation": true,
+    "allInteractiveControlsNamed": true,
+    "keyboardFocusVisitedControls": true,
+    "keyboardFocusIndicatorPresent": true,
+    "desktopNoHorizontalOverflow": true,
+    "mobile320NoHorizontalOverflow": true,
+    "mobileTenderVisible": true,
+    "reducedMotionStylesPresent": true,
+    "noUnexpectedErrorAlert": true
+  },
+  "blockers": [],
+  "notes": [
+    "The live Flare route was exercised with keyboard input and a 320px viewport.",
+    "The smoke records labels, layout assertions, and public route state only; it does not connect a wallet or access confidential data."
+  ]
+}

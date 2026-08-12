@@ -180,7 +180,7 @@ try {
     return true;
   })()`);
   await cdp.evaluate(`(() => {
-    const button = [...document.querySelectorAll("button")].find((element) => element.textContent.includes("PREPARE PUBLIC 0xFE JOB"));
+    const button = [...document.querySelectorAll("button")].find((element) => element.textContent.includes("REVIEW XRP PAYMENT"));
     if (!button) throw new Error("PREPARE_BUTTON_NOT_FOUND");
     button.click();
     return true;
@@ -196,8 +196,8 @@ try {
     return {
       draftShape: parsed?.TransactionType === "Payment" && typeof parsed.Destination === "string" && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(parsed.Destination) && /^[0-9]+$/.test(parsed.Amount ?? ""),
       memoBytes: /^0x[0-9a-fA-F]{84}$/.test(memo) ? 42 : 0,
-      paymentBoundaryRendered: body.includes("WALLET-READY XRPL PAYMENT DRAFT") && body.includes("Payment destination"),
-      jobDeferredUntilTransactionId: body.includes("Payment draft only") && body.includes("enter its transaction ID"),
+      paymentBoundaryRendered: body.includes("WALLET-READY XRPL PAYMENT JSON") && body.includes("Payment destination"),
+      jobDeferredUntilTransactionId: body.includes("Payment review only") && body.includes("enter a confirmed transaction ID"),
       noSecretMaterialRendered: !hasSecretFields,
     };
   })()`);

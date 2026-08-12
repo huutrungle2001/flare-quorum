@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-frontend-xrp-funding-checkpoint",
+  "recordedAt": "2026-08-12T19:17:48.936Z",
+  "publicIdentifiers": {
+    "sourceCommit": "831db6400b09f6f1cf74cb6473eeb326fdae73ff",
+    "provider": "vercel",
+    "project": "flare-quorum",
+    "canonicalUrl": "https://flare-quorum.vercel.app",
+    "network": "flare-coston2",
+    "chainId": 114
+  },
+  "assertions": {
+    "initialCheckpointRestored": true,
+    "reloadCheckpointRestored": true,
+    "resumeControlRendered": true,
+    "publicFieldsRestored": true,
+    "explicitForgetClearsState": true
+  },
+  "blockers": [],
+  "notes": [
+    "The production XRP Treasury route restored a browser-safe public checkpoint after a real page reload.",
+    "The restored route rendered an explicit resume control; the smoke does not click it or submit a payment.",
+    "The checkpoint test used only a public XRPL owner, transaction hash, wallet ID, and executor fee; it never entered a signing flow or touched a secret, bid, ciphertext, or FDC proof.",
+    "The explicit forget action removed the checkpoint from browser storage and the rendered recovery notice."
+  ]
+}
