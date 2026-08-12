@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "gate": "FLARE_V2_DEPLOYMENT_CONSISTENCY",
+  "status": "PASSED",
+  "recordedAt": "2026-08-12T18:51:33.657Z",
+  "sourceCommit": "668146833adecf5b4a60d298c95924f1c8ceaab8",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33978510"
+  },
+  "publicIdentifiers": {
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+    "awardReceipt": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3",
+    "extensionId": "66142"
+  },
+  "assertions": {
+    "candidateIsUnpromotedV2": true,
+    "freshExtensionBoundToV2": true,
+    "threeFreshMachines": true,
+    "machineEvidencePassed": true,
+    "successLifecyclePassed": true,
+    "threeVendorComparisonRecorded": true,
+    "oneResultOutageRecoveryPassed": true,
+    "invalidCredentialRejectionPassed": true,
+    "undispatchedRefundLifecyclePassed": true,
+    "candidateRuntimeRecorded": true,
+    "candidateDeploymentVerified": true,
+    "governanceVerified": true,
+    "chainIdMatches": true,
+    "deploymentFinalized": true,
+    "runtimeHashMatchesCandidate": true,
+    "runtimeLogicMatchesArtifact": true,
+    "constructorBindingsMatch": true,
+    "liveGettersMatch": true,
+    "awardReceiptCodePresent": true,
+    "extensionSenderMatchesMarket": true,
+    "exactActiveMachineSet": true,
+    "ftsoRegistryBindingFresh": true,
+    "verifiedV1AddressUnchanged": true
+  },
+  "blockers": [],
+  "notes": [
+    "V2 runtime, constructor, registry, extension sender, machine set, success lifecycle, and refund lifecycle were rechecked before recording this release.",
+    "This promotion does not switch web, relay, console, or public package consumers; V1 remains their default until a separate approval."
+  ]
+}

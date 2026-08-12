@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "network": "flare-coston2",
+  "chainId": 114,
+  "kind": "flarequorum-v2-release",
+  "verified": true,
+  "consumerSelectable": false,
+  "recordedAt": "2026-08-12T18:51:33.657Z",
+  "sourceCommit": "668146833adecf5b4a60d298c95924f1c8ceaab8",
+  "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+  "contracts": {
+    "FlareQuorumMarketV2": {
+      "address": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+      "deploymentTransaction": "0x95557afc8aa5d042849de119ea4a28aec5cc6f749957e4a1f4d971fee9984e38",
+      "deploymentBlock": "33919464",
+      "runtimeHash": "0x2ecfef4943e1dc772f7d5bb1db47415c9d4b037532aca0630c0450479e86d563",
+      "maskedRuntimeHash": "0xeaa1c5bc81e5fa617e4215914a7408922cbb2add63094f61ab020f0a8f3d0153",
+      "artifactMaskedRuntimeHash": "0xeaa1c5bc81e5fa617e4215914a7408922cbb2add63094f61ab020f0a8f3d0153"
+    },
+    "FlareQuorumAwardReceiptV2": {
+      "address": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3"
+    }
+  },
+  "constructorArguments": {
+    "paymentToken": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+    "teeManager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "ftso": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+    "teeExtensionRegistry": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE"
+  },
+  "fcc": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "66142",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "version": "v0.2.2",
+    "teeIds": [
+      "0x325E7f5DE26e2ECdaAc23d4883024850E76a0F9B",
+      "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD",
+      "0xc3c454aaDb538A15B18a9Cce24E5e53cC062AFC1"
+    ],
+    "resultThreshold": 2,
+    "governanceHash": "0xa3ff9bd94c8e0f9512e1e3ecc81caa16c94946e366974182da86dba03a5f9832"
+  },
+  "evidence": [
+    "evidence/coston2/market-v2-candidate-deployment.json",
+    "evidence/coston2/fcc-market-v2-extension-registration.json",
+    "evidence/coston2/fcc-market-v2-governance.json",
+    "evidence/coston2/fcc-market-v2-machines-refresh.json",
+    "evidence/coston2/market-v2-refresh-multi-vendor-success.json",
+    "evidence/coston2/market-v2-refresh-one-result-outage.json",
+    "evidence/coston2/market-v2-refresh-invalid-credential.json",
+    "evidence/coston2/market-v2-undispatched-refund.json",
+    "evidence/coston2/market-v2-selection-expired-refund.json"
+  ],
+  "consumerPromotion": {
+    "status": "PENDING_EXPLICIT_APPROVAL",
+    "verifiedV1RemainsDefault": true
+  },
+  "blockers": [
+    "V2_CONSUMER_SWITCH_NOT_APPROVED"
+  ]
+}
