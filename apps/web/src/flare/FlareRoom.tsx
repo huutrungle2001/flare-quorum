@@ -14,6 +14,7 @@ import { FlareWalletAssets } from "./FlareWalletAssets";
 import { ContextHelp } from "../shell/ContextHelp";
 import { PublicValue } from "../shell/PublicValue";
 import { refreshStateEvent } from "../shell/refreshState";
+import { scrollToPageTop } from "../shell/navigationScroll";
 import { FlareBuyerBriefPanel, useVerifiedFlareBuyerBrief } from "./FlareBuyerBriefPanel";
 
 type FlareTenderFilter = "current" | "all" | "open" | "compute" | "awarded" | "refunded";
@@ -433,7 +434,10 @@ export function FlareRoleBar({
             type="button"
             className={activeRole === role ? "active" : ""}
             aria-current={activeRole === role ? "page" : undefined}
-            onClick={() => onRoleChange(role)}
+            onClick={() => {
+              scrollToPageTop();
+              onRoleChange(role);
+            }}
           >
             {label}
           </button>

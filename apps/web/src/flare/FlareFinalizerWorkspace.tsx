@@ -248,9 +248,6 @@ export function FlareFinalizerWorkspace({
                         {busy === refundKey ? "RECOVERING…" : "RECORD FAILURE & RECOVER ESCROW"}
                       </button>
                     )}
-                    {(state === "request-selection" || state === "retry-selection" || state === "compute-live") && (
-                      <a className="text-link" href="/docs#flare-coston2">OPEN RELAY RUNBOOK →</a>
-                    )}
                     <a className="secondary-button" href={`/flare?status=all&tender=${tender.tenderId.toString()}`}>VIEW PUBLIC DOSSIER →</a>
                   </div>
                   {isConfirming && (

@@ -175,13 +175,18 @@ describe("Coston2 public evidence boundary", () => {
   });
 
   it("exposes the complete Flare role taxonomy without private-audit authority", () => {
-    render(<FlareRoleBar activeRole="public" onRoleChange={() => undefined} />);
+    const onRoleChange = vi.fn();
+    render(<FlareRoleBar activeRole="public" onRoleChange={onRoleChange} />);
     expect(screen.getByRole("button", { name: "PUBLIC" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "BUYER" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "PRIVATE BIDS" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "ACTIVITY" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "XRP TREASURY" })).toBeNull();
     expect(screen.getByRole("button", { name: "AUDITOR" })).toBeInTheDocument();
+    vi.mocked(window.scrollTo).mockClear();
+    fireEvent.click(screen.getByRole("button", { name: "BUYER" }));
+    expect(onRoleChange).toHaveBeenCalledWith("buyer");
+    expect(window.scrollTo).toHaveBeenCalledWith({ behavior: "auto", left: 0, top: 0 });
   });
 
   it("renders the dedicated public activity ledger without exposing bid data", () => {
@@ -238,6 +243,7 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByRole("heading", { name: "Ready to close" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "CLOSE & FREEZE FTSO →" })).toBeDisabled();
     expect(screen.getByRole("link", { name: "VIEW PUBLIC DOSSIER →" })).toHaveAttribute("href", "/flare?status=all&tender=1");
+    expect(screen.queryByRole("link", { name: "OPEN RELAY RUNBOOK →" })).toBeNull();
     expect(screen.queryByText("Selection attempt")).toBeNull();
     expect(screen.getByText(/no bid-decryption capability/i)).toBeInTheDocument();
     expect(screen.queryByText(/client-provided winner accepted/i)).toBeNull();
@@ -255,6 +261,10 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByRole("button", { name: "MY SUBMISSIONS" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "REVIEW SEALED BID →" })).toBeDisabled();
     expect(screen.queryByText(/&amp;/)).toBeNull();
+    vi.mocked(window.scrollTo).mockClear();
+    fireEvent.click(screen.getByRole("button", { name: "MY SUBMISSIONS" }));
+    expect(window.scrollTo).toHaveBeenCalledWith({ behavior: "auto", left: 0, top: 0 });
+    expect(screen.getByRole("heading", { name: "Track your submissions." })).toBeInTheDocument();
   });
 
   it("shows only wallet-scoped public receipts in My Submissions", () => {

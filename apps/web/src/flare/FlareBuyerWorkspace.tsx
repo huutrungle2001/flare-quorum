@@ -30,7 +30,10 @@ import { useToasts } from "../shell/ToastProvider";
 import { useEffect, useState } from "react";
 import { FlareXrpFundingPanel, type XrpFundingPrepareInput, type XrpFundingPreview } from "./FlareXrpFundingPanel";
 import { clearBuyerPublicDraft, readBuyerPublicDraft, saveBuyerPublicDraft } from "./buyerPublicDraft";
-import { publishFlarePublicBrief } from "./flarePublicBriefRegistry";
+import {
+  assertFlareIngressReady,
+  publishFlarePublicBrief,
+} from "./flarePublicBriefRegistry";
 
 const coston2 = {
   id: 114,
@@ -127,6 +130,9 @@ function flareTenderErrorMessage(cause: unknown): string {
   if (raw.includes("InvalidCodeVersion")) return "The Coston2 FCC extension binding is stale. Refresh state and try again.";
   if (raw.includes("InvalidScoringPolicy")) return "The tender scoring rules were rejected. Check the deadline and weight total.";
   if (raw.includes("InvalidTender")) return "The tender rules were rejected. Check the required fields and vendor list.";
+  if (raw.includes("FLARE_INGRESS_NOT_READY")) {
+    return "FCC is not ready: all three machines need fresh availability before a tender can be opened. No approval or tender transaction was requested.";
+  }
   if (raw.includes("FLARE_PUBLIC_BRIEF_REGISTRY")) {
     return "The public Buyer Brief registry is unavailable. No approval or tender transaction was requested.";
   }
@@ -493,6 +499,8 @@ export function FlareBuyerWorkspace({
         deliveryWeight,
         warrantyWeight,
       }, block.timestamp);
+      toasts.update(toastId, "Checking fresh FCC machine availability…");
+      await assertFlareIngressReady();
       toasts.update(toastId, "Publishing the hash-verified public Buyer Brief…");
       const published = await publishFlarePublicBrief(publicBrief);
       if (published.metadataHash.toLowerCase() !== terms.metadataHash.toLowerCase()) {
@@ -583,6 +591,7 @@ export function FlareBuyerWorkspace({
       deliveryWeight,
       warrantyWeight,
     }, block.timestamp);
+    await assertFlareIngressReady();
     const published = await publishFlarePublicBrief(publicBrief);
     if (published.metadataHash.toLowerCase() !== terms.metadataHash.toLowerCase()) {
       throw new Error("FLARE_PUBLIC_BRIEF_VERIFICATION_FAILED");

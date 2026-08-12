@@ -30,6 +30,12 @@ function registryUrl(env: Record<string, string | undefined> = import.meta.env):
   return parsed.toString().replace(/\/$/, "");
 }
 
+function ingressUrl(env: Record<string, string | undefined>): string {
+  const value = env.VITE_FLARE_INGRESS_URL?.trim();
+  if (!value) throw new Error("FLARE_INGRESS_NOT_CONFIGURED");
+  return registryUrl({ VITE_FLARE_PUBLIC_BRIEF_URL: value });
+}
+
 function metadataHash(value: string): Hex {
   if (!/^0x[0-9a-fA-F]{64}$/.test(value)) throw new Error("INVALID_FLARE_PUBLIC_BRIEF_HASH");
   return value.toLowerCase() as Hex;
@@ -129,6 +135,31 @@ export async function publishFlarePublicBrief(
   }
   verifiedCache.set(hash, published);
   return { metadataHash: hash, brief: published };
+}
+
+export async function assertFlareIngressReady(
+  env: Record<string, string | undefined> = import.meta.env,
+): Promise<void> {
+  let response: Response;
+  try {
+    response = await request(`${ingressUrl(env)}/health`, {
+      headers: { accept: "application/json" },
+    });
+  } catch {
+    throw new Error("FLARE_INGRESS_NOT_READY");
+  }
+  if (!response.ok) throw new Error("FLARE_INGRESS_NOT_READY");
+  try {
+    const value = await response.json() as Record<string, unknown>;
+    if (
+      value.status !== "ok" ||
+      value.chainId !== 114 ||
+      value.schemaVersion !== 1 ||
+      value.machineBindingsValid !== true
+    ) throw new Error("FLARE_INGRESS_NOT_READY");
+  } catch {
+    throw new Error("FLARE_INGRESS_NOT_READY");
+  }
 }
 
 export function clearFlarePublicBriefCache(): void {

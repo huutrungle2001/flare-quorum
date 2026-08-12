@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { canonicalFlarePublicBuyerBrief, hashFlarePublicBuyerBrief } from "@flarequorum/flare-bindings";
 import {
+  assertFlareIngressReady,
   clearFlarePublicBriefCache,
   loadFlarePublicBrief,
   publishFlarePublicBrief,
@@ -16,7 +17,10 @@ const brief = canonicalFlarePublicBuyerBrief({
   approvedVendors: ["0x2000000000000000000000000000000000000002"],
 });
 const hash = hashFlarePublicBuyerBrief(brief);
-const env = { VITE_FLARE_PUBLIC_BRIEF_URL: "https://briefs.example" };
+const env = {
+  VITE_FLARE_PUBLIC_BRIEF_URL: "https://briefs.example",
+  VITE_FLARE_INGRESS_URL: "https://ingress.example",
+};
 
 afterEach(() => {
   clearFlarePublicBriefCache();
@@ -47,5 +51,31 @@ describe("Flare public Buyer Brief registry client", () => {
       brief: { ...brief, category: "software" },
     }), { status: 200, headers: { "Content-Type": "application/json" } })));
     await expect(loadFlarePublicBrief(hash, env)).resolves.toEqual({ status: "invalid", brief: null });
+  });
+
+  it("requires machine-bound ingress health before buyer funding starts", async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      status: "ok",
+      service: "flare-quorum-ingress",
+      chainId: 114,
+      schemaVersion: 1,
+      machineBindingsValid: true,
+      tenderId: "23",
+      tenderStatus: "Awarded",
+    }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(assertFlareIngressReady(env)).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://ingress.example/health",
+      expect.objectContaining({ credentials: "omit", redirect: "error" }),
+    );
+
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({
+      status: "ok",
+      chainId: 114,
+      schemaVersion: 1,
+      machineBindingsValid: false,
+    }), { status: 200 })));
+    await expect(assertFlareIngressReady(env)).rejects.toThrow("FLARE_INGRESS_NOT_READY");
   });
 });

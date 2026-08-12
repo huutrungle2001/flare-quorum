@@ -4,6 +4,7 @@ import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
 import { ContextHelp } from "../shell/ContextHelp";
 import { useToasts } from "../shell/ToastProvider";
+import { scrollToPageTop } from "../shell/navigationScroll";
 import { createPublicClient, formatUnits, http, isAddressEqual, parseUnits, type Abi, type Hex } from "viem";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
@@ -131,6 +132,7 @@ export function FlareVendorWorkspace({
     const updated = new URLSearchParams(params);
     if (next === "submit") updated.delete("vendor");
     else updated.set("vendor", "submissions");
+    scrollToPageTop();
     setParams(updated);
   }
 
