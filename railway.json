@@ -5,7 +5,6 @@
     "buildCommand": "pnpm install --frozen-lockfile && pnpm bindings:build && pnpm --filter @flarequorum/flare-bindings build && pnpm --filter @flarequorum/settlement-relay build",
     "watchPatterns": [
       ".nvmrc",
-      "apps/fcc-extension/**",
       "apps/relay/**",
       "package.json",
       "packages/chain-bindings/**",
