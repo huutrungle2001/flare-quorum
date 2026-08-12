@@ -3,6 +3,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
 import {
+  BaseError,
+  ContractFunctionRevertedError,
   createPublicClient,
   createWalletClient,
   encodeAbiParameters,
@@ -16,7 +18,6 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 
 import { readV2ReleasePlan } from "../flare/v2-release.mjs";
-import { buildCoston2LogBlockRanges } from "../flare/rpc-log-ranges.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const plan = readV2ReleasePlan(root);
@@ -49,6 +50,8 @@ const tokenAbi = parseAbi([
   "function balanceOf(address owner) view returns (uint256)",
 ]);
 const receiptAbi = parseAbi([
+  "error ReceiptDoesNotExist(uint256 tenderId)",
+  "function ownerOf(uint256 tokenId) view returns (address owner)",
   "event AwardReceiptMinted(uint256 indexed tenderId,uint256 indexed winnerBidId,address indexed winner,uint256 amount,bytes32 resultDigest)",
 ]);
 
@@ -82,20 +85,27 @@ async function send({ client, wallet, account, address, abi, functionName, args,
   return { hash, receipt };
 }
 
-async function awardExists(client, awardReceipt, tenderId, fromBlock, toBlock) {
-  for (const range of buildCoston2LogBlockRanges(fromBlock, toBlock)) {
-    const events = await client.getContractEvents({
+async function awardExists(client, awardReceipt, tenderId, blockNumber) {
+  try {
+    await client.readContract({
       address: awardReceipt,
       abi: receiptAbi,
-      eventName: "AwardReceiptMinted",
-      args: { tenderId },
-      fromBlock: range.fromBlock,
-      toBlock: range.toBlock,
-      strict: true,
+      functionName: "ownerOf",
+      args: [tenderId],
+      blockNumber,
     });
-    if (events.length > 0) return true;
+    return true;
+  } catch (error) {
+    const reverted = error instanceof BaseError
+      ? error.walk((item) => item instanceof ContractFunctionRevertedError)
+      : null;
+    if (
+      reverted instanceof ContractFunctionRevertedError &&
+      reverted.data?.errorName === "ReceiptDoesNotExist" &&
+      reverted.data.args?.[0] === tenderId
+    ) return false;
+    throw error;
   }
-  return false;
 }
 
 const rpcUrl = process.env.COSTON2_RPC_URL?.trim();
@@ -333,11 +343,10 @@ if (block.timestamp < BigInt(state.refundAvailableAt)) {
 }
 
 const beforeTender = await client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId] });
-const lifecycleStartBlock = BigInt(state.createBlock);
 const [buyerBefore, marketBefore, awardBefore] = await Promise.all([
   client.readContract({ address: token, abi: tokenAbi, functionName: "balanceOf", args: [account.address] }),
   client.readContract({ address: token, abi: tokenAbi, functionName: "balanceOf", args: [market] }),
-  awardExists(client, awardReceipt, tenderId, lifecycleStartBlock, block.number),
+  awardExists(client, awardReceipt, tenderId, block.number),
 ]);
 const refunded = await send({
   client, wallet, account, address: market, abi: marketAbi,
@@ -347,7 +356,7 @@ const [afterTender, buyerAfter, marketAfter, awardAfter] = await Promise.all([
   client.readContract({ address: market, abi: marketAbi, functionName: "getTender", args: [tenderId], blockNumber: refunded.receipt.blockNumber }),
   client.readContract({ address: token, abi: tokenAbi, functionName: "balanceOf", args: [account.address], blockNumber: refunded.receipt.blockNumber }),
   client.readContract({ address: token, abi: tokenAbi, functionName: "balanceOf", args: [market], blockNumber: refunded.receipt.blockNumber }),
-  awardExists(client, awardReceipt, tenderId, lifecycleStartBlock, refunded.receipt.blockNumber),
+  awardExists(client, awardReceipt, tenderId, refunded.receipt.blockNumber),
 ]);
 const events = parseEventLogs({
   abi: marketAbi,
