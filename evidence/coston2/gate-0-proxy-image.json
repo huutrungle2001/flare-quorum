@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "gate": "0-proxy-image",
   "status": "PASSED",
-  "recordedAt": "2026-08-04T06:13:05.786Z",
-  "sourceCommit": "5c86be227b631485f27c41e45e24e9e62a2e0dec",
-  "upstreamSourceCommit": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
+  "recordedAt": "2026-08-12T17:44:21.738Z",
+  "sourceCommit": "1174f8533300d8425688b339918851bcd1755a0c",
+  "upstreamSourceCommit": "2e8412990d150a386a2ee5fdc1d2889a04e658aa",
   "buildPolicy": {
     "dockerfile": "apps/fcc-extension/proxy/Dockerfile",
     "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
@@ -15,16 +15,16 @@
     "sbom": true
   },
   "publicIdentifiers": {
-    "imageTag": "veilbid/tee-proxy:coston2-0c6d016b",
-    "imageDigest": "sha256:59f8abcd380ded3c180e16dd5366118af37488822057ef6c562d9cf07e060ecb",
+    "imageTag": "veilbid/tee-proxy:coston2-v0.0.18",
+    "imageDigest": "sha256:58f804d1dcc8e6f3850e6a34df5fcee0e4c4e08bffb75ad9b4f92b0a71ad5622",
     "imageMediaType": "application/vnd.oci.image.manifest.v1+json",
     "platform": "linux/amd64",
     "runtimeUser": "65532:65532",
     "entrypoint": [
       "/app/tee-proxy"
     ],
-    "binarySha256": "76b83c8e09ae01e3457e8463fc044aca98504ddb0e335456f6f9d0e078258488",
-    "binaryBytes": 46145684,
+    "binarySha256": "cfb6b728adb15e4d1a0fd4b0673475ae6e1c19eec7d72f129c82e390c778dfe4",
+    "binaryBytes": 29352084,
     "binaryMode": "555"
   },
   "assertions": {

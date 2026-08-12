@@ -2,23 +2,23 @@
   "schemaVersion": 1,
   "gate": "0-registration-image",
   "status": "PASSED",
-  "recordedAt": "2026-08-07T13:27:33.083Z",
-  "sourceCommit": "2b53c5c91f264732d5ccc235242b7ef85c93ef27",
-  "upstreamSourceCommit": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
+  "recordedAt": "2026-08-12T17:44:21.736Z",
+  "sourceCommit": "1174f8533300d8425688b339918851bcd1755a0c",
+  "upstreamSourceCommit": "e3f587949069780084e2ced8a53c9419ed05c250",
   "alignedModules": {
-    "teeNode": "v0.0.23",
+    "teeNode": "v0.0.24",
     "goFlareCommon": "v1.2.2-0.20260727094511-09a10067e6a4"
   },
   "publicIdentifiers": {
-    "imageTag": "veilbid/fcc-register-tee:coston2-f48cafb",
-    "imageDigest": "sha256:95cd528b5bef931d216ad0fc92b14b6315f5345c337fddcd74eb062f7258febf",
+    "imageTag": "veilbid/fcc-register-tee:coston2-e3f5879",
+    "imageDigest": "sha256:e0e1abf696cd63d0bd0bd2e332432d91d0d51c8f6f31d7040782b7bd813f8a9a",
     "imageMediaType": "application/vnd.oci.image.manifest.v1+json",
     "platform": "linux/amd64",
     "runtimeUser": "65532:65532",
     "entrypoint": [
       "/app/register-tee"
     ],
-    "binarySha256": "d88d6816fb132275cd60a5e13bb181ee96db2811d3f78a309b842fb382b2a012",
+    "binarySha256": "71ccae716c373a3584e8de49aa44e962ade34b489b45836ec6922a70c464d206",
     "binaryBytes": 10129556,
     "binaryMode": "555"
   },
