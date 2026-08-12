@@ -44,3 +44,57 @@ export function planStaleMachineRetirement({
     blockingTenderIds: blockingTenders.map(({ tenderId }) => tenderId),
   };
 }
+
+export function planRollingMachineReplacement({
+  previousMachines,
+  currentMachines,
+  activeMachines,
+  expectedOwner,
+  openTenders,
+  machineIndex,
+}) {
+  const blockers = [];
+  if (
+    !Number.isInteger(machineIndex) || machineIndex < 0 || machineIndex > 2 ||
+    previousMachines.length !== 3 || currentMachines.length !== 3
+  ) {
+    return { status: "BLOCKED", blockers: ["ROLLING_MACHINE_SET_INVALID"] };
+  }
+  const previousIds = new Set(previousMachines.map(({ teeId }) => getAddress(teeId)));
+  const currentIds = new Set(currentMachines.map(({ teeId }) => getAddress(teeId)));
+  if (previousIds.size !== 3 || currentIds.size !== 3) {
+    blockers.push("ROLLING_MACHINE_IDENTITIES_NOT_DISTINCT");
+  }
+  for (let index = 0; index < 3; index += 1) {
+    const previous = previousMachines[index];
+    const current = currentMachines[index];
+    if (previous.publicUrl !== current.publicUrl) blockers.push("ROLLING_MACHINE_ROUTE_CHANGED");
+    const changed = !sameAddress(previous.teeId, current.teeId);
+    if ((index === machineIndex) !== changed) blockers.push("ROLLING_ONLY_SELECTED_MACHINE_MAY_CHANGE");
+  }
+  const oldMachine = previousMachines[machineIndex];
+  const replacement = currentMachines[machineIndex];
+  const activeById = new Map(activeMachines.map((machine) => [getAddress(machine.teeId), machine]));
+  if (activeMachines.length !== 3 || activeMachines.some(({ teeId }) => !previousIds.has(getAddress(teeId)))) {
+    blockers.push("ROLLING_ACTIVE_SET_NOT_PREVIOUS_CHECKPOINT");
+  }
+  const oldActive = activeById.get(getAddress(oldMachine.teeId));
+  if (
+    !oldActive || Number(oldActive.status) !== 2 ||
+    !sameAddress(oldActive.owner, expectedOwner) || oldActive.url !== oldMachine.publicUrl
+  ) blockers.push("ROLLING_OLD_MACHINE_NOT_OWNED_PRODUCTION");
+  if (activeById.has(getAddress(replacement.teeId))) {
+    blockers.push("ROLLING_REPLACEMENT_ALREADY_ACTIVE");
+  }
+  const blockingTenderIds = openTenders
+    .filter(({ teeIds }) => teeIds.some((teeId) => sameAddress(teeId, oldMachine.teeId)))
+    .map(({ tenderId }) => tenderId);
+  if (blockingTenderIds.length > 0) blockers.push("ROLLING_OLD_MACHINE_FROZEN_BY_OPEN_TENDER");
+  return {
+    status: blockers.length === 0 ? "READY" : "BLOCKED",
+    blockers,
+    oldMachine,
+    replacement,
+    blockingTenderIds,
+  };
+}

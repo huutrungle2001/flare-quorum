@@ -153,10 +153,19 @@ export function evaluateV2PromotionBundle({
   const v2Machines = machines?.publicIdentifiers?.machines ?? [];
   const v2MachineIds = v2Machines.map(({ teeId }) => String(teeId).toLowerCase());
   const successVendors = success?.publicIdentifiers?.vendors ?? [];
+  const successTeeIds = (success?.publicIdentifiers?.teeIds ?? [])
+    .map((teeId) => String(teeId).toLowerCase());
   const recoveryTeeIds = (recovery?.publicIdentifiers?.teeIds ?? [])
     .map((teeId) => String(teeId).toLowerCase());
   const recoverySigners = (recovery?.publicIdentifiers?.selectionSignerIds ?? [])
     .map((teeId) => String(teeId).toLowerCase());
+  const invalidCredentialMachineIds = (
+    invalidCredential?.publicIdentifiers?.machineIds ?? []
+  ).map((teeId) => String(teeId).toLowerCase());
+  const exactMachineSet = (ids) =>
+    ids.length === v2MachineIds.length &&
+    new Set(ids).size === ids.length &&
+    ids.every((teeId) => v2MachineIds.includes(teeId));
   const outageMachineIndex = Number(
     recovery?.publicIdentifiers?.selectionResultCollectionOutageMachineIndex,
   );
@@ -178,6 +187,7 @@ export function evaluateV2PromotionBundle({
       machines.assertions?.exactActiveMachineSet === true,
     successLifecyclePassed:
       success?.status === "PASSED" && allAssertionsPass(success) &&
+      exactMachineSet(successTeeIds) &&
       success.assertions?.fccWinnerSelected === true &&
       success.assertions?.escrowConserved === true,
     threeVendorComparisonRecorded:
@@ -190,6 +200,7 @@ export function evaluateV2PromotionBundle({
     oneResultOutageRecoveryPassed:
       recovery?.gate === "FLARE_V2_SUCCESS_RECOVERY" &&
       recovery?.status === "PASSED" && allAssertionsPass(recovery) &&
+      exactMachineSet(recoveryTeeIds) &&
       recovery?.ingressBenchmarks?.vendorCount === 3 &&
       recoveryTeeIds.length === 3 && new Set(recoveryTeeIds).size === 3 &&
       recoverySigners.length === 2 && new Set(recoverySigners).size === 2 &&
@@ -200,6 +211,7 @@ export function evaluateV2PromotionBundle({
     invalidCredentialRejectionPassed:
       invalidCredential?.gate === "FLARE_V2_INVALID_CREDENTIAL_REJECTION" &&
       invalidCredential?.status === "PASSED" && allAssertionsPass(invalidCredential) &&
+      exactMachineSet(invalidCredentialMachineIds) &&
       invalidCredential?.assertions?.wrongIssuerSignatureRejectedByAllThree === true &&
       invalidCredential?.assertions?.rejectedAttemptDidNotConsumeCanonicalSlot === true &&
       invalidCredential?.assertions?.correctedCredentialAcceptedByAllThree === true &&

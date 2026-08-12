@@ -224,7 +224,7 @@ export function machineEvidenceRelativePath(environment = process.env) {
   const configured = environment.FCC_MACHINE_EVIDENCE_PATH?.trim();
   if (configured) return configured;
   if (environment.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2") {
-    return "evidence/coston2/fcc-market-v2-machines.json";
+    return "evidence/coston2/fcc-market-v2-machines-refresh.json";
   }
   const selected = registeredMachineExtensionId(environment).toLowerCase();
   const product = String(environment.FCC_MARKET_EXTENSION_ID ?? "").trim().toLowerCase();

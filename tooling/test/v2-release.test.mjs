@@ -67,6 +67,7 @@ function passingBundle() {
     success: {
       status: "PASSED",
       publicIdentifiers: {
+        teeIds: machineIds,
         vendors: [address("9"), address("a"), address("b")],
         plaintextCommitments: [hash("1"), hash("2"), hash("3")],
         bidTransactions: [hash("4"), hash("5"), hash("6")],
@@ -94,6 +95,7 @@ function passingBundle() {
     invalidCredential: {
       gate: "FLARE_V2_INVALID_CREDENTIAL_REJECTION",
       status: "PASSED",
+      publicIdentifiers: { machineIds },
       assertions: {
         wrongIssuerSignatureRejectedByAllThree: true,
         rejectedAttemptDidNotConsumeCanonicalSlot: true,
@@ -178,4 +180,12 @@ test("rejects V2 promotion without three-machine invalid credential evidence", (
   assert.deepEqual(v2ProgressBlockers(result.assertions), [
     "V2_INVALID_CREDENTIAL_REJECTION_NOT_VERIFIED",
   ]);
+});
+
+test("rejects lifecycle evidence produced by a superseded V2 machine set", () => {
+  const bundle = passingBundle();
+  bundle.success.publicIdentifiers.teeIds[0] = address("c");
+  const result = evaluateV2PromotionBundle(bundle);
+  assert.equal(result.status, "BLOCKED");
+  assert.equal(result.assertions.successLifecyclePassed, false);
 });

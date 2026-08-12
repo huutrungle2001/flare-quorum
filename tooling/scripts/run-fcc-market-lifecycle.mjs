@@ -46,7 +46,7 @@ const evidencePath = resolve(
 const statePath = resolve(
   root,
   process.env.FCC_MARKET_STATE_PATH ??
-    (v2 ? ".local/fcc/market-v2-multi-vendor-success.state.json" : ".local/fcc/market-lifecycle.state.json"),
+    (v2 ? ".local/fcc/market-v2-refresh-multi-vendor-success.state.json" : ".local/fcc/market-lifecycle.state.json"),
 );
 const vendorCount = Number(process.env.FCC_MARKET_VENDOR_COUNT ?? (v2 ? "3" : "1"));
 if (!Number.isInteger(vendorCount) || vendorCount < 1 || vendorCount > 3) {

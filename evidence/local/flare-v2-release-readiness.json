@@ -3,8 +3,8 @@
   "gate": "FLARE_V2_LOCAL_RELEASE_READINESS",
   "status": "PARTIAL",
   "scope": "local release readiness and committed live V2 progress; no consumer switch",
-  "recordedAt": "2026-08-11T16:36:06.294Z",
-  "sourceCommit": "a74df9925091696f03f33294246f46c71182ec39",
+  "recordedAt": "2026-08-12T18:12:39.360Z",
+  "sourceCommit": "17f467db08c1d442fc5a52bc2eb9feadb4e3f4f5",
   "network": {
     "name": "flare-coston2",
     "chainId": 114
@@ -20,13 +20,13 @@
     "liveProgressAssertions": {
       "candidateIsUnpromotedV2": true,
       "freshExtensionBoundToV2": true,
-      "threeFreshMachines": true,
-      "machineEvidencePassed": true,
-      "successLifecyclePassed": true,
-      "threeVendorComparisonRecorded": true,
-      "oneResultOutageRecoveryPassed": true,
-      "invalidCredentialRejectionPassed": true,
-      "undispatchedRefundLifecyclePassed": false,
+      "threeFreshMachines": false,
+      "machineEvidencePassed": false,
+      "successLifecyclePassed": false,
+      "threeVendorComparisonRecorded": false,
+      "oneResultOutageRecoveryPassed": false,
+      "invalidCredentialRejectionPassed": false,
+      "undispatchedRefundLifecyclePassed": true,
       "candidateRuntimeRecorded": true,
       "candidateDeploymentVerified": true,
       "governanceVerified": true
@@ -43,7 +43,10 @@
     "v2ArtifactsCannotClaimReleaseWithoutPromotion": true
   },
   "blockers": [
-    "V2_REFUND_LIFECYCLE_NOT_VERIFIED"
+    "V2_THREE_FRESH_TEE_MACHINES_NOT_VERIFIED",
+    "V2_SUCCESS_LIFECYCLE_NOT_VERIFIED",
+    "V2_ONE_RESULT_OUTAGE_RECOVERY_NOT_VERIFIED",
+    "V2_INVALID_CREDENTIAL_REJECTION_NOT_VERIFIED"
   ],
   "notes": [
     "This readiness command sends no Coston2 transaction; live progress is derived only from committed sanitized artifacts.",

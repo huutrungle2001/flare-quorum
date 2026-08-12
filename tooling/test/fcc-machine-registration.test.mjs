@@ -45,7 +45,7 @@ test("routes V2 machines through isolated IDs, endpoints, and evidence", () => {
     FCC_V2_NORMAL_PROXY_URL: "https://normal-v2.example",
   };
   assert.equal(registeredMachineExtensionId(environment), v2Id);
-  assert.equal(machineEvidenceRelativePath(environment), "evidence/coston2/fcc-market-v2-machines.json");
+  assert.equal(machineEvidenceRelativePath(environment), "evidence/coston2/fcc-market-v2-machines-refresh.json");
   assert.deepEqual(machineRegistrationEnvironment(environment), {
     publicUrls: ["https://v2-1.example", "https://v2-2.example", "https://v2-3.example"],
     controlUrls: ["https://control-1.example", "https://control-2.example", "https://control-3.example"],
