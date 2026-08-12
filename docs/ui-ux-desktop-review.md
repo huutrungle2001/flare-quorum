@@ -1,8 +1,9 @@
 # Desktop UI/UX Review Notes
 
-This file records decisions from the current user-led desktop review. These
-items remain discussion notes until they are implemented and validated as one
-batch. Mobile is outside this review.
+This file preserves decisions from the completed user-led desktop review. The
+batch is implemented in the hosted V2 release and covered by production and
+keyboard/accessibility smoke evidence. Mobile was outside the discussion scope,
+although the release also passed its 320px overflow and navigation checks.
 
 ## Working agreement
 
@@ -14,7 +15,7 @@ batch. Mobile is outside this review.
 
 ### Remove the historical Sepolia route from the judge experience
 
-Status: implemented locally, pending user review.
+Status: implemented, validated, and deployed in the V2 judge release.
 
 - Remove every Sepolia link from the Coston2 user interface.
 - Redirect `/room` and legacy role/tender URLs to the canonical Coston2 route.
@@ -23,7 +24,7 @@ Status: implemented locally, pending user review.
 
 ### Make Verified Flare Integrations visibly expandable
 
-Status: implemented locally, pending user review.
+Status: implemented, validated, and deployed in the V2 judge release.
 
 - Keep the section collapsed by default.
 - Add an obvious chevron and `Click to expand` / `Click to collapse` guidance.
@@ -33,7 +34,7 @@ Status: implemented locally, pending user review.
 
 ### Move technical identifiers into an expandable area
 
-Status: implemented locally, pending user review.
+Status: implemented, validated, and deployed in the V2 judge release.
 
 - Keep the human-readable tender facts visible: lifecycle, status, escrow,
   deadline, accepted-bid count, scoring rules, service requirements, winner,
@@ -47,7 +48,7 @@ Status: implemented locally, pending user review.
 
 ### Keep the privacy checkpoint visible
 
-Status: implemented locally, pending user review.
+Status: implemented, validated, and deployed in the V2 judge release.
 
 - Keep `PUBLIC CHECKPOINT / PRIVATE LOSING BIDS` permanently visible as the
   visual privacy statement; do not move it into the technical accordion.
@@ -60,8 +61,9 @@ Status: implemented locally, pending user review.
 
 ### Rebuild Buyer XRP funding as one guided card
 
-Status: implemented locally, pending user review. The browser continues to stop
-at an honest executor handoff because no supported executor API is available.
+Status: implemented, validated, and deployed in the V2 judge release. The
+browser continues to stop at an honest executor handoff when no supported
+executor API is available.
 
 - Make FTestXRP and XRP two alternative funding methods; users never need to
   complete both.
@@ -105,7 +107,7 @@ at an honest executor handoff because no supported executor API is available.
 
 ### Add contextual help to input cards
 
-Status: implemented locally, pending user review.
+Status: implemented, validated, and deployed in the V2 judge release.
 
 - Add a clearly recognizable `?` help control to the header of every card that
   asks the user to enter data or complete a transaction step.
@@ -124,7 +126,7 @@ Status: implemented locally, pending user review.
 
 ### Simplify Private Bids and separate Redemption
 
-Status: implemented locally, pending user review.
+Status: implemented, validated, and deployed in the V2 judge release.
 
 - Keep open-tender facts publicly readable, but after wallet connection check
   the approved-vendor allowlist immediately rather than waiting for submit.
@@ -160,7 +162,7 @@ Status: implemented locally, pending user review.
 
 ### Combine Auditor evidence into one tender dossier
 
-Status: implemented locally, pending user review.
+Status: implemented, validated, and deployed in the V2 judge release.
 
 - Keep search, status filtering, tender selection, and the finalized-block
   indicator above the selected dossier.
@@ -184,7 +186,7 @@ Status: implemented locally, pending user review.
 
 ### Separate actions, inputs, and read-only information
 
-Status: implemented locally, pending user review.
+Status: implemented, validated, and deployed in the V2 judge release.
 
 - Reserve orange fill, a 2px outline, compact corners, pointer cursor, and a
   visible hover/focus response for actions. Secondary actions remain white but
@@ -267,13 +269,14 @@ Status: implemented locally, pending user review.
 
 ## Validation and release
 
-Do not run the final test, commit, push, or deployment sequence until the review
-is complete and the complete change list has been confirmed.
+The batch completed repository test/lint/build, documentation and secret checks,
+hosted V2 production smoke, and keyboard/accessibility validation before the
+consumer deployment.
 
 ## Hash-verified public Buyer Brief
 
-Status: implemented locally, pending hosted registry deployment and user
-review.
+Status: implemented and deployed with the hosted V2 ingress/web path; strict
+registry and browser tests plus production Buyer Brief rendering pass.
 
 - Keep title, category, public objective, acceptance criteria, optional vendor
   questions, asset, deadline, and approved vendor list public after tender

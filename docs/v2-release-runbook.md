@@ -49,8 +49,8 @@ pnpm flare:slither:v2
 
 The generated candidate manifest is address-free and records
 `consumerSelectable: false`. Local readiness is recorded as `PARTIAL`, because
-the committed live candidate facts pass while promotion remains time-locked by
-the refund lifecycle.
+that immutable preparation artifact captured the historical state before the
+refund lifecycle and promotion passed. It is not the current consumer manifest.
 
 ## Live prerequisites
 

@@ -112,9 +112,10 @@ A judge should understand the product in 30 seconds, verify the Flare path in
 two minutes, and reproduce the public lifecycle from the repository. The
 roadmap must describe credible audit, liveness, pilot, and mainnet work without
 claiming those outcomes already exist. Roadmap items may support future-
-potential scoring, but only the verified V1 artifacts and evidence count as
-delivered implementation; post-Summer promotion criteria are not current
-acceptance gates.
+potential scoring. The verified, consumer-selected V2 manifest and its
+promotion evidence define the delivered Coston2 implementation; V1 remains
+historical rollback evidence. Post-Summer hardening and product-expansion work
+remain roadmap items rather than current acceptance gates.
 
 ## 7. Submission readiness checklist
 

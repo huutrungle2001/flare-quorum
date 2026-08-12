@@ -254,8 +254,8 @@ chain checkpoint used for bid admission. Its `/health` becomes unavailable when
 any frozen machine is expired or mismatched. Both Buyer funding paths require
 that machine-bound health response before publishing the brief, requesting an
 FTestXRP approval, preparing an XRPL payment, or creating a tender. This is the
-consumer-side guard for the immutable V1 contract, whose on-chain creation
-check predates the new availability requirement.
+consumer-side availability guard for the selected V2 release; the historical
+V1 contract predates this stricter known-good readiness requirement.
 
 The Railway Coston2 option deploys
 `apps/fcc-extension/railway/Dockerfile` as three separate services. Each service

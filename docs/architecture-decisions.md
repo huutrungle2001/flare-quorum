@@ -1,9 +1,11 @@
 # FlareQuorum Architecture Decision Record
 
 > Status: Accepted decisions with live Coston2 implementation/evidence for the
-> FCC, ingress, market, and XRP-native funding path. Restart/recovery, final
-> UX, and validation gaps remain explicitly tracked below. These decisions
-> replace the open alternatives in the initial transition plan.
+> FCC, ingress, consumer-selected V2 market, and XRP-native funding path. The
+> supported rolling replacement and bounded V2 refund paths pass; additional
+> live fault breadth, browser-native executor recovery, and Gate H human
+> validation remain explicitly tracked below. These decisions replace the open
+> alternatives in the initial transition plan.
 
 ## ADR-001 — Product shape
 
@@ -614,8 +616,8 @@ with only a ceiling, deadline, and feed identifier on-chain. That made the
 published procurement rule unverifiable and allowed the client representation
 to diverge from what FCC scored. Canonical storage and derivation make the
 transparent rule a contract fact while keeping every bid value and credential
-private. This is locally tested architecture only until the replacement market
-is deployed and runtime-verified on Coston2.
+private. The V2 market is deployed, runtime-verified, and consumer-selected on
+Coston2; its public readers and funding path use the canonical stored policy.
 
 ## ADR-024 — Three-receipt custody with two-machine outage recovery
 
@@ -771,12 +773,11 @@ buyer choose a winner, weaken the threshold, replace a frozen machine, or
 represent the refund as FCC success.
 
 **Release boundary:** Local unit, fuzz, reentrancy, token-failure, and stateful
-conservation tests pass. The side-by-side V2 candidate, fresh extension and
-three-machine set, runtime/constructor verification, candidate bindings, and
-flagship lifecycle are live and verified as candidate evidence. Its
-undispatched-refund tender is waiting for the real fixed grace. Until that
-lifecycle and promotion pass, `coston2.release.json` and its V1 limitation
-remain the authoritative consumer facts.
+conservation tests pass. The side-by-side V2 deployment, refreshed extension
+and three-machine set, runtime/constructor verification, success/outage/
+credential lifecycles, and both fixed-grace refund proofs passed live. The
+canonical `coston2.release.json` and generated bindings now select V2; V1 and
+the promotion-stage artifact remain preserved historical records.
 
 ## ADR-029 — Live registry and exact active-machine preflight
 

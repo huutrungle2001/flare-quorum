@@ -5,9 +5,10 @@ completed interviews or pilot traction. Do not fill in results until a person
 has actually completed the task, and do not record wallet addresses, seeds,
 private bids, or personal data in the repository.
 
-This current Gate H validation track is separate from the planned post-Summer
-Signal V2 release upgrade. Its recorded state remains `NOT_RUN` until the
-sessions below occur; staged V2 work does not change that state.
+This Gate H validation track is separate from the completed V2 technical
+release. Its recorded state remains `NOT_RUN` until the sessions below occur;
+deployment, smoke tests, and protocol evidence do not substitute for real
+participants.
 
 ## Buyer/treasury interview (five sessions)
 

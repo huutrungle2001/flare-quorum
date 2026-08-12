@@ -1,13 +1,12 @@
 # FlareQuorum Championship Contract Specification
 
-> Status: The verified Coston2 V1 market implements canonical public scoring,
-> receipt quorum, close-time FTSO, FCC result verification, and public-token
-> conservation, but has a known liveness gap when the first selection dispatch
-> cannot start after close. The side-by-side `FlareQuorumMarketV2` candidate
-> adds bounded pre-dispatch recovery, passes local unit/fuzz/reentrancy/stateful
-> conservation tests, and now has live deployment, fresh FCC authority, and
-> success-lifecycle evidence. It is not release authority until the real
-> time-locked refund lifecycle and promotion verification pass.
+> Status: `FlareQuorumMarketV2` is the verified, consumer-selected Coston2
+> market. It preserves canonical public scoring, receipt quorum, close-time
+> FTSO, FCC result verification, and public-token conservation while adding
+> bounded pre-dispatch recovery for the historical V1 liveness gap. Local
+> unit/fuzz/reentrancy/stateful conservation tests, both live fixed-grace refund
+> lifecycles, deployment consistency, promotion verification, and the consumer
+> switch pass. V1 remains immutable historical evidence.
 
 ## 1. Core types
 

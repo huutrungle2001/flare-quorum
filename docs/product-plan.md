@@ -212,25 +212,24 @@ All formerly open choices are accepted in
 
 ## 13. Post-Summer Signal upgrades
 
-Two independent tracks follow the current verified V1 submission. First, the
-live side-by-side `FlareQuorumMarketV2` candidate already has a fresh FCC
-extension and three-machine set, verified candidate bindings, and live success
-evidence; promotion still requires the time-locked refund evidence and final
-bundle verification. Second, product discovery can expand the proven
-procurement foundation into Flare Treasury Exchange. Neither track changes the
-current V1 release claim until its separate gate passes.
+The staged V2 track is complete: `FlareQuorumMarketV2` passed both time-locked
+refund lifecycles, final bundle verification, refreshed three-machine FCC
+lifecycles, promotion, and the explicit consumer switch. It is the canonical
+Coston2 release; V1 remains historical rollback evidence. The remaining
+post-Summer track is product discovery and hardening that may expand this
+proven procurement foundation into Flare Treasury Exchange.
 
 This roadmap supports the hackathon's clarity-and-future-potential criterion.
 Its bullets are release or discovery criteria for later work, not incomplete
 acceptance gates for the current submission.
 
-### 13.1 V2 release promotion
+### 13.1 Completed V2 release promotion
 
-The repository contains the address-free staged-release kit, local V2 liveness
-evidence, live candidate deployment, new FCC identities, verified authority
-chain, and success lifecycle. The closed refund tender must complete after its
-real grace, then promotion must reverify the bundle. Consumer promotion remains
-a separate explicit decision.
+The repository preserves the address-free staged-release kit, immutable
+promotion artifact, candidate deployment evidence, refreshed FCC identities,
+verified authority chain, success/outage/credential drills, and both live
+fixed-grace refund proofs. The canonical release manifest and generated
+bindings select V2; the dedicated V1 manifest preserves the prior release.
 
 ### 13.2 Flare Treasury Exchange
 

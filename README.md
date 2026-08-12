@@ -46,9 +46,11 @@ The project targets **Flare Summer Signal** with:
 > [!NOTE]
 > FlareQuorum is the current product and repository brand. Existing `VeilBid*`
 > Solidity identifiers, verified Coston2 deployment artifacts, and the
-> Sepolia/Nox `/room` baseline retain their original names so the rebrand never
-> rewrites historical or on-chain evidence. New candidate contracts use the
-> FlareQuorum name without relabeling those immutable V1 facts.
+> Sepolia/Nox source baseline retain their original names so the rebrand never
+> rewrites historical or on-chain evidence. The legacy `/room` URL redirects to
+> the canonical Coston2 app; historical Sepolia behavior remains reproducible
+> only from its isolated packages/evidence. Newer contracts use the FlareQuorum
+> name without relabeling immutable V1 facts.
 
 ## Why FlareQuorum
 
@@ -177,8 +179,9 @@ pass. See the [Championship Plan](PLAN.md),
 ## Verified Coston2 judge path
 
 The browser uses the verified Coston2 public route when the four sanitized
-`VITE_*` values below are supplied. `/room` remains the explicitly historical
-Sepolia/Nox baseline and must not be used as Flare evidence:
+`VITE_*` values below are supplied. `/room` redirects to `/flare`; the isolated
+Sepolia/Nox packages and evidence remain historical baseline only and must not
+be used as Flare evidence:
 
 ```bash
 corepack enable

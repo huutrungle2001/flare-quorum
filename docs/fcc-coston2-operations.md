@@ -336,13 +336,15 @@ Three-machine availability, private ingress, and supported replacement recovery
 are separately evidenced. A one-machine `PRODUCTION` result does not satisfy
 the championship quorum requirement.
 
-The current live records are `evidence/coston2/gate-0-foundations.json`,
-`evidence/coston2/fcc-market-extension-registration.json`,
-`evidence/coston2/fcc-market-machines.json`, and
-`evidence/coston2/fcc-market-governance.json`. They record the resolved source
-hashes, toolchains, manager interface, registry discovery, FTestXRP binding,
-XRP/USD feed, indexer configuration, extension registration, code-version
-allowlisting, governance, stable proxy reachability, and all three production
-machines. Same-identity simulated-TEE restart is an unsupported runtime
-boundary, not a remaining Gate-B requirement; replacement and re-registration
-is the verified recovery path.
+The current V2 live records are
+`evidence/coston2/fcc-market-v2-machines-refresh.json`,
+`evidence/coston2/fcc-market-v2-extension-registration.json`,
+`evidence/coston2/fcc-market-v2-governance.json`, and the canonical release
+manifest. The immutable foundation and historical V1 records remain available
+separately. Together they record the resolved source hashes, toolchains,
+manager interface, registry discovery, FTestXRP binding, XRP/USD feed, indexer
+configuration, extension registration, code-version allowlisting, governance,
+stable proxy reachability, and all three production machines. Same-identity
+simulated-TEE restart is an unsupported runtime boundary, not a remaining
+Gate-B requirement; replacement and re-registration is the verified recovery
+path. Availability is still time-bounded and must be rechecked near the demo.

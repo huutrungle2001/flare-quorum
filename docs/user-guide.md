@@ -4,14 +4,14 @@
 > provide the fail-closed wallet-free evidence view and explicit Coston2 role
 > routes. The current source build combines direct Coston2 and XRP-native
 > funding under the Buyer workspace alongside Public, Vendor, Public Finalizer,
-> and Auditor/Evidence. The current desktop refinement is implemented locally
-> and awaits final repository/hosted validation. The XRP-native
+> and Auditor/Evidence. The desktop refinement is deployed and passes the
+> hosted V2 production and keyboard/accessibility smokes. The XRP-native
 > funding protocol and executor have live Gate G
 > evidence plus a public-safe delayed-mint checkpoint/resume path. The Buyer
 > workspace can also prepare a wallet-ready XRPL Payment draft and public-safe
 > `0xFE` executor job preview from read-only Coston2 state; the live
 > wallet-ready draft smoke is recorded in
-> `evidence/coston2/web-xrp-funding-draft.json`. Optional GemWallet Testnet
+> `evidence/coston2/web-v2-xrp-funding-draft.json`. Optional GemWallet Testnet
 > signing/submission is available without custody; browser-native recovery
 > remains outside the browser custody boundary. `/room` now redirects to the
 > canonical Coston2 application; historical Sepolia artifacts remain
@@ -215,12 +215,12 @@ Rules, scoring, commitments, and TEE facts remain in Public and Auditor.
    the buyer may recover only the original escrow. This records failed-compute
    `Refunded`, creates no award, and is never displayed as FCC success.
 
-Known V1 limitation: if fewer than two frozen TEEs remain valid before the
-first selection request succeeds, the verified market remains `Closed` and its
-post-dispatch refund clock never starts. The live side-by-side V2 candidate adds
-a separate close-time refund, but the live app must not expose or imply that
-action until its real refund lifecycle and promotion verification pass and a
-separate consumer migration is approved.
+Historical V1 limitation: if fewer than two frozen TEEs remained valid before
+the first selection request succeeded, that market could remain `Closed` and
+its post-dispatch refund clock never started. The consumer-selected V2 market
+adds a separate close-time refund. Its live undispatched and post-dispatch
+refund lifecycles passed before promotion, and the app derives both actions
+from canonical V2 state without presenting either refund as FCC success.
 
 The Public Finalizer browser intentionally does not request selection or submit
 TEE results itself. Those operations require the relay's public FCC endpoints,

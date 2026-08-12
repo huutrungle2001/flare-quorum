@@ -10,12 +10,12 @@
 > run also finalized with one result endpoint unavailable. The organizer has
 > confirmed that restart recovery uses replacement registration rather than
 > same-identity restoration; the full rolling replacement drill now passes on
-> Coston2. A newly identified V1 pre-dispatch refund gap is addressed by the
-> side-by-side live V2 candidate. Its fresh extension, governance, three
-> production machines, runtime wiring, and success lifecycle pass; the
-> undispatched-refund tender is `WAITING` for the fixed on-chain grace before
-> promotion. This does not change the current verified V1 release. Gate H
-> remains mandatory for any user-validation or traction claim.
+> Coston2. The historical V1 pre-dispatch refund gap is addressed by the
+> verified, consumer-selected V2 release. Its refreshed extension, governance,
+> three production machines, runtime wiring, success/outage/credential
+> lifecycles, both fixed-grace refunds, promotion verification, and consumer
+> switch pass. Gate H remains mandatory for any user-validation or traction
+> claim.
 
 ## 1. Rules
 
@@ -153,16 +153,16 @@ or private scoring requires subjective/AI branching.
 
 ## 7. Gate E — threshold result and recovery
 
-Live core pass: two distinct frozen TEE identities signed the exact same result
+Live pass: two distinct frozen TEE identities signed the exact same result
 digest and the market finalized the result on Coston2. The evidence includes
 the request and finalization transactions and the public binding assertions;
 the recovery run also proves that one unavailable result endpoint does not
 prevent threshold finalization. Replacement registration and live two-machine
 loss remain part of release hardening; an active tender never swaps its frozen
-identities. The verified V1 market cannot refund if fewer than two identities
-remain valid before its first dispatch succeeds. The live V2 candidate adds
-that path and has passed its success lifecycle; the separate undispatched-
-refund proof remains `WAITING` for the real fixed grace.
+identities. Historical V1 could not refund if fewer than two identities
+remained valid before its first dispatch succeeded. V2 adds that path, and the
+live undispatched and post-dispatch refund proofs both passed before it became
+the consumer-selected release.
 
 Prove:
 

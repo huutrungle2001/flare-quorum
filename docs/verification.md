@@ -1,32 +1,21 @@
 # FlareQuorum Championship Verification Plan
 
-> Status: Gates 0–A, the live Gate-B ingress/replay portion, Gates C–F, and Gate
-> G are recorded on Coston2. Two- and three-vendor encrypted lifecycles are now
-> also recorded, including a three-vendor one-result-outage recovery; the canonical release is verified, the hosted ciphertext
-> ingress is live with a fail-closed finalized-tender health check, and the wallet-free Coston2 judge/role/accessibility smokes
-> pass. The supported three-machine replacement-TEE fault drill also passes;
-> browser-native XRP recovery is planned post-Summer Signal hardening, while
-> Gate H user validation remains `NOT_RUN`. The wallet-ready browser XRPL Payment/job preview, optional
-> GemWallet Testnet signing/submission path, and server-side XRP funding checkpoint/resume have fail-closed
-> coverage, and the hosted Railway runtime-log review found no forbidden-material
-> pattern matches. A review identified a V1 pre-dispatch closed-tender liveness
-> gap; the live side-by-side V2 candidate now has verified deployment,
-> governance, three fresh production machines, a passed three-vendor success
-> lifecycle, a passed one-result-endpoint outage recovery, and a passed live
-> invalid-credential rejection/retry drill across all three machines.
-> Its real undispatched-refund lifecycle remains `WAITING` for the fixed grace,
-> so no V2 release or consumer switch is claimed. Historical Sepolia/Nox
-> artifacts are pre-hackathon baseline only. Local adversarial coverage is
-> recorded separately and is not promoted to live Coston2 evidence. An
-> additional post-dispatch tender is live in `ComputePending` and remains
-> `WAITING` for its own fixed grace; it is optional fault breadth, not a new
-> promotion requirement.
+> Status: Gates 0–G are recorded on Coston2. V2 is the verified,
+> consumer-selected release after passing its current-scaffold rolling machine
+> refresh, deployment consistency, three-vendor success,
+> one-result-endpoint outage, invalid-credential retry, undispatched refund,
+> selection-expired refund, promotion, relay, and hosted web gates. The wallet-free role,
+> accessibility, XRP draft, and reload-checkpoint smokes also pass. Historical
+> V1 and Sepolia/Nox artifacts remain preserved but are not consumer authority.
+> Gate H remains open only for real buyer/vendor/pilot validation; broader live
+> fault injection and browser-native XRP executor recovery remain honest
+> post-Summer Signal hardening tracks.
 >
-> Operational recheck on 2026-08-12: the historical gate evidence is preserved,
-> but judge-time FCC readiness is currently blocked because the registered
-> machines' availability windows have expired and the verified V1 runtime does
-> not yet use the versions pinned by current scaffold `main`. A rolling refresh
-> and new evidence are required before claiming current known-good readiness.
+> Operational boundary: the refreshed machine evidence proves availability at
+> its recorded checkpoint. Because FCC availability is time-bounded, rerun the
+> V2 machine preflight (`pnpm flare:v2:machines:preflight`) and refresh `rRap`
+> if necessary near the judge demo; an old pass is never treated as current
+> availability.
 
 ## 1. Evidence policy
 
@@ -46,15 +35,15 @@ in-memory and save only an allowlisted pass/fail code.
 
 | Gate | Required live outcome | Minimum evidence | Status |
 |---|---|---|---|
-| 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, current scaffold pin set, fresh `rRap`, status `2`, availability age `<6h`, provider-facing `/instruction`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status/availability, route, and reachability assertions | HISTORICAL PASS / CURRENT RECHECK BLOCKED — block `33745484` preserves the earlier pass; the 2026-08-12 preflight requires fresh availability and current scaffold pins before judge-time readiness |
+| 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, current scaffold pin set, fresh `rRap`, status `2`, availability age `<6h`, provider-facing `/instruction`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status/availability, route, and reachability assertions | PASSED AT RECORDED V2 CHECKPOINT — current scaffold pins, image digests, rolling registration, exact active set, stable routes, status `2`, and fresh availability are recorded in `fcc-market-v2-machines-refresh.json`; availability must be rechecked near the demo |
 | A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | PASSED — block `33745987`; `PING_V1` binding, TEE signature domain, production signer mapping, wrong-binding rejection, and fresh-process recovery all pass |
 | B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext; rotated runtime fails closed and supported replacement restores capacity for new tenders | Commitment/receipt IDs, redaction assertions, identity-drift and replacement checkpoint | PASSED (aggregate) — live ingress/replay evidence plus `fcc-replacement-recovery.json` prove identity rotation, three replacement registrations, safe stale-identity retirement, and a new tender on the replacement set |
 | C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | PASSED (core + result-collection recovery) — live two- and three-vendor lifecycles plus `three-vendor-recovery.release.json`; replacement recovery must not mutate an existing frozen set |
 | D — Private scoring | Real TEEs match shared `SCORING_V1` vectors and select the deterministic eligible winner | Vector hashes, public inputs, result digest, Boolean expectations | PASSED — live FCC selection bound to XRP/USD terms and the common root |
-| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED for live result correctness and V2 recovery — the fresh V2 quorum passed a three-vendor success lifecycle and a second three-vendor lifecycle in which machine 3 was excluded from result collection while machines 1 and 2 finalized the same digest; closed-state recovery remains PARTIAL only because the undispatched-refund tender is still waiting for its real fixed grace |
+| E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED for live result correctness and V2 recovery — the refreshed V2 quorum passed a three-vendor success lifecycle, a second lifecycle where machines 1 and 2 finalized while machine 3's result endpoint was excluded, and both fixed-grace full-refund paths |
 | F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP and the award can enter the official redemption path | Feed snapshot, discovered asset IDs, balance conservation, redemption request | PASSED — live FTSO snapshot, conserved FTestXRP award, and amount-based AssetManager redemption request in `fassets-redemption.release.json` |
 | G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | PASSED — live evidence in `gate-g-smart-account.json`; delayed-mint checkpoint/resume is fail-closed and covered by relay tests |
-| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — the hosted unified Buyer funding chooser (direct Coston2 or XRP-native), Public Finalizer/Auditor workspaces, per-bid receipt inspection, award dossier, mobile/320px keyboard path, XRP draft, and reload checkpoint pass; browser-native executor recovery and broader wallet coverage are planned post-Summer Signal hardening, while user validation remains `NOT_RUN` |
+| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — the hosted V2 Buyer, Public, Private Bids, Activity, Auditor, award dossier, 320px keyboard path, XRP draft, and reload checkpoint pass; the remaining gate requirement is real buyer/vendor/pilot validation, currently `NOT_RUN` |
 
 No later gate converts an earlier failure into success. Private ingress, FCC
 selection, FTestXRP conservation, and the XRP-native flagship path are product
@@ -73,7 +62,7 @@ promote an unexecuted drill. Additional live stateful fault breadth and
 browser-native XRP recovery remain post-Summer Signal hardening rather than
 current V2 submission blockers. V2's real undispatched and post-dispatch refund
 lifecycles, promotion verification, and consumer switch have passed.
-Gate H remains a current validation track and stays `NOT RUN` until real
+Gate H remains a current validation track and stays `NOT_RUN` until real
 sessions occur.
 
 | Area | Passing condition | Status |
@@ -93,16 +82,16 @@ sessions occur.
 | FTestXRP settlement | Winner plus remainder, or zero-winner refund, equals exact escrow and happens once | PASSED (local stateful multi-tender harness plus live C-E-F lifecycle) |
 | FAssets redemption | Awarded vendor can request an official amount-based FTestXRP/FXRP redemption without FlareQuorum custody | PASSED — live Coston2 approval and `RedemptionRequested` evidence in `fassets-redemption.release.json` |
 | Smart Account/FDC | Sender/account/nonce/user-op hash/payment proof mismatch and replay fail | PARTIAL — public binding, quote, nonce, proof-domain, and checkpoint-drift tests pass; full live fault-drill evidence is planned post-Summer Signal hardening |
-| Closed-state liveness | Escrow has a bounded failure terminal path even when the first FCC dispatch cannot start | PARTIAL — `FlareQuorumMarketV2` passes local adversarial/conservation coverage, is deployed with fresh live FCC authority, and has a real closed undispatched tender; the final full-refund assertion remains `WAITING` until the fixed on-chain grace, while V1 stays the verified default |
-| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage and organizer-supported three-machine replacement recovery are live; XRP funding checkpoint/resume, public-safe browser job preview, reload-safe public checkpoint with an explicit resume control, and GemWallet hash handoff are implemented and tested (`evidence/coston2/web-xrp-funding-checkpoint.json`); optional V2 tender `5` has a real dispatch and is `WAITING` for the fixed post-dispatch refund grace; browser-native executor recovery remains post-Summer Signal hardening, while V2 promotion is waiting only for its required undispatched-refund lifecycle |
+| Closed-state liveness | Escrow has a bounded failure terminal path even when the first FCC dispatch cannot start | PASSED for V2 — `market-v2-undispatched-refund.json` proves the fixed close-time grace, exact full-escrow return, explicit `UndispatchedTimeout`, and no award; `market-v2-selection-expired-refund.json` separately proves the post-dispatch `SelectionExpired` path |
+| Recovery | Fresh relay/browser resumes every mined checkpoint without private state or mock data | PARTIAL — one-result FCC outage, organizer-supported three-machine replacement, both contract refund paths, XRP funding checkpoint/resume, public-safe browser job preview, reload-safe public checkpoint, and GemWallet hash handoff pass; browser-native executor recovery remains post-Summer Signal hardening and is not a V2 promotion blocker |
 | Public UX | Judges inspect a real finalized tender, Flare integration, and trust boundary without a wallet | PASSED for the expanded hosted release — `evidence/coston2/web-v2-production-smoke.json`, `evidence/coston2/web-v2-keyboard-accessibility.json`, and `evidence/coston2/flare-ingress-v2-production.json` record the wallet-free role shell, finalized tender, trust boundary, keyboard/320px checks, and fail-closed ingress |
-| Public Buyer Brief integrity | Registry accepts only the canonical public schema; web displays it only after recomputing the contract `metadataHash`; missing/mismatch is explicit | IMPLEMENTED LOCALLY — shared binding vectors, immutable file-store/HTTP tests, browser registry tests, and Public/Private Bids/Auditor component coverage pass; hosted volume and production smoke remain pending |
-| Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PASSED for the hosted current-release path in `evidence/coston2/web-keyboard-accessibility.json`; browser-native signing/recovery remains a separate post-Summer Signal hardening track |
+| Public Buyer Brief integrity | Registry accepts only the canonical public schema; web displays it only after recomputing the contract `metadataHash`; missing/mismatch is explicit | DEPLOYED AND TESTED — strict registry/file-store/browser tests pass, the hosted ingress exposes the public-safe registry, and `web-v2-production-smoke.json` verifies the V2 Buyer Brief surface; persistent-volume survival across a hosted restart remains an operational check rather than a contract claim |
+| Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PASSED for the hosted V2 path in `evidence/coston2/web-v2-keyboard-accessibility.json`; browser-native signing/recovery remains a separate post-Summer Signal hardening track |
 | Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; 602 latest hosted Railway JSON log records were inspected in memory with zero forbidden-material pattern matches; longer-retention and stateful fault coverage are planned post-Summer Signal hardening |
 | New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | PASSED for the current Flare package — `submission/flare/NEW-WORK-LEDGER.md` and judge-package validation agree; historical parent pack remains isolated |
 | User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN — explicit zero-session record in [`evidence/coston2/user-validation.release.json`](../evidence/coston2/user-validation.release.json); no traction is claimed |
 
-## 4. Planned evidence set
+## 4. Current evidence inventory
 
 ```text
 evidence/coston2/gate-0-foundations.json
@@ -126,25 +115,29 @@ evidence/coston2/bid-ingress-benchmark.release.json
 evidence/coston2/live-negative-calls.release.json
 evidence/coston2/web-desktop-mobile-keyboard.release.json
 evidence/coston2/production-smoke.release.json
-evidence/coston2/web-production-smoke.json
-evidence/coston2/web-keyboard-accessibility.json
-evidence/coston2/web-xrp-funding-draft.json
+evidence/coston2/web-v2-production-smoke.json
+evidence/coston2/web-v2-keyboard-accessibility.json
+evidence/coston2/web-v2-xrp-funding-draft.json
+evidence/coston2/web-v2-xrp-funding-checkpoint.json
 evidence/coston2/hosted-runtime-log-review.json
-evidence/coston2/fcc-market-machine-preflight.json
-evidence/coston2/market-v2-multi-vendor-success.json
-evidence/coston2/market-v2-one-result-outage.json
-evidence/coston2/market-v2-invalid-credential.json
+evidence/coston2/fcc-market-v2-machines-refresh.json
+evidence/coston2/market-v2-refresh-multi-vendor-success.json
+evidence/coston2/market-v2-refresh-one-result-outage.json
+evidence/coston2/market-v2-refresh-invalid-credential.json
+evidence/coston2/market-v2-undispatched-refund.json
 evidence/coston2/market-v2-selection-expired-refund.json
+evidence/coston2/market-v2-deployment-consistency.json
 evidence/coston2/web-role-workspaces.json
 evidence/coston2/flare-ingress-v2-production.json
 evidence/coston2/user-validation.release.json
 evidence/coston2/new-work-ledger.release.json
 ```
 
-File names are targets, not evidence that the tests ran. Each schema records
-`sourceCommit`, public environment identity, assertions, blockers, and
-collection time. A release file never changes from failed to passed without new
-live identifiers.
+Historical entries above preserve earlier gate provenance; current V2 entries
+are the release-facing records selected by the canonical manifest. A file name
+alone is not proof that a test ran: its status/assertions, public environment
+identity, blockers, and collection time remain authoritative. A release file
+never changes from failed to passed without new live identifiers.
 
 The current local rejection/continuity coverage is recorded in
 [`evidence/local/flare-adversarial-coverage.json`](../evidence/local/flare-adversarial-coverage.json).

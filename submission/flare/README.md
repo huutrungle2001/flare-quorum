@@ -71,13 +71,14 @@ FCC is essential: the winner is computed from sealed bid state inside the
    network/address and asks the buyer's wallet to sign/submit the exact public
    Payment; the fallback remains an external wallet handoff. No XRPL secret
    enters the browser. The live draft shape/memo smoke is recorded in
-   `evidence/coston2/web-xrp-funding-draft.json`; the reload-safe public
+   `evidence/coston2/web-v2-xrp-funding-draft.json`; the reload-safe public
    checkpoint resume/forget flow is verified in
-   `evidence/coston2/web-xrp-funding-checkpoint.json`.
+   `evidence/coston2/web-v2-xrp-funding-checkpoint.json`.
 5. Open the awarded Coston2 tender and follow the public market and award
    receipt contracts in the explorer.
 6. Use the [Flare docs](https://flare-quorum.vercel.app/docs#flare-coston2) to
-   distinguish the current release from the historical `/room` Sepolia app.
+   distinguish the current release from the repository-only Sepolia/Nox
+   baseline; the legacy `/room` URL now redirects to `/flare`.
 
 ## Verified public deployment
 

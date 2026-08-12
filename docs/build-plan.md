@@ -5,12 +5,12 @@
 > lifecycle. The public release hardening and product UX are recorded; the
 > supported replacement-TEE drill passes. Additional stateful fault breadth and
 > browser-native XRP recovery are planned post-Summer Signal hardening; Gate H
-> user validation remains `NOT_RUN`. The isolated V2 candidate is now live with
-> its own market, extension, governance, three fresh machines, and passed
-> three-vendor success lifecycle, one-result-endpoint outage recovery, and
-> three-machine invalid-credential rejection/retry drill. Its
-> refund tender is `WAITING` for the fixed 24-hour grace;
-> V2 promotion remains separate from the verified V1 submission release.
+> user validation remains `NOT_RUN`. V2 is now the verified, consumer-selected
+> release with its own market, extension, governance, three refreshed machines,
+> and passed three-vendor success lifecycle, one-result-endpoint outage recovery, and
+> three-machine invalid-credential rejection/retry drill. Both fixed-grace
+> refund lifecycles passed before promotion; V1 is preserved as historical
+> Coston2 release evidence.
 
 The master execution checklist is [`PLAN.md`](../PLAN.md). This document records
 workspace sequencing, deliverables, and release engineering.
@@ -118,7 +118,7 @@ placeholders are forbidden after that commit.
   secret review; user-validation and organizer submission decisions remain
   external.
 
-### Isolated V2 promotion and later hardening
+### Completed V2 promotion and later hardening
 
 - [x] Deploy V2 alongside V1 with a fresh extension and exactly three fresh
   machine identities.

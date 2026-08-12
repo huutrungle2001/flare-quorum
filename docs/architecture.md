@@ -253,12 +253,11 @@ selected TEE boundary.
 - Quorum loss after a successful dispatch: explicit liveness failure; after
   the fixed 24-hour selection grace the buyer may recover escrow with no award
   and no success claim.
-- Quorum loss before the first successful dispatch: the verified V1 market has
-  a known `Closed`-state liveness gap. The live side-by-side V2 candidate
-  records `closedAt` and permits the same full-escrow failure refund after a
-  separate fixed grace without consulting the unavailable manager. Its refund
-  tender is currently waiting for that real grace; V2 is not release authority
-  until the lifecycle and promotion evidence pass.
+- Quorum loss before the first successful dispatch: historical V1 had a
+  `Closed`-state liveness gap. The consumer-selected V2 market records
+  `closedAt` and permits a full-escrow failure refund after a separate fixed
+  grace without consulting the unavailable manager. The live undispatched
+  refund lifecycle passed before V2 promotion.
 - FTSO unavailable/stale: USD-enabled close pauses; no manual price.
 - FDC/Smart Account failure: use the documented public-safe delayed-mint
   checkpoint/resume; no app custody and no duplicate XRPL payment.

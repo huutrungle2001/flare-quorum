@@ -1,41 +1,19 @@
 # FlareQuorum Championship Execution Plan
 
-> Status: Phase 0, Gates 0–A, live Gate-B ingress/replay, the core Gates C–F
-> lifecycle, and Gate G pass on Coston2. Three stable Railway FCC origins accept encrypted bids and
-> return domain-bound receipts; the current Railway ingress fronts that path for
-> browser ciphertext, while a three-bid, two-signature lifecycle proves
-> common quorum, private scoring, threshold finalization, FTSO binding, and
-> exact FTestXRP settlement. The XRP-native run also proves an XRPL `0xFE`
-> payment, FDC proof, Smart Account direct mint, and atomic tender funding.
-> The organizer-confirmed restart model is replacement registration, not
-> same-identity restoration; a full three-machine rolling replacement drill now
-> passes on Coston2. A one-result-endpoint outage recovery, verified release, hosted
-> ingress, public Evidence workspace, wallet-free Coston2 judge smoke, and
-> read-only live negative guards are live. The unified Buyer deployment,
-> wallet-ready XRP Payment/job preview, hosted desktop/mobile/keyboard smokes,
-> and captioned judge video are shipped. Browser-native signing and
-> executor recovery plus additional stateful fault-drill breadth are planned
-> post-Summer Signal hardening; Gate H user validation remains `NOT_RUN`.
-> A review found that the verified V1 market can remain `Closed` indefinitely
-> when its first selection dispatch cannot obtain two active frozen TEEs. The
-> side-by-side `FlareQuorumMarketV2` candidate now has bounded pre-dispatch
-> recovery, comprehensive contract tests, a verified live deployment, fresh
-> extension `66142`, three fresh production machines, a passed live three-vendor
-> success lifecycle, a passed one-result-endpoint outage recovery, and a passed
-> live invalid-credential rejection/retry drill. Its real
-> undispatched-refund tender is waiting for the fixed
-> on-chain grace before promotion can be verified. V1 remains the canonical
-> Coston2 submission release and consumer default. A separate optional
-> post-dispatch recovery tender (`5`) is also live in `ComputePending` and is
-> honestly `WAITING` for its own fixed first-dispatch grace; it adds fault
-> breadth but is not a new promotion blocker.
-> The 2026-08-12 FCC known-good recheck adds a new judge-time operations blocker:
-> status `2` is insufficient while availability is expired, and the current V1
-> runtime predates the dependency set pinned by current scaffold `main`. Local
-> preflight now verifies provider `POST /instruction` reachability, `<6h`
-> availability, one identity per endpoint, and exact scaffold pins. Refresh the
-> three machines by rolling replacement and record new evidence before the next
-> public deployment; do not rewrite the historical V1 evidence.
+> Status: Gates 0–G pass on Coston2. `FlareQuorumMarketV2` is the verified,
+> consumer-selected release with extension `66142`, the current scaffold pin
+> set, three refreshed `PRODUCTION` machine identities, exact 3-of-3 bid
+> custody, 2-of-3 result agreement, FTSO-bound scoring, FTestXRP settlement,
+> XRPL/FDC/Smart Account funding, and official redemption-request evidence. Its
+> live success, one-result-endpoint outage, invalid-credential retry,
+> undispatched refund, and selection-expired refund lifecycles pass. Relay was
+> deployed before the V2 web consumer; the hosted judge, role,
+> keyboard/accessibility, XRP draft, reload-checkpoint, and captioned-video
+> checks pass. V1 remains preserved as historical Coston2 evidence. Gate H user
+> validation remains `NOT_RUN`; browser-native executor recovery and additional
+> stateful live fault breadth remain post-Summer Signal hardening.
+> Judge-time operations still require a fresh machine preflight because status
+> `2` alone is insufficient and FCC availability expires after six hours.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable
@@ -203,7 +181,7 @@ for every golden vector without exposing losing fields.
   XRP/USD snapshot, official feed, freshness, decimals, and bounds locally.
 - [x] Implement asynchronous close/request/result/finalize recovery locally.
 - [x] Verify distinct threshold signers over the exact same domain digest in
-  Foundry; registered live-machine verification remains pending.
+  Foundry and through the registered live V2 machine quorum.
 - [x] Implement and unit-test winner payout, buyer remainder, zero-winner
   refund, and receipt.
 - [x] Add unit, fuzz, reentrancy, signer, root, nonce, and expiry tests.
@@ -256,7 +234,8 @@ custodial FlareQuorum signer.
 - [x] Add fail-closed Coston2 public-market and XRP funding consumer adapters;
   the browser route is now backed by the verified Coston2 release.
 - [x] Replace the Sepolia judge path with verified Coston2 bindings for `/` and
-  `/flare`; `/room` remains explicitly historical.
+  `/flare`; `/room` redirects to the canonical Coston2 application while the
+  Sepolia implementation remains isolated in repository packages/evidence.
 - [x] Build the current-release role workspaces: the wallet-free Public dossier,
   unified Buyer with direct Coston2 and XRP-native funding choices, Vendor,
   Public Finalizer, and Auditor/Evidence paths. The Buyer includes a wallet-ready
@@ -291,8 +270,8 @@ custodial FlareQuorum signer.
   Flare reader, relay, funding, and ingress adapters.
 - [x] Complete the responsive, keyboard, reduced-motion, privacy-copy, and
   role-workspace review; production desktop/mobile smoke and the 320px keyboard
-  evidence pass in `evidence/coston2/web-production-smoke.json` and
-  `evidence/coston2/web-keyboard-accessibility.json`. The public-safe XRP job
+  evidence pass in `evidence/coston2/web-v2-production-smoke.json` and
+  `evidence/coston2/web-v2-keyboard-accessibility.json`. The public-safe XRP job
   preview and explicit reload-safe public checkpoint resume are live, while
   browser-native XRPL signing/submission remains explicitly outside the app
   custody boundary.
@@ -361,13 +340,12 @@ confidential bid or settlement boundary:
 - [x] Re-resolve `FtsoV2` from the live Flare registry before deployment or
   promotion, and reject any unexpected active FCC identity/route before machine
   registration; the complete post-registration set must be exactly three.
-- [x] Deploy the isolated V2 candidate side-by-side, register fresh extension
+- [x] Deploy V2 side-by-side, register fresh extension
   `66142` and exactly three fresh production machines, verify governance and
   runtime bindings, pass the live three-vendor encrypted-bid success lifecycle,
   and prove two remaining result endpoints still finalize when one is excluded,
-  without changing V1. The undispatched-refund tender is closed and honestly remains
-  `WAITING` until its fixed on-chain grace elapses; promotion and consumer
-  switching remain separate gates.
+  without changing V1. The undispatched-refund and selection-expired tenders
+  both passed after their real fixed on-chain grace periods.
 - [x] Prove all three V2 machines reject a sealed bid signed by the wrong
   credential issuer, verify each signed rejection against its expected TEE,
   then accept the corrected credential on the same canonical slot without
@@ -425,39 +403,39 @@ two minutes, and reproduce the public path from the repository.
 | Gates 0–G | Current Summer Signal technical acceptance | Passed with the cited Coston2 evidence |
 | Gate H | Current product and user-validation gate | `NOT_RUN`; no interview, usability, or traction result is claimed |
 | Organizer submission and bounty-selection actions | External submission actions | Builder-controlled; not an engineering pass/fail result |
-| V2 live release promotion | Isolated current candidate track | Candidate address, extension, three fresh machines, governance, three-vendor success, one-result-endpoint outage recovery, and invalid-credential rejection/retry are live; refund is `WAITING` for its fixed on-chain grace, so no verified release or consumer switch is claimed |
+| V2 live release promotion | Completed release track | Deployment, extension, refreshed three-machine set, governance, success, outage recovery, invalid-credential retry, both fixed-grace refunds, promotion verification, relay-first rollout, and consumer switch passed; V1 is historical |
 | Additional live fault breadth and browser-native XRP recovery | Planned post-Summer Signal hardening | The current recorded drills and public-safe wallet handoff remain the submission boundary |
 | Flare Treasury Exchange | Planned post-Summer Signal product expansion | Roadmap only |
 
-### Phase 9 — isolated upgrades beyond the verified V1 release
+### Phase 9 — completed V2 promotion and later product expansion
 
-This phase is separate from the verified V1 release. Its V2 candidate track may
-produce current engineering evidence, but it must not be presented as a verified
-or consumer-selected release until its own Coston2 gates pass. The Treasury
-Exchange bullets remain a post-competition roadmap.
+The isolated V2 track completed its own Coston2 gates and is now the verified,
+consumer-selected release. V1 remains a historical manifest and evidence set.
+The Treasury Exchange bullets remain a post-competition roadmap.
 
-#### 9.0 — staged V2 release promotion
+#### 9.0 — completed staged V2 release promotion
 
 - [x] Deploy `FlareQuorumMarketV2` alongside the immutable verified V1 release.
 - [x] Register a fresh FCC extension and exactly three fresh TEE machines
   without reusing or pausing the V1 machine set.
-- Publish a V2-specific manifest and generated bindings only after source,
+- [x] Publish a V2-specific manifest and generated bindings only after source,
   runtime, registry, extension, code-version, machine, and signer checks agree.
 - [x] Record the three-vendor flagship success lifecycle with public-safe Coston2 evidence.
 - [x] Record a second three-vendor lifecycle where one result endpoint is
   excluded and the other two frozen identities still finalize the exact digest.
 - [x] Record a live sealed-bid invalid-credential drill across all three fresh
   machines and prove a rejected attempt does not consume its canonical slot.
-- Resume the already closed tender after its real 24-hour grace and record the
+- [x] Resume the already closed tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle.
-- Complete the separate post-dispatch tender `5` after chain timestamp
+- [x] Complete the separate post-dispatch tender `5` after chain timestamp
   `1786553311` and record `SelectionExpired`, exact escrow return, and no award;
-  this optional fault proof is `WAITING`, not a V2 promotion requirement.
+  this optional fault proof passed and remains separate from the original
+  promotion requirement.
 - Expand stateful Coston2 fault injection, live two-machine-loss coverage,
   and browser-native XRP recovery without weakening the current fail-closed
   boundary.
-- Promote V2 only after its release gate passes; switching consumers remains
-  a separate explicit release decision.
+- [x] Promote V2 only after its release gate passes, then switch package,
+  relay, and web consumers as a separate explicit release decision.
 
 #### 9.1 — Flare Treasury Exchange direction
 
@@ -539,7 +517,7 @@ is never changed as part of this roadmap.
 
 **V2 track exit:** its separate verified release, fresh FCC identity set, live
 success/refund evidence, and consumer-promotion decision all agree without
-changing V1 authority.
+rewriting the historical V1 manifest or evidence.
 
 **Treasury Exchange track exit:** one real Coston2 intent with at least two
 private offers and two objective milestones completes selection, proof
@@ -612,7 +590,7 @@ the championship product and requires Product Plan approval.
 | FCC foundation operation | LIVE PASSED — deterministic `PING_V1` result verified on Coston2 with registered signer/domain |
 | FCC private ingress | LIVE PASSED — three-machine authenticated direct ingress, ECIES encryption, receipt binding, exact-retry idempotence, changed-ciphertext rejection, and supported rolling replacement recovery pass |
 | Multi-TEE quorum | LIVE PASSED for one three-bid lifecycle — atomic 3-of-3 receipts, common root, two matching frozen-TEE signatures, and one-machine resilience assertions recorded; replacements never mutate an existing frozen set |
-| Flare contracts | V1 LIVE VERIFIED AND DEFAULT; V2 LIVE CANDIDATE — market `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, extension `66142`, three fresh production machines, governance, runtime/wiring, and three-vendor success lifecycle pass; refund is time-locked `WAITING`, so V2 is not yet a verified or consumer-selected release |
+| Flare contracts | V2 LIVE VERIFIED AND CONSUMER-SELECTED — market `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, extension `66142`, three refreshed production machines, governance, runtime/wiring, success/outage/credential lifecycles, and both refund paths pass; V1 is historical |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, official amount-based FTestXRP redemption request, and fail-closed delayed-mint checkpoint/resume are implemented; evidence is recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
 | Coston2 deployment/evidence | CURRENT RELEASE VALIDATED; GATE H IN PROGRESS — Gates 0–G and verified deployment evidence recorded; the unified Buyer deployment, wallet-free judge/role/accessibility/XRP smokes, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; additional live fault breadth and browser-native XRP recovery are planned post-Summer Signal hardening, while Gate H user validation remains `NOT_RUN` |

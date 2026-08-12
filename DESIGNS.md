@@ -244,20 +244,22 @@ Role pills:
 - `BUYER`
 - `PRIVATE BIDS`
 - `ACTIVITY`
-- `XRP TREASURY`
 - `AUDITOR`
 
 The active role uses Veil Green with black text and a black border. Role changes
 must not imply wallet permission. Unauthorized roles remain browsable where
 public data exists, with writes hidden or disabled and explained.
 
-`PUBLIC` is strictly wallet-free discovery and tender inspection. `BUYER` is
-the EVM recovery path, `PRIVATE BIDS` is the vendor/FCC ingress path, `ACTIVITY`
-is the separate public-finalizer context, and `XRP TREASURY` is the XRP Treasury
-mapping (XRPL → FDC → Smart Account). `ACTIVITY` is not a privileged role:
-permissionless close remains permissionless, buyer cancellation/refund still
-require the canonical buyer, and FCC dispatch/result grouping remain relay-only.
-`AUDITOR` is wallet-free and has no signer or bid access.
+`PUBLIC` is strictly wallet-free discovery and tender inspection. `BUYER`
+contains one rules draft with two alternative funding choices: direct
+Coston2/FTestXRP or the advanced XRPL → FDC → Smart Account path. The historical
+`?role=treasury` URL is only a compatibility alias that opens Buyer with the XRP
+choice selected. `PRIVATE BIDS` is the vendor/FCC ingress path, and `ACTIVITY`
+is the public action/recovery queue plus contextual Assets/Redemption.
+`ACTIVITY` is not a privileged role: permissionless close remains
+permissionless, buyer cancellation/refund still require the canonical buyer,
+and FCC dispatch/result grouping remain relay-only. `AUDITOR` is wallet-free
+and has no signer or bid access.
 
 ### Historical UI parity decisions
 
