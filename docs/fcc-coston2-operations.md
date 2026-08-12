@@ -230,9 +230,12 @@ Diagnose a dispatched-but-unexecuted instruction in this order:
    registration tool or intentionally create a fresh extension. Re-running a
    registration command without reconciling the existing record is not proof
    that the URL changed.
-7. Check `instructions_received` and `instructions_rejected` metrics. Provider
-   attempt-level HTTP responses are not publicly queryable and require operator
-   escalation with public-safe identifiers.
+7. When the exact tested proxy release exposes them, check
+   `instructions_received` and `instructions_rejected` metrics. The scaffold's
+   pinned `tee-proxy v0.0.18` rejects the newer `[metrics]` TOML section, so V2
+   does not mix in a newer proxy merely to add that optional diagnostic.
+   Provider attempt-level HTTP responses are not publicly queryable and require
+   operator escalation with public-safe identifiers.
 
 Indexer readiness is a separate check for policy and indexed protocol state.
 Expected lag is effectively zero: `GET :6661/ready` returning `200` means the

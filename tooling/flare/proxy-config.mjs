@@ -108,9 +108,6 @@ max_body_size = 1048576
 [attestation]
 enable = true
 allow_magic_pass = true
-
-[metrics]
-enable = true
 `;
 }
 
