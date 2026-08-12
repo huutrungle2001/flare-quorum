@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "gate": "FLARE_V2_UNDISPATCHED_REFUND",
+  "status": "PASSED",
+  "recordedAt": "2026-08-12T17:47:58.659Z",
+  "sourceCommit": "8982eba74d6421575dcedfb719be7a7160c4c744",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33976818"
+  },
+  "publicIdentifiers": {
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+    "awardReceipt": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3",
+    "extensionId": "66142",
+    "tenderId": "2",
+    "closedAt": "1786451980",
+    "refundAvailableAt": "1786538381",
+    "approvalTransaction": "0x8c94cc75c8eef295b9ba3d92bcd439e00fe3014893fcea2d18257b243c446450",
+    "createTransaction": "0xacc27130f02285bf40bcc0ff5872a15f31ef99a96d2ce3dc146e8f6b3eb72667",
+    "closeTransaction": "0x1f5c5bb5e0c2152eb6dfb7603e0aa83a604b4f93790f578ce97a34d22dd168cd",
+    "refundTransaction": "0x8fd281907b4e0163dca20f219c50f68cd0597e47fad8fa5638e56453f50bac6a",
+    "refundReason": "UndispatchedTimeout",
+    "escrowAmount": "1000000"
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "accountMatchesDeclaredDeployer": true,
+    "buyerHasEscrow": true,
+    "v2MarketCodePresent": true,
+    "v2AwardReceiptCodePresent": true,
+    "extensionSenderMatchesV2": true,
+    "threeProductionMachinesBound": true,
+    "closedRefundGraceIs24Hours": true,
+    "selectionRefundGraceIs24Hours": true,
+    "selectionNeverDispatched": true,
+    "closedGraceElapsed": true,
+    "refundTransactionSucceeded": true,
+    "tenderStatusRefunded": true,
+    "fullEscrowReturned": true,
+    "noAwardMinted": true,
+    "refundReasonUndispatchedTimeout": true
+  },
+  "blockers": [],
+  "notes": [
+    "The tender was closed and never dispatched to FCC before the bounded refund grace elapsed.",
+    "The full public FTestXRP escrow returned to the buyer and no award receipt was minted.",
+    "No bid, TEE result, proxy credential, private key, or fabricated lifecycle value is recorded."
+  ]
+}
