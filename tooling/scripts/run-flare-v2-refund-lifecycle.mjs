@@ -16,6 +16,7 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 
 import { readV2ReleasePlan } from "../flare/v2-release.mjs";
+import { buildCoston2LogBlockRanges } from "../flare/rpc-log-ranges.mjs";
 
 const root = resolve(import.meta.dirname, "../..");
 const plan = readV2ReleasePlan(root);
@@ -82,15 +83,14 @@ async function send({ client, wallet, account, address, abi, functionName, args,
 }
 
 async function awardExists(client, awardReceipt, tenderId, fromBlock, toBlock) {
-  for (let cursor = fromBlock; cursor <= toBlock; cursor += 2_000n) {
-    const end = cursor + 1_999n < toBlock ? cursor + 1_999n : toBlock;
+  for (const range of buildCoston2LogBlockRanges(fromBlock, toBlock)) {
     const events = await client.getContractEvents({
       address: awardReceipt,
       abi: receiptAbi,
       eventName: "AwardReceiptMinted",
       args: { tenderId },
-      fromBlock: cursor,
-      toBlock: end,
+      fromBlock: range.fromBlock,
+      toBlock: range.toBlock,
       strict: true,
     });
     if (events.length > 0) return true;
