@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "gate": "FCC_V2_ROLLING_MACHINE_PAUSE",
+  "status": "PASSED",
+  "recordedAt": "2026-08-12T18:34:25.136Z",
+  "sourceCommit": "66051b46f572c7fe5ec1a0d7afe0e7c84e561492",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33978064"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "66142",
+    "machine": 2,
+    "oldTeeId": "0xc625B0190048A3BBc3E2B89349B2E6150aA0BC36",
+    "replacementTeeId": "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD",
+    "publicUrl": "https://flare-quorum-v2-fcc-2-production.up.railway.app",
+    "pauseTransaction": "0x34a0603f2b079990e44ac6483b3e42bca4b71ae9522908158c46ddae31dcad1d"
+  },
+  "assertions": {
+    "replacementIdentityChanged": true,
+    "onlySelectedEndpointChanged": true,
+    "noOpenTenderUsesPausedIdentity": true,
+    "oldIdentityRemovedFromProduction": true,
+    "twoPreviousMachinesRemainActive": true
+  },
+  "blockers": [],
+  "notes": [
+    "The replacement endpoint was verified before the old identity was paused; rRap registration is the next separate step.",
+    "No deployment key, TEE key, proxy credential, raw signature, ciphertext, or bid data is recorded."
+  ]
+}
