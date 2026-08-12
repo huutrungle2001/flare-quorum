@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "gate": "FLARE_V2_SUCCESS_RECOVERY",
+  "status": "PASSED",
+  "recordedAt": "2026-08-12T18:50:06.133Z",
+  "sourceCommit": "4349da0ac1d2c2c522dcc9e3c8c199ca1ca8cb04",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33978495"
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+    "awardReceipt": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3",
+    "paymentToken": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+    "ftso": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+    "extensionId": "66142",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "version": "0.2.2",
+    "buyer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+    "vendor": "0x746D220865BE9E192782BCCfF5b729D583b4Bf24",
+    "vendors": [
+      "0x746D220865BE9E192782BCCfF5b729D583b4Bf24",
+      "0x03C882584D3c8CfD3A768E78fAb520321c25f3e4",
+      "0x36df67D9031Af6645A2f8D6A7fA5574b43F719f7"
+    ],
+    "teeIds": [
+      "0x325E7f5DE26e2ECdaAc23d4883024850E76a0F9B",
+      "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD",
+      "0xc3c454aaDb538A15B18a9Cce24E5e53cC062AFC1"
+    ],
+    "teeKeyFingerprints": [
+      "0xd5c641c8135521c9eca9a7ee325e7f5de26e2ecdaac23d4883024850e76a0f9b",
+      "0x048e8317bbe32e76be67c5d577091a12534cdd90ea9f4ca11003ba645b6e8abd",
+      "0x70556c00e875d71135d7987cc3c454aadb538a15b18a9cce24e5e53cc062afc1"
+    ],
+    "tenderId": "7",
+    "rulesHash": "0x5cec77c07dd2428069ed766528a648ae4b3eb3d8f74a11e584085633e584081d",
+    "orderedBidRoot": "0xbdff25ea37de8ddfe3e631f165a69b034e1a7cf33a7352e1cc251aab851c20e9",
+    "plaintextCommitment": "0x52b90069c60bad839b7ac4a652ecef9fb7733d0e9c1408d917a053fe59c83eb8",
+    "plaintextCommitments": [
+      "0x52b90069c60bad839b7ac4a652ecef9fb7733d0e9c1408d917a053fe59c83eb8",
+      "0x532413d8e3d0f2b5c0d5a42c4f06596d622e4c7897417d2c6acf10e829dde5fd",
+      "0x2ebf10e1ac0d3010492d4ddd20d1ec79658c2dd49e84b981460924b680d9afcf"
+    ],
+    "bidReceiptActionIds": [
+      "0x1bb85875a881b683956992a92b3384bc3937aa1e6c0374550778fce0ad1b0f69",
+      "0xdae454fa58e5478f981e958d4e93a24cc41b0b878e9403e1738a56411a647429",
+      "0xd5170433903d44afa1955b642f884c4d47cc60d34be35bc655dbc8465585dfdd"
+    ],
+    "bidReceiptActionIdsByVendor": [
+      [
+        "0x1bb85875a881b683956992a92b3384bc3937aa1e6c0374550778fce0ad1b0f69",
+        "0xdae454fa58e5478f981e958d4e93a24cc41b0b878e9403e1738a56411a647429",
+        "0xd5170433903d44afa1955b642f884c4d47cc60d34be35bc655dbc8465585dfdd"
+      ],
+      [
+        "0x359f1edf47a2968dfb2f5b1067250f3b4cb8cd37535374ccd1c39dce59b1449f",
+        "0xd734a943f5269dc4e2054f902debe07d1e60bb42518a8ec465a362678486a8d9",
+        "0xd945c3be43cbcc449ed2006d3ad6dbc6c1c4f9f3475e8a72685ef9cf3905c8ab"
+      ],
+      [
+        "0x02c5e45ff1a5916152e6bf2ee51ee254ad4f5b2f397294cee853d3a25e8a8330",
+        "0x0178453412f0a9f510c0f2eb3fe36f0d9a3fac972f389b628dabb45079236d73",
+        "0x153e881f20dab228543b0a69b58773d82e228c2b1300ea1b0b113574a2d8dd86"
+      ]
+    ],
+    "requestId": "0xd079617c8d8a38d918c410eb3630ccbb638580c2669e4644d908a06f211531bf",
+    "selectionResultCollectionOutageMachineIndex": 3,
+    "selectionSignerIds": [
+      "0x325E7f5DE26e2ECdaAc23d4883024850E76a0F9B",
+      "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD"
+    ],
+    "selectionResultDataHash": "0x864e5f4a8366b52e484bcc97d1dc33d842261a4804d201920179d886c47649be",
+    "winnerBidId": "1",
+    "winner": "0x746D220865BE9E192782BCCfF5b729D583b4Bf24",
+    "winningAmountXrp": "693808",
+    "ftsoFeedId": "0x015852502f55534400000000000000000000000000",
+    "ftsoValue": "1008925",
+    "ftsoDecimals": 6,
+    "ftsoTimestamp": "1786560621",
+    "closeBlock": "33978484",
+    "marketEscrowBalanceBefore": "0",
+    "marketEscrowBalanceAfter": "0",
+    "awardReceiptOwner": "0x746D220865BE9E192782BCCfF5b729D583b4Bf24",
+    "approvalTransaction": "0xdfe8f9c53853f78adfc4768b96782d9d1d066bdbca5430190211416bd00693a1",
+    "tenderTransaction": "0xa53b0f16f2135e795b4dbc0cd46f72078f0d8efe5cdef8a88c66befffd0974eb",
+    "vendorFundingTransaction": "0xb8d00a2228bb903a946e0f9fc37f0e3d8bb60a2fdacfeb9fbff45d6c74dae605",
+    "vendorFundingTransactions": [
+      "0xb8d00a2228bb903a946e0f9fc37f0e3d8bb60a2fdacfeb9fbff45d6c74dae605",
+      "0x331cc763e932528f3005f000fbc1e632db4edb92258f4d3353c467354f9dc1c7",
+      "0x137a82b69e9b1ef31f6b9212fe60ebd6fe899b9c7715d92a88f7b54b992dbd9f"
+    ],
+    "bidTransaction": "0x6b9aa8bbbdd6c3967b85df245ae2424b2a1e1799f8aca11c1ca833bf89cc8134",
+    "bidTransactions": [
+      "0x6b9aa8bbbdd6c3967b85df245ae2424b2a1e1799f8aca11c1ca833bf89cc8134",
+      "0x8437177b2d83a142b5e1b64f7c13990b28a27162ca97b1effff31dc624e76378",
+      "0x3580567ccfaf242b94a19c364eca2a1a6afa2d635c74c2990a190b46536eafbf"
+    ],
+    "closeTransaction": "0x07556d04e8774938fc753baa0ae18ecf38f55e32b27343f749f6153ba3913e49",
+    "requestTransaction": "0xc92046c8816b3736bfb044bc85c70bedf6015a3096ad6220e089f2fc5c0c36a0",
+    "finalizationTransaction": "0x74763c4c0739086b469a3cc38ff99a7f1f6d9530f6a8e0a4a09cf708ee7a9bb3"
+  },
+  "ingressBenchmarks": {
+    "vendorCount": 3,
+    "perVendor": [
+      {
+        "vendorIndex": 1,
+        "sampleCount": 3,
+        "samples": [
+          {
+            "machine": 1,
+            "directResponseMs": 494.736,
+            "resultResponseMs": 365.476,
+            "endToEndMs": 860.212
+          },
+          {
+            "machine": 2,
+            "directResponseMs": 497.948,
+            "resultResponseMs": 360.79,
+            "endToEndMs": 858.739
+          },
+          {
+            "machine": 3,
+            "directResponseMs": 439.137,
+            "resultResponseMs": 358.867,
+            "endToEndMs": 798.003
+          }
+        ],
+        "directResponse": {
+          "minMs": 439.137,
+          "maxMs": 497.948,
+          "averageMs": 477.274
+        },
+        "resultResponse": {
+          "minMs": 358.867,
+          "maxMs": 365.476,
+          "averageMs": 361.711
+        },
+        "endToEnd": {
+          "minMs": 798.003,
+          "maxMs": 860.212,
+          "averageMs": 838.985
+        }
+      },
+      {
+        "vendorIndex": 2,
+        "sampleCount": 3,
+        "samples": [
+          {
+            "machine": 1,
+            "directResponseMs": 322.36,
+            "resultResponseMs": 365.194,
+            "endToEndMs": 687.553
+          },
+          {
+            "machine": 2,
+            "directResponseMs": 243.894,
+            "resultResponseMs": 243.757,
+            "endToEndMs": 487.651
+          },
+          {
+            "machine": 3,
+            "directResponseMs": 241.796,
+            "resultResponseMs": 249.663,
+            "endToEndMs": 491.46
+          }
+        ],
+        "directResponse": {
+          "minMs": 241.796,
+          "maxMs": 322.36,
+          "averageMs": 269.35
+        },
+        "resultResponse": {
+          "minMs": 243.757,
+          "maxMs": 365.194,
+          "averageMs": 286.205
+        },
+        "endToEnd": {
+          "minMs": 487.651,
+          "maxMs": 687.553,
+          "averageMs": 555.555
+        }
+      },
+      {
+        "vendorIndex": 3,
+        "sampleCount": 3,
+        "samples": [
+          {
+            "machine": 1,
+            "directResponseMs": 234.397,
+            "resultResponseMs": 241.76,
+            "endToEndMs": 476.157
+          },
+          {
+            "machine": 2,
+            "directResponseMs": 250.874,
+            "resultResponseMs": 242.183,
+            "endToEndMs": 493.058
+          },
+          {
+            "machine": 3,
+            "directResponseMs": 246.204,
+            "resultResponseMs": 247.641,
+            "endToEndMs": 493.845
+          }
+        ],
+        "directResponse": {
+          "minMs": 234.397,
+          "maxMs": 250.874,
+          "averageMs": 243.825
+        },
+        "resultResponse": {
+          "minMs": 241.76,
+          "maxMs": 247.641,
+          "averageMs": 243.861
+        },
+        "endToEnd": {
+          "minMs": 476.157,
+          "maxMs": 493.845,
+          "averageMs": 487.687
+        }
+      }
+    ],
+    "allSamples": {
+      "sampleCount": 9,
+      "samples": [
+        {
+          "machine": 1,
+          "directResponseMs": 494.736,
+          "resultResponseMs": 365.476,
+          "endToEndMs": 860.212
+        },
+        {
+          "machine": 2,
+          "directResponseMs": 497.948,
+          "resultResponseMs": 360.79,
+          "endToEndMs": 858.739
+        },
+        {
+          "machine": 3,
+          "directResponseMs": 439.137,
+          "resultResponseMs": 358.867,
+          "endToEndMs": 798.003
+        },
+        {
+          "machine": 1,
+          "directResponseMs": 322.36,
+          "resultResponseMs": 365.194,
+          "endToEndMs": 687.553
+        },
+        {
+          "machine": 2,
+          "directResponseMs": 243.894,
+          "resultResponseMs": 243.757,
+          "endToEndMs": 487.651
+        },
+        {
+          "machine": 3,
+          "directResponseMs": 241.796,
+          "resultResponseMs": 249.663,
+          "endToEndMs": 491.46
+        },
+        {
+          "machine": 1,
+          "directResponseMs": 234.397,
+          "resultResponseMs": 241.76,
+          "endToEndMs": 476.157
+        },
+        {
+          "machine": 2,
+          "directResponseMs": 250.874,
+          "resultResponseMs": 242.183,
+          "endToEndMs": 493.058
+        },
+        {
+          "machine": 3,
+          "directResponseMs": 246.204,
+          "resultResponseMs": 247.641,
+          "endToEndMs": 493.845
+        }
+      ],
+      "directResponse": {
+        "minMs": 234.397,
+        "maxMs": 497.948,
+        "averageMs": 330.15
+      },
+      "resultResponse": {
+        "minMs": 241.76,
+        "maxMs": 365.476,
+        "averageMs": 297.259
+      },
+      "endToEnd": {
+        "minMs": 476.157,
+        "maxMs": 860.212,
+        "averageMs": 627.409
+      }
+    }
+  },
+  "assertions": {
+    "fccWinnerSelected": true,
+    "marketSenderBoundToExtension": true,
+    "threeProductionMachinesFrozen": true,
+    "threeEncryptedBidsAcceptedByDistinctTees": true,
+    "allBidReceiptsBindCommitment": true,
+    "commonBidQuorumIsThree": true,
+    "ftsSnapshotCapturedOnClose": true,
+    "selectionResultSignedByTwoDistinctFrozenTees": true,
+    "selectionResultThresholdSatisfied": true,
+    "oneSelectionResultUnavailableStillFinalized": true,
+    "selectionResultMatchesCommonRoot": true,
+    "ftestXrpWinnerPayoutConserved": true,
+    "escrowConserved": true,
+    "awardReceiptMintedToWinner": true,
+    "finalTenderAwarded": true,
+    "independentBidIngressLatencyRecorded": true,
+    "noPlaintextOrCiphertextRecorded": true
+  },
+  "blockers": [],
+  "notes": [
+    "This is a live Coston2 simulated-TEE lifecycle: FTestXRP escrow, encrypted private bid ingress, FTSO XRP/USD snapshot, FCC private scoring, 2-of-3 result quorum, and award settlement.",
+    "Only public commitments, result fields, machine IDs, and transaction identifiers are recorded; bid plaintext, ciphertext, raw signatures, salts, and credentials are not recorded.",
+    "3 vendor bid(s) were generated in process memory; private keys and bid payloads are not persisted or included in evidence.",
+    "Bid-ingress timings are wall-clock measurements for direct acknowledgment and signed receipt retrieval; they are public timing metadata only, not an SLA.",
+    "One result endpoint was intentionally unavailable during collection; the two remaining frozen TEE results still formed the threshold quorum."
+  ]
+}
