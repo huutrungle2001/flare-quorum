@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-frontend-smoke",
+  "recordedAt": "2026-08-12T19:15:24.913Z",
+  "publicIdentifiers": {
+    "sourceCommit": "831db6400b09f6f1cf74cb6473eeb326fdae73ff",
+    "provider": "vercel",
+    "project": "flare-quorum",
+    "canonicalUrl": "https://flare-quorum.vercel.app",
+    "network": "flare-coston2",
+    "chainId": 114,
+    "deploymentKind": "flarequorum-v2-release",
+    "deploymentVerified": true,
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+    "awardReceipt": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3"
+  },
+  "routeStatuses": {
+    "/": 200,
+    "/flare": 200,
+    "/flare?role=treasury": 200,
+    "/flare?role=buyer": 200,
+    "/flare?role=vendor": 200,
+    "/flare?role=finalizer": 200,
+    "/flare?role=evidence": 200,
+    "/room": 200,
+    "/docs": 200
+  },
+  "visualChecks": {
+    "desktop": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "9727f8021524c715d66d4e973e363f5f88da4d2393826955d0f56d886caeb98c"
+    },
+    "tenders": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "9d49c337ff164455ef73221fe17103db7fea1d6ea65c7c1724f3d35dc0bd8603"
+    },
+    "mobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "dd046c9477d220700de709f8f069a45362bdf13342b643a981c132ce36ef282e"
+    },
+    "evidence": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "9722c05c48e5e0b5391f97693996a67d0e379c679da9bbf5e66b93dd08494386"
+    },
+    "treasury": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "77aca5e9298a3a1ee2199dd3d4d69741a39295ae04f2c1f3f0e5a9ef40455612"
+    },
+    "buyer": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "3106a7825bba3ab5ba21eabc9b1d57edbdf80424b4880fb464d68a7b3e91d840"
+    },
+    "vendor": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "ae14c16edc228a337e52cc18107cf4cd346195e9f466df09f4af056c0614fac7"
+    },
+    "finalizer": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "sha256": "51be42b5ffeb6b89520e81ffb5ee4561ab2bb674ea8c2d976c44a50cced77ceb"
+    },
+    "docsMobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "26b392ed2a1744f0a0ae460bc52029b3022aa9e1ac68b3d116237ded657efb8b"
+    }
+  },
+  "assertions": {
+    "allRoutesReturned200": true,
+    "canonicalMarketBundled": true,
+    "coston2NetworkRendered": true,
+    "verifiedReleaseRendered": true,
+    "walletFreeTenderListLoaded": true,
+    "productStoryRendered": true,
+    "roleTaxonomyRendered": true,
+    "redundantRailControlsRemoved": true,
+    "globalRefreshAndWalletAssetsRendered": true,
+    "tenderSortRendered": true,
+    "publicProtocolFactsCollapsed": true,
+    "awardedTenderVisible": true,
+    "privacyBoundaryVisible": true,
+    "publicEvidenceDossierRendered": true,
+    "publicEvidenceNoWalletGate": true,
+    "publicFinalizerRendered": true,
+    "buyerBriefRendered": true,
+    "vendorSubmissionNavigationRendered": true,
+    "xrpFundingJourneyRendered": true,
+    "unifiedBuyerDefaultsToCoston2": true,
+    "activityRedemptionBoundaryRendered": true,
+    "noPublicStateFailureRendered": true,
+    "mobileTenderNavigationActive": true,
+    "docsRouteRendered": true,
+    "historicalSepoliaRouteHiddenFromCurrentDocs": true,
+    "desktopScreenshotCaptured": true,
+    "mobileScreenshotCaptured": true,
+    "docsMobileScreenshotCaptured": true
+  },
+  "blockers": [],
+  "notes": [
+    "The deployed v2 Vercel project loaded the verified Coston2 public market without a wallet.",
+    "The Auditor route reread the same finalized market snapshot without a wallet, bid payload, signer, or decryption capability.",
+    "The Public Finalizer route exposes only canonical lifecycle actions; FCC dispatch and threshold grouping remain dedicated relay operations.",
+    "Activity exposes the official redemption boundary in a locked state until the connected Coston2 wallet is the public winner of an awarded tender; Private Bids does not duplicate redemption controls.",
+    "The unified Buyer route defaults to direct Coston2/FTestXRP funding and exposes the structured public brief without collecting bid plaintext.",
+    "The legacy treasury URL selects the advanced XRP-native option inside Buyer and presents one ordered Define Rules → Connect & Pay → FDC & Mint → Tender Opened journey; this wallet-free smoke does not submit a payment and no XRPL secret is accepted.",
+    "The global refresh control, read-only wallet-assets panel, and public tender sort controls are rendered without requesting a signature.",
+    "The /docs route serves only the current Flare judge path and does not expose a navigation link to the historical Sepolia/Nox route.",
+    "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
+    "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed."
+  ]
+}
