@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "release": "coston2-v0.2.4",
+  "scaffoldCommit": "e3f587949069780084e2ced8a53c9419ed05c250",
+  "teeNodeVersion": "v0.0.24",
+  "teeProxyVersion": "v0.0.18",
+  "extensionImageDigest": "sha256:4226480fb6733e5aed511eef1bee44852038ed0db820497f0c4d9fd1a706a487",
+  "proxyImageDigest": "sha256:58f804d1dcc8e6f3850e6a34df5fcee0e4c4e08bffb75ad9b4f92b0a71ad5622",
+  "providerPort": 6664
+}

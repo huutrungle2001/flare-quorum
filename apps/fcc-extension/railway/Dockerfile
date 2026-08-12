@@ -41,6 +41,7 @@ WORKDIR /app
 COPY --chmod=0555 --chown=0:0 --from=extension-builder /out/extension-tee /app/extension-tee
 COPY --chmod=0555 --chown=0:0 --from=proxy-builder /out/tee-proxy /app/tee-proxy
 COPY --chmod=0555 --chown=0:0 apps/fcc-extension/railway/entrypoint.sh /app/entrypoint.sh
+COPY --chmod=0444 --chown=0:0 apps/fcc-extension/railway/runtime-release.json /app/runtime-release.json
 
 ENV MODE=1 \
     CHAIN_ID=114 \
