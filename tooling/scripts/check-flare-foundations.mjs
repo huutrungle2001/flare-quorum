@@ -30,11 +30,15 @@ const requiredFoundationAssertions = [
   "teeProxyReleaseImageDigestRecorded",
   "teeProxyReleaseImageVerified",
   "managerInterfaceResponds",
+  "operationalManagerMatches",
+  "currentScaffoldPinsRecorded",
   "registryDiscoveryMatches",
   "fTestXrpBindingMatches",
   "fdcProtocolBindingsLive",
   "fAssetsDirectMintingBindingsLive",
   "xrpUsdFeedIsLive",
+  "stableProxyInstructionRouteReady",
+  "threeFreshAvailabilityChecks",
 ];
 
 try {

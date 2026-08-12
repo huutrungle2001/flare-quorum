@@ -423,6 +423,15 @@ tests one wire-compatible runtime pair: `tee-node` `v0.0.23` at
 the same `tee-node` version. This supersedes the briefly tested independent
 `v0.0.24` extension pin after 2026-08-05 Flare maintainer guidance confirmed
 that node/proxy wire formats must be aligned rather than upgraded separately.
+That decision describes the verified V1 runtime. On 2026-08-12, scaffold
+commit `e3f587949069780084e2ced8a53c9419ed05c250` became the current known-good
+set and superseded it for the V2 rolling replacement: `tee-node v0.0.24`,
+`tee-proxy v0.0.18`, and
+`go-flare-common v1.2.2-0.20260727094511-09a10067e6a4`. The V2 extension and
+registration operator use the scaffold's exact module pins; the proxy uses the
+exact scaffold-pinned proxy tag. The proxy's own transitive module graph is not
+misrepresented as the extension's runtime graph.
+
 The FlareQuorum proxy recipe pins the
 official source archive by checksum and both build stages by digest. Gate 0 also
 requires the recipe to be built and the resulting immutable release image
@@ -634,7 +643,7 @@ partial receipt state. Live Gate C evidence remains required.
 ## ADR-025 — TEE identity restart boundary
 
 **Decision:** Do not export, log, inject, or host-persist a raw TEE identity
-private key. The pinned official `tee-node v0.0.23` initializes an identity key
+private key. The pinned official `tee-node v0.0.24` initializes an identity key
 in memory and its public extension server starts from `ZeroState`; neither that
 release nor the inspected `v0.0.25` release exposes a supported identity-key
 restore path. Consequently, restarting the `extension-tee` process creates a
@@ -668,7 +677,7 @@ survivors is compatible with the threshold design and safer than weakening the
 TEE trust boundary to manufacture same-identity restart evidence.
 
 This boundary was rechecked against Flare's pinned upstream source: the
-official `tee-node v0.0.23` `node.Initialize` implementation generates a fresh
+official `tee-node v0.0.24` `node.Initialize` implementation generates a fresh
 key with `crypto.GenerateKey()` and derives `teeID` from that key on every
 process start; it does not load an identity key from `SEALED_STORE_DIR`.
 The upstream `main` implementation was checked again on 2026-08-08 and still
@@ -781,15 +790,21 @@ Before registration it permits only an empty or partial subset of the intended
 three identities with exact public routes; any foreign, duplicate, or stale
 identity/route blocks execution. After registration, the complete active set
 must be exactly the three intended identities and routes, and every individual
-machine binding must pass at one checkpoint. Stale retirement remains a
-separate irreversible owner operation guarded by unfinished-tender checks.
+machine binding and availability window must pass at one checkpoint. The check
+derives the last availability time from the manager's validity duration and
+requires age `<6h`. A read-only `GET /instruction` must return `405` at every
+public origin, confirming the provider-facing POST route without submitting a
+payload. Stale retirement remains a separate irreversible owner operation
+guarded by unfinished-tender checks.
 
 **Reason:** Protocol addresses can change without making the retired contract
 revert, so deployed code alone cannot establish canonical FTSO authority.
-Likewise, a valid dispatch event and three healthy endpoints do not prove that
-the indexer-backed proxy is routing against the intended active set. These two
-pre-write checks turn silent dependency drift into explicit blockers without
-weakening FCC thresholds or changing a frozen tender.
+Likewise, a valid dispatch event and three healthy `/info` endpoints do not
+prove provider delivery. Providers POST directly to the selected registered
+`/instruction` route; status `2` with an expired availability window or a stale
+identity can still fail intermittently. These pre-write checks turn silent
+dependency drift into explicit blockers without weakening FCC thresholds or
+changing a frozen tender.
 
 ## ADR-030 — Keep public Buyer Brief preimages off-chain but hash-verified
 
@@ -825,7 +840,7 @@ These decisions must be revalidated against the pinned versions in Gate 0:
   for ECIES/private-channel and long-lived ciphertext guidance
 - [FCC signed-result example](https://dev.flare.network/fcc/guides/weather-insurance-extension)
   for domain-separated TEE result verification
-- [Pinned tee-node v0.0.23 source](https://github.com/flare-foundation/tee-node/blob/v0.0.23/internal/node/node.go)
+- [Pinned tee-node v0.0.24 source](https://github.com/flare-foundation/tee-node/blob/v0.0.24/internal/node/node.go)
   for the identity initialization boundary described in ADR-025
 - [Inspected tee-node v0.0.25 source](https://github.com/flare-foundation/tee-node/blob/v0.0.25/internal/node/node.go)
   for the current identity initialization boundary; it still generates the

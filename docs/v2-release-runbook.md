@@ -89,11 +89,14 @@ apply:
 - use three stable HTTPS proxy origins (named Cloudflare tunnels, reserved
   domains, or equivalent), never changing quick-tunnel hostnames;
 - verify the URL stored on-chain is the URL currently serving `/info`;
-- the extension proxy pulls instructions from the indexer database and the node
-  polls that proxy; port `6664` is inbound for cosigned responses, not an
-  instruction-delivery endpoint; and
+- providers POST cosigned instructions directly to the selected registered
+  proxy at `/instruction` on external port `6664`; the proxy does not discover
+  instructions from the indexer;
+- require status `2`, an availability check younger than six hours, and exactly
+  one active identity per stable public endpoint; and
 - keep indexer database credentials only in the secret store. A TCP connection
-  alone does not prove the MySQL handshake or query path is healthy.
+  alone does not prove the MySQL handshake or query path is healthy. Indexer
+  readiness is for current policy/indexed state, not provider delivery.
 
 `SIMULATED_TEE=true` remains a Coston2 feasibility configuration. It must not be
 described as hardware-backed production confidentiality.

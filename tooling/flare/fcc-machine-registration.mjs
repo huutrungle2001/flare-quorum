@@ -100,6 +100,15 @@ async function jsonInfo(origin, fetchImplementation) {
   return response.json();
 }
 
+async function instructionRouteExists(origin, fetchImplementation) {
+  const response = await fetchImplementation(new URL("instruction", origin), {
+    method: "GET",
+    headers: { accept: "application/json" },
+    signal: AbortSignal.timeout(10_000),
+  });
+  return response.status === 405;
+}
+
 export async function inspectMachineRegistrationEndpoints({
   publicUrls,
   localUrls,
@@ -140,6 +149,10 @@ export async function inspectMachineRegistrationEndpoints({
         jsonInfo(effectiveControlUrls[index], fetchImplementation),
         jsonInfo(publicUrls[index], fetchImplementation),
       ]);
+      if (!await instructionRouteExists(publicUrls[index], fetchImplementation)) {
+        blockers.push(`MACHINE_${index + 1}_INSTRUCTION_ROUTE_UNAVAILABLE`);
+        continue;
+      }
       const localMachine = parseMachineInfo(local, expected);
       const publicMachine = parseMachineInfo(remote, expected);
       if (!sameMachine(localMachine, publicMachine)) {
@@ -150,6 +163,7 @@ export async function inspectMachineRegistrationEndpoints({
         machine: index + 1,
         controlUrl: effectiveControlUrls[index],
         publicUrl: publicUrls[index],
+        instructionRouteReady: true,
         ...localMachine,
       });
     } catch {
@@ -308,6 +322,7 @@ export function evaluateRegisteredMachine({
   record,
   publicKey,
   expectedExtensionId,
+  availability,
 }) {
   const assertions = {
     productionStatus: status === 2,
@@ -319,6 +334,11 @@ export function evaluateRegisteredMachine({
     publicKeyMatches:
       String(publicKey.x).toLowerCase() === machine.publicKeyX &&
       String(publicKey.y).toLowerCase() === machine.publicKeyY,
+    availabilityNotExpired: availability.assertions.validityNotExpired,
+    availabilityFresh: availability.assertions.checkFresh,
+    availabilityWindowValid:
+      availability.assertions.validityDurationConfigured &&
+      availability.assertions.checkTimestampNotFuture,
   };
   return {
     machine: machine.machine,
@@ -326,6 +346,7 @@ export function evaluateRegisteredMachine({
     url: machine.publicUrl,
     status: Number(status),
     publicKeyFingerprintSha256: machine.publicKeyFingerprintSha256,
+    availability,
     assertions,
   };
 }

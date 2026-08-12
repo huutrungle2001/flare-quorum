@@ -54,8 +54,13 @@
     "fccScaffold": {
       "repository": "https://github.com/flare-foundation/fce-extension-scaffold.git",
       "branch": "main",
-      "commit": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
-      "role": "reference scaffold; its tee-node v0.0.21 and tee-proxy v0.0.18 pins are below the organizer baseline and must not be copied unchanged"
+      "commit": "e3f587949069780084e2ced8a53c9419ed05c250",
+      "dependencyPins": {
+        "teeNode": "v0.0.24",
+        "teeProxy": "v0.0.18",
+        "goFlareCommon": "v1.2.2-0.20260727094511-09a10067e6a4"
+      },
+      "role": "current known-good scaffold snapshot; use its dependency versions as one tested set"
     },
     "fccSignExample": {
       "repository": "https://github.com/flare-foundation/fce-sign.git",
@@ -71,16 +76,17 @@
     },
     "teeNode": {
       "repository": "https://github.com/flare-foundation/tee-node.git",
-      "branch": "v0.0.23",
-      "commit": "9090eccbae1111742bd83ef0601485d9503b4a13",
-      "tag": "v0.0.23",
+      "branch": "v0.0.24",
+      "commit": "adc67a29eb7162f6f1b5dabcbca320009480695e",
+      "tag": "v0.0.24",
       "minimumOrganizerVersion": "0.0.22"
     },
     "teeProxy": {
       "repository": "https://github.com/flare-foundation/tee-proxy.git",
-      "branch": "develop",
-      "commit": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
-      "teeNodeModuleVersion": "0.0.23"
+      "branch": "v0.0.18",
+      "commit": "2e8412990d150a386a2ee5fdc1d2889a04e658aa",
+      "tag": "v0.0.18",
+      "teeNodeModuleVersion": "0.0.21-0.20260619120252-31fc839ae6d2"
     },
     "flareSmartContracts": {
       "repository": "https://github.com/flare-foundation/flare-smart-contracts-v2.git",
@@ -118,33 +124,33 @@
   "sourceFiles": [
     {
       "id": "fcc-coston2-addresses",
-      "url": "https://raw.githubusercontent.com/flare-foundation/fce-extension-scaffold/f48cafb889441a62e47c083f4be8dd7d3f456f83/config/coston2/deployed-addresses.json",
+      "url": "https://raw.githubusercontent.com/flare-foundation/fce-extension-scaffold/e3f587949069780084e2ced8a53c9419ed05c250/config/coston2/deployed-addresses.json",
       "sha256": "c158350ea5a9bbba8c6485a680252b8f401bc2e25ea10830101eb6d0b40b022e"
     },
     {
       "id": "fcc-scaffold-source-archive",
-      "url": "https://codeload.github.com/flare-foundation/fce-extension-scaffold/tar.gz/f48cafb889441a62e47c083f4be8dd7d3f456f83",
-      "sha256": "ff2c61c5054ebb6636539db0417e41565d6c8afd24368f8b54578c32503290d4"
+      "url": "https://codeload.github.com/flare-foundation/fce-extension-scaffold/tar.gz/e3f587949069780084e2ced8a53c9419ed05c250",
+      "sha256": "b0bc98f6c3c74ab19cd46f245d3f7baa20cc824e6f43692921c0bf4e789e1a9e"
     },
     {
       "id": "fcc-scaffold-go-module",
-      "url": "https://raw.githubusercontent.com/flare-foundation/fce-extension-scaffold/f48cafb889441a62e47c083f4be8dd7d3f456f83/go/go.mod",
-      "sha256": "76eb9f5e4e1994a913a272e3b0b7114656ac9fcdbdc331a58326736821d1f5d9"
+      "url": "https://raw.githubusercontent.com/flare-foundation/fce-extension-scaffold/e3f587949069780084e2ced8a53c9419ed05c250/go/go.mod",
+      "sha256": "108a165caa2e85d29eb7e1512035efe10c226a356852e2febd23238317a1b40b"
     },
     {
       "id": "tee-node-go-module",
-      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/9090eccbae1111742bd83ef0601485d9503b4a13/go.mod",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/adc67a29eb7162f6f1b5dabcbca320009480695e/go.mod",
       "sha256": "4b9b20a58b6ffa7c4dfa157d1d6c20671a40e81064925a3aeb0ef6cd121b7ca5"
     },
     {
       "id": "tee-proxy-go-module",
-      "url": "https://raw.githubusercontent.com/flare-foundation/tee-proxy/0c6d016b09948cba9a508ba357e592eb6088fd1c/go.mod",
-      "sha256": "31a8d342fcdc5079b19a35d88cf9001e184de677b9cf6a0e76e533c6c952badb"
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-proxy/2e8412990d150a386a2ee5fdc1d2889a04e658aa/go.mod",
+      "sha256": "1c3b360efcea853e21d4a368ab573f8199705e843393d34db04059d562798e84"
     },
     {
       "id": "tee-proxy-source-archive",
-      "url": "https://codeload.github.com/flare-foundation/tee-proxy/tar.gz/0c6d016b09948cba9a508ba357e592eb6088fd1c",
-      "sha256": "64b74cc37f2e64771244e17ea335d5fc4b5c726b32976b9d548c81c833213984"
+      "url": "https://codeload.github.com/flare-foundation/tee-proxy/tar.gz/2e8412990d150a386a2ee5fdc1d2889a04e658aa",
+      "sha256": "e5d355b9b7dcc8daaf51ce7179c6a30cba66a75d9e350d60a04aacf7e91ecb10"
     },
     {
       "id": "tee-machine-manager-abi",
@@ -163,27 +169,27 @@
     },
     {
       "id": "tee-proxy-authenticated-direct-endpoint",
-      "url": "https://raw.githubusercontent.com/flare-foundation/tee-proxy/0c6d016b09948cba9a508ba357e592eb6088fd1c/internal/server/external.go",
-      "sha256": "f7aacc36edbb50f5b18bd30e369889030248f467cfc142035556c5c0ec68c816"
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-proxy/2e8412990d150a386a2ee5fdc1d2889a04e658aa/internal/server/external.go",
+      "sha256": "b0d03e8558170d103e6108122cd29c6139beb0ad551a248d50be8e850bd86db6"
     },
     {
       "id": "tee-node-extension-crypto-api",
-      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/9090eccbae1111742bd83ef0601485d9503b4a13/internal/extension/server/server.go",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/adc67a29eb7162f6f1b5dabcbca320009480695e/internal/extension/server/server.go",
       "sha256": "ed62e21b6edb5ba498159f797869be0917575471936dc918c7a04c072a8da29a"
     },
     {
       "id": "tee-node-ecies-and-signature-convention",
-      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/9090eccbae1111742bd83ef0601485d9503b4a13/pkg/utils/crypto.go",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/adc67a29eb7162f6f1b5dabcbca320009480695e/pkg/utils/crypto.go",
       "sha256": "4ca3745ad29fe18507abd5eb6b6f5ef0c2fdcbaab8e1430706f95d24cefc89d6"
     },
     {
       "id": "tee-node-identity-initialization",
-      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/9090eccbae1111742bd83ef0601485d9503b4a13/internal/node/node.go",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/adc67a29eb7162f6f1b5dabcbca320009480695e/internal/node/node.go",
       "sha256": "9d9e00baa283cdd956cb00ebaceb9a026a97e44eb0a8cb6aeec9e068a5805422"
     },
     {
       "id": "tee-node-extension-server-initialization",
-      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/9090eccbae1111742bd83ef0601485d9503b4a13/pkg/server/server.go",
+      "url": "https://raw.githubusercontent.com/flare-foundation/tee-node/adc67a29eb7162f6f1b5dabcbca320009480695e/pkg/server/server.go",
       "sha256": "849fb3344df5fb51f966204609391c03f6ed33a9ab7367ac2844006047d406ce"
     },
     {
@@ -220,41 +226,41 @@
       "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
       "context": "apps/fcc-extension",
       "platform": "linux/amd64",
-      "version": "0.2.3",
+      "version": "0.2.4",
       "wireVersion": "0.2.2",
       "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
       "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
-      "releaseImageTag": "veilbid/fcc-extension:coston2-v0.2.3",
-      "releaseImageDigest": "sha256:96b89cc4604e4f392548d0aaa20beec1ccf6b88b4991cb2b67ee753bd70da378",
-      "releaseBinarySha256": "a6394fabef7d492ba90c28d898c13c5c51dffea6568b67bc4fdafd81540a993e"
+      "releaseImageTag": "veilbid/fcc-extension:coston2-v0.2.4",
+      "releaseImageDigest": "sha256:4226480fb6733e5aed511eef1bee44852038ed0db820497f0c4d9fd1a706a487",
+      "releaseBinarySha256": "5af180f83439da1ec16ae8b16b2285ee54c52ebacec36b8bbe98b4c5fd09e633"
     },
     "teeProxyReleaseRecipe": {
       "dockerfile": "apps/fcc-extension/proxy/Dockerfile",
       "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
       "platform": "linux/amd64",
-      "sourceCommit": "0c6d016b09948cba9a508ba357e592eb6088fd1c",
-      "sourceUrl": "https://codeload.github.com/flare-foundation/tee-proxy/tar.gz/0c6d016b09948cba9a508ba357e592eb6088fd1c",
-      "sourceSha256": "64b74cc37f2e64771244e17ea335d5fc4b5c726b32976b9d548c81c833213984",
+      "sourceCommit": "2e8412990d150a386a2ee5fdc1d2889a04e658aa",
+      "sourceUrl": "https://codeload.github.com/flare-foundation/tee-proxy/tar.gz/2e8412990d150a386a2ee5fdc1d2889a04e658aa",
+      "sourceSha256": "e5d355b9b7dcc8daaf51ce7179c6a30cba66a75d9e350d60a04aacf7e91ecb10",
       "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
       "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
-      "releaseImageTag": "veilbid/tee-proxy:coston2-0c6d016b",
-      "releaseImageDigest": "sha256:59f8abcd380ded3c180e16dd5366118af37488822057ef6c562d9cf07e060ecb",
-      "releaseBinarySha256": "76b83c8e09ae01e3457e8463fc044aca98504ddb0e335456f6f9d0e078258488"
+      "releaseImageTag": "veilbid/tee-proxy:coston2-v0.0.18",
+      "releaseImageDigest": "sha256:58f804d1dcc8e6f3850e6a34df5fcee0e4c4e08bffb75ad9b4f92b0a71ad5622",
+      "releaseBinarySha256": "cfb6b728adb15e4d1a0fd4b0673475ae6e1c19eec7d72f129c82e390c778dfe4"
     },
     "teeRegistrationReleaseRecipe": {
       "dockerfile": "apps/fcc-extension/registration/Dockerfile",
       "dockerfileFrontend": "docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e",
       "platform": "linux/amd64",
-      "sourceCommit": "f48cafb889441a62e47c083f4be8dd7d3f456f83",
-      "sourceUrl": "https://codeload.github.com/flare-foundation/fce-extension-scaffold/tar.gz/f48cafb889441a62e47c083f4be8dd7d3f456f83",
-      "sourceSha256": "ff2c61c5054ebb6636539db0417e41565d6c8afd24368f8b54578c32503290d4",
-      "teeNodeModuleVersion": "0.0.23",
+      "sourceCommit": "e3f587949069780084e2ced8a53c9419ed05c250",
+      "sourceUrl": "https://codeload.github.com/flare-foundation/fce-extension-scaffold/tar.gz/e3f587949069780084e2ced8a53c9419ed05c250",
+      "sourceSha256": "b0bc98f6c3c74ab19cd46f245d3f7baa20cc824e6f43692921c0bf4e789e1a9e",
+      "teeNodeModuleVersion": "0.0.24",
       "goFlareCommonModuleVersion": "v1.2.2-0.20260727094511-09a10067e6a4",
       "builderImage": "golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d883a3e2fb4862063fa",
       "runtimeImage": "gcr.io/distroless/static-debian12@sha256:20bc6c0bc4d625a22a8fde3e55f6515709b32055ef8fb9cfbddaa06d1760f838",
-      "releaseImageTag": "veilbid/fcc-register-tee:coston2-f48cafb",
-      "releaseImageDigest": "sha256:95cd528b5bef931d216ad0fc92b14b6315f5345c337fddcd74eb062f7258febf",
-      "releaseBinarySha256": "d88d6816fb132275cd60a5e13bb181ee96db2811d3f78a309b842fb382b2a012"
+      "releaseImageTag": "veilbid/fcc-register-tee:coston2-e3f5879",
+      "releaseImageDigest": "sha256:e0e1abf696cd63d0bd0bd2e332432d91d0d51c8f6f31d7040782b7bd813f8a9a",
+      "releaseBinarySha256": "71ccae716c373a3584e8de49aa44e962ade34b489b45836ec6922a70c464d206"
     },
     "redisImage": "redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2",
     "policy": "FlareQuorum's tee-proxy recipe pins the official source archive and both image stages. The executable linux/amd64 OCI manifest and binary SHA-256 are recorded separately from timestamp-bearing provenance attestations."

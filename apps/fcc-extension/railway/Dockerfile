@@ -21,8 +21,8 @@ FROM golang:1.25.8-alpine@sha256:8e02eb337d9e0ea459e041f1ee5eece41cbb61f1d83e7d8
 ENV GOTOOLCHAIN=local
 WORKDIR /src
 
-ADD --checksum=sha256:64b74cc37f2e64771244e17ea335d5fc4b5c726b32976b9d548c81c833213984 \
-    https://codeload.github.com/flare-foundation/tee-proxy/tar.gz/0c6d016b09948cba9a508ba357e592eb6088fd1c \
+ADD --checksum=sha256:e5d355b9b7dcc8daaf51ce7179c6a30cba66a75d9e350d60a04aacf7e91ecb10 \
+    https://codeload.github.com/flare-foundation/tee-proxy/tar.gz/2e8412990d150a386a2ee5fdc1d2889a04e658aa \
     /tmp/tee-proxy.tar.gz
 
 RUN tar -xzf /tmp/tee-proxy.tar.gz --strip-components=1 -C /src \
@@ -32,7 +32,7 @@ RUN tar -xzf /tmp/tee-proxy.tar.gz --strip-components=1 -C /src \
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -mod=readonly -trimpath -buildvcs=false \
-    -ldflags="-buildid= -s -w -X github.com/flare-foundation/tee-proxy/internal/version.Revision=0c6d016b09948cba9a508ba357e592eb6088fd1c -X github.com/flare-foundation/tee-proxy/internal/version.Version=veilbid-coston2-0c6d016b" \
+    -ldflags="-buildid= -s -w -X github.com/flare-foundation/tee-proxy/internal/version.Revision=2e8412990d150a386a2ee5fdc1d2889a04e658aa -X github.com/flare-foundation/tee-proxy/internal/version.Version=v0.0.18" \
     -o /out/tee-proxy ./cmd/proxy
 
 FROM redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
@@ -49,7 +49,7 @@ ENV MODE=1 \
     EXTENSION_PORT=7702 \
     SEALED_STORE_DIR=/data/sealed \
     LOG_LEVEL=INFO \
-    PORT=6662
+    PORT=6664
 
-EXPOSE 6662
+EXPOSE 6664
 ENTRYPOINT ["/app/entrypoint.sh"]

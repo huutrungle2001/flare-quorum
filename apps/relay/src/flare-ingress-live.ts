@@ -42,6 +42,26 @@ const teeManagerAbi = [
   },
   {
     type: "function",
+    name: "getAvailabilityCheckValidity",
+    stateMutability: "view",
+    inputs: [{ name: "teeId", type: "address" }],
+    outputs: [
+      { name: "endTs", type: "uint64" },
+      { name: "lastSigningPolicyId", type: "uint32" },
+    ],
+  },
+  {
+    type: "function",
+    name: "getSettings",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "availabilityCheckValidityDurationSeconds", type: "uint256" },
+      { name: "challengeValidityDurationSeconds", type: "uint256" },
+    ],
+  },
+  {
+    type: "function",
     name: "getExtensionId",
     stateMutability: "view",
     inputs: [{ name: "teeId", type: "address" }],
@@ -82,6 +102,7 @@ const teeManagerAbi = [
 
 const marketAbi = flareQuorumFlareMarketAbi as Abi;
 const proxyResponseLimit = 640 * 1024;
+const maximumAvailabilityAgeSeconds = 6n * 60n * 60n;
 
 export interface FlareIngressReader {
   getChainId(): Promise<number>;
@@ -148,6 +169,19 @@ function numericStatus(value: unknown): number {
   if (typeof value === "number" && Number.isSafeInteger(value)) return value;
   if (typeof value === "bigint" && value >= 0n && value <= 255n) return Number(value);
   throw new Error("MALFORMED_FCC_MACHINE_STATUS");
+}
+
+function unsignedInteger(value: unknown, code: string): bigint {
+  if (typeof value === "bigint" && value >= 0n) return value;
+  if (typeof value === "number" && Number.isSafeInteger(value) && value >= 0) {
+    return BigInt(value);
+  }
+  throw new Error(code);
+}
+
+function tuple(value: unknown, length: number, code: string): readonly unknown[] {
+  if (!Array.isArray(value) || value.length !== length) throw new Error(code);
+  return value;
 }
 
 function extensionId(value: unknown): bigint {
@@ -226,13 +260,34 @@ export class LiveFlareBidIngressChain implements FlareBidIngressChain {
     const managerCode = await this.reader.getCode({ address: manager, blockNumber: block.number });
     if (managerCode === undefined || managerCode === "0x") throw new Error("FLARE_TEE_MANAGER_CODE_MISSING");
     const tender = parseFlareTender(tenderId, tenderValue);
+    const settings = tuple(await this.reader.readContract({
+      address: manager,
+      abi: teeManagerAbi,
+      functionName: "getSettings",
+      blockNumber: block.number,
+    }), 2, "MALFORMED_FCC_MANAGER_SETTINGS");
+    const availabilityDuration = unsignedInteger(
+      settings[0],
+      "MALFORMED_FCC_MANAGER_SETTINGS",
+    );
+    if (
+      availabilityDuration === 0n ||
+      availabilityDuration > maximumAvailabilityAgeSeconds
+    ) throw new Error("FCC_AVAILABILITY_WINDOW_UNSUPPORTED");
 
     const machineValues = await Promise.all(tender.teeIds.map(async (teeId) => {
-      const [status, machineExtensionId, publicKey, machine] = await Promise.all([
+      const [status, availability, machineExtensionId, publicKey, machine] = await Promise.all([
         this.reader.readContract({
           address: manager,
           abi: teeManagerAbi,
           functionName: "getTeeMachineStatus",
+          args: [teeId],
+          blockNumber: block.number as bigint,
+        }),
+        this.reader.readContract({
+          address: manager,
+          abi: teeManagerAbi,
+          functionName: "getAvailabilityCheckValidity",
           args: [teeId],
           blockNumber: block.number as bigint,
         }),
@@ -258,11 +313,28 @@ export class LiveFlareBidIngressChain implements FlareBidIngressChain {
           blockNumber: block.number as bigint,
         }),
       ]);
-      return { status, machineExtensionId, publicKey, machine };
+      return { status, availability, machineExtensionId, publicKey, machine };
     }));
 
     const teePublicKeys = machineValues.map((value, index) => {
       if (numericStatus(value.status) !== 2) throw new Error("FCC_MACHINE_NOT_PRODUCTION");
+      const availability = tuple(
+        value.availability,
+        2,
+        "MALFORMED_FCC_MACHINE_AVAILABILITY",
+      );
+      const availabilityEnd = unsignedInteger(
+        availability[0],
+        "MALFORMED_FCC_MACHINE_AVAILABILITY",
+      );
+      const checkedAt = availabilityEnd - availabilityDuration;
+      const checkAge = block.timestamp - checkedAt;
+      if (availabilityEnd <= block.timestamp) throw new Error("FCC_MACHINE_AVAILABILITY_EXPIRED");
+      if (
+        checkedAt > block.timestamp ||
+        checkAge < 0n ||
+        checkAge >= maximumAvailabilityAgeSeconds
+      ) throw new Error("FCC_MACHINE_AVAILABILITY_STALE");
       if (extensionId(value.machineExtensionId) !== tender.extensionId) {
         throw new Error("FCC_MACHINE_EXTENSION_MISMATCH");
       }

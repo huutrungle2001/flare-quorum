@@ -114,10 +114,12 @@ Record in a committed public dependency manifest:
 - Coston2 chain ID `114`, XRP/USD feed identifier, official FTestXRP and
   AssetManager discovery source;
 - availability of three registered TEE identities for one extension and their
-  supported sealed-state recovery mechanism.
+  supported sealed-state recovery mechanism;
 - live `FlareTeeManager` resolution, deployed bytecode/interface match, fresh
-  extension/machine registration, and machine status `2` (`PRODUCTION`);
-- tested `tee-node >= v0.0.22` plus organizer-supported `tee-proxy` revision;
+  extension/machine registration, machine status `2` (`PRODUCTION`), and an
+  availability check younger than six hours;
+- the exact `tee-node`, `tee-proxy`, and `go-flare-common` versions pinned
+  together by the current official scaffold commit;
 - current indexer credentials and a stable named HTTPS proxy origin.
 
 Do not hardcode an address copied from prose when an official registry or
@@ -219,8 +221,10 @@ Hosted product-machine checks resolve `FCC_MACHINES_EXTENSION_ID` first, then
 `FCC_EXTENSION_ID`. This keeps the foundation extension used by local Compose
 separate from the market extension frozen by the hosted Railway machines.
 `pnpm flare:machines:preflight` compares every public `/info` response with its
-control endpoint, rejects credential-bearing/path/quick-tunnel URLs, and prints
-only TEE IDs and public-key fingerprints. Before machine registration, bind the
+control endpoint, confirms a read-only `GET /instruction` returns `405`, checks
+the exact active identity/route set and availability freshness from one Coston2
+block, rejects credential-bearing/path/quick-tunnel URLs, and prints only
+public machine identifiers and timestamps. Before machine registration, bind the
 exact governance signer set reported by all three machines to the extension:
 
 ```bash
@@ -242,9 +246,20 @@ pnpm flare:machines:register
 
 The runner extracts and re-hashes the verified registration binary, invokes
 `rRap` sequentially with a TEE-ID-specific resume file, and verifies status,
-extension, URL, code/platform, and public key from one Coston2 block before it
-writes public evidence. The deployment key remains process-local and is never
-placed in an argument, image, state file, output, or evidence.
+fresh availability, extension, URL, code/platform, and public key from one
+Coston2 block before it writes public evidence. Providers deliver cosigned
+instructions directly to the selected machine's registered
+`POST /instruction` route on external port `6664`; the indexer does not discover
+or route those instructions. The deployment key remains process-local and is
+never placed in an argument, image, state file, output, or evidence.
+
+The live ingress repeats the same status and availability reads at the exact
+chain checkpoint used for bid admission. Its `/health` becomes unavailable when
+any frozen machine is expired or mismatched. Both Buyer funding paths require
+that machine-bound health response before publishing the brief, requesting an
+FTestXRP approval, preparing an XRPL payment, or creating a tender. This is the
+consumer-side guard for the immutable V1 contract, whose on-chain creation
+check predates the new availability requirement.
 
 The Railway Coston2 option deploys
 `apps/fcc-extension/railway/Dockerfile` as three separate services. Each service

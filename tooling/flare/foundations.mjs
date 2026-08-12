@@ -11,12 +11,19 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
+import {
+  evaluateAvailabilityWindow,
+  readFccOperationalBaseline,
+} from "./fcc-operational-baseline.mjs";
+
 const registryAbi = parseAbi([
   "function getContractAddressByName(string) view returns (address)",
 ]);
 const managerAbi = parseAbi([
   "function nextPublicExtensionId() view returns (uint256)",
   "function getTeeMachineStatus(address) view returns (uint8)",
+  "function getAvailabilityCheckValidity(address teeId) view returns (uint64 endTs,uint32 lastSigningPolicyId)",
+  "function getSettings() view returns (uint256 availabilityCheckValidityDurationSeconds,uint256 challengeValidityDurationSeconds)",
 ]);
 const assetManagerAbi = parseAbi([
   "function fAsset() view returns (address)",
@@ -154,9 +161,8 @@ export function verifyTeeRegistrationReleaseRecipe(source, recipe) {
     `FROM --platform=${recipe.platform} ${recipe.builderImage} AS builder`,
     `ADD --checksum=sha256:${recipe.sourceSha256}`,
     recipe.sourceUrl,
-    `go mod edit -require=github.com/flare-foundation/tee-node@v${recipe.teeNodeModuleVersion}`,
-    `go mod edit -require=github.com/flare-foundation/go-flare-common@${recipe.goFlareCommonModuleVersion}`,
-    "go get ./cmd/register-tee",
+    "cd /src/tools",
+    "go mod download",
     "go mod verify",
     "go build -mod=readonly -trimpath -buildvcs=false",
     `FROM --platform=${recipe.platform} ${recipe.runtimeImage}`,
@@ -200,19 +206,34 @@ export function verifyFccExtensionReleaseRecipe(source, recipe) {
   );
 }
 
-export function verifyFccRuntimeAlignment(extensionGoMod, teeNode, teeProxy) {
+export function verifyFccRuntimeAlignment(
+  extensionGoMod,
+  teeNode,
+  teeProxy,
+  scaffold,
+  goFlareCommon,
+) {
   if (
-    typeof extensionGoMod !== "string" || !teeNode || !teeProxy ||
+    typeof extensionGoMod !== "string" || !teeNode || !teeProxy || !scaffold ||
+    !goFlareCommon ||
     typeof teeNode.tag !== "string" ||
-    typeof teeProxy.teeNodeModuleVersion !== "string"
+    typeof teeProxy.tag !== "string" ||
+    typeof scaffold.dependencyPins !== "object" ||
+    typeof goFlareCommon.moduleVersion !== "string"
   ) return false;
   const selectedVersion = teeNode.tag.replace(/^v/, "");
-  const moduleMatch = extensionGoMod.match(
+  const teeNodeMatch = extensionGoMod.match(
     /^\s*(?:require\s+)?github\.com\/flare-foundation\/tee-node\s+v([^\s]+)\s*$/mu,
   );
+  const commonMatch = extensionGoMod.match(
+    /^\s*(?:require\s+)?github\.com\/flare-foundation\/go-flare-common\s+([^\s]+)\s*$/mu,
+  );
   return (
-    moduleMatch?.[1] === selectedVersion &&
-    teeProxy.teeNodeModuleVersion === selectedVersion &&
+    teeNodeMatch?.[1] === selectedVersion &&
+    commonMatch?.[1] === goFlareCommon.moduleVersion &&
+    scaffold.dependencyPins.teeNode === teeNode.tag &&
+    scaffold.dependencyPins.teeProxy === teeProxy.tag &&
+    scaffold.dependencyPins.goFlareCommon === goFlareCommon.moduleVersion &&
     versionAtLeast(selectedVersion, teeNode.minimumOrganizerVersion)
   );
 }
@@ -257,6 +278,7 @@ export async function inspectFoundations({
   fetchImplementation = fetch,
 }) {
   const manifest = readFoundationManifest(repositoryRoot);
+  const operationalBaseline = readFccOperationalBaseline(repositoryRoot);
   const fccExtensionRecipe = manifest.docker.fccExtensionReleaseRecipe;
   const fccExtensionDockerfile = readFileSync(
     resolve(repositoryRoot, fccExtensionRecipe.dockerfile),
@@ -274,6 +296,8 @@ export async function inspectFoundations({
     fccExtensionGoMod,
     manifest.upstreams.teeNode,
     manifest.upstreams.teeProxy,
+    manifest.upstreams.fccScaffold,
+    manifest.upstreams.goFlareCommon,
   );
   const teeProxyRecipe = manifest.docker.teeProxyReleaseRecipe;
   const teeProxyDockerfile = readFileSync(
@@ -345,6 +369,7 @@ export async function inspectFoundations({
     directMintingPaymentAddress,
     directMintingFeeBIPS,
     directMintingMinimumFeeUBA,
+    managerSettings,
   ] = await Promise.all([
     client.readContract({
       address: getAddress(manifest.contracts.flareTeeManager),
@@ -431,6 +456,12 @@ export async function inspectFoundations({
       functionName: "getDirectMintingMinimumFeeUBA",
       blockNumber,
     }),
+    client.readContract({
+      address: getAddress(manifest.contracts.flareTeeManager),
+      abi: managerAbi,
+      functionName: "getSettings",
+      blockNumber,
+    }),
   ]);
 
   const nodeCheck = command("node", ["--version"]);
@@ -481,16 +512,29 @@ export async function inspectFoundations({
       manifest.externalRequirements.forbiddenProxyHostnameSuffix,
     ));
   let stableProxyReachable = false;
+  let stableProxyInstructionRouteReady = false;
   if (stableProxyConfigured) {
     try {
-      const responses = await Promise.all(stableProxyUrls.map((url) =>
-        fetchImplementation(`${url.replace(/\/$/, "")}/info`, {
-          headers: { accept: "application/json" },
-        })
-      ));
-      stableProxyReachable = responses.every((response) => response.ok);
+      const [infoResponses, instructionResponses] = await Promise.all([
+        Promise.all(stableProxyUrls.map((url) =>
+          fetchImplementation(`${url.replace(/\/$/, "")}/info`, {
+            headers: { accept: "application/json" },
+          })
+        )),
+        Promise.all(stableProxyUrls.map((url) =>
+          fetchImplementation(`${url.replace(/\/$/, "")}/instruction`, {
+            method: "GET",
+            headers: { accept: "application/json" },
+          })
+        )),
+      ]);
+      stableProxyReachable = infoResponses.every((response) => response.ok);
+      stableProxyInstructionRouteReady = instructionResponses.every(
+        (response) => response.status === 405,
+      );
     } catch {
       stableProxyReachable = false;
+      stableProxyInstructionRouteReady = false;
     }
   }
 
@@ -501,17 +545,39 @@ export async function inspectFoundations({
     .map((value) => value.trim())
     .filter(Boolean);
   let productionMachineCount = 0;
+  let freshProductionMachineCount = 0;
+  const machineAvailability = [];
+  const [availabilityCheckValidityDurationSeconds] = managerSettings;
   for (const machineId of machineIds) {
     try {
-      const status = await client.readContract({
-        address: getAddress(manifest.contracts.flareTeeManager),
-        abi: managerAbi,
-        functionName: "getTeeMachineStatus",
-        args: [getAddress(machineId)],
-        blockNumber,
+      const [status, availabilityValidity] = await Promise.all([
+        client.readContract({
+          address: getAddress(manifest.contracts.flareTeeManager),
+          abi: managerAbi,
+          functionName: "getTeeMachineStatus",
+          args: [getAddress(machineId)],
+          blockNumber,
+        }),
+        client.readContract({
+          address: getAddress(manifest.contracts.flareTeeManager),
+          abi: managerAbi,
+          functionName: "getAvailabilityCheckValidity",
+          args: [getAddress(machineId)],
+          blockNumber,
+        }),
+      ]);
+      const [endTs, lastSigningPolicyId] = availabilityValidity;
+      const availability = evaluateAvailabilityWindow({
+        endTs,
+        validityDurationSeconds: availabilityCheckValidityDurationSeconds,
+        checkpointTimestamp: block.timestamp,
+        maxCheckAgeSeconds: operationalBaseline.availability.maxCheckAgeSeconds,
+        lastSigningPolicyId,
       });
+      machineAvailability.push({ teeId: getAddress(machineId), ...availability });
       if (status === manifest.externalRequirements.requiredMachineStatus) {
         productionMachineCount += 1;
+        if (availability.status === "PASSED") freshProductionMachineCount += 1;
       }
     } catch {
       // An invalid or unregistered public machine identifier is simply not ready.
@@ -547,6 +613,15 @@ export async function inspectFoundations({
       manifest.upstreams.teeNode.minimumOrganizerVersion,
     ),
     managerInterfaceResponds: nextPublicExtensionId >= 65_536n,
+    operationalManagerMatches:
+      getAddress(manifest.contracts.flareTeeManager) ===
+      getAddress(operationalBaseline.network.flareTeeManager),
+    currentScaffoldPinsRecorded:
+      manifest.upstreams.fccScaffold.commit === operationalBaseline.scaffold.observedCommit &&
+      manifest.upstreams.teeNode.tag === `v${operationalBaseline.scaffold.teeNodeVersion}` &&
+      manifest.upstreams.teeProxy.commit === operationalBaseline.scaffold.teeProxyCommit &&
+      manifest.upstreams.goFlareCommon.moduleVersion ===
+        operationalBaseline.scaffold.goFlareCommonVersion,
     registryDiscoveryMatches,
     fTestXrpBindingMatches:
       getAddress(fAsset) === getAddress(manifest.contracts.fTestXRP) &&
@@ -597,10 +672,14 @@ export async function inspectFoundations({
       teeRegistrationImageCheck.output === teeRegistrationRecipe.releaseImageDigest,
     stableProxyConfigured,
     stableProxyReachable,
+    stableProxyInstructionRouteReady,
     indexerConfigured,
     threeProductionMachinesRegistered:
       machineIds.length === manifest.externalRequirements.requiredMachineCount &&
       productionMachineCount === manifest.externalRequirements.requiredMachineCount,
+    threeFreshAvailabilityChecks:
+      machineIds.length === operationalBaseline.machines.requiredCount &&
+      freshProductionMachineCount === operationalBaseline.machines.requiredCount,
   };
 
   const blockers = [];
@@ -658,11 +737,26 @@ export async function inspectFoundations({
   );
   addBlocker(blockers, assertions.stableProxyConfigured, "STABLE_PROXY_NOT_CONFIGURED");
   addBlocker(blockers, assertions.stableProxyReachable, "STABLE_PROXY_NOT_REACHABLE");
+  addBlocker(
+    blockers,
+    assertions.stableProxyInstructionRouteReady,
+    "FCC_INSTRUCTION_ROUTE_NOT_READY",
+  );
   addBlocker(blockers, assertions.indexerConfigured, "FCC_INDEXER_NOT_CONFIGURED");
   addBlocker(
     blockers,
     assertions.threeProductionMachinesRegistered,
     "THREE_PRODUCTION_MACHINES_NOT_VERIFIED",
+  );
+  addBlocker(
+    blockers,
+    assertions.threeFreshAvailabilityChecks,
+    "THREE_FRESH_MACHINE_AVAILABILITY_CHECKS_NOT_VERIFIED",
+  );
+  addBlocker(
+    blockers,
+    assertions.currentScaffoldPinsRecorded,
+    "FCC_CURRENT_SCAFFOLD_PINS_NOT_ADOPTED",
   );
 
   return {
@@ -717,9 +811,11 @@ export async function inspectFoundations({
       ),
       sourceChecks,
       fccRuntimeCompatibility: {
+        scaffoldCommit: manifest.upstreams.fccScaffold.commit,
         extensionTeeNodeVersion: manifest.upstreams.teeNode.tag,
         teeProxySourceCommit: manifest.upstreams.teeProxy.commit,
-        teeProxyTeeNodeVersion: `v${manifest.upstreams.teeProxy.teeNodeModuleVersion}`,
+        teeProxyVersion: manifest.upstreams.teeProxy.tag,
+        goFlareCommonVersion: manifest.upstreams.goFlareCommon.moduleVersion,
       },
       fccExtensionReleaseRecipe: {
         dockerfile: fccExtensionRecipe.dockerfile,
@@ -758,6 +854,7 @@ export async function inspectFoundations({
         releaseBinarySha256: teeRegistrationRecipe.releaseBinarySha256,
       },
       configuredMachineCount: machineIds.length,
+      machineAvailability,
       productionMachineCount,
     },
     assertions,

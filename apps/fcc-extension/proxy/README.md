@@ -9,8 +9,9 @@ and runtime images.
 The image intentionally contains no runtime config or credentials. Mount the
 machine-specific configuration at `/app/config/config.toml` and inject the
 proxy signing key through its configured runtime environment variable. Never
-publish port `6661`; only the external port `6662` belongs behind the stable
-HTTPS ingress.
+publish internal port `6663`; only provider-facing port `6664` belongs behind
+the stable HTTPS ingress. Providers POST cosigned instructions to
+`/instruction`; the proxy does not discover them from the indexer.
 
 Render the ignored, owner-readable Coston2 config from `.env.local` without
 printing its values:

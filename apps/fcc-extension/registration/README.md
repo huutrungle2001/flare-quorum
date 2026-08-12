@@ -2,8 +2,9 @@
 
 This directory builds only the official scaffold's `register-tee` command from
 the checksum-pinned commit in `tooling/flare/coston2-foundations.json`. Its Go
-dependencies are realigned to FlareQuorum's selected `tee-node v0.0.23` and current
-`go-flare-common` MachineManager ABI before the binary is built.
+dependencies are built unchanged from that scaffold's `tools/go.mod`: `tee-node
+v0.0.24` and the matching `go-flare-common` MachineManager ABI. The operator
+does not independently rewrite the upstream dependency graph.
 
 Build or verify the non-root linux/amd64 image with:
 

@@ -15,6 +15,13 @@ import {
   registrationAddresses,
   requiredMachineRouteUpdate,
 } from "../flare/fcc-machine-registration.mjs";
+import {
+  evaluateAvailabilityWindow,
+  operationTypesRespectReservations,
+  readFccOperationalBaseline,
+} from "../flare/fcc-operational-baseline.mjs";
+
+const repositoryRoot = new URL("../..", import.meta.url).pathname;
 
 test("routes product and foundation machine evidence to separate canonical files", () => {
   const productId = `0x${"0".repeat(59)}101db`;
@@ -80,6 +87,7 @@ test("requires three stable public endpoints exposing the same local identities"
   const localUrls = [1, 2, 3].map((n) => `http://127.0.0.1:${6673 + n}/`);
   const allUrls = [...localUrls, ...publicUrls];
   const fetchImplementation = async (url) => {
+    if (url.pathname === "/instruction") return new Response(null, { status: 405 });
     const index = allUrls.findIndex((origin) => url.href.startsWith(origin));
     if (url.href === "https://tee-proxy-coston2-1.flare.rocks/info") {
       return new Response(JSON.stringify({ ready: true }), { status: 200 });
@@ -97,6 +105,20 @@ test("requires three stable public endpoints exposing the same local identities"
   assert.equal(result.status, "READY");
   assert.equal(result.machines.length, 3);
   assert.deepEqual(result.machines.map(({ controlUrl }) => controlUrl), localUrls);
+
+  const missingInstructionRoute = await inspectMachineRegistrationEndpoints({
+    publicUrls,
+    localUrls,
+    normalProxyUrl: "https://tee-proxy-coston2-1.flare.rocks/",
+    expected,
+    fetchImplementation: async (url) => {
+      if (url.pathname === "/instruction") return new Response(null, { status: 404 });
+      return fetchImplementation(url);
+    },
+  });
+  assert.ok(missingInstructionRoute.blockers.includes(
+    "MACHINE_1_INSTRUCTION_ROUTE_UNAVAILABLE",
+  ));
 
   const blocked = await inspectMachineRegistrationEndpoints({
     publicUrls: ["https://random.trycloudflare.com/"],
@@ -244,6 +266,7 @@ test("accepts stable remote control endpoints for hosted Railway machines", asyn
     (n) => `https://flare-quorum-fcc-${n}-production.up.railway.app/`,
   );
   const fetchImplementation = async (url) => {
+    if (url.pathname === "/instruction") return new Response(null, { status: 405 });
     if (url.href === "https://tee-proxy-coston2-1.flare.rocks/info") {
       return new Response(JSON.stringify({ ready: true }), { status: 200 });
     }
@@ -264,6 +287,13 @@ test("accepts stable remote control endpoints for hosted Railway machines", asyn
 test("accepts only a production on-chain machine with exact frozen bindings", () => {
   const machine = parseMachineInfo(info("11"), expected);
   const runtime = { machine: 1, publicUrl: "https://tee-1.flarequorum.example", ...machine };
+  const availability = evaluateAvailabilityWindow({
+    endTs: 31_000,
+    validityDurationSeconds: 21_600,
+    checkpointTimestamp: 10_000,
+    maxCheckAgeSeconds: 21_600,
+    lastSigningPolicyId: 42,
+  });
   const result = evaluateRegisteredMachine({
     machine: runtime,
     status: 2,
@@ -276,6 +306,7 @@ test("accepts only a production on-chain machine with exact frozen bindings", ()
       platform: runtime.platform,
     },
     publicKey: { x: runtime.publicKeyX, y: runtime.publicKeyY },
+    availability,
   });
   assert.ok(Object.values(result.assertions).every(Boolean));
   assert.equal(evaluateRegisteredMachine({
@@ -290,5 +321,33 @@ test("accepts only a production on-chain machine with exact frozen bindings", ()
       platform: runtime.platform,
     },
     publicKey: { x: runtime.publicKeyX, y: runtime.publicKeyY },
+    availability,
   }).assertions.productionStatus, false);
+});
+
+test("fails a production machine whose availability check is expired or stale", () => {
+  const expired = evaluateAvailabilityWindow({
+    endTs: 30_000,
+    validityDurationSeconds: 21_600,
+    checkpointTimestamp: 30_001,
+    maxCheckAgeSeconds: 21_600,
+    lastSigningPolicyId: 42,
+  });
+  assert.equal(expired.status, "FAILED");
+  assert.equal(expired.assertions.validityNotExpired, false);
+  assert.equal(expired.assertions.checkFresh, false);
+});
+
+test("loads the current provider-push baseline and rejects reserved operation types", () => {
+  const baseline = readFccOperationalBaseline(repositoryRoot);
+  assert.equal(baseline.delivery.path, "/instruction");
+  assert.equal(baseline.delivery.externalPort, 6664);
+  assert.equal(operationTypesRespectReservations(
+    ["VEILBID_FOUNDATION", "VEILBID_BID", "VEILBID_SELECTION"],
+    baseline.opTypes.reservedPrefixes,
+  ), true);
+  assert.equal(operationTypesRespectReservations(
+    ["F_RESERVED"],
+    baseline.opTypes.reservedPrefixes,
+  ), false);
 });

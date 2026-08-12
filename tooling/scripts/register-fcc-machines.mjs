@@ -30,6 +30,10 @@ import {
   registeredMachineExtensionId,
   isTeeNotFoundError,
 } from "../flare/fcc-machine-registration.mjs";
+import {
+  evaluateAvailabilityWindow,
+  readFccOperationalBaseline,
+} from "../flare/fcc-operational-baseline.mjs";
 import { normalizePrivateKey, readFoundationManifest } from "../flare/foundations.mjs";
 import { setLocalEnvironmentValues } from "../flare/local-fcc-secrets.mjs";
 
@@ -41,9 +45,12 @@ const managerAbi = parseAbi([
   "function getTeeMachine(address) view returns ((address teeId,address teeProxyId,string url))",
   "function getTeeMachineWithAttestationData(address) view returns ((address teeId,address initialTeeId,string url,bytes32 codeHash,bytes32 platform))",
   "function getActiveTeeMachines(uint256 extensionId) view returns (address[] teeIds,string[] urls)",
+  "function getAvailabilityCheckValidity(address teeId) view returns (uint64 endTs,uint32 lastSigningPolicyId)",
+  "function getSettings() view returns (uint256 availabilityCheckValidityDurationSeconds,uint256 challengeValidityDurationSeconds)",
   "function updateTeeMachineSettings(address teeId,address teeProxyId,string url)",
 ]);
 const repositoryRoot = resolve(import.meta.dirname, "../..");
+const operationalBaseline = readFccOperationalBaseline(repositoryRoot);
 const v2 = process.env.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
 const environmentPath = resolve(repositoryRoot, ".env.local");
 const runtimeDirectory = resolve(repositoryRoot, ".local/fcc/registration");
@@ -100,7 +107,7 @@ function extractRegistrationBinary(recipe) {
   return binaryPath;
 }
 
-function publicPreflight(result, extraBlockers, activeSet) {
+function publicPreflight(result, extraBlockers, activeSet, registeredVerification) {
   const blockers = [...extraBlockers, ...result.blockers];
   return {
     status: blockers.length === 0 ? "READY" : "BLOCKED",
@@ -109,11 +116,16 @@ function publicPreflight(result, extraBlockers, activeSet) {
     machineCount: result.machines.length,
     activeMachineCount: activeSet?.activeMachineCount ?? null,
     activeSetAssertions: activeSet?.assertions ?? null,
+    registeredMachineStatus: registeredVerification?.status ?? null,
     machines: result.machines.map((machine) => ({
       machine: machine.machine,
       teeId: machine.teeId,
       publicUrl: machine.publicUrl,
       publicKeyFingerprintSha256: machine.publicKeyFingerprintSha256,
+      instructionRouteReady: machine.instructionRouteReady,
+      availability: registeredVerification?.machines.find(
+        ({ teeId }) => teeId.toLowerCase() === machine.teeId.toLowerCase(),
+      )?.availability ?? null,
     })),
     blockers,
   };
@@ -179,13 +191,24 @@ async function machineStatus({ client, manager, machine }) {
 
 async function verifyOnchainMachines({ client, manager, extensionId, endpointResult }) {
   const blockNumber = await client.getBlockNumber();
-  const [activeIds, activeUrls] = await client.readContract({
-    address: manager,
-    abi: managerAbi,
-    functionName: "getActiveTeeMachines",
-    args: [extensionId],
-    blockNumber,
-  });
+  const [block, settings, activeMachines] = await Promise.all([
+    client.getBlock({ blockNumber }),
+    client.readContract({
+      address: manager,
+      abi: managerAbi,
+      functionName: "getSettings",
+      blockNumber,
+    }),
+    client.readContract({
+      address: manager,
+      abi: managerAbi,
+      functionName: "getActiveTeeMachines",
+      args: [extensionId],
+      blockNumber,
+    }),
+  ]);
+  const [availabilityCheckValidityDurationSeconds] = settings;
+  const [activeIds, activeUrls] = activeMachines;
   const activeSet = evaluateActiveMachineSet(
     activeIds,
     activeUrls,
@@ -193,12 +216,21 @@ async function verifyOnchainMachines({ client, manager, extensionId, endpointRes
   );
   const machines = [];
   for (const machine of endpointResult.machines) {
-    const [status, registeredExtensionId, record, publicKey] = await Promise.all([
+    const [status, registeredExtensionId, record, publicKey, availabilityValidity] = await Promise.all([
       client.readContract({ address: manager, abi: managerAbi, functionName: "getTeeMachineStatus", args: [machine.teeId], blockNumber }),
       client.readContract({ address: manager, abi: managerAbi, functionName: "getExtensionId", args: [machine.teeId], blockNumber }),
       client.readContract({ address: manager, abi: managerAbi, functionName: "getTeeMachineWithAttestationData", args: [machine.teeId], blockNumber }),
       client.readContract({ address: manager, abi: managerAbi, functionName: "getPublicKey", args: [machine.teeId], blockNumber }),
+      client.readContract({ address: manager, abi: managerAbi, functionName: "getAvailabilityCheckValidity", args: [machine.teeId], blockNumber }),
     ]);
+    const [endTs, lastSigningPolicyId] = availabilityValidity;
+    const availability = evaluateAvailabilityWindow({
+      endTs,
+      validityDurationSeconds: availabilityCheckValidityDurationSeconds,
+      checkpointTimestamp: block.timestamp,
+      maxCheckAgeSeconds: operationalBaseline.availability.maxCheckAgeSeconds,
+      lastSigningPolicyId,
+    });
     machines.push(evaluateRegisteredMachine({
       machine,
       status,
@@ -206,10 +238,12 @@ async function verifyOnchainMachines({ client, manager, extensionId, endpointRes
       record,
       publicKey,
       expectedExtensionId: extensionId,
+      availability,
     }));
   }
   return {
     blockNumber,
+    blockTimestamp: Number(block.timestamp),
     status: activeSet.status === "PASSED" &&
       machines.every(({ assertions }) => Object.values(assertions).every(Boolean))
       ? "PASSED"
@@ -268,6 +302,7 @@ try {
     }
   }
   let activeSet;
+  let registeredVerification;
   if (
     secureRpcUrl(rpcUrl) &&
     /^0x[0-9a-f]{64}$/i.test(extensionIdHex ?? "")
@@ -290,12 +325,34 @@ try {
       );
       if (activeSet.status !== "PASSED") {
         extraBlockers.push("FCC_ACTIVE_MACHINE_SET_CONFLICT");
+      } else if (activeSet.activeMachineCount === operationalBaseline.machines.requiredCount) {
+        registeredVerification = await verifyOnchainMachines({
+          client: readClient,
+          manager: getAddress(manifest.contracts.flareTeeManager),
+          extensionId: BigInt(extensionIdHex),
+          endpointResult,
+        });
+        if (registeredVerification.status !== "PASSED") {
+          extraBlockers.push("FCC_REGISTERED_MACHINE_READINESS_STALE_OR_MISMATCH");
+          for (const machine of registeredVerification.machines) {
+            if (!machine.assertions.availabilityNotExpired) {
+              extraBlockers.push(`MACHINE_${machine.machine}_AVAILABILITY_EXPIRED`);
+            } else if (!machine.assertions.availabilityFresh) {
+              extraBlockers.push(`MACHINE_${machine.machine}_AVAILABILITY_STALE`);
+            }
+          }
+        }
       }
     } catch {
       extraBlockers.push("FCC_ACTIVE_MACHINE_SET_UNAVAILABLE");
     }
   }
-  const preflight = publicPreflight(endpointResult, extraBlockers, activeSet);
+  const preflight = publicPreflight(
+    endpointResult,
+    extraBlockers,
+    activeSet,
+    registeredVerification,
+  );
   if (!process.argv.includes("--execute") || preflight.status !== "READY") {
     console.log(JSON.stringify(preflight, null, 2));
     if (preflight.status !== "READY") process.exitCode = 1;
@@ -374,7 +431,12 @@ try {
       status: verification.status,
       recordedAt: new Date().toISOString(),
       sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, encoding: "utf8" }).trim(),
-      network: { name: manifest.network.name, chainId: manifest.network.chainId, blockNumber: verification.blockNumber.toString() },
+      network: {
+        name: manifest.network.name,
+        chainId: manifest.network.chainId,
+        blockNumber: verification.blockNumber.toString(),
+        blockTimestamp: verification.blockTimestamp,
+      },
       publicIdentifiers: {
         manager: manifest.contracts.flareTeeManager,
         extensionId: extensionIdHex,

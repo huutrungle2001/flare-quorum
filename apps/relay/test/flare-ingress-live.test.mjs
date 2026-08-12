@@ -78,7 +78,9 @@ function reader(overrides = {}) {
       switch (args.functionName) {
         case "teeManager": return overrides.manager ?? manager;
         case "getTender": return tender();
+        case "getSettings": return machineOverrides.settings ?? [21_600n, 600n];
         case "getTeeMachineStatus": return machineOverrides.status ?? 2;
+        case "getAvailabilityCheckValidity": return machineOverrides.availability ?? [22_000n, 42];
         case "getExtensionId": return machineOverrides.extensionId ?? 65_537n;
         case "getPublicKey": return machineOverrides.publicKey ?? publicKeys[index];
         case "getTeeMachineWithAttestationData": return {
@@ -120,6 +122,8 @@ test("live ingress rejects every stale or mismatched machine binding", async () 
   for (const [overrides, code] of [
     [{ manager: "0x9000000000000000000000000000000000000009" }, "FLARE_TEE_MANAGER_BINDING_MISMATCH"],
     [{ machine: { status: 1 } }, "FCC_MACHINE_NOT_PRODUCTION"],
+    [{ machine: { availability: [1_000n, 42] } }, "FCC_MACHINE_AVAILABILITY_EXPIRED"],
+    [{ machine: { settings: [21_601n, 600n] } }, "FCC_AVAILABILITY_WINDOW_UNSUPPORTED"],
     [{ machine: { extensionId: 65_538n } }, "FCC_MACHINE_EXTENSION_MISMATCH"],
     [{ machine: { codeHash: `0x${"88".repeat(32)}` } }, "FCC_MACHINE_CODE_VERSION_MISMATCH"],
     [{ machine: { url: "https://other.example" } }, "FCC_MACHINE_PROXY_URL_MISMATCH"],

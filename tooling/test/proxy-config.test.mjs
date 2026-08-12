@@ -34,6 +34,9 @@ test("renders a fail-closed Coston2 proxy config without embedding API keys", ()
   assert.match(source, /api_key_variable = "FCC_DIRECT_API_KEY"/);
   assert.match(source, /api_key_optional = false/);
   assert.match(source, /allow_magic_pass = true/);
+  assert.match(source, /internal = "6663"/);
+  assert.match(source, /external = "6664"/);
+  assert.match(source, /\[metrics\]\nenable = true/);
   assert.doesNotMatch(source, /PROXY_PRIVATE_KEY\s*=/);
   assert.doesNotMatch(source, /FCC_DIRECT_API_KEY\s*=/);
 });

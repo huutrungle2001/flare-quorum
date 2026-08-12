@@ -24,18 +24,20 @@ Required service variables:
 - `RAILWAY_DOCKERFILE_PATH=/apps/fcc-extension/railway/Dockerfile`
 
 Attach a Railway volume at `/data` before registration. Upstream `tee-node`
-v0.0.23 creates a new simulated identity whenever its process starts, so any
+v0.0.24 creates a new simulated identity whenever its process starts, so any
 restart requires endpoint identity verification and re-registration. Do not
 redeploy a registered machine during the demo window.
 
-The co-located `tee-proxy` obtains instructions from the configured C-chain
-indexer database; `COSTON2_RPC_URL` does not replace that database path. A port
-connect alone is not an indexer health check: diagnose startup from inside the
-same Railway service and require a completed MySQL handshake/authenticated
-query plus a live proxy process. Never print the rendered TOML or database
-variables.
+Providers send cosigned instructions directly to the selected service's
+`POST /instruction` route on provider-facing port `6664`; `tee-proxy` does not
+discover instructions from the indexer. The indexer remains required for
+signing-policy and indexed protocol state. A port connect alone is not an
+indexer health check: use `GET :6661/ready`, where `200` means current and a
+`503` C-chain-delay response means it is actually behind. Never print the
+rendered TOML or database variables.
 
-After registration, require status `2` and run the machine preflight to compare
-the public `/info` identity, on-chain URL, and the extension's complete active
-machine set. Status `1`, a successful dispatch transaction, or an HTTP listener
+After registration, require status `2`, availability younger than six hours,
+one active identity per endpoint, and run the machine preflight to compare the
+public `/info` identity, `/instruction` route, on-chain URL, and complete active
+machine set. Status `2`, a successful dispatch transaction, or an HTTP listener
 alone does not prove that the instruction can be consumed.

@@ -133,7 +133,7 @@ test("requires an aligned checksum-pinned register-tee recipe", () => {
     sourceCommit: "1".repeat(40),
     sourceUrl: "https://example.invalid/scaffold.tar.gz",
     sourceSha256: "2".repeat(64),
-    teeNodeModuleVersion: "0.0.23",
+    teeNodeModuleVersion: "0.0.24",
     goFlareCommonModuleVersion: "v1.2.2-test",
     dockerfileFrontend: `frontend@sha256:${"5".repeat(64)}`,
     builderImage: `builder@sha256:${"3".repeat(64)}`,
@@ -143,9 +143,7 @@ test("requires an aligned checksum-pinned register-tee recipe", () => {
     `# syntax=${recipe.dockerfileFrontend}`,
     `FROM --platform=${recipe.platform} ${recipe.builderImage} AS builder`,
     `ADD --checksum=sha256:${recipe.sourceSha256} ${recipe.sourceUrl} /tmp/source.tar.gz`,
-    `RUN go mod edit -require=github.com/flare-foundation/tee-node@v${recipe.teeNodeModuleVersion}`,
-    `RUN go mod edit -require=github.com/flare-foundation/go-flare-common@${recipe.goFlareCommonModuleVersion}`,
-    "RUN go get ./cmd/register-tee && go mod verify",
+    "RUN cd /src/tools && go mod download && go mod verify",
     "RUN go build -mod=readonly -trimpath -buildvcs=false",
     `FROM --platform=${recipe.platform} ${recipe.runtimeImage}`,
     "COPY --chmod=0555 --chown=65532:65532 --from=builder /out/register-tee /app/register-tee",
@@ -154,7 +152,7 @@ test("requires an aligned checksum-pinned register-tee recipe", () => {
   ].join("\n");
   assert.equal(verifyTeeRegistrationReleaseRecipe(source, recipe), true);
   assert.equal(
-    verifyTeeRegistrationReleaseRecipe(source.replace("v0.0.23", "v0.0.21"), recipe),
+    verifyTeeRegistrationReleaseRecipe(source.replace("go mod download", "go get ./cmd/register-tee"), recipe),
     false,
   );
 });
@@ -188,21 +186,44 @@ test("requires exact pinned inputs and safe defaults for the FCC extension image
   );
 });
 
-test("requires the extension and proxy to resolve the same tee-node wire version", () => {
-  const goMod = "module example\nrequire github.com/flare-foundation/tee-node v0.0.23\n";
-  const teeNode = { tag: "v0.0.23", minimumOrganizerVersion: "0.0.22" };
-  const teeProxy = { teeNodeModuleVersion: "0.0.23" };
-  assert.equal(verifyFccRuntimeAlignment(goMod, teeNode, teeProxy), true);
+test("requires the extension runtime to match the scaffold's tested dependency set", () => {
+  const goMod = [
+    "module example",
+    "require github.com/flare-foundation/tee-node v0.0.24",
+    "require github.com/flare-foundation/go-flare-common v1.2.2-test",
+  ].join("\n");
+  const teeNode = { tag: "v0.0.24", minimumOrganizerVersion: "0.0.22" };
+  const teeProxy = { tag: "v0.0.18", teeNodeModuleVersion: "0.0.21-old-transitive" };
+  const scaffold = {
+    dependencyPins: {
+      teeNode: "v0.0.24",
+      teeProxy: "v0.0.18",
+      goFlareCommon: "v1.2.2-test",
+    },
+  };
+  const common = { moduleVersion: "v1.2.2-test" };
+  assert.equal(
+    verifyFccRuntimeAlignment(goMod, teeNode, teeProxy, scaffold, common),
+    true,
+  );
   assert.equal(
     verifyFccRuntimeAlignment(
-      goMod.replace("v0.0.23", "v0.0.24"),
+      goMod.replace("v0.0.24", "v0.0.23"),
       teeNode,
       teeProxy,
+      scaffold,
+      common,
     ),
     false,
   );
   assert.equal(
-    verifyFccRuntimeAlignment(goMod, teeNode, { teeNodeModuleVersion: "0.0.24" }),
+    verifyFccRuntimeAlignment(
+      goMod,
+      teeNode,
+      teeProxy,
+      { dependencyPins: { ...scaffold.dependencyPins, teeProxy: "v0.0.17" } },
+      common,
+    ),
     false,
   );
 });

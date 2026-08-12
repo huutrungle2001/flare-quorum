@@ -1,12 +1,16 @@
 # FCC Coston2 Operational Baseline
 
-> Status: Phase 0 machine-registration checks passed for the championship
-> extension, derived from the project-owner-supplied
+> Status: the recorded V1 machine-registration evidence remains historical
+> proof of the verified release, but judge-time operational readiness is
+> currently blocked until all three availability checks are fresh again and the
+> runtime is rolled to the dependency set pinned by the current scaffold. This
+> baseline is derived from the project-owner-supplied
 > [FCC redeploy message](original/fcc-coston2-redeploy-message.md) and current
-> official FCC sources. The live manager, core protocol discovery, extension
-> `66011`, and three simulated product machines are verified at `PRODUCTION`
-> with stable Railway HTTPS origins. Extension `66007` remains foundation-only
-> compatibility evidence.
+> [known-good setup clarification](original/fcc-coston2-known-good-setup-2026-08-12.md).
+> The live manager, extension `66011`, and three simulated product machines are
+> still visible at `PRODUCTION` with stable Railway HTTPS origins; status `2`
+> alone is no longer treated as sufficient readiness. Extension `66007` remains
+> foundation-only compatibility evidence.
 
 ## 1. Authority and drift rule
 
@@ -34,12 +38,13 @@ address from this document directly into production source.
 
 ## 2. Required component baseline
 
-The group bulletin requires:
+The 2026-08-12 clarification requires:
 
-- current `main` for `fce-extension-scaffold`, `fce-sign`, or the applicable
-  official example base;
-- `tee-node` and `tee-proxy` from tested `develop` revisions;
-- `tee-node >= v0.0.22`;
+- current `main` for `fce-extension-scaffold` or the applicable official
+  example base;
+- the exact dependency versions pinned together by that scaffold revision;
+- no independent mixing of latest `tee-node`, `tee-proxy`, and
+  `go-flare-common` revisions;
 - new indexer credentials from the organizer's current pinned message.
 
 Version names alone are insufficient. Gate 0 records exact commits, Go module
@@ -47,7 +52,15 @@ resolution, container digests, and a successful availability vote. If the
 scaffold's resolved module is older than the bulletin minimum, the gate remains
 blocked until a tested organizer-supported combination is pinned.
 
-The foundation audit found this exact upstream drift:
+The 2026-08-12 audit observed scaffold commit
+`e3f587949069780084e2ced8a53c9419ed05c250`, which pins `tee-node` `v0.0.24`,
+`tee-proxy` `v0.0.18`, and
+`go-flare-common` `v1.2.2-0.20260727094511-09a10067e6a4` for its extension.
+These values are recorded in
+`tooling/flare/coston2-operational-baseline.json` and must be rechecked before
+the next deployment because `main` can move.
+
+The verified V1 release used an earlier tested runtime line:
 
 - official scaffold `f48cafb889441a62e47c083f4be8dd7d3f456f83` and sign
   example `6df972c64d34efe1d4497f0eafe6792d1f0862dd` still pin
@@ -58,9 +71,10 @@ The foundation audit found this exact upstream drift:
   `0c6d016b09948cba9a508ba357e592eb6088fd1c` resolves `tee-node`
   `v0.0.23` and Go `1.25.8`.
 
-The scaffold is therefore a reference, not a build-ready dependency snapshot.
-FlareQuorum tests one wire-compatible node/proxy pair rather than combining their
-independent latest tags. The proxy release
+Do not rewrite that release manifest or its evidence. The next rolling runtime
+deployment must rebuild and retest against the current scaffold pin set before
+promotion; the foundation preflight reports
+`FCC_CURRENT_SCAFFOLD_PINS_NOT_ADOPTED` until this is true. The proxy release
 recipe at `apps/fcc-extension/proxy/Dockerfile` downloads the exact official
 source archive, verifies its checksum, and pins both image stages. The canonical
 public pin set and repeatable live checks are in
@@ -153,9 +167,10 @@ Register each machine with the bare origin and no trailing slash, for example
 `/instruction`; a trailing slash can produce a redirecting `//instruction`
 route that changes the request method and prevents the TEE from receiving it.
 
-Championship 2-of-3 operation requires one stable public origin and independent
-machine identity per registered TEE unless the supported infrastructure defines
-another routing model.
+Championship 2-of-3 operation requires exactly one active machine identity per
+stable public endpoint. Although the registry can store several identities for
+one URL, that layout is rejected because each dispatch selects one machine and
+a stale identity can cause intermittent delivery failure.
 
 ## 5. Thirty-second machine diagnosis
 
@@ -184,25 +199,28 @@ multi-machine quorum.
 
 ### 5.1 Instruction delivery and indexer diagnosis
 
-The organizer's 2026-08-10
-[routing clarification](original/fcc-indexer-routing-response-2026-08-10.md)
-matches the current official guide: the extension proxy consumes C-chain events
-through the configured indexer database, and the TEE node polls that proxy. An
-on-chain dispatch event therefore proves addressing, not delivery. The proxy's
-inbound FTDC response port is not a substitute instruction-delivery endpoint.
+The newer 2026-08-12
+[known-good setup clarification](original/fcc-coston2-known-good-setup-2026-08-12.md)
+supersedes the older indexer-pull note. Providers POST the cosigned instruction
+directly to the selected machine's stable HTTPS `/instruction` route on external
+port `6664`. The proxy does not discover instructions from the indexer. An
+on-chain dispatch therefore proves addressing, not delivery.
 
 Diagnose a dispatched-but-unexecuted instruction in this order:
 
-1. From the same runtime/network as `tee-proxy`, verify that the indexer returns
-   a MySQL handshake and an authenticated `SELECT 1`; a TCP-open result alone is
-   insufficient. Never print the connection string or password.
-2. Confirm the proxy process remains alive after database initialization and
-   that its local/public `/info` views expose the same extension and identity.
+1. Confirm the selected machine is status `2`, has a registered `teeId`, and
+   its availability validity has not expired. Derive the check time from the
+   manager's validity window and require its age to be strictly less than six
+   hours.
+2. Confirm its on-chain URL is the stable HTTPS origin currently serving
+   `/info`, and that a read-only `GET /instruction` probe returns `405`, proving
+   the provider-facing POST route exists without submitting an instruction.
 3. Query `getActiveTeeMachines(extensionId)` and require exactly the three
    intended identities and public origins. `pnpm flare:machines:register` now
-   rejects a missing, additional, duplicated, or stale active identity/route.
-4. Require every intended identity to be status `2`. Status `1` is a failed
-   readiness gate even if an availability keeper is running.
+   rejects a missing, additional, duplicated, stale, or expired identity/route.
+4. Query `/action/status/<reward-epoch>/<instruction-id>` on the primary FTDC
+   proxy, then the fallback when needed. A recent `404` can mean the instruction
+   never reached that proxy; it does not by itself prove an outage.
 5. If an old identity remains active, run
    `pnpm flare:machines:retirement:preflight`. Pause it only through
    `pnpm flare:machines:retire-stale` after the tool proves ownership, three
@@ -212,6 +230,24 @@ Diagnose a dispatched-but-unexecuted instruction in this order:
    registration tool or intentionally create a fresh extension. Re-running a
    registration command without reconciling the existing record is not proof
    that the URL changed.
+7. Check `instructions_received` and `instructions_rejected` metrics. Provider
+   attempt-level HTTP responses are not publicly queryable and require operator
+   escalation with public-safe identifiers.
+
+Indexer readiness is a separate check for policy and indexed protocol state.
+Expected lag is effectively zero: `GET :6661/ready` returning `200` means the
+indexer is current, while `503` with a C-chain indexer-delay message means it is
+behind. Missing rows in the hackathon log table alone do not prove lag because
+only selected contracts and topics are indexed.
+
+The normal Coston2 FTDC proxies are
+`https://tee-proxy-coston2-1.flare.rocks` (primary) and
+`https://tee-proxy-coston2-2.flare.rocks` (fallback).
+
+All custom FlareQuorum operation types must remain outside the reserved `F_`
+namespace. The current `VEILBID_FOUNDATION`, `VEILBID_BID`, and
+`VEILBID_SELECTION` values comply, and a source test prevents accidental
+regression.
 
 Do not copy shared chat credentials into a tracked file, command argument,
 evidence record, browser variable, or container image. Obtain the current
@@ -284,6 +320,10 @@ Gate 0 cannot pass without all of:
 - fresh extension ID and machine ID;
 - fresh `rRap` challenge;
 - machine status `2` (`PRODUCTION`);
+- unexpired availability whose check age is strictly under six hours;
+- a read-only confirmation that the registered public origin exposes the
+  provider-facing `/instruction` POST route;
+- one active TEE identity per stable endpoint;
 - one successful current-domain action result;
 - explicit simulated-versus-hardware mode;
 - sanitized evidence containing public identifiers only.

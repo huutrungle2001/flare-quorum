@@ -21,6 +21,12 @@
 > additional post-dispatch tender is live in `ComputePending` and remains
 > `WAITING` for its own fixed grace; it is optional fault breadth, not a new
 > promotion requirement.
+>
+> Operational recheck on 2026-08-12: the historical gate evidence is preserved,
+> but judge-time FCC readiness is currently blocked because the registered
+> machines' availability windows have expired and the verified V1 runtime does
+> not yet use the versions pinned by current scaffold `main`. A rolling refresh
+> and new evidence are required before claiming current known-good readiness.
 
 ## 1. Evidence policy
 
@@ -40,7 +46,7 @@ in-memory and save only an allowlisted pass/fail code.
 
 | Gate | Required live outcome | Minimum evidence | Status |
 |---|---|---|---|
-| 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, minimum TEE/proxy revisions, fresh `rRap`, status `2`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status, and reachability assertions | PASSED — block `33745484`; extension `66007` has three distinct simulated TEE machines in `PRODUCTION` with exact URL/code/platform/key bindings |
+| 0 — Foundations | Official access, live FCC manager, current indexer, three stable proxy URLs, current scaffold pin set, fresh `rRap`, status `2`, availability age `<6h`, provider-facing `/instruction`, image digests, and machine capacity pinned | Dependency/version manifest, manager bytecode/interface, machine record/status/availability, route, and reachability assertions | HISTORICAL PASS / CURRENT RECHECK BLOCKED — block `33745484` preserves the earlier pass; the 2026-08-12 preflight requires fresh availability and current scaffold pins before judge-time readiness |
 | A — FCC result | Registered Coston2 TEE result verifies with the exact FCC signing domain | Extension, code, machine, request, result digest, verification transaction | PASSED — block `33745987`; `PING_V1` binding, TEE signature domain, production signer mapping, wrong-binding rejection, and fresh-process recovery all pass |
 | B — Private ingress | ECIES bid reaches TEE without public plaintext/ciphertext; rotated runtime fails closed and supported replacement restores capacity for new tenders | Commitment/receipt IDs, redaction assertions, identity-drift and replacement checkpoint | PASSED (aggregate) — live ingress/replay evidence plus `fcc-replacement-recovery.json` prove identity rotation, three replacement registrations, safe stale-identity retirement, and a new tender on the replacement set |
 | C — Common quorum | All three fixed machines acknowledge every accepted bid; either surviving pair can reproduce the same root/result after one outage | Machine fingerprints, `0x07` receipt/common bitmaps, one-/two-outage and rejection cases | PASSED (core + result-collection recovery) — live two- and three-vendor lifecycles plus `three-vendor-recovery.release.json`; replacement recovery must not mutate an existing frozen set |
@@ -74,6 +80,7 @@ sessions occur.
 |---|---|---|
 | Deployment truth | Source, runtime, constructor, manifest, registry wiring, extension image, machines, and bindings agree | PASSED — `evidence/coston2/deployment-consistency.json` and verified release manifest |
 | Bid privacy | No plaintext/ciphertext in chain, logs, analytics, evidence, or durable browser/proxy state | PARTIAL — live three-machine ciphertext ingress, browser no-persistence path, bounded HTTP/proxy tests, repository/history/evidence scans, and a read-only review of 602 hosted JSON log records pass; additional stateful fault breadth is planned post-Summer Signal hardening |
+| Judge-time FCC availability | Buyer preparation and bid ingress fail closed unless all three frozen identities are status `2`, exactly bound, and availability-fresh at one Coston2 checkpoint | LOCAL PASS / LIVE REFRESH REQUIRED — runtime and browser guards are tested; the current three live validity windows are expired, so no ready claim is made until rolling refresh and redeploy |
 | Receipt binding | Wrong chain/market/extension/code/tender/vendor/rules/nonce/commitment/expiry fails | PASSED — live receipts and domain-binding tests pass; restart recovery is tracked separately from receipt cryptography |
 | Quorum continuity | Every accepted bid preserves a common 2-of-3 machine set; weaker receipt sets fail | PASSED for result collection and supported replacement — live `three-vendor-recovery.release.json` finalizes with one unavailable result endpoint, and all three identities were safely replaced for new tenders; simultaneous two-machine loss remains fail-closed |
 | State integrity | TEE rebuilds ordered root; omitted, duplicated, reordered, and rolled-back state fails | PARTIAL — Go sealed-store/selection, Solidity fuzz/invariant, and TypeScript root tests pass; additional live rollback/restart evidence is planned post-Summer Signal hardening |

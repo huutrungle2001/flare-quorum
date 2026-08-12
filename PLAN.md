@@ -29,6 +29,13 @@
 > post-dispatch recovery tender (`5`) is also live in `ComputePending` and is
 > honestly `WAITING` for its own fixed first-dispatch grace; it adds fault
 > breadth but is not a new promotion blocker.
+> The 2026-08-12 FCC known-good recheck adds a new judge-time operations blocker:
+> status `2` is insufficient while availability is expired, and the current V1
+> runtime predates the dependency set pinned by current scaffold `main`. Local
+> preflight now verifies provider `POST /instruction` reachability, `<6h`
+> availability, one identity per endpoint, and exact scaffold pins. Refresh the
+> three machines by rolling replacement and record new evidence before the next
+> public deployment; do not rewrite the historical V1 evidence.
 >
 > Objective: build the strongest credible Summer Signal submission by making
 > FCC private computation and XRP interoperability inseparable from one usable

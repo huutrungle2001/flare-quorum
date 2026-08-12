@@ -77,8 +77,8 @@ relay = ${tomlString(relay)}
 voter_registry = ${tomlString(voterRegistry)}
 
 [ports]
-internal = "6661"
-external = "6662"
+internal = "6663"
+external = "6664"
 
 [info_timing]
 initial_timeout = "5m"
@@ -110,7 +110,7 @@ enable = true
 allow_magic_pass = true
 
 [metrics]
-enable = false
+enable = true
 `;
 }
 

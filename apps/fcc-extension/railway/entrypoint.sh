@@ -32,7 +32,7 @@ done
 case "${FCC_INDEXER_PORT}" in
   *[!0-9]*|'') printf 'FCC_INDEXER_PORT must be numeric\n' >&2; exit 64 ;;
 esac
-case "${PORT:-6662}" in
+case "${PORT:-6664}" in
   *[!0-9]*|'') printf 'PORT must be numeric\n' >&2; exit 64 ;;
 esac
 
@@ -47,7 +47,7 @@ indexer_host=$(toml_string "$FCC_INDEXER_HOST")
 indexer_database=$(toml_string "$FCC_INDEXER_DATABASE")
 indexer_user=$(toml_string "$FCC_INDEXER_USER")
 indexer_password=$(toml_string "$FCC_INDEXER_PASSWORD")
-external_port=${PORT:-6662}
+external_port=${PORT:-6664}
 
 cat > "$config_path" <<EOF
 # Generated inside the Railway runtime. Never publish this file.
@@ -79,7 +79,7 @@ relay = "0xa10B672D1c62e5457b17af63d4302add6A99d7dE"
 voter_registry = "0x6a0AF07b7972177B176d3D422555cbc98DfDe914"
 
 [ports]
-internal = "6661"
+internal = "6663"
 external = "$external_port"
 
 [info_timing]
@@ -112,7 +112,7 @@ enable = true
 allow_magic_pass = true
 
 [metrics]
-enable = false
+enable = true
 EOF
 chmod 0600 "$config_path"
 
@@ -151,7 +151,7 @@ done
 proxy_pid=$!
 
 for attempt in $(seq 1 120); do
-  if nc -z 127.0.0.1 6661 >/dev/null 2>&1; then
+  if nc -z 127.0.0.1 6663 >/dev/null 2>&1; then
     break
   fi
   if ! kill -0 "$proxy_pid" 2>/dev/null; then
@@ -167,7 +167,7 @@ done
 
 export MODE=1
 export CHAIN_ID=114
-export PROXY_URL=http://127.0.0.1:6661
+export PROXY_URL=http://127.0.0.1:6663
 export SEALED_STORE_DIR="$sealed_dir"
 /app/extension-tee &
 tee_pid=$!

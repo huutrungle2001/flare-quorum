@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-08-12",
+  "source": "docs/original/fcc-coston2-known-good-setup-2026-08-12.md",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "flareTeeManager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE"
+  },
+  "scaffold": {
+    "repository": "https://github.com/flare-foundation/fce-extension-scaffold.git",
+    "branch": "main",
+    "observedCommit": "e3f587949069780084e2ced8a53c9419ed05c250",
+    "teeNodeVersion": "0.0.24",
+    "teeProxyVersion": "0.0.18",
+    "teeProxyCommit": "2e8412990d150a386a2ee5fdc1d2889a04e658aa",
+    "goFlareCommonVersion": "v1.2.2-0.20260727094511-09a10067e6a4",
+    "dependencyPolicy": "use the versions pinned together by this scaffold commit"
+  },
+  "delivery": {
+    "method": "POST",
+    "path": "/instruction",
+    "externalPort": 6664,
+    "providerPush": true
+  },
+  "availability": {
+    "requiredStatus": 2,
+    "maxCheckAgeSeconds": 21600,
+    "requireUnexpiredValidity": true
+  },
+  "machines": {
+    "requiredCount": 3,
+    "oneActiveIdentityPerEndpoint": true
+  },
+  "opTypes": {
+    "reservedPrefixes": ["F_"]
+  },
+  "ftdc": {
+    "primary": "https://tee-proxy-coston2-1.flare.rocks",
+    "fallback": "https://tee-proxy-coston2-2.flare.rocks",
+    "readinessPort": 6661,
+    "readinessPath": "/ready"
+  }
+}

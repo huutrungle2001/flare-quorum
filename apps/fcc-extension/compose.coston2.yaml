@@ -25,7 +25,7 @@ x-config-init: &config-init
     - no-new-privileges:true
 
 x-proxy: &proxy
-  image: veilbid/tee-proxy:coston2-0c6d016b
+  image: veilbid/tee-proxy:coston2-v0.0.18
   pull_policy: never
   read_only: true
   tmpfs:
@@ -40,7 +40,7 @@ x-proxy-ready: &proxy-ready
   command:
     - /bin/sh
     - -euc
-    - for attempt in $$(seq 1 120); do nc -z "$${PROXY_HOST}" 6661 && exit 0; sleep 0.25; done; exit 1
+    - for attempt in $$(seq 1 120); do nc -z "$${PROXY_HOST}" 6663 && exit 0; sleep 0.25; done; exit 1
   read_only: true
   cap_drop:
     - ALL
@@ -77,7 +77,7 @@ services:
     volumes:
       - proxy-config-1:/app/config:ro
     ports:
-      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_1:-6674}:6662"
+      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_1:-6674}:6664"
     depends_on:
       redis-1:
         condition: service_healthy
@@ -102,7 +102,7 @@ services:
       EXTENSION_ID: ${FCC_EXTENSION_ID:?FCC_EXTENSION_ID is required}
       GOVERNANCE_SIGNERS: ${FCC_GOVERNANCE_SIGNERS:-0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E}
       GOVERNANCE_THRESHOLD: ${FCC_GOVERNANCE_THRESHOLD:-1}
-      PROXY_URL: http://ext-proxy-1:6661
+      PROXY_URL: http://ext-proxy-1:6663
       CONFIG_PORT: "5501"
       SIGN_PORT: "7701"
       EXTENSION_PORT: "7702"
@@ -131,7 +131,7 @@ services:
     volumes:
       - proxy-config-2:/app/config:ro
     ports:
-      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_2:-6675}:6662"
+      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_2:-6675}:6664"
     depends_on:
       redis-2:
         condition: service_healthy
@@ -150,7 +150,7 @@ services:
     <<: *extension
     environment:
       <<: *extension-environment-1
-      PROXY_URL: http://ext-proxy-2:6661
+      PROXY_URL: http://ext-proxy-2:6663
     volumes:
       - extension-sealed-2:/var/lib/veilbid/sealed
     depends_on:
@@ -174,7 +174,7 @@ services:
     volumes:
       - proxy-config-3:/app/config:ro
     ports:
-      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_3:-6676}:6662"
+      - "127.0.0.1:${FCC_PROXY_EXTERNAL_PORT_3:-6676}:6664"
     depends_on:
       redis-3:
         condition: service_healthy
@@ -193,7 +193,7 @@ services:
     <<: *extension
     environment:
       <<: *extension-environment-1
-      PROXY_URL: http://ext-proxy-3:6661
+      PROXY_URL: http://ext-proxy-3:6663
     volumes:
       - extension-sealed-3:/var/lib/veilbid/sealed
     depends_on:

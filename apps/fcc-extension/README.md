@@ -1,10 +1,11 @@
 # FlareQuorum FCC extension
 
 This Go module is the confidential-compute component of the Flare release. It
-was bootstrapped from Flare's official `fce-extension-scaffold` at commit
-`f48cafb889441a62e47c083f4be8dd7d3f456f83`, then upgraded to aligned
-`tee-node` `v0.0.23`. This is above the organizer baseline and matches the
-module used by the pinned `tee-proxy` commit `0c6d016b`.
+tracks Flare's official `fce-extension-scaffold` at commit
+`e3f587949069780084e2ced8a53c9419ed05c250`. The current tested set is
+`tee-node v0.0.24`, `tee-proxy v0.0.18`, and
+`go-flare-common v1.2.2-0.20260727094511-09a10067e6a4`; the versions are taken
+together from that scaffold rather than upgraded independently.
 
 The current foundation operation is deliberately public-safe. `PING_V1`
 proves deterministic ABI decoding and binds the operation type, command,
