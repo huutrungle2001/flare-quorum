@@ -58,7 +58,7 @@ const recovery = readJson(resolve(root, "evidence/coston2/market-v2-refresh-one-
 const credentialNegative = readJson(resolve(root, "evidence/coston2/market-v2-refresh-invalid-credential.json"), "JUDGE_PACKAGE_V2_CREDENTIAL_INVALID");
 const undispatchedRefund = readJson(resolve(root, "evidence/coston2/market-v2-undispatched-refund.json"), "JUDGE_PACKAGE_V2_UNDISPATCHED_REFUND_INVALID");
 const selectionRefund = readJson(resolve(root, "evidence/coston2/market-v2-selection-expired-refund.json"), "JUDGE_PACKAGE_V2_SELECTION_REFUND_INVALID");
-const ingress = readJson(resolve(root, "evidence/coston2/flare-ingress-production.json"), "JUDGE_PACKAGE_INGRESS_EVIDENCE_INVALID");
+const ingress = readJson(resolve(root, "evidence/coston2/flare-ingress-v2-production.json"), "JUDGE_PACKAGE_INGRESS_EVIDENCE_INVALID");
 const recoveryAssertions = recovery.assertions ?? {};
 const normalizeSet = (values) => [...(values ?? [])].map((value) => String(value).toLowerCase()).sort();
 const releaseTeeIds = normalizeSet(release.fcc?.teeIds);

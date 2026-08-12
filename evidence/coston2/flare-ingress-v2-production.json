@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "gate": "FLARE_V2_HOSTED_INGRESS",
+  "status": "PASSED",
+  "recordedAt": "2026-08-12T19:08:37Z",
+  "sourceCommit": "831db6400b09f6f1cf74cb6473eeb326fdae73ff",
+  "publicIdentifiers": {
+    "provider": "railway",
+    "project": "veilbid-flare-fcc",
+    "service": "veilbid-flare-ingress",
+    "canonicalUrl": "https://veilbid-flare-ingress-production.up.railway.app",
+    "deploymentId": "8e364b70-da9e-4080-8f8e-66c73cb7f17d",
+    "healthPath": "/health",
+    "machineKeyPath": "/flare/ingress/tenders/:tenderId/machines",
+    "resultPath": "/flare/ingress/tenders/:tenderId/machines/:machineIndex/results/:actionId",
+    "webOrigin": "https://flare-quorum.vercel.app",
+    "network": "flare-coston2",
+    "chainId": 114,
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+    "teeManager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "healthTenderId": "7",
+    "healthTenderStatus": "Awarded",
+    "machineIds": [
+      "0x325E7f5DE26e2ECdaAc23d4883024850E76a0F9B",
+      "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD",
+      "0xc3c454aaDb538A15B18a9Cce24E5e53cC062AFC1"
+    ]
+  },
+  "assertions": {
+    "deploymentSucceeded": true,
+    "healthReturned200": true,
+    "healthTenderBound": true,
+    "threeFrozenMachineKeysPublished": true,
+    "chainIdBoundToCoston2": true,
+    "marketBoundToV2": true,
+    "httpsCanonicalOrigin": true,
+    "exactWebOriginConfigured": true,
+    "publicMachineKeyRouteVerified": true,
+    "pendingResultsDoNotBecomeSuccess": true,
+    "directProxyKeysRemainServerSide": true,
+    "bidBodiesAreNotPersisted": true,
+    "ciphertextIsNotReturnedByHealth": true
+  },
+  "blockers": [],
+  "notes": [
+    "The hosted ingress was deployed before the V2 web release and validates the exact three tender-frozen Coston2 identities against the live manager and proxy info envelopes.",
+    "The public result route returned HTTP 202 for an unknown action rather than manufacturing success.",
+    "No bid plaintext, ciphertext, proxy API key, indexer credential, wallet key, raw signature, or confidential TEE material is recorded."
+  ]
+}
