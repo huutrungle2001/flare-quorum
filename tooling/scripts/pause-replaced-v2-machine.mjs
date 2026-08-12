@@ -64,7 +64,9 @@ try {
   const candidate = read(plan.artifacts.candidateManifest);
   const previousEvidence = read(previousEvidenceArtifact);
   const marketAbi = read(plan.artifacts.candidateMarketAbi);
-  const previousMachines = previousEvidence.publicIdentifiers?.machines ?? [];
+  const previousMachines = (previousEvidence.publicIdentifiers?.machines ?? []).map(
+    (machine) => ({ ...machine, publicUrl: machine.publicUrl ?? machine.url }),
+  );
   const rpcUrl = process.env.COSTON2_RPC_URL?.trim();
   const deploymentKey = normalizePrivateKey(process.env.FLARE_DEPLOYMENT_PRIVATE_KEY);
   if (!secureRpcUrl(rpcUrl) || !/^0x[0-9a-f]{64}$/i.test(deploymentKey ?? "")) {
