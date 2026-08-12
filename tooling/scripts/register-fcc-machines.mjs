@@ -52,6 +52,10 @@ const managerAbi = parseAbi([
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 const operationalBaseline = readFccOperationalBaseline(repositoryRoot);
 const v2 = process.env.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
+const rollingMachineNumber = Number(process.env.FCC_ROLLING_MACHINE_INDEX ?? "0");
+const rollingMachineIndex = rollingMachineNumber - 1;
+const rolling = v2 && Number.isInteger(rollingMachineIndex) &&
+  rollingMachineIndex >= 0 && rollingMachineIndex < operationalBaseline.machines.requiredCount;
 const environmentPath = resolve(repositoryRoot, ".env.local");
 const runtimeDirectory = resolve(repositoryRoot, ".local/fcc/registration");
 const binaryDirectory = resolve(repositoryRoot, ".local/fcc/bin");
@@ -425,10 +429,24 @@ try {
       extensionId: BigInt(extensionIdHex),
       endpointResult,
     });
+    const selectedMachine = rolling ? verification.machines[rollingMachineIndex] : null;
+    const nonAvailabilityAssertionsPass = verification.machines.every(({ assertions }) =>
+      Object.entries(assertions).every(([name, value]) =>
+        name.startsWith("availability") ? true : value === true
+      )
+    );
+    const rollingVerificationPassed = rolling &&
+      verification.activeSet.status === "PASSED" &&
+      nonAvailabilityAssertionsPass &&
+      Object.values(selectedMachine?.assertions ?? {}).every(Boolean);
+    const evidenceStatus = rolling
+      ? (rollingVerificationPassed ? "PASSED" : "FAILED")
+      : verification.status;
     const evidence = {
       schemaVersion: 1,
-      gate: v2 ? "FCC_MARKET_V2_MACHINES" : "0-fcc-machines",
-      status: verification.status,
+      gate: rolling ? "FCC_MARKET_V2_ROLLING_MACHINE_REGISTRATION" :
+        (v2 ? "FCC_MARKET_V2_MACHINES" : "0-fcc-machines"),
+      status: evidenceStatus,
       recordedAt: new Date().toISOString(),
       sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, encoding: "utf8" }).trim(),
       network: {
@@ -442,14 +460,22 @@ try {
         extensionId: extensionIdHex,
         command: "rRap",
         simulatedTee: true,
+        ...(rolling ? { rollingMachine: rollingMachineNumber } : {}),
         activeMachineCount: verification.activeSet.activeMachineCount,
         machines: verification.machines,
       },
       assertions: {
         threeMachinesVerified: verification.machines.length === 3,
-        allProductionAndBound: verification.status === "PASSED",
+        allProductionAndBound: rolling
+          ? nonAvailabilityAssertionsPass
+          : verification.status === "PASSED",
         threeDistinctIdentities: new Set(verification.machines.map(({ teeId }) => teeId)).size === 3,
         exactActiveMachineSet: verification.activeSet.status === "PASSED",
+        ...(rolling ? {
+          selectedMachineProductionAndFresh:
+            Object.values(selectedMachine?.assertions ?? {}).every(Boolean),
+          remainingMachinesStillBound: nonAvailabilityAssertionsPass,
+        } : {}),
       },
       blockers: [],
       notes: [
@@ -457,7 +483,7 @@ try {
         "No deployment key, TEE key, proxy key, direct API key, indexer credential, raw signature, attestation, or bid payload is recorded.",
       ],
     };
-    if (verification.status !== "PASSED") throw new Error("FCC_MACHINE_ONCHAIN_VERIFICATION_FAILED");
+    if (evidenceStatus !== "PASSED") throw new Error("FCC_MACHINE_ONCHAIN_VERIFICATION_FAILED");
     mkdirSync(resolve(repositoryRoot, "evidence/coston2"), { recursive: true });
     writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, v2 ? { flag: "wx" } : {});
     setLocalEnvironmentValues(environmentPath, {
