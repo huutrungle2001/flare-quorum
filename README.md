@@ -26,25 +26,18 @@ The project targets **Flare Summer Signal** with:
 > three-machine rolling Coston2 drill, while the final user-validation gate
 > remains open.
 
-> [!CAUTION]
-> The verified Coston2 V1 market has a known pre-dispatch liveness gap: if a
-> tender is already `Closed` and fewer than two frozen TEEs remain valid before
-> the first selection request succeeds, V1 cannot start its 24-hour refund
-> clock. The side-by-side `FlareQuorumMarketV2` candidate adds a close-time
-> bounded refund and is now live with a fresh extension, three fresh production
-> machines, verified runtime/wiring, a passed three-vendor success lifecycle,
-> a one-result-endpoint outage recovery, and a live three-machine credential
-> rejection/retry drill. Its real
-> undispatched-refund tender is closed and waiting for the fixed 24-hour
-> on-chain grace; the candidate is not a verified release or consumer default
-> until that lifecycle and promotion verification pass. V1 remains the current
-> submission release.
+> [!IMPORTANT]
+> `FlareQuorumMarketV2` is the current consumer-selected Coston2 release. Its
+> bounded pre-dispatch and post-dispatch refund paths, refreshed three-machine
+> runtime, three-vendor success lifecycle, one-result-endpoint outage recovery,
+> credential rejection/retry, runtime bytecode, constructor wiring, and exact
+> active machine set all pass live verification. V1 is preserved only as a
+> historical Coston2 release artifact.
 
 > [!NOTE]
-> **Judging boundary:** V1 remains the verified consumer-selectable release.
-> V2 artifacts count only as candidate engineering evidence until the separate
-> refund and promotion gates pass; they do not silently replace V1 or inflate
-> the current release claim.
+> **Judging boundary:** V2 is the verified consumer-selected release. Its
+> promotion artifact, canonical manifest, bindings, and refreshed evidence are
+> distinct from the preserved V1 and historical Sepolia/Nox artifacts.
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
@@ -199,12 +192,13 @@ Sepolia or mock state.
 
 Verified public release facts:
 
-- Market: `0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05` (deployment block
-  `33746695`).
-- Award receipt: `0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5`.
-- Extension `66011`, code hash
+- Market: `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC` (deployment block
+  `33919464`).
+- Award receipt: `0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3`.
+- Extension `66142`, code hash
   `0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2`.
 - Canonical manifest: `packages/flare-contracts/deployments/coston2.release.json`.
+- Preserved V1 manifest: `packages/flare-contracts/deployments/coston2.v1.release.json`.
 
 ## Documentation
 

@@ -1,13 +1,13 @@
 # FlareQuorum — Judge Package
 
-This folder is the Summer Signal submission material for the verified Flare
-Coston2 V1 market release and its current judge application.
+This folder is the Summer Signal submission material for the verified,
+consumer-selected Flare Coston2 V2 market release and its judge application.
 The files in the parent `submission/` folder describe the historical
 Ethereum Sepolia/Nox release and must not be used as evidence for this package.
 
-The side-by-side `FlareQuorumMarketV2` candidate is a planned post-Summer
-Signal upgrade. It is staged locally and is not presented here as a deployed or
-verified release. Gate H user validation is also recorded separately as
+The side-by-side `FlareQuorumMarketV2` deployment passed its promotion,
+refund, recovery, credential-negative, and refreshed machine gates before the
+consumer switch. Gate H user validation is still recorded separately as
 `NOT_RUN`; no interview, usability, pilot, or traction outcome is inferred.
 
 ## Start here
@@ -57,7 +57,7 @@ FCC is essential: the winner is computed from sealed bid state inside the
 ## Judge route (no wallet)
 
 1. Open the [public dossier](https://flare-quorum.vercel.app/).
-2. Read the verified FCC manager, extension `66011`, code version `v0.2.2`,
+2. Read the verified FCC manager, extension `66142`, code version `v0.2.2`,
    three machine fingerprints, FTestXRP, FTSO, FDC, FAssets, and Smart Account
    bindings.
 3. Open [Activity/Evidence](https://flare-quorum.vercel.app/flare?role=evidence)
@@ -84,23 +84,20 @@ FCC is essential: the winner is computed from sealed bid state inside the
 | Fact | Value |
 | --- | --- |
 | Network | Flare Coston2 / chain `114` |
-| Market | [`0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05`](https://coston2-explorer.flare.network/address/0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05) |
-| Award receipt | [`0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5`](https://coston2-explorer.flare.network/address/0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5) |
+| Market | [`0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`](https://coston2-explorer.flare.network/address/0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC) |
+| Award receipt | [`0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3`](https://coston2-explorer.flare.network/address/0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3) |
 | FTestXRP | [`0x0b6A3645c240605887a5532109323A3E12273dc7`](https://coston2-explorer.flare.network/address/0x0b6A3645c240605887a5532109323A3E12273dc7) |
 | FCC manager | [`0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE`](https://coston2-explorer.flare.network/address/0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE) |
-| Extension | `66011` · `v0.2.2` · code hash `0x194844cf…10fdc2` |
+| Extension | `66142` · `v0.2.2` · code hash `0x194844cf…10fdc2` |
 | Verified release manifest | [`packages/flare-contracts/deployments/coston2.release.json`](../../packages/flare-contracts/deployments/coston2.release.json) |
 
-### Known V1 liveness limitation
+### Bounded V2 refunds
 
-The verified address above is still V1. If a tender reaches `Closed` and fewer
-than two frozen TEEs remain valid before the first selection dispatch succeeds,
-V1 cannot start its post-dispatch 24-hour refund clock. The repository contains
-a locally tested, side-by-side `FlareQuorumMarketV2` candidate with a bounded
-close-time full-refund path, but no V2 address, success lifecycle, or refund
-evidence is claimed. Live V2 deployment and promotion are a planned
-post-Summer Signal upgrade. The V1 manifest and evidence remain immutable until
-a separate V2 release passes its own gates.
+V2 closes the known V1 pre-dispatch liveness gap. Separate live tenders prove
+exact escrow return both when the first selection dispatch never succeeds and
+when a dispatched selection expires; neither path mints an award receipt. The
+historical V1 manifest and evidence remain immutable at
+`packages/flare-contracts/deployments/coston2.v1.release.json`.
 
 The live amount-based FAssets redemption request is recorded in
 [`fassets-redemption.release.json`](../../evidence/coston2/fassets-redemption.release.json)
@@ -110,19 +107,20 @@ payment.
 
 ### Featured recovery lifecycle
 
-The live three-vendor recovery run is tender `21`. The result endpoint for one
+The refreshed V2 three-vendor recovery run is tender `7`. The result endpoint for one
 machine was intentionally unavailable during result collection; the two
 remaining tender-frozen machines signed the same result and finalization passed.
 This is result-collection recovery evidence, not a claim that a simulated TEE
 identity survives a container restart.
 
-The separate organizer-supported recovery drill replaced and re-registered
-all three product identities, retired the stale identities only after frozen
-tenders were resolved, and then completed tender `23` on the new set. It does
+The organizer-supported rolling upgrade replaced and re-registered all three
+product identities, retired stale identities only after frozen tenders were
+resolved, and then completed V2 tenders `6` and `7` on the new set. It does
 not claim unsupported same-identity restoration.
 
-- Evidence: [`three-vendor-recovery.release.json`](../../evidence/coston2/three-vendor-recovery.release.json)
-- Replacement evidence: [`fcc-replacement-recovery.json`](../../evidence/coston2/fcc-replacement-recovery.json) and [`gate-c-e-f-v023-live-lifecycle.json`](../../evidence/coston2/gate-c-e-f-v023-live-lifecycle.json)
+- Success evidence: [`market-v2-refresh-multi-vendor-success.json`](../../evidence/coston2/market-v2-refresh-multi-vendor-success.json)
+- Recovery evidence: [`market-v2-refresh-one-result-outage.json`](../../evidence/coston2/market-v2-refresh-one-result-outage.json)
+- Refreshed machine evidence: [`fcc-market-v2-machines-refresh.json`](../../evidence/coston2/fcc-market-v2-machines-refresh.json)
 - Public gas, lifecycle, and independent bid-ingress timing: [`performance-benchmarks.release.json`](../../evidence/coston2/performance-benchmarks.release.json) and [`bid-ingress-benchmark.release.json`](../../evidence/coston2/bid-ingress-benchmark.release.json)
 - The independent ingress sample is a fresh one-vendor Coston2 lifecycle (tender `22`) finalized by the same verified market and three-machine FCC binding; it is supplementary benchmark evidence, not a new judge path.
 - Finalization: [`0x9b9003…47403`](https://coston2-explorer.flare.network/tx/0x9b9003a5597deb8e5396a48f5962bfab2cc4dd518188b4bff58ce0dee8c47403)
@@ -217,10 +215,7 @@ FAssets protocol obligation.
 
 ## Roadmap / future potential — not current delivery
 
-Planned post-Summer Signal upgrades: deploy V2 alongside V1 with a fresh FCC
-extension and exactly three fresh machines, verify its own manifest/bindings,
-record one live success and one bounded-refund lifecycle, expand stateful live
-fault coverage, and add browser-native XRP recovery and broader wallet coverage.
-Consumer promotion remains a separate decision. None of those future facts is
-used to support the current V1 submission or treated as an unpassed current
-gate.
+Planned post-Summer Signal upgrades: expand stateful live fault coverage, add
+browser-native XRP recovery and broader wallet coverage, and complete real
+buyer/vendor validation. These future facts are not used to inflate the
+current V2 release claim.

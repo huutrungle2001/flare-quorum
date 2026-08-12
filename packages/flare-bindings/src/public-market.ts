@@ -7,8 +7,8 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { type: "json" };
-import awardReceiptAbiJson from "../generated/abis/VeilBidFlareAwardReceipt.json" with { type: "json" };
+import marketAbiJson from "../generated/abis/FlareQuorumMarketV2.json" with { type: "json" };
+import awardReceiptAbiJson from "../generated/abis/FlareQuorumAwardReceiptV2.json" with { type: "json" };
 import {
   assertFlareScoringPolicy,
   calculateFlareRulesHash,

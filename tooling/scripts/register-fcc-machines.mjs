@@ -296,7 +296,7 @@ try {
   if (v2 && endpointResult.machines.length > 0) {
     const v1Release = JSON.parse(readFileSync(resolve(
       repositoryRoot,
-      "packages/flare-contracts/deployments/coston2.release.json",
+      "packages/flare-contracts/deployments/coston2.v1.release.json",
     ), "utf8"));
     const v1MachineIds = new Set(
       (v1Release.fcc?.teeIds ?? []).map((teeId) => teeId.toLowerCase()),

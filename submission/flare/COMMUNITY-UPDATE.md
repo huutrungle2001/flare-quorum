@@ -20,9 +20,9 @@ that Flare or a user has endorsed the project.
 > replacement and re-registration drill passes for all three machines. The
 > Buyer page can optionally submit the exact
 > Testnet Payment through GemWallet, or prepare a public-safe `0xFE` memo/job
-> preview without custody. The verified submission remains V1; the staged V2
-> market is a planned post-Summer Signal upgrade and no live V2 release is
-> claimed. I would value
+> preview without custody. The verified submission now selects V2 after live
+> refund, three-vendor, one-result-outage, credential-negative, and rolling
+> three-machine gates passed. V1 remains preserved as historical evidence. I would value
 > feedback on the procurement brief, failure-state UX, and the supported FCC
 > production/restart path.
 

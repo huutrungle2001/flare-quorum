@@ -1,15 +1,15 @@
 # FCC Coston2 Operational Baseline
 
-> Status: the recorded V1 machine-registration evidence remains historical
-> proof of the verified release, but judge-time operational readiness is
-> currently blocked until all three availability checks are fresh again and the
-> runtime is rolled to the dependency set pinned by the current scaffold. This
+> Status: V2 completed a rolling replacement onto the dependency set pinned by
+> the current scaffold. Extension `66142` and exactly three simulated product
+> machines were re-registered at `PRODUCTION` with fresh availability in
+> `evidence/coston2/fcc-market-v2-machines-refresh.json`. Availability remains a
+> time-bounded fact and must be checked again at judge time. This
 > baseline is derived from the project-owner-supplied
 > [FCC redeploy message](original/fcc-coston2-redeploy-message.md) and current
 > [known-good setup clarification](original/fcc-coston2-known-good-setup-2026-08-12.md).
-> The live manager, extension `66011`, and three simulated product machines are
-> still visible at `PRODUCTION` with stable Railway HTTPS origins; status `2`
-> alone is no longer treated as sufficient readiness. Extension `66007` remains
+> The former V1 extension `66011` remains historical release evidence; status
+> `2` alone is never treated as sufficient readiness. Extension `66007` remains
 > foundation-only compatibility evidence.
 
 ## 1. Authority and drift rule
@@ -71,10 +71,8 @@ The verified V1 release used an earlier tested runtime line:
   `0c6d016b09948cba9a508ba357e592eb6088fd1c` resolves `tee-node`
   `v0.0.23` and Go `1.25.8`.
 
-Do not rewrite that release manifest or its evidence. The next rolling runtime
-deployment must rebuild and retest against the current scaffold pin set before
-promotion; the foundation preflight reports
-`FCC_CURRENT_SCAFFOLD_PINS_NOT_ADOPTED` until this is true. The proxy release
+Do not rewrite that V1 release manifest or its evidence. V2 rebuilt and retested
+the rolling runtime against the current scaffold pin set before promotion. The proxy release
 recipe at `apps/fcc-extension/proxy/Dockerfile` downloads the exact official
 source archive, verifies its checksum, and pins both image stages. The canonical
 public pin set and repeatable live checks are in
@@ -116,9 +114,12 @@ failure. Re-running `pre-build --force` casually is also forbidden because it
 can detach a machine from the expected extension.
 
 The foundation sender evidence remains under
-`evidence/coston2/fcc-extension-registration.json`. The product sender
+`evidence/coston2/fcc-extension-registration.json`. The historical V1 product sender
 `0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05` is explicitly bound to extension
 `66011` in `evidence/coston2/fcc-market-extension-registration.json`. The
+current V2 product sender `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`
+is bound to extension `66142`; its refreshed set is recorded in
+`evidence/coston2/fcc-market-v2-machines-refresh.json`. The
 allowed FCC wire/code version `v0.2.2` and simulated code/platform record is in
 `evidence/coston2/fcc-code-version.json`. The current reproducible FlareQuorum
 application image is versioned independently in

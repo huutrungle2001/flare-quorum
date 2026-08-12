@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "network": "flare-coston2",
+  "chainId": 114,
+  "kind": "release",
+  "verified": true,
+  "recordedAt": "2026-08-08T09:53:42.240Z",
+  "sourceCommit": "ed8add1dda1fc11703b4962584dfb030d93e8f48",
+  "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
+  "contracts": {
+    "VeilBidFlareMarket": {
+      "address": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
+      "deploymentTransaction": "0x908861fecad1c9a35d7c3b47f63c4f2c197e4af4b745b5816f2cca85d95e655f",
+      "deploymentBlock": "33746695",
+      "runtimeHash": "0x27a884c8e3d82e38286f8ab83729bc1d273b919024764ec4625fe49016dccf10",
+      "maskedRuntimeHash": "0x752dba153b00bb05850cd939b323e1fca31df74f7726c99d6b28288a9edbb9be",
+      "artifactMaskedRuntimeHash": "0x752dba153b00bb05850cd939b323e1fca31df74f7726c99d6b28288a9edbb9be"
+    },
+    "VeilBidFlareAwardReceipt": {
+      "address": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5"
+    }
+  },
+  "constructorArguments": {
+    "paymentToken": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+    "teeManager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "ftso": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+    "teeExtensionRegistry": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE"
+  },
+  "fcc": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "66011",
+    "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
+    "version": "v0.2.2",
+    "platform": "0x544553545f504c4154464f524d00000000000000000000000000000000000000",
+    "applicationImage": {
+      "tag": "veilbid/fcc-extension:coston2-v0.2.3",
+      "digest": "sha256:96b89cc4604e4f392548d0aaa20beec1ccf6b88b4991cb2b67ee753bd70da378",
+      "binarySha256": "a6394fabef7d492ba90c28d898c13c5c51dffea6568b67bc4fdafd81540a993e"
+    },
+    "teeIds": [
+      "0x403C88Ab59976dD5ed0513dEDfa003C99621cca3",
+      "0x9cAE8bc688eE2a27Fa9ae6D45739569EE7c3b9fA",
+      "0xcBCcF4BBd4E2B2217e93e6260DB7905E04107bfc"
+    ],
+    "teeKeyFingerprints": [
+      "0xaade678370b8b142b21c9311403c88ab59976dd5ed0513dedfa003c99621cca3",
+      "0x31845d866d40a9324cb5489f9cae8bc688ee2a27fa9ae6d45739569ee7c3b9fa",
+      "0x11ef7408ee9390461998cd65cbccf4bbd4e2b2217e93e6260db7905e04107bfc"
+    ],
+    "resultThreshold": 2,
+    "governanceHash": "0xa3ff9bd94c8e0f9512e1e3ecc81caa16c94946e366974182da86dba03a5f9832"
+  },
+  "protocols": {
+    "fTestXRP": "0x0b6A3645c240605887a5532109323A3E12273dc7",
+    "assetManagerFXRP": "0xc1Ca88b937d0b528842F95d5731ffB586f4fbDFA",
+    "ftsoV2": "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+    "xrpUsdFeedId": "0x015852502f55534400000000000000000000000000",
+    "fdcHub": "0x48aC463d7975828989331F4De43341627b9c5f1D",
+    "fdcVerification": "0x906507E0B64bcD494Db73bd0459d1C667e14B933",
+    "masterAccountController": "0x434936d47503353f06750Db1A444DBDC5F0AD37c",
+    "relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE"
+  },
+  "evidence": [
+    "evidence/coston2/gate-0-foundations.json",
+    "evidence/coston2/gate-a-fcc-result.json",
+    "evidence/coston2/gate-b-private-ingress.json",
+    "evidence/coston2/fcc-market-extension-registration.json",
+    "evidence/coston2/fcc-market-governance.json",
+    "evidence/coston2/fcc-market-machines.json",
+    "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json",
+    "evidence/coston2/fcc-replacement-recovery.json",
+    "evidence/coston2/gate-g-smart-account.json",
+    "evidence/coston2/deployment-consistency.json"
+  ],
+  "blockers": []
+}

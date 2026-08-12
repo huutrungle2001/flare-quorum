@@ -17,22 +17,18 @@ the preserved organizer-group redeploy bulletin and official scaffold sources.
 | Release | Canonical authority | Status |
 |---|---|---|
 | Historical Sepolia/Nox | `packages/contracts/deployments/sepolia.release.json` | Verified pre-hackathon baseline |
-| Coston2/FCC championship | `packages/flare-contracts/deployments/coston2.release.json` | Verified live candidate promoted after runtime/wiring/evidence checks |
-| Coston2 liveness V2 | `packages/flare-contracts/deployments/coston2.v2-candidate.json` | Live isolated candidate: deployment, fresh extension/governance/three-machine set, three-vendor success, one-result-endpoint outage recovery, and invalid-credential rejection/retry pass; refund is `WAITING`, so no verified release manifest or consumer switch exists yet |
+| Coston2/FCC V2 | `packages/flare-contracts/deployments/coston2.release.json` | Verified and consumer-selected after runtime, wiring, refund, success, outage-recovery, and credential-negative gates passed |
+| Historical Coston2 V1 | `packages/flare-contracts/deployments/coston2.v1.release.json` | Preserved verified predecessor with its known pre-dispatch liveness gap; no longer selected by consumers |
+| V2 promotion record | `packages/flare-contracts/deployments/coston2.v2.release.json` | Immutable promotion-stage artifact retained separately from the selected canonical manifest |
 
 Never put Flare addresses into the Sepolia manifest/bindings or reuse historical
 deployment artifacts as Coston2 evidence.
 
-The current verified Coston2 row is V1 and has a known liveness gap when fewer
-than two frozen TEEs remain valid before the first selection dispatch succeeds.
-`FlareQuorumMarketV2` is intentionally side-by-side rather than an upgrade or
-rewrite. Its fresh extension/machine registration, candidate manifest,
-source/runtime verification, generated candidate bindings, and flagship
-lifecycle are recorded. A separate sealed-bid drill proves all three candidate
-TEEs reject the wrong credential issuer and still accept the corrected
-credential on the same canonical slot. The undispatched-refund lifecycle is waiting for its
-real fixed grace, after which promotion must recheck the complete bundle before
-any consumer route can point to it. V1 artifacts and evidence remain immutable.
+`FlareQuorumMarketV2` was deployed side-by-side, then selected only after its
+fresh extension/machine registration, source/runtime verification, three-vendor
+lifecycle, outage recovery, credential-negative drill, and both refund paths
+passed. V1 artifacts and evidence remain immutable and provide rollback facts;
+they are not relabeled as V2.
 
 ## 2. Phase 0: pin before building
 

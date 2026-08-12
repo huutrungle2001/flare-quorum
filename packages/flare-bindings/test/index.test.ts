@@ -18,6 +18,6 @@ test("Flare bindings expose the Coston2 ABI and sanitized release facts", () => 
   assert.equal(isCoston2FlareDeployment({ chainId: 1, status: "verified" }), false);
   assert.equal(coston2FlarePublicRelease.status, "verified");
   assert.equal(coston2FlarePublicRelease.chainId, 114);
-  assert.equal(coston2FlarePublicRelease.fcc.extensionId, "66011");
+  assert.equal(coston2FlarePublicRelease.fcc.extensionId, "66142");
   assert.equal(coston2FlarePublicRelease.protocols.fdcHub.startsWith("0x"), true);
 });

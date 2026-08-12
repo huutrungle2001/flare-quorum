@@ -129,7 +129,7 @@ const vendorRoute = browserCapture(chrome, "/flare?role=vendor", { width: 1440, 
 const finalizerRoute = browserCapture(chrome, "/flare?role=finalizer", { width: 1440, height: 1000 }, "flare-production-finalizer.png");
 const docsMobile = browserCapture(chrome, "/docs", { width: 390, height: 844 }, "flare-production-docs-mobile.png");
 
-const market = release.contracts.VeilBidFlareMarket.address;
+const market = release.contracts.FlareQuorumMarketV2.address;
 const assertions = {
   allRoutesReturned200: routes.every((route) => route.status === 200),
   canonicalMarketBundled: assetSources.some((source) => source.toLowerCase().includes(market.toLowerCase())),
@@ -176,7 +176,7 @@ const evidence = {
     deploymentKind: release.kind,
     deploymentVerified: release.verified,
     market,
-    awardReceipt: release.contracts.VeilBidFlareAwardReceipt.address,
+    awardReceipt: release.contracts.FlareQuorumAwardReceiptV2.address,
   },
   routeStatuses: Object.fromEntries(routes.map((route) => [route.path, route.status])),
   visualChecks: {

@@ -3,8 +3,8 @@ import { dirname, resolve } from "node:path";
 
 const repositoryRoot = resolve(new URL("../../..", import.meta.url).pathname);
 const artifacts = [
-  ["VeilBidFlareMarket", "VeilBidFlareMarket.sol"],
-  ["VeilBidFlareAwardReceipt", "VeilBidFlareAwardReceipt.sol"],
+  ["FlareQuorumMarketV2", "FlareQuorumMarketV2.sol"],
+  ["FlareQuorumAwardReceiptV2", "FlareQuorumAwardReceiptV2.sol"],
 ];
 
 for (const [contractName, sourceName] of artifacts) {

@@ -2,22 +2,23 @@
   "schemaVersion": 1,
   "network": "flare-coston2",
   "chainId": 114,
-  "kind": "release",
+  "kind": "flarequorum-v2-release",
   "verified": true,
-  "recordedAt": "2026-08-08T09:53:42.240Z",
-  "sourceCommit": "ed8add1dda1fc11703b4962584dfb030d93e8f48",
+  "consumerSelectable": true,
+  "recordedAt": "2026-08-12T18:51:33.657Z",
+  "sourceCommit": "668146833adecf5b4a60d298c95924f1c8ceaab8",
   "deployer": "0xE412d04DA2A211F7ADC80311CC0FF9F03440B64E",
   "contracts": {
-    "VeilBidFlareMarket": {
-      "address": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
-      "deploymentTransaction": "0x908861fecad1c9a35d7c3b47f63c4f2c197e4af4b745b5816f2cca85d95e655f",
-      "deploymentBlock": "33746695",
-      "runtimeHash": "0x27a884c8e3d82e38286f8ab83729bc1d273b919024764ec4625fe49016dccf10",
-      "maskedRuntimeHash": "0x752dba153b00bb05850cd939b323e1fca31df74f7726c99d6b28288a9edbb9be",
-      "artifactMaskedRuntimeHash": "0x752dba153b00bb05850cd939b323e1fca31df74f7726c99d6b28288a9edbb9be"
+    "FlareQuorumMarketV2": {
+      "address": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+      "deploymentTransaction": "0x95557afc8aa5d042849de119ea4a28aec5cc6f749957e4a1f4d971fee9984e38",
+      "deploymentBlock": "33919464",
+      "runtimeHash": "0x2ecfef4943e1dc772f7d5bb1db47415c9d4b037532aca0630c0450479e86d563",
+      "maskedRuntimeHash": "0xeaa1c5bc81e5fa617e4215914a7408922cbb2add63094f61ab020f0a8f3d0153",
+      "artifactMaskedRuntimeHash": "0xeaa1c5bc81e5fa617e4215914a7408922cbb2add63094f61ab020f0a8f3d0153"
     },
-    "VeilBidFlareAwardReceipt": {
-      "address": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5"
+    "FlareQuorumAwardReceiptV2": {
+      "address": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3"
     }
   },
   "constructorArguments": {
@@ -28,24 +29,34 @@
   },
   "fcc": {
     "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
-    "extensionId": "66011",
+    "extensionId": "66142",
     "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
     "version": "v0.2.2",
     "platform": "0x544553545f504c4154464f524d00000000000000000000000000000000000000",
     "applicationImage": {
-      "tag": "veilbid/fcc-extension:coston2-v0.2.3",
-      "digest": "sha256:96b89cc4604e4f392548d0aaa20beec1ccf6b88b4991cb2b67ee753bd70da378",
-      "binarySha256": "a6394fabef7d492ba90c28d898c13c5c51dffea6568b67bc4fdafd81540a993e"
+      "tag": "veilbid/fcc-extension:coston2-v0.2.4",
+      "digest": "sha256:4226480fb6733e5aed511eef1bee44852038ed0db820497f0c4d9fd1a706a487",
+      "binarySha256": "5af180f83439da1ec16ae8b16b2285ee54c52ebacec36b8bbe98b4c5fd09e633"
+    },
+    "proxyImage": {
+      "tag": "veilbid/tee-proxy:coston2-v0.0.18",
+      "digest": "sha256:58f804d1dcc8e6f3850e6a34df5fcee0e4c4e08bffb75ad9b4f92b0a71ad5622",
+      "binarySha256": "cfb6b728adb15e4d1a0fd4b0673475ae6e1c19eec7d72f129c82e390c778dfe4"
+    },
+    "registrationImage": {
+      "tag": "veilbid/fcc-register-tee:coston2-e3f5879",
+      "digest": "sha256:e0e1abf696cd63d0bd0bd2e332432d91d0d51c8f6f31d7040782b7bd813f8a9a",
+      "binarySha256": "71ccae716c373a3584e8de49aa44e962ade34b489b45836ec6922a70c464d206"
     },
     "teeIds": [
-      "0x403C88Ab59976dD5ed0513dEDfa003C99621cca3",
-      "0x9cAE8bc688eE2a27Fa9ae6D45739569EE7c3b9fA",
-      "0xcBCcF4BBd4E2B2217e93e6260DB7905E04107bfc"
+      "0x325E7f5DE26e2ECdaAc23d4883024850E76a0F9B",
+      "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD",
+      "0xc3c454aaDb538A15B18a9Cce24E5e53cC062AFC1"
     ],
     "teeKeyFingerprints": [
-      "0xaade678370b8b142b21c9311403c88ab59976dd5ed0513dedfa003c99621cca3",
-      "0x31845d866d40a9324cb5489f9cae8bc688ee2a27fa9ae6d45739569ee7c3b9fa",
-      "0x11ef7408ee9390461998cd65cbccf4bbd4e2b2217e93e6260db7905e04107bfc"
+      "0xd5c641c8135521c9eca9a7ee325e7f5de26e2ecdaac23d4883024850e76a0f9b",
+      "0x048e8317bbe32e76be67c5d577091a12534cdd90ea9f4ca11003ba645b6e8abd",
+      "0x70556c00e875d71135d7987cc3c454aadb538a15b18a9cce24e5e53cc062afc1"
     ],
     "resultThreshold": 2,
     "governanceHash": "0xa3ff9bd94c8e0f9512e1e3ecc81caa16c94946e366974182da86dba03a5f9832"
@@ -61,16 +72,22 @@
     "relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE"
   },
   "evidence": [
-    "evidence/coston2/gate-0-foundations.json",
-    "evidence/coston2/gate-a-fcc-result.json",
-    "evidence/coston2/gate-b-private-ingress.json",
-    "evidence/coston2/fcc-market-extension-registration.json",
-    "evidence/coston2/fcc-market-governance.json",
-    "evidence/coston2/fcc-market-machines.json",
-    "evidence/coston2/gate-c-e-f-v023-live-lifecycle.json",
-    "evidence/coston2/fcc-replacement-recovery.json",
-    "evidence/coston2/gate-g-smart-account.json",
-    "evidence/coston2/deployment-consistency.json"
+    "evidence/coston2/market-v2-candidate-deployment.json",
+    "evidence/coston2/fcc-market-v2-extension-registration.json",
+    "evidence/coston2/fcc-market-v2-governance.json",
+    "evidence/coston2/fcc-market-v2-machines-refresh.json",
+    "evidence/coston2/market-v2-refresh-multi-vendor-success.json",
+    "evidence/coston2/market-v2-refresh-one-result-outage.json",
+    "evidence/coston2/market-v2-refresh-invalid-credential.json",
+    "evidence/coston2/market-v2-undispatched-refund.json",
+    "evidence/coston2/market-v2-selection-expired-refund.json",
+    "evidence/coston2/market-v2-deployment-consistency.json"
   ],
+  "consumerPromotion": {
+    "status": "SELECTED",
+    "selectedAt": "2026-08-12T18:53:14Z",
+    "previousRelease": "packages/flare-contracts/deployments/coston2.v1.release.json",
+    "promotionArtifact": "packages/flare-contracts/deployments/coston2.v2.release.json"
+  },
   "blockers": []
 }

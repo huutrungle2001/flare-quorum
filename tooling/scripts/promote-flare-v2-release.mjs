@@ -21,7 +21,7 @@ const root = resolve(import.meta.dirname, "../..");
 const plan = readV2ReleasePlan(root);
 const execute = process.argv.includes("--execute");
 const requireReady = process.argv.includes("--require-ready");
-const v1ReleasePath = "packages/flare-contracts/deployments/coston2.release.json";
+const v1ReleasePath = "packages/flare-contracts/deployments/coston2.v1.release.json";
 const requiredRecords = {
   candidate: plan.artifacts.candidateManifest,
   candidateDeployment: plan.artifacts.candidateDeploymentEvidence,

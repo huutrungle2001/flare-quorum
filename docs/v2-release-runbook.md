@@ -2,31 +2,26 @@
 
 ## Current status
 
-V2 is a **live, isolated candidate and not yet a verified release**. Market
+V2 is the **verified, consumer-selected Coston2 release**. Market
 `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, award receipt
 `0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3`, extension `66142`, governance,
 and exactly three fresh production machines are recorded in sanitized Coston2
-evidence. The three-vendor encrypted-bid success lifecycle and a second
+evidence. The refreshed three-vendor encrypted-bid success lifecycle and a second
 one-result-endpoint outage recovery both pass. A live credential-negative drill
 also proves all three machines reject the wrong issuer signature, sign those
 rejections, and accept the corrected credential without consuming the sealed
-slot. Refund tender `2` is
-closed without a selection dispatch and is waiting until chain timestamp
-`1786538381` (`2026-08-12T12:39:41Z`) before the real refund can execute.
+slot. Refund tender `2` passed the undispatched refund gate, and tender `5`
+passed the separate selection-expired refund gate after their real fixed grace
+periods.
 
-Promotion therefore remains blocked only by the refund lifecycle. This is a
-real time-lock, not a failed or fabricated gate.
+The post-dispatch drill reached `ComputePending` through a real FCC dispatch
+with request ID
+`0x080ce5ba3a636cd2e6abce426a0a1f57e26d4e09dfc6341b3b5727b48cf3ba12`
+and subsequently proved exact escrow return with no award mint.
 
-An additional non-blocking recovery drill is also active. Tender `5` reached
-`ComputePending` through a real FCC dispatch with request ID
-`0x080ce5ba3a636cd2e6abce426a0a1f57e26d4e09dfc6341b3b5727b48cf3ba12`.
-Its fixed first-dispatch refund becomes eligible after chain timestamp
-`1786553311` (`2026-08-12T16:48:31Z`). This drill remains `WAITING` and is not a
-promotion requirement.
-
-The verified V1 Coston2 release remains the only consumer-selectable release.
-Web, relay, console, and `@flarequorum/flare-bindings` continue to use V1. The
-V2 candidate directory is intentionally not exported from that package.
+Web, relay, console, and `@flarequorum/flare-bindings` now use V2. The V1
+manifest remains preserved at `coston2.v1.release.json`; the address-free V2
+candidate directory remains unexported.
 
 ## Safety boundary
 
@@ -219,14 +214,13 @@ pnpm flare:v2:selection-refund
 adds stateful fault breadth but never becomes a substitute for the mandatory
 undispatched-refund lifecycle.
 
-## Consumer switch is a separate decision
+## Consumer switch record
 
-Even after V2 promotion, the recorded V2 release has
-`consumerSelectable: false` and V1 remains the application default. Switching
-web, relay, console, or the public binding manifest requires a separate user
-approval, consumer migration, full validation, and rollback review. Do not
-silently rewrite the existing V1 manifest.
+The promotion-stage artifact remains immutable with `consumerSelectable:
+false`. After explicit approval and full gate verification, the canonical
+manifest and public bindings selected V2; V1 was copied to a dedicated
+historical manifest before the switch. Relay deployment precedes web deployment
+so the browser never points at an unready ingress.
 
-Until every live stage passes, describe V2 as a **live candidate** or **not yet
-verified**. A `NOT RUN`, `BLOCKED`, or `WAITING` result is evidence of the actual
-state and must not be replaced with a synthetic success.
+Before promotion, any `NOT RUN`, `BLOCKED`, or `WAITING` result remains evidence
+of the actual historical state and must not be replaced with synthetic success.

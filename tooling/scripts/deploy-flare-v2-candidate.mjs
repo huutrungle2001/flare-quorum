@@ -35,7 +35,7 @@ if (existsSync(manifestPath) || existsSync(evidencePath)) {
 
 const read = (path) => JSON.parse(readFileSync(resolve(root, path), "utf8"));
 const gate0 = read("evidence/coston2/gate-0-foundations.json");
-const v1Release = read("packages/flare-contracts/deployments/coston2.release.json");
+const v1Release = read("packages/flare-contracts/deployments/coston2.v1.release.json");
 const artifact = read(plan.contracts.market.artifact);
 if (gate0.status !== "PASSED" || !Object.values(gate0.assertions ?? {}).every(Boolean)) {
   throw new Error("FLARE_V2_FOUNDATIONS_NOT_PASSED");

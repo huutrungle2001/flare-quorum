@@ -21,6 +21,7 @@ function rawTender(status, overrides = {}) {
     publicCeilingXrp: 1_000_000n,
     bidDeadline: 2_000n,
     closeBlock: 100n,
+    closedAt: 1_400n,
     bidCount: 0n,
     approvedVendorCount: 2,
     commonQuorumBitmap: 7,

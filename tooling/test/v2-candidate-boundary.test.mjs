@@ -7,11 +7,12 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 
-test("does not export V2 candidate bindings to release consumers", () => {
+test("exports promoted V2 bindings without exposing a candidate namespace", () => {
   const packageManifest = JSON.parse(read("packages/flare-bindings/package.json"));
   const publicIndex = read("packages/flare-bindings/src/index.ts");
   assert.equal(Object.keys(packageManifest.exports).some((key) => key.includes("candidate")), false);
-  assert.doesNotMatch(publicIndex, /FlareQuorumMarketV2|candidates\/v2/);
+  assert.match(publicIndex, /FlareQuorumMarketV2/);
+  assert.doesNotMatch(publicIndex, /candidates\/v2/);
 });
 
 test("candidate binding manifest is explicitly address-free and unselectable", () => {
@@ -23,16 +24,16 @@ test("candidate binding manifest is explicitly address-free and unselectable", (
   assert.doesNotMatch(manifestText, /0x[0-9a-fA-F]{40}/);
 });
 
-test("web, relay, and console source do not import the V2 candidate namespace", () => {
+test("web, relay, and console source do not import the staging candidate namespace", () => {
   for (const path of ["apps/web/src", "apps/relay/src", "apps/console/src"]) {
     const output = search(path);
-    assert.equal(output, "", `${path} must not select V2 before promotion`);
+    assert.equal(output, "", `${path} must consume only the promoted package API`);
   }
 });
 
 function search(relativePath) {
   try {
-    return execFileSync("rg", ["-n", "FlareQuorumMarketV2|candidates/v2|coston2\\.v2", relativePath], {
+    return execFileSync("rg", ["-n", "candidates/v2|coston2\\.v2", relativePath], {
       cwd: root,
       encoding: "utf8",
     }).trim();

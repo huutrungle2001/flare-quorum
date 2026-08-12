@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { decodeAbiParameters, decodeFunctionData, keccak256, type Abi } from "viem";
-import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { type: "json" };
+import marketAbiJson from "../generated/abis/FlareQuorumMarketV2.json" with { type: "json" };
 import {
   buildIgnoreMemo,
   buildMintAndFundPlan,

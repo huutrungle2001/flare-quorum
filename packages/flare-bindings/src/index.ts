@@ -1,6 +1,6 @@
 import type { Abi, Address, Hex } from "viem";
-import marketAbiJson from "../generated/abis/VeilBidFlareMarket.json" with { type: "json" };
-import awardReceiptAbiJson from "../generated/abis/VeilBidFlareAwardReceipt.json" with { type: "json" };
+import marketAbiJson from "../generated/abis/FlareQuorumMarketV2.json" with { type: "json" };
+import awardReceiptAbiJson from "../generated/abis/FlareQuorumAwardReceiptV2.json" with { type: "json" };
 import releaseManifestJson from "../generated/manifest.json" with { type: "json" };
 export * from "./protocol.js";
 export * from "./smart-account.js";
@@ -13,7 +13,9 @@ export * from "./private-bid.js";
 export * from "./public-brief.js";
 
 export const coston2ChainId = 114;
+/** Stable consumer export; currently bound to the selected FlareQuorumMarketV2 ABI. */
 export const flareQuorumFlareMarketAbi = marketAbiJson as Abi;
+/** Stable consumer export; currently bound to the selected FlareQuorumAwardReceiptV2 ABI. */
 export const flareQuorumFlareAwardReceiptAbi = awardReceiptAbiJson as Abi;
 
 export interface Coston2FlarePublicRelease {

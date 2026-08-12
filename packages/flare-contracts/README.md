@@ -17,10 +17,10 @@ Implemented and locally verified:
   the winner, payout, rules hash, ordered root, and exact selection-result
   digest. Refunds never mint a receipt.
 
-The side-by-side `FlareQuorumMarketV2` and `FlareQuorumAwardReceiptV2` are local
-release candidates, not Coston2 release authority. They preserve the verified
-wire domains while adding a buyer-only, 24-hour full-refund path when the first
-FCC selection dispatch never succeeds. The candidate is covered by focused
+The side-by-side `FlareQuorumMarketV2` and `FlareQuorumAwardReceiptV2` are the
+current consumer-selected Coston2 release. They preserve the verified wire
+domains while adding bounded buyer-only full-refund paths before and after the
+first FCC selection dispatch. V2 is covered by focused
 unit, fuzz, reentrancy, and stateful conservation tests plus the pinned Slither
 gate:
 
@@ -28,8 +28,9 @@ gate:
 pnpm flare:slither:v2
 ```
 
-V2 requires a fresh extension, machine set, manifest, bindings, and live
-success/refund evidence before any consumer may select it.
+The required fresh extension, machine set, manifest, bindings, live
+success/recovery, credential-negative, and refund evidence passed before the
+consumer switch. V1 remains at `deployments/coston2.v1.release.json`.
 
 The Coston2 release is now verified in
 `deployments/coston2.release.json`. The test suite still uses local protocol

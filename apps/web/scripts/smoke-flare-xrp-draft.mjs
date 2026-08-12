@@ -217,7 +217,7 @@ try {
       canonicalUrl: baseUrl.origin,
       network: release.network,
       chainId: release.chainId,
-      market: release.contracts.VeilBidFlareMarket.address,
+      market: release.contracts.FlareQuorumMarketV2.address,
     },
     assertions,
     blockers,

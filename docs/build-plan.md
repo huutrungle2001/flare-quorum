@@ -130,16 +130,16 @@ placeholders are forbidden after that commit.
 - [x] Record one live sealed-bid credential-negative lifecycle in which all
   three TEEs reject the wrong issuer and accept the corrected credential on the
   same canonical slot.
-- Resume the closed refund tender after its real 24-hour grace and record the
+- [x] Resume the closed refund tender after its real 24-hour grace and record the
   bounded pre-dispatch full-refund lifecycle before promotion.
-- Resume optional post-dispatch tender `5` after chain timestamp `1786553311`
+- [x] Resume optional post-dispatch tender `5` after chain timestamp `1786553311`
   and record the fixed-first-dispatch refund path. It is additional fault
   breadth and does not delay promotion once the required undispatched refund
   passes.
 - Expand stateful live fault coverage and browser-native XRP recovery under
   the same public-safe, fail-closed release policy.
-- Keep V1 consumer-selectable until the separate V2 promotion decision is
-  explicitly approved.
+- [x] Promote V2 and select it for web/relay/package consumers only after the
+  complete gate bundle passes; preserve V1 as a historical rollback manifest.
 
 ## 4. Production packages
 

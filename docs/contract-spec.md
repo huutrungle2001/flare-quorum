@@ -157,9 +157,8 @@ Retry never changes rules, bids, root, quorum, machines, FTSO snapshot, or close
 block. Both timeout refunds are public failure terminal states, not successful
 selection fallbacks; they create no award receipt and return only the original
 escrow to the buyer. The verified V1 release implements only the post-dispatch
-refund. The V2 pre-dispatch path is a live candidate whose refund tender is
-closed and waiting for the fixed grace; it remains unavailable to consumers
-until promotion and a separate migration decision.
+refund. V2 adds the bounded pre-dispatch path; its live refund proof and the
+separate post-dispatch proof both passed before V2 became consumer-selected.
 
 ## 4. Creation and funding
 

@@ -2,26 +2,27 @@
   "network": "coston2",
   "chainId": 114,
   "status": "verified",
-  "source": "packages/flare-contracts/src/VeilBidFlareMarket.sol",
+  "release": "v2",
+  "source": "packages/flare-contracts/src/FlareQuorumMarketV2.sol",
   "deployment": "packages/flare-contracts/deployments/coston2.release.json",
-  "deploymentBlock": "33746695",
-  "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
-  "awardReceipt": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5",
+  "deploymentBlock": "33919464",
+  "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+  "awardReceipt": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3",
   "fcc": {
     "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
-    "extensionId": "66011",
+    "extensionId": "66142",
     "codeHash": "0x194844cf417dde867073e5ab7199fa4d21fd82b5dbe2bdea8b3d7fc18d10fdc2",
     "version": "v0.2.2",
     "resultThreshold": 2,
     "teeIds": [
-      "0x403C88Ab59976dD5ed0513dEDfa003C99621cca3",
-      "0x9cAE8bc688eE2a27Fa9ae6D45739569EE7c3b9fA",
-      "0xcBCcF4BBd4E2B2217e93e6260DB7905E04107bfc"
+      "0x325E7f5DE26e2ECdaAc23d4883024850E76a0F9B",
+      "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD",
+      "0xc3c454aaDb538A15B18a9Cce24E5e53cC062AFC1"
     ],
     "teeKeyFingerprints": [
-      "0xaade678370b8b142b21c9311403c88ab59976dd5ed0513dedfa003c99621cca3",
-      "0x31845d866d40a9324cb5489f9cae8bc688ee2a27fa9ae6d45739569ee7c3b9fa",
-      "0x11ef7408ee9390461998cd65cbccf4bbd4e2b2217e93e6260db7905e04107bfc"
+      "0xd5c641c8135521c9eca9a7ee325e7f5de26e2ecdaac23d4883024850e76a0f9b",
+      "0x048e8317bbe32e76be67c5d577091a12534cdd90ea9f4ca11003ba645b6e8abd",
+      "0x70556c00e875d71135d7987cc3c454aadb538a15b18a9cce24e5e53cc062afc1"
     ]
   },
   "protocols": {
@@ -35,8 +36,8 @@
     "relay": "0xa10B672D1c62e5457b17af63d4302add6A99d7dE"
   },
   "abis": {
-    "VeilBidFlareMarket": "generated/abis/VeilBidFlareMarket.json",
-    "VeilBidFlareAwardReceipt": "generated/abis/VeilBidFlareAwardReceipt.json"
+    "FlareQuorumMarketV2": "generated/abis/FlareQuorumMarketV2.json",
+    "FlareQuorumAwardReceiptV2": "generated/abis/FlareQuorumAwardReceiptV2.json"
   },
   "privacy": "Public ABI only; sealed bids, credentials, ciphertext, and TEE secrets are excluded."
 }

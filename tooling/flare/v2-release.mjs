@@ -67,7 +67,7 @@ export function inspectV2LocalReadiness(repositoryRoot) {
   const receiptArtifact = readJson(resolve(repositoryRoot, plan.contracts.awardReceipt.artifact));
   const v1Release = readJson(resolve(
     repositoryRoot,
-    "packages/flare-contracts/deployments/coston2.release.json",
+    "packages/flare-contracts/deployments/coston2.v1.release.json",
   ));
   const marketAbi = marketArtifact.abi;
   const receiptAbi = receiptArtifact.abi;
