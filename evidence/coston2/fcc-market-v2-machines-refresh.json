@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "gate": "FCC_MARKET_V2_MACHINES",
+  "status": "PASSED",
+  "recordedAt": "2026-08-12T18:44:36.905Z",
+  "sourceCommit": "ecca8bc50224a29c73badf76f6a6cdb81c636dad",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33978312",
+    "blockTimestamp": 1786560289
+  },
+  "publicIdentifiers": {
+    "manager": "0x1a9C4A0f9D76c0b1D91d22E24E573a9b377618aE",
+    "extensionId": "0x000000000000000000000000000000000000000000000000000000000001025e",
+    "command": "rRap",
+    "simulatedTee": true,
+    "activeMachineCount": 3,
+    "machines": [
+      {
+        "machine": 1,
+        "teeId": "0x325E7f5DE26e2ECdaAc23d4883024850E76a0F9B",
+        "url": "https://flare-quorum-v2-fcc-1-production.up.railway.app",
+        "status": 2,
+        "publicKeyFingerprintSha256": "4956fe3cf1ecbd05cb1332f44895d150edad525d33f2e6c1f42041e850aad793",
+        "availability": {
+          "status": "PASSED",
+          "endTimestamp": 1786580951,
+          "checkedAtTimestamp": 1786559351,
+          "ageSeconds": 938,
+          "validityDurationSeconds": 21600,
+          "lastSigningPolicyId": 5932,
+          "assertions": {
+            "validityDurationConfigured": true,
+            "validityNotExpired": true,
+            "checkTimestampNotFuture": true,
+            "checkFresh": true
+          }
+        },
+        "assertions": {
+          "productionStatus": true,
+          "extensionMatches": true,
+          "teeIdMatches": true,
+          "urlMatches": true,
+          "codeHashMatches": true,
+          "platformMatches": true,
+          "publicKeyMatches": true,
+          "availabilityNotExpired": true,
+          "availabilityFresh": true,
+          "availabilityWindowValid": true
+        }
+      },
+      {
+        "machine": 2,
+        "teeId": "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD",
+        "url": "https://flare-quorum-v2-fcc-2-production.up.railway.app",
+        "status": 2,
+        "publicKeyFingerprintSha256": "9bc4bea975356b44a27bdaf26287142e941bfb3e91b8f7948443c7ba256614fe",
+        "availability": {
+          "status": "PASSED",
+          "endTimestamp": 1786581390,
+          "checkedAtTimestamp": 1786559790,
+          "ageSeconds": 499,
+          "validityDurationSeconds": 21600,
+          "lastSigningPolicyId": 5932,
+          "assertions": {
+            "validityDurationConfigured": true,
+            "validityNotExpired": true,
+            "checkTimestampNotFuture": true,
+            "checkFresh": true
+          }
+        },
+        "assertions": {
+          "productionStatus": true,
+          "extensionMatches": true,
+          "teeIdMatches": true,
+          "urlMatches": true,
+          "codeHashMatches": true,
+          "platformMatches": true,
+          "publicKeyMatches": true,
+          "availabilityNotExpired": true,
+          "availabilityFresh": true,
+          "availabilityWindowValid": true
+        }
+      },
+      {
+        "machine": 3,
+        "teeId": "0xc3c454aaDb538A15B18a9Cce24E5e53cC062AFC1",
+        "url": "https://flare-quorum-v2-fcc-3-production.up.railway.app",
+        "status": 2,
+        "publicKeyFingerprintSha256": "cabf16518ac3f45c3bc2cae58a26f6f471bb1d2358dbf3495b6235a38f996e4f",
+        "availability": {
+          "status": "PASSED",
+          "endTimestamp": 1786581715,
+          "checkedAtTimestamp": 1786560115,
+          "ageSeconds": 174,
+          "validityDurationSeconds": 21600,
+          "lastSigningPolicyId": 5932,
+          "assertions": {
+            "validityDurationConfigured": true,
+            "validityNotExpired": true,
+            "checkTimestampNotFuture": true,
+            "checkFresh": true
+          }
+        },
+        "assertions": {
+          "productionStatus": true,
+          "extensionMatches": true,
+          "teeIdMatches": true,
+          "urlMatches": true,
+          "codeHashMatches": true,
+          "platformMatches": true,
+          "publicKeyMatches": true,
+          "availabilityNotExpired": true,
+          "availabilityFresh": true,
+          "availabilityWindowValid": true
+        }
+      }
+    ]
+  },
+  "assertions": {
+    "threeMachinesVerified": true,
+    "allProductionAndBound": true,
+    "threeDistinctIdentities": true,
+    "exactActiveMachineSet": true
+  },
+  "blockers": [],
+  "notes": [
+    "This evidence records public Coston2 machine bindings only and does not claim hardware-backed confidentiality.",
+    "No deployment key, TEE key, proxy key, direct API key, indexer credential, raw signature, attestation, or bid payload is recorded."
+  ]
+}
