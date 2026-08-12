@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "gate": "FLARE_V2_SELECTION_EXPIRED_REFUND",
+  "status": "PASSED",
+  "recordedAt": "2026-08-12T17:48:59.395Z",
+  "sourceCommit": "e1086232a63fc6fec437f109fa865a3563463a42",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114,
+    "blockNumber": "33976843"
+  },
+  "publicIdentifiers": {
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+    "awardReceipt": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3",
+    "extensionId": "66142",
+    "tenderId": "5",
+    "closedAt": "1786466908",
+    "refundAvailableAt": "1786553311",
+    "approvalTransaction": "0x12191acae0ef4b02022746f2235e3a4815b04ac4fcd791225f578d869b55965f",
+    "createTransaction": "0xbc12bc976d6b9b16e323e314c86de9374d9f3b9c93dea9939c06522b0af5b390",
+    "closeTransaction": "0x5167a405cc3563d09a1e3c14ede7e9b7e21c64d2a645e3b75690df052866a45e",
+    "requestTransaction": "0xfca0c3fcacdff75452033ffcb12da65b6aa3d39d0e44faaa098a89aa6010c63f",
+    "requestId": "0x080ce5ba3a636cd2e6abce426a0a1f57e26d4e09dfc6341b3b5727b48cf3ba12",
+    "selectionStartedAt": "1786466910",
+    "refundTransaction": "0x828da2afd5158ca375e186ca5fa0d1ed38f941254ec5bc8fbded46fda3aa703d",
+    "refundReason": "SelectionExpired",
+    "escrowAmount": "1000000"
+  },
+  "assertions": {
+    "chainIdMatches": true,
+    "accountMatchesDeclaredDeployer": true,
+    "buyerHasEscrow": true,
+    "v2MarketCodePresent": true,
+    "v2AwardReceiptCodePresent": true,
+    "extensionSenderMatchesV2": true,
+    "threeProductionMachinesBound": true,
+    "closedRefundGraceIs24Hours": true,
+    "selectionRefundGraceIs24Hours": true,
+    "selectionWasDispatched": true,
+    "firstDispatchGraceElapsed": true,
+    "refundTransactionSucceeded": true,
+    "tenderStatusRefunded": true,
+    "fullEscrowReturned": true,
+    "noAwardMinted": true,
+    "refundReasonSelectionExpired": true
+  },
+  "blockers": [],
+  "notes": [
+    "The tender entered ComputePending through a real FCC dispatch and remained unresolved until the fixed first-dispatch grace elapsed.",
+    "The full public FTestXRP escrow returned to the buyer and no award receipt was minted.",
+    "No bid, TEE result, proxy credential, private key, or fabricated lifecycle value is recorded."
+  ]
+}
