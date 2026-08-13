@@ -107,10 +107,45 @@ mới.
 
 1. Mở `BUYER`, chọn direct `COSTON2 / FTESTXRP`.
 2. Kết nối ví A và kiểm tra Coston2.
-3. Điền Buyer Brief ngắn, budget, deadline, hai vendor B/C và scoring weights.
+3. Điền Buyer Brief bằng đúng bộ dữ liệu mẫu bên dưới.
 4. Quay phần review public rules và ba TEE identities.
 5. Bấm approve rồi create tender; xác nhận đúng từng popup ví.
 6. Khi hoàn tất, giữ tender ID và trạng thái `OPEN` khoảng ba giây.
+
+#### Dữ liệu nhập sẵn cho Clip 02
+
+Ví Buyer là ví đang kết nối. Hai địa chỉ dưới đây là hai approved vendor:
+
+```text
+Approved vendor 1
+0xA2aD117d3A0DA89A94a43f305DF638E2cA36A38e
+
+Approved vendor 2
+0x5f04Ec71ef0027D475Ee9dd329437CE90B50fbEA
+```
+
+Nhập các field còn lại như sau:
+
+| Field | Giá trị |
+|---|---|
+| Public title | `FlareQuorum Demo Website` |
+| Category | `Software` |
+| Escrow ceiling | `1` FTestXRP |
+| Bid deadline | `30` phút |
+| Public objective | `Build a responsive public website for a Coston2 treasury procurement demo.` |
+| Acceptance criteria | `Deliver a working responsive website, source code, setup instructions, and a short handover document.` |
+| Optional vendor questions | `What is your delivery plan and what warranty support is included?` |
+| Price weight | `60` |
+| Delivery weight | `25` |
+| Warranty weight | `15` |
+
+Sau khi dán vendor 1, bấm `+ Add vendor` rồi dán vendor 2. Kiểm tra UI hiển thị
+`2/8` vendor và `Total weight: 100% ✓` trước khi tiếp tục. Deadline 30 phút vẫn
+có thể close sớm ngay khi cả hai approved vendor đã submit thành công.
+
+Nếu ví Buyer có ít hơn `1` FTestXRP, giảm `Escrow ceiling` xuống một số dương
+mà ví đủ balance, tối đa sáu chữ số thập phân. Khi đó dùng chính ceiling mới
+làm giới hạn cho bid demo; không thay đổi ceiling sau khi tender đã mở.
 
 Nếu UI yêu cầu hai transaction approval/create, giữ cả hai trong footage; không
 mô tả thành một transaction.
