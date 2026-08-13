@@ -12,6 +12,7 @@ vi.mock("viem", async (importOriginal) => ({
 }));
 
 import {
+  acceptedBidPostcondition,
   assertFlareVendorApproved,
   submitFlareBid,
 } from "../src/flare/flareBidIngress";
@@ -38,7 +39,29 @@ describe("Coston2 vendor admission preflight", () => {
     expect(message).not.toMatch(/no plaintext or ciphertext was saved/i);
   });
 
-  it("checks the mapping before loading TEE keys or sending ciphertext", async () => {
+  it("recognizes only the exact three-receipt on-chain postcondition", () => {
+    const expected = {
+      vendor: "0x1111111111111111111111111111111111111111" as const,
+      submissionNonce: 42n,
+      plaintextCommitment: `0x${"22".repeat(32)}` as const,
+      receiptExpiry: 1_000n,
+    };
+    const reference = {
+      ...expected,
+      receiptBitmap: 7,
+      acceptedBlock: 123n,
+    };
+    expect(acceptedBidPostcondition(reference, expected)).toBe(123n);
+    expect(acceptedBidPostcondition({ ...reference, receiptBitmap: 3 }, expected)).toBeNull();
+    expect(acceptedBidPostcondition({ ...reference, submissionNonce: 43n }, expected)).toBeNull();
+  });
+
+  it("explains an already accepted bid instead of claiming no commitment", () => {
+    expect(flareVendorBidErrorMessage(new Error("FLARE_BID_ALREADY_SUBMITTED")))
+      .toMatch(/already has an accepted bid/i);
+  });
+
+  it("checks approval and prior submission before loading TEE keys or sending ciphertext", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     await expect(submitFlareBid({
       tender: {

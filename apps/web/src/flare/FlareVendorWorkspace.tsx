@@ -62,6 +62,9 @@ export function flareVendorBidErrorMessage(cause: unknown): string {
   if (code === "FLARE_CREDENTIALS_REQUIRED") {
     return "This tender requires credentials that this browser composer cannot collect. No bid was attempted.";
   }
+  if (code === "FLARE_BID_ALREADY_SUBMITTED" || code.includes("AlreadySubmitted")) {
+    return "This wallet already has an accepted bid for this tender. Refresh state and open My submissions; do not submit it again.";
+  }
   return code;
 }
 

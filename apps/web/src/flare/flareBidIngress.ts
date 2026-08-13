@@ -228,6 +228,63 @@ export function assertFlareVendorApproved(approved: boolean): void {
   if (approved !== true) throw new Error("FLARE_VENDOR_NOT_APPROVED");
 }
 
+export function acceptedBidPostcondition(
+  value: unknown,
+  expected: {
+    vendor: Address;
+    submissionNonce: bigint;
+    plaintextCommitment: Hex;
+    receiptExpiry: bigint;
+  },
+): bigint | null {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return null;
+  const reference = value as Record<string, unknown>;
+  if (
+    typeof reference.vendor !== "string" || !isAddress(reference.vendor) ||
+    !isAddressEqual(reference.vendor, expected.vendor) ||
+    reference.submissionNonce !== expected.submissionNonce ||
+    typeof reference.plaintextCommitment !== "string" ||
+    reference.plaintextCommitment.toLowerCase() !== expected.plaintextCommitment.toLowerCase() ||
+    reference.receiptBitmap !== 7 ||
+    reference.receiptExpiry !== expected.receiptExpiry ||
+    typeof reference.acceptedBlock !== "bigint" || reference.acceptedBlock <= 0n
+  ) return null;
+  return reference.acceptedBlock;
+}
+
+async function recoverAcceptedBid(
+  publicClient: ReturnType<typeof createPublicClient>,
+  market: Address,
+  tenderId: bigint,
+  expected: Parameters<typeof acceptedBidPostcondition>[1],
+): Promise<bigint | null> {
+  try {
+    const submitted = await publicClient.readContract({
+      address: market,
+      abi: flareQuorumFlareMarketAbi,
+      functionName: "hasSubmittedBid",
+      args: [tenderId, expected.vendor],
+    });
+    if (submitted !== true) return null;
+    const bidId = await publicClient.readContract({
+      address: market,
+      abi: flareQuorumFlareMarketAbi,
+      functionName: "bidIdByVendor",
+      args: [tenderId, expected.vendor],
+    });
+    if (typeof bidId !== "bigint" || bidId <= 0n) return null;
+    const reference = await publicClient.readContract({
+      address: market,
+      abi: flareQuorumFlareMarketAbi,
+      functionName: "getBidReference",
+      args: [tenderId, bidId],
+    });
+    return acceptedBidPostcondition(reference, expected);
+  } catch {
+    return null;
+  }
+}
+
 async function waitForReceipt(
   tenderId: bigint,
   machineIndex: number,
@@ -278,13 +335,22 @@ export async function submitFlareBid(input: {
   if (!Number.isInteger(input.deliveryDays) || input.deliveryDays < 0 || input.deliveryDays > input.tender.scoringPolicy.maxDeliveryDays) throw new Error("FLARE_BID_DELIVERY_INVALID");
   if (!Number.isInteger(input.warrantyDays) || input.warrantyDays < input.tender.scoringPolicy.minWarrantyDays || input.warrantyDays > input.tender.scoringPolicy.maxWarrantyDays) throw new Error("FLARE_BID_WARRANTY_INVALID");
   const publicClient = createPublicClient({ chain: coston2, transport: http(rpcUrl(env)) });
-  const approved = await publicClient.readContract({
-    address: market,
-    abi: flareQuorumFlareMarketAbi,
-    functionName: "isApprovedVendor",
-    args: [input.tender.tenderId, input.vendor],
-  });
+  const [approved, alreadySubmitted] = await Promise.all([
+    publicClient.readContract({
+      address: market,
+      abi: flareQuorumFlareMarketAbi,
+      functionName: "isApprovedVendor",
+      args: [input.tender.tenderId, input.vendor],
+    }),
+    publicClient.readContract({
+      address: market,
+      abi: flareQuorumFlareMarketAbi,
+      functionName: "hasSubmittedBid",
+      args: [input.tender.tenderId, input.vendor],
+    }),
+  ]);
   assertFlareVendorApproved(approved === true);
+  if (alreadySubmitted === true) throw new Error("FLARE_BID_ALREADY_SUBMITTED");
   const machines = await loadFlareIngressMachines(input.tender.tenderId, env);
   input.onStage?.("encrypting");
   const submissionNonce = BigInt(randomHex(8));
@@ -339,14 +405,27 @@ export async function submitFlareBid(input: {
   });
   const transactionHash = await input.walletClient.writeContract(simulation.request);
   input.onStage?.("confirming");
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: transactionHash });
-  if (receipt.status !== "success") throw new Error("FLARE_BID_TRANSACTION_FAILED");
+  let blockNumber: bigint;
+  try {
+    const receipt = await publicClient.waitForTransactionReceipt({ hash: transactionHash });
+    if (receipt.status !== "success") throw new Error("FLARE_BID_TRANSACTION_FAILED");
+    blockNumber = receipt.blockNumber;
+  } catch (cause) {
+    const acceptedBlock = await recoverAcceptedBid(publicClient, market, input.tender.tenderId, {
+      vendor: input.vendor,
+      submissionNonce,
+      plaintextCommitment: commitment,
+      receiptExpiry,
+    });
+    if (acceptedBlock === null) throw cause;
+    blockNumber = acceptedBlock;
+  }
   return {
     submission,
     commitment,
     receipts: receipts as [FlareBidReceipt, FlareBidReceipt, FlareBidReceipt],
     actions: actions as [FlareIngressAction, FlareIngressAction, FlareIngressAction],
     transactionHash,
-    blockNumber: receipt.blockNumber,
+    blockNumber,
   };
 }
