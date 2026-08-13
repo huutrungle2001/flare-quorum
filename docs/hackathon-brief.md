@@ -128,7 +128,7 @@ remain roadmap items rather than current acceptance gates.
 - [x] GitHub repository and technical materials are accessible to judges.
 - [x] Every Flare integration is explained by user value and live evidence.
 - [x] Existing/new/ported/integrated/improved work is separated in
-  `submission/flare/NEW-WORK-LEDGER.md`.
+  `submission/flarequorum/NEW-WORK-LEDGER.md`.
 - [x] Verified addresses, extension ID, code/image version, machine identities,
   transactions, and deployment network are included.
 - [ ] User testing, community interest, pilots, and traction are reported

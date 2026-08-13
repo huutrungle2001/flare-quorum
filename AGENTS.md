@@ -31,15 +31,13 @@ Read these files before making changes:
 6. `docs/deployment.md`
 7. `docs/product-plan.md`
 8. `docs/feasibility-plan.md`
-9. `docs/build-plan.md`
-10. `docs/architecture.md`
-11. `docs/contract-spec.md`
-12. `docs/threat-model.md`
-13. `docs/verification.md`
-14. `docs/repository-layout.md`
-15. `docs/architecture-decisions.md`
-16. `PLAN.md`
-17. `DESIGNS.md` for user-interface changes.
+9. `docs/architecture.md`
+10. `docs/contract-spec.md`
+11. `docs/threat-model.md`
+12. `docs/verification.md`
+13. `docs/architecture-decisions.md`
+14. `PLAN.md`
+15. `DESIGNS.md` for user-interface changes.
 
 ## 3. Source priority
 

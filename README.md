@@ -174,7 +174,7 @@ pass. See the [Championship Plan](PLAN.md),
 [Architecture Decisions](docs/architecture-decisions.md),
 [Product Plan](docs/product-plan.md),
 [Feasibility Plan](docs/feasibility-plan.md), and
-[Build Plan](docs/build-plan.md).
+[Verification Plan](docs/verification.md).
 
 ## Verified Coston2 judge path
 
@@ -208,17 +208,14 @@ Verified public release facts:
 - [Original Source Materials](docs/original/README.md)
 - [Competition Requirements and Judging Map](docs/hackathon-brief.md)
 - [FCC Coston2 Operational Baseline](docs/fcc-coston2-operations.md)
-- [V2 Staged Release Runbook](docs/v2-release-runbook.md)
 - [User Guide](docs/user-guide.md)
 - [Championship Execution Plan](PLAN.md)
 - [Architecture Decisions](docs/architecture-decisions.md)
 - [Product Plan](docs/product-plan.md)
 - [Feasibility Plan](docs/feasibility-plan.md)
-- [Build Plan](docs/build-plan.md)
 - [Architecture](docs/architecture.md)
 - [Contract Specification](docs/contract-spec.md)
 - [Threat Model](docs/threat-model.md)
 - [Deployment](docs/deployment.md)
 - [Verification](docs/verification.md)
-- [Repository Layout](docs/repository-layout.md)
 - [Security Policy](SECURITY.md)

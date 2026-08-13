@@ -5,9 +5,9 @@
 > machines were re-registered at `PRODUCTION` with fresh availability in
 > `evidence/coston2/fcc-market-v2-machines-refresh.json`. Availability remains a
 > time-bounded fact and must be checked again at judge time. This
-> baseline is derived from the project-owner-supplied
-> [FCC redeploy message](original/fcc-coston2-redeploy-message.md) and current
-> [known-good setup clarification](original/fcc-coston2-known-good-setup-2026-08-12.md).
+> baseline is derived from the project-owner-supplied current
+> [known-good setup clarification](original/fcc-coston2-known-good-setup-2026-08-12.md)
+> and verified release evidence.
 > The former V1 extension `66011` remains historical release evidence; status
 > `2` alone is never treated as sufficient readiness. Extension `66007` remains
 > foundation-only compatibility evidence.

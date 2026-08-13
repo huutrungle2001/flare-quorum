@@ -369,10 +369,10 @@ all agree and contain no confidential material.
 - [ ] Record problems, decisions, and changes without inventing traction.
 - [x] Publish [`docs/integration-guide.md`](docs/integration-guide.md) for
   procurement/treasury teams and infrastructure partners.
-- [x] Prepare [`submission/flare/COMMUNITY-UPDATE.md`](submission/flare/COMMUNITY-UPDATE.md)
-  and [`submission/flare/VALIDATION-PLAN.md`](submission/flare/VALIDATION-PLAN.md);
-  sending the draft and collecting organizer/user feedback are builder-
-  controlled external actions and are not claimed as complete.
+- [x] Publish the honest validation protocol at
+  [`submission/flarequorum/VALIDATION-PLAN.md`](submission/flarequorum/VALIDATION-PLAN.md);
+  collecting organizer/user feedback remains a builder-controlled external
+  action and is not claimed as complete.
 
 Exit: the submission contains real user evidence, not only technical claims.
 
@@ -380,16 +380,16 @@ Exit: the submission contains real user evidence, not only technical claims.
 
 - [x] Live Coston2 app and wallet-free finalized tender.
 - [x] Four-minute captioned video following the single flagship journey is
-  checked in at `submission/flare/flare-quorum-demo.mp4`; it uses live public
+  checked in at `submission/flarequorum/flare-quorum-demo.mp4`; it uses live public
   smoke captures and states the testnet/simulated-TEE limits.
 - [x] Architecture diagram and 60-second privacy/trust explanation in
-  `submission/flare/PRIVACY-TRUST-TALK.md`.
+  `submission/flarequorum/PRIVACY-TRUST-TALK.md`.
 - [x] Before/after work ledger with commits and evidence in
-  `submission/flare/NEW-WORK-LEDGER.md`.
+  `submission/flarequorum/NEW-WORK-LEDGER.md`.
 - [x] Contract addresses, extension ID, code hash, TEE identities, and
-  transactions in `submission/flare/README.md`.
+  transactions in `submission/flarequorum/README.md`.
 - [x] Clear bounty selection and explanation of why every Flare integration is
-  essential in `submission/flare/README.md`.
+  essential in `submission/flarequorum/README.md`.
 - [x] Roadmap limited to credible mainnet, audit, liveness, and pilot work;
   future promotion criteria are explicitly separated from current gates.
 

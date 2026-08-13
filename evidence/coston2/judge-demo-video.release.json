@@ -9,7 +9,7 @@
     "chainId": 114
   },
   "publicIdentifiers": {
-    "videoPath": "submission/flare/flare-quorum-demo.mp4",
+    "videoPath": "submission/flarequorum/flare-quorum-demo.mp4",
     "videoSha256": "741c5aed222ca212ca29f61a168068f33a688c023882ade0a7418a7c918421be",
     "durationSeconds": 240,
     "width": 1280,

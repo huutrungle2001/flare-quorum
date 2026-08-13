@@ -18,11 +18,16 @@ out/
 *.pem
 *.key
 
-# Local evidence, source context, and submission media
+# Local evidence and source context
 .local/
-submission/
 image/
 *.checkpoint.json
+
+# Submission source is tracked; local recording/render exports are not
+submission/**/*.mkv
+submission/**/*.mov
+submission/**/raw/
+submission/**/renders/
 
 # IDE, OS, and logs
 .DS_Store

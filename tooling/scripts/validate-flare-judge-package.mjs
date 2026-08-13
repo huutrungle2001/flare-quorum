@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "../..");
-const packageRoot = resolve(root, "submission/flare");
+const packageRoot = resolve(root, "submission/flarequorum");
 const requiredFiles = [
   "README.md",
   "PRIVACY-TRUST-TALK.md",
@@ -129,7 +129,7 @@ const result = {
   blockers,
   notes: [
     "This check validates only public package files, release facts, and sanitized evidence references; it never reads .env.local.",
-    "The parent submission pack remains historical Sepolia material and is intentionally excluded from this current Flare package.",
+    "submission/flarequorum is the only current judge package; obsolete VeilBid submission media and guides are excluded.",
   ],
 };
 console.log(JSON.stringify(result, null, 2));
