@@ -409,6 +409,13 @@ test("refreshes at four hours by default and rejects spam-prone thresholds", () 
     ...availability,
     ageSeconds: 14_400,
   }, 14_400), true);
+  assert.throws(
+    () => availabilityRefreshDue({
+      ...availability,
+      validityDurationSeconds: 14_400,
+    }, 14_400),
+    /FCC_AVAILABILITY_REFRESH_THRESHOLD_INVALID/,
+  );
 });
 
 test("loads the current provider-push baseline and rejects reserved operation types", () => {

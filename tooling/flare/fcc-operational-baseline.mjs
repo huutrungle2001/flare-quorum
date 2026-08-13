@@ -73,6 +73,9 @@ export function availabilityRefreshDue(availability, refreshAfterSeconds) {
   if (!availability.assertions.checkTimestampNotFuture) {
     throw new Error("FCC_AVAILABILITY_WINDOW_INVALID");
   }
+  if (refreshAfterSeconds >= availability.validityDurationSeconds) {
+    throw new Error("FCC_AVAILABILITY_REFRESH_THRESHOLD_INVALID");
+  }
   return !availability.assertions.validityNotExpired ||
     !availability.assertions.checkFresh ||
     availability.ageSeconds >= refreshAfterSeconds;
