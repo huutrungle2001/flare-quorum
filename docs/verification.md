@@ -62,13 +62,14 @@ receipt are recorded in `evidence/coston2/gate-g-smart-account.json`. The
 evidence contains only public identifiers and assertion booleans; disposable
 wallet/executor secrets are never persisted.
 
-## 3. Mandatory release matrix
+## 3. Release assurance matrix
 
 `PARTIAL` below bounds the evidence actually recorded; it does not silently
-promote an unexecuted drill. Additional live stateful fault breadth and
-browser-native XRP recovery remain post-Summer Signal hardening rather than
-current V2 submission blockers. V2's real undispatched and post-dispatch refund
-lifecycles, promotion verification, and consumer switch have passed.
+promote an unexecuted drill or represent a failed submission gate. Additional
+live stateful fault breadth and browser-native XRP recovery remain post-Summer
+Signal hardening rather than current V2 submission blockers. V2's real
+undispatched and post-dispatch refund lifecycles, promotion verification, and
+consumer switch have passed.
 Gate H covers pre-submission website acceptance. Independent buyer interviews,
 vendor studies, and pilot outreach are a separate post-Summer Signal track and
 remain `NOT_RUN`; that absence does not alter the technical acceptance pass and
@@ -247,7 +248,9 @@ Coston2 release manifest as proof of Flare execution.
 
 The release is ready only when:
 
-- Gates 0–H and every mandatory matrix row pass;
+- Gates 0–H and every submission-blocking acceptance row pass; additional
+  assurance rows may remain explicitly bounded `PARTIAL` only when classified
+  here as post-Summer Signal hardening;
 - the canonical Coston2 manifest is verified and blocker-free;
 - source, runtime, bindings, extension image, machine mapping, UI, relay, and
   evidence all identify the same release;

@@ -13,8 +13,8 @@ Summer Signal while changing the confidential-compute implementation:
 - public evidence proves the result binding without exposing losing bids.
 
 The primary target is the Confidential Compute Apps bounty. Interoperable Asset
-Products becomes a submission target only after a substantive FAssets/FXRP
-mint, escrow, payout, or redemption lifecycle passes on Coston2.
+Products is also selected because the substantive XRP/FDC/Smart Account/FAssets
+mint, escrow, payout, and redemption-request lifecycle has passed on Coston2.
 
 The verified Ethereum Sepolia/Nox release is historical pre-hackathon baseline.
 Never relabel its addresses, tests, evidence, or UI as a Flare implementation.

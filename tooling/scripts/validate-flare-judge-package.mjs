@@ -21,6 +21,20 @@ const requiredText = [
   "extension `66142`",
   "Confidential Compute Apps",
 ];
+const submissionRequirementText = [
+  "Project name",
+  "Selected bounties",
+  "Short description",
+  "Target users",
+  "Working demo",
+  "GitHub repository",
+  "Why the Flare integration is essential",
+  "Existing project and Summer Signal work",
+  "Verified deployment",
+  "Roadmap",
+  "Honest release boundary",
+  "Interoperable Asset Products",
+];
 const forbiddenPatterns = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/,
   /\b(?:PRIVATE_KEY|MNEMONIC|SEED_PHRASE|API_KEY|PASSWORD)\s*=/i,
@@ -47,6 +61,9 @@ const packageText = requiredFiles
   .join("\n");
 for (const text of requiredText) {
   if (!packageText.includes(text)) blockers.push(`JUDGE_PACKAGE_TEXT_MISSING_${text.slice(0, 20).replace(/[^A-Z0-9]+/gi, "_").toUpperCase()}`);
+}
+for (const text of submissionRequirementText) {
+  if (!packageText.includes(text)) blockers.push(`JUDGE_PACKAGE_REQUIREMENT_MISSING_${text.slice(0, 20).replace(/[^A-Z0-9]+/gi, "_").toUpperCase()}`);
 }
 for (const pattern of forbiddenPatterns) {
   if (pattern.test(packageText)) blockers.push("JUDGE_PACKAGE_FORBIDDEN_SECRET_OR_HISTORICAL_LINK");
@@ -75,6 +92,7 @@ const ingressTeeIds = normalizeSet(ingress.publicIdentifiers?.machineIds);
 const assertions = {
   packageFilesPresent: requiredFiles.every((file) => existsSync(resolve(packageRoot, file))),
   currentV2LinksPresent: requiredText.every((text) => packageText.includes(text)),
+  submissionRequirementsMapped: submissionRequirementText.every((text) => packageText.includes(text)),
   noForbiddenSecretOrHistoricalLink: forbiddenPatterns.every((pattern) => !pattern.test(packageText)),
   verifiedCoston2V2Release: release.chainId === 114
     && release.verified === true

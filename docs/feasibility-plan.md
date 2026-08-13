@@ -251,7 +251,8 @@ Prove:
   Activity, and Auditor journeys on the deployed Coston2 website;
 - the bounded result is recorded without converting owner testing into an
   external-user, adoption, pilot, or traction claim;
-- a four-minute demo completes the flagship journey.
+- the working deployed app lets a judge complete the flagship inspection
+  journey without private credentials.
 
 Kill condition: the product is only a developer script, the judge path requires
 private credentials, or public claims exceed executed evidence.

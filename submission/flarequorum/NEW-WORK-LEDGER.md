@@ -31,8 +31,8 @@ same-identity restoration. The recorded FAssets lifecycle reaches the official
 redemption-request boundary rather than asserting an instant underlying XRP
 payout. Gate H passes only for owner-operated website acceptance. Independent
 interviews and pilot outcomes remain `NOT_RUN` and absent from current claims.
-The checked-in four-minute captioned demo is a public smoke-capture walkthrough
-and does not replace those records.
+The working app and automated public smokes do not replace those external-user
+records.
 
 V2 deployment, both refund paths, refreshed FCC machines, promotion, and the
 consumer switch are complete and represented by the canonical manifest and

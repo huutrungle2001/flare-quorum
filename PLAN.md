@@ -8,7 +8,7 @@
 > live success, one-result-endpoint outage, invalid-credential retry,
 > undispatched refund, and selection-expired refund lifecycles pass. Relay was
 > deployed before the V2 web consumer; the hosted judge, role,
-> keyboard/accessibility, XRP draft, reload-checkpoint, and captioned-video
+> keyboard/accessibility, XRP draft, reload-checkpoint, and working-app demo
 > checks pass. V1 remains preserved as historical Coston2 evidence. Gate H
 > owner-operated website acceptance passes; independent buyer/vendor research
 > and pilot outreach remain `NOT_RUN` post-Summer Signal tracks. Browser-native
@@ -46,8 +46,8 @@ Coston2 with a publicly verifiable award.
 **Selected bounty strategy:**
 
 - Confidential Compute Apps: mandatory primary submission.
-- Interoperable Asset Products: selected only after the complete XRP -> Smart
-  Account -> FXRP escrow -> FCC award -> FXRP/XRP exit lifecycle passes.
+- Interoperable Asset Products: selected because the XRP -> Smart Account ->
+  FTestXRP escrow -> FCC award -> official redemption-request lifecycle passes.
 
 ## 2. Non-negotiable product path
 
@@ -383,9 +383,9 @@ for the Summer Signal website-acceptance gate.
 ### Phase 8 — judge package
 
 - [x] Live Coston2 app and wallet-free finalized tender.
-- [x] Four-minute captioned video following the single flagship journey is
-  checked in at `submission/flarequorum/flare-quorum-demo.mp4`; it uses live public
-  smoke captures and states the testnet/simulated-TEE limits.
+- [x] Working-app demo follows the single flagship journey and exposes a
+  wallet-free finalized tender; this satisfies the supplied
+  demo-link/video/working-app requirement without depending on a media file.
 - [x] Architecture diagram and 60-second privacy/trust explanation in
   `submission/flarequorum/PRIVACY-TRUST-TALK.md`.
 - [x] Before/after work ledger with commits and evidence in

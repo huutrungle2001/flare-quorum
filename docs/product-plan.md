@@ -16,7 +16,7 @@
 - Name: FlareQuorum
 - Tagline: Confidential Procurement for XRP and Flare Treasuries
 - Primary bounty: Confidential Compute Apps
-- Secondary bounty target: Interoperable Asset Products
+- Secondary selected bounty: Interoperable Asset Products
 - Development network: Flare Testnet Coston2 (`114`)
 - Settlement asset: official FTestXRP on Coston2; FXRP on Flare Mainnet roadmap
 - Confidential compute: Flare Compute Extension with a target 2-of-3 TEE result

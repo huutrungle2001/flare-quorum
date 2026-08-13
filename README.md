@@ -3,28 +3,56 @@
 > Confidential procurement for XRP and Flare treasuries, powered by Flare
 > Confidential Compute.
 
-FlareQuorum is the Flare-native successor to the historical predecessor baseline. XRP-native buyers atomically mint
-FXRP and fund a tender; approved vendors privately deliver encrypted
-multi-criteria offers to a fixed Flare TEE quorum; and a Flare smart contract
-settles only after two registered TEE identities agree on the same deterministic
-result.
+[LIVE COSTON2 APP](https://flare-quorum.vercel.app) ·
+[WALLET-FREE AUDITOR](https://flare-quorum.vercel.app/flare?role=evidence) ·
+[JUDGE PACKAGE](submission/flarequorum/README.md) ·
+[VERIFIED MANIFEST](packages/flare-contracts/deployments/coston2.release.json) ·
+[NEW-WORK LEDGER](submission/flarequorum/NEW-WORK-LEDGER.md)
 
-The project targets **Flare Summer Signal** with:
+## Summer Signal submission
+
+| Submission field | FlareQuorum |
+|---|---|
+| Project | **FlareQuorum** |
+| Selected bounties | **Confidential Compute Apps** and **Interoperable Asset Products** |
+| Target users | XRP-native treasury operators, Flare DAOs/procurement teams, and vendors protecting commercial offers |
+| Working demo | [flare-quorum.vercel.app](https://flare-quorum.vercel.app) on Flare Testnet Coston2 (`114`) |
+| Primary outcome | A public, independently inspectable procurement award without publishing losing bids |
+| Release status | Verified Coston2 V2; three simulated FCC machines, 3-of-3 bid custody, and 2-of-3 result agreement |
 
 - **Primary bounty:** Confidential Compute Apps.
-- **Secondary bounty target:** Interoperable Asset Products through a real
-  XRP/FDC/Smart Account/FAssets funding and redemption lifecycle.
-- **Development network:** Flare Testnet Coston2 (`114`).
-- **Target settlement asset:** FTestXRP on Coston2 and FXRP on Flare Mainnet.
+- **Secondary selected bounty:** Interoperable Asset Products.
+
+FlareQuorum lets a treasury publish transparent procurement rules and escrow
+FTestXRP while approved vendors submit encrypted multi-criteria offers to a fixed Flare TEE quorum.
+Flare Confidential Compute performs qualification, eligibility, comparison,
+and winner selection. The market settles only after two tender-fixed registered
+machines sign the same deterministic result.
+
+The product is useful where public offers leak vendor strategy but a private
+server would give the operator too much authority. Buyers get transparent
+rules and escrow; vendors keep losing commercial terms private; auditors can
+verify the rule/result/settlement binding without a wallet or decryption key.
+
+## Judge in two minutes
+
+1. Open the [Public workspace](https://flare-quorum.vercel.app) and inspect a
+   finalized Coston2 tender without connecting a wallet.
+2. Open [Auditor](https://flare-quorum.vercel.app/flare?role=evidence) and check
+   the rule hash, ordered bid root, FCC machine set, FTSO snapshot, matching
+   result signers, and escrow conservation.
+3. Open [Buyer](https://flare-quorum.vercel.app/flare?role=buyer) to inspect
+   direct FTestXRP funding and the XRP/FDC/Smart Account funding path.
+4. Open [Private Bids](https://flare-quorum.vercel.app/flare?role=vendor) to see
+   the approved-wallet gate and encrypted three-receipt submission path.
+5. Use the [judge package](submission/flarequorum/README.md) for addresses,
+   evidence, new-work disclosure, limitations, and reproduction commands.
 
 > [!IMPORTANT]
-> Phase 0 feasibility validation is complete for the live Coston2 core path:
-> the registered FCC market, three-machine private bid lifecycle, FTSO-bound
-> scoring, FTestXRP settlement, and XRPL/FDC/Smart Account funding are recorded
-> in public-safe evidence. Same-identity restoration is unsupported by design;
-> the organizer-approved replacement registration model has passed a full
-> three-machine rolling Coston2 drill, while the final user-validation gate
-> remains open.
+> Phase 0 feasibility validation is complete, and Gates 0–H pass for the
+> current release, including the bounded owner-operated website acceptance run.
+> Independent interviews, pilots, adoption, and traction are not claimed and
+> remain post-Summer Signal work.
 
 > [!IMPORTANT]
 > `FlareQuorumMarketV2` is the current consumer-selected Coston2 release. Its
@@ -41,7 +69,9 @@ The project targets **Flare Summer Signal** with:
 
 > [!WARNING]
 > This repository contains unaudited hackathon software. Use disposable testnet
-> wallets and assets only.
+> wallets and assets only. The FCC machines are simulated rather than hardware-
+> backed production TEEs; this is not a mainnet, formal-audit, or production-
+> security claim.
 
 > [!NOTE]
 > FlareQuorum is the current product and repository brand. Existing `VeilBid*`
@@ -133,7 +163,18 @@ recorded in evidence.
 Displaying a feed, accepting an arbitrary token, or merely changing RPC does not
 count as a completed integration.
 
-## What existed before Summer Signal
+## Existing project disclosure and new work
+
+| Category | Summer Signal boundary | Why it matters |
+|---|---|---|
+| Existed before | Historical Sepolia/Nox confidential procurement, Safe funding, relay, web app, bindings, and evidence | Preserves provenance without presenting old Ethereum work as Flare work |
+| Newly built | FCC Go extension, private ECIES ingress, three-machine receipt quorum, Flare market/contracts, and Coston2 bindings | Makes FCC responsible for private eligibility, comparison, and selection |
+| Ported | Public explorer, role-based product shell, and stateless checkpoint recovery | Gives judges and users a usable Flare-native workflow |
+| Integrated | FAssets/FTestXRP, FDC `XRPPayment`, FTSOv2, and Flare Smart Accounts | Connects XRP-native funding, price normalization, escrow, payout, and redemption |
+| Improved | Multi-criteria scoring, 3-of-3 bid custody, 2-of-3 result agreement, replay domains, bounded refunds, and replacement recovery | Reduces winner authority and makes failure states explicit and recoverable |
+
+The detailed, evidence-backed mapping is in the
+[new-work ledger](submission/flarequorum/NEW-WORK-LEDGER.md).
 
 The historical predecessor previously shipped a verified Ethereum Sepolia release for the iExec
 Nox hackathon. That baseline includes Safe treasury funding, Nox encrypted
@@ -150,7 +191,7 @@ Those artifacts are **pre-hackathon baseline evidence**, not proof of Flare
 integration. The new work ledger and Coston2 evidence must identify everything
 built, ported, or improved for Summer Signal.
 
-## Target repository structure
+## Repository structure
 
 ```text
 apps/
@@ -169,8 +210,7 @@ evidence/
 docs/
 ```
 
-Directories marked as new targets do not exist until their feasibility gates
-pass. See the [Championship Plan](PLAN.md),
+See the [Championship Plan](PLAN.md),
 [Architecture Decisions](docs/architecture-decisions.md),
 [Product Plan](docs/product-plan.md),
 [Feasibility Plan](docs/feasibility-plan.md), and
@@ -203,8 +243,25 @@ Verified public release facts:
 - Canonical manifest: `packages/flare-contracts/deployments/coston2.release.json`.
 - Preserved V1 manifest: `packages/flare-contracts/deployments/coston2.v1.release.json`.
 
+## Short roadmap
+
+1. Run external buyer/vendor usability sessions and pursue one honest Coston2
+   design-partner pilot; do not claim traction before those sessions occur.
+2. Expand browser-native XRP recovery, wallet coverage, and live fault drills
+   while preserving fail-closed behavior.
+3. Move from simulated FCC machines to a hardware-backed, audited operating
+   model before any production-value deployment.
+4. Validate mainnet FXRP funding/redemption and evolve the proven procurement
+   flow into milestone-based treasury execution without changing historical
+   release claims.
+
+See [PLAN.md](PLAN.md) for acceptance criteria and sequencing.
+
 ## Documentation
 
+- [Summer Signal Judge Package](submission/flarequorum/README.md)
+- [New-Work Ledger](submission/flarequorum/NEW-WORK-LEDGER.md)
+- [Privacy and Trust Explanation](submission/flarequorum/PRIVACY-TRUST-TALK.md)
 - [Original Source Materials](docs/original/README.md)
 - [Competition Requirements and Judging Map](docs/hackathon-brief.md)
 - [FCC Coston2 Operational Baseline](docs/fcc-coston2-operations.md)

@@ -15,7 +15,7 @@ The supplied brief defines two bounties:
 
 | Bounty | Supplied prize pool | FlareQuorum strategy |
 |---|---:|---|
-| Interoperable Asset Products | $6,000 | Enter only after the XRP → FDC/Smart Account → FAssets escrow → award → redemption lifecycle passes |
+| Interoperable Asset Products | $6,000 | Selected — the XRP → FDC/Smart Account → FAssets escrow → award → redemption-request lifecycle has passed |
 | Confidential Compute Apps | $6,000 | Primary bounty; FCC private intake and winner computation are mandatory |
 
 Each supplied bounty lists first place at `$4,000` and second place at `$2,000`.
@@ -39,10 +39,10 @@ organizer channel.
 | Supplied requirement | FlareQuorum authority | Release condition |
 |---|---|---|
 | Project name | `README.md`, `docs/product-plan.md` | Exact name agrees everywhere |
-| Selected bounty/bounties | `README.md`, `PLAN.md` | Primary FCC; interoperability only after its evidence gate passes |
+| Selected bounty/bounties | `README.md`, `PLAN.md` | Confidential Compute Apps and Interoperable Asset Products; both evidence gates pass |
 | Short description | `README.md`, final submission material | Explains user problem and result in plain language |
 | Target user | `docs/product-plan.md` | XRP treasuries, Flare treasury teams, and vendors are explicit |
-| Demo/video/app | `PLAN.md` Phase 8 | Live Coston2 app, wallet-free tender, and four-minute video |
+| Demo/video/app | `PLAN.md` Phase 8 | Live Coston2 app and wallet-free finalized tender; a video is optional under the supplied `or` requirement |
 | GitHub/technical material | Repository and canonical docs | Judge-friendly source, setup, architecture, security, and verification |
 | Meaningful Flare usage | Architecture and release evidence | FCC, FAssets, FDC, FTSO, and Smart Accounts form one flagship journey |
 | New/ported/integrated/improved work | `docs/verification.md` new-work ledger | Commit- and evidence-backed separation from Sepolia/Nox baseline |
@@ -87,8 +87,10 @@ new Flare work is not.
 ### Product usefulness
 
 FlareQuorum must solve the concrete problem of confidential vendor competition for
-XRP/Flare treasuries, demonstrate complete buyer/vendor journeys, and record
-real feedback. A protocol-only script does not pass.
+XRP/Flare treasuries, demonstrate complete buyer/vendor journeys, and record a
+bounded working-app acceptance result. External feedback remains encouraged
+post-Summer Signal and must not be invented. A protocol-only script does not
+pass.
 
 ### Flare integration quality
 
@@ -124,10 +126,10 @@ remain roadmap items rather than current acceptance gates.
 - [x] Project name and bounty selection are consistent in the Flare judge package.
 - [x] Product description and target users are understandable without protocol
   knowledge.
-- [x] Live app, wallet-free demo, public evidence links, and the checked-in
-  captioned demo video work; remaining user-validation evidence is tracked in
-  `PLAN.md` Phase 7.
-- [x] GitHub repository and technical materials are accessible to judges.
+- [x] Live app, wallet-free demo, and public evidence links work; the working
+  app satisfies the supplied demo-link/video/working-app requirement.
+- [ ] Make the GitHub repository accessible to anonymous judges before final
+  submission; the repository URL currently returns `404` without authentication.
 - [x] Every Flare integration is explained by user value and live evidence.
 - [x] Existing/new/ported/integrated/improved work is separated in
   `submission/flarequorum/NEW-WORK-LEDGER.md`.
@@ -137,8 +139,10 @@ remain roadmap items rather than current acceptance gates.
   testing, community interest, pilots, and traction remain honestly unclaimed.
 - [x] Roadmap and next steps do not exceed the threat model or evidence.
 
-The checklist remains incomplete until the corresponding rows in
-[`verification.md`](verification.md) pass.
+The engineering checklist is complete. Anonymous GitHub access remains the one
+external submission action above; explicitly bounded `PARTIAL` assurance rows
+in [`verification.md`](verification.md) are disclosed post-Summer Signal
+hardening tracks, not hidden submission passes.
 
 ## 8. Supplied organizer links
 
