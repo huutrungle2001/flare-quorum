@@ -1,6 +1,6 @@
 import { formatUnits } from "viem";
 import { useSearchParams } from "react-router";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { coston2FlarePublicRelease } from "@flarequorum/flare-bindings";
 import type { FlareMarketState } from "../public-market/useFlareMarket";
 import { useFlareMarket } from "../public-market/useFlareMarket";
@@ -16,11 +16,7 @@ import { PublicValue } from "../shell/PublicValue";
 import { refreshStateEvent } from "../shell/refreshState";
 import { scrollToPageTop } from "../shell/navigationScroll";
 import { FlareBuyerBriefPanel, useVerifiedFlareBuyerBrief } from "./FlareBuyerBriefPanel";
-import {
-  clearPendingFlareTender,
-  pendingTenderChangedEvent,
-  readPendingFlareTender,
-} from "./pendingFinality";
+import { usePendingFlareTender } from "./pendingFinality";
 
 type FlareTenderFilter = "current" | "all" | "open" | "compute" | "awarded" | "refunded";
 type FlareTenderSort = "newest" | "oldest";
@@ -512,22 +508,7 @@ function FlareRoleWorkspace({
 export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState; onRetry: () => void }) {
   const [params, setParams] = useSearchParams();
   const tenders = state.data?.tenders ?? [];
-  const [pendingTender, setPendingTender] = useState(readPendingFlareTender);
-  useEffect(() => {
-    const syncPendingTender = () => setPendingTender(readPendingFlareTender());
-    window.addEventListener(pendingTenderChangedEvent, syncPendingTender);
-    return () => window.removeEventListener(pendingTenderChangedEvent, syncPendingTender);
-  }, []);
-  useEffect(() => {
-    if (!pendingTender?.tenderId) return;
-    if (tenders.some((tender) => tender.tenderId.toString() === pendingTender.tenderId)) {
-      clearPendingFlareTender(pendingTender.tenderId);
-    }
-  }, [pendingTender, tenders]);
-  const pendingFinality = pendingTender
-    && (!pendingTender.tenderId || !tenders.some((tender) => tender.tenderId.toString() === pendingTender.tenderId))
-    ? pendingTender
-    : null;
+  const pendingFinality = usePendingFlareTender(tenders.map((tender) => tender.tenderId.toString()));
   const requestedFilter = params.get("status");
   const filter = flareTenderFilters.some((option) => option.value === requestedFilter)
     ? requestedFilter as FlareTenderFilter

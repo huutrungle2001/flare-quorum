@@ -1,10 +1,13 @@
 import { coston2FlarePublicRelease } from "@flarequorum/flare-bindings";
 import { formatUnits } from "viem";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";
 import { ContextHelp } from "../shell/ContextHelp";
 import { PublicValue } from "../shell/PublicValue";
 import { FlareBuyerBriefPanel } from "./FlareBuyerBriefPanel";
+import { PendingTenderNotice } from "./PendingTenderNotice";
+import { usePendingFlareTender } from "./pendingFinality";
 
 function short(value: string) {
   return `${value.slice(0, 10)}…${value.slice(-8)}`;
@@ -21,14 +24,16 @@ export function FlareAuditorWorkspace({
   tenders: readonly FlarePublicTender[];
   finalizedBlock: bigint;
 }) {
+  const [params, setParams] = useSearchParams();
   const orderedTenders = useMemo(
     () => [...tenders].sort((left, right) => left.tenderId > right.tenderId ? -1 : left.tenderId < right.tenderId ? 1 : 0),
     [tenders],
   );
-  const preferredTender = orderedTenders.find((tender) => tender.status === "Awarded") ?? orderedTenders[0] ?? null;
-  const [selectedId, setSelectedId] = useState(() => preferredTender?.tenderId.toString() ?? "");
+  const preferredTender = orderedTenders[0] ?? null;
+  const selectedId = params.get("tender") ?? preferredTender?.tenderId.toString() ?? "";
   const [statusFilter, setStatusFilter] = useState<"all" | "awarded" | "active" | "refunded">("all");
   const [query, setQuery] = useState("");
+  const pendingTender = usePendingFlareTender(tenders.map((tender) => tender.tenderId.toString()));
   const filteredTenders = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return orderedTenders.filter((tender) => {
@@ -51,9 +56,17 @@ export function FlareAuditorWorkspace({
 
   useEffect(() => {
     if (selected && selected.tenderId.toString() !== selectedId) {
-      setSelectedId(selected.tenderId.toString());
+      const updated = new URLSearchParams(params);
+      updated.set("tender", selected.tenderId.toString());
+      setParams(updated, { replace: true });
     }
-  }, [selected, selectedId]);
+  }, [params, selected, selectedId, setParams]);
+
+  function selectTender(tenderId: string) {
+    const updated = new URLSearchParams(params);
+    updated.set("tender", tenderId);
+    setParams(updated);
+  }
 
   return (
     <main id="main-content" className="role-workspace flare-auditor-workspace">
@@ -77,6 +90,7 @@ export function FlareAuditorWorkspace({
           or authority to choose a winner.
         </p>
       </section>
+      {pendingTender && <PendingTenderNotice pending={pendingTender} />}
       {tenders.length === 0 ? (
         <section className="state-panel">
           <span aria-hidden="true">0</span>
@@ -100,7 +114,7 @@ export function FlareAuditorWorkspace({
             </label>
             <label>
               Public tender dossier
-              <select value={selected?.tenderId.toString() ?? ""} onChange={(event) => setSelectedId(event.target.value)} disabled={filteredTenders.length === 0}>
+              <select value={selected?.tenderId.toString() ?? ""} onChange={(event) => selectTender(event.target.value)} disabled={filteredTenders.length === 0}>
                 {filteredTenders.length === 0 && <option value="">No matching dossier</option>}
                 {filteredTenders.map((tender) => (
                   <option key={tender.tenderId.toString()} value={tender.tenderId.toString()}>

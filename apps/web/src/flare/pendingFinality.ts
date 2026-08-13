@@ -1,4 +1,5 @@
 import type { Address, Hex } from "viem";
+import { useEffect, useState } from "react";
 
 const pendingTenderKey = "flarequorum:coston2:pending-tender:v1";
 const pendingBidKey = "flarequorum:coston2:pending-bid:v1";
@@ -58,6 +59,23 @@ export function clearPendingFlareTender(tenderId?: string): void {
   if (tenderId && current?.tenderId !== tenderId) return;
   window.sessionStorage.removeItem(pendingTenderKey);
   window.dispatchEvent(new Event(pendingTenderChangedEvent));
+}
+
+export function usePendingFlareTender(
+  canonicalTenderIds: readonly string[] = [],
+): PendingFlareTender | null {
+  const [pending, setPending] = useState(readPendingFlareTender);
+  useEffect(() => {
+    const sync = () => setPending(readPendingFlareTender());
+    window.addEventListener(pendingTenderChangedEvent, sync);
+    return () => window.removeEventListener(pendingTenderChangedEvent, sync);
+  }, []);
+  useEffect(() => {
+    if (pending?.tenderId && canonicalTenderIds.includes(pending.tenderId)) {
+      clearPendingFlareTender(pending.tenderId);
+    }
+  }, [canonicalTenderIds, pending]);
+  return pending?.tenderId && canonicalTenderIds.includes(pending.tenderId) ? null : pending;
 }
 
 function validPendingBid(value: unknown): value is PendingFlareBid {

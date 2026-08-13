@@ -7750,6 +7750,11 @@ footer p {
   cursor: default;
 }
 
+.pending-tender-notice {
+  border-left: 6px solid var(--color-brand-accent);
+  margin: 24px 32px 0;
+}
+
 .my-submission-card > header {
   align-items: start;
   display: flex;
@@ -7990,6 +7995,18 @@ footer p {
 
 .activity-action-card[data-lane="action"] {
   border-left: 6px solid var(--color-brand-accent);
+}
+
+.activity-action-card.is-selected {
+  outline: 3px solid var(--color-ink-black);
+  outline-offset: 3px;
+}
+
+.activity-status-badges {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .activity-action-card h3 {

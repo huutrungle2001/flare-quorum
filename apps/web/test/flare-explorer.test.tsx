@@ -10,6 +10,7 @@ import {
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareAuditorWorkspace } from "../src/flare/FlareAuditorWorkspace";
 import {
+  directActionAppliedStatus,
   directActionWasApplied,
   finalizerLifecycleQueue,
   FlareFinalizerWorkspace,
@@ -310,7 +311,7 @@ describe("Coston2 public evidence boundary", () => {
   });
 
   it("renders a read-only auditor binding with no reveal or signing control", () => {
-    render(<FlareAuditorWorkspace tenders={[publicTender]} finalizedBlock={100n} />);
+    render(<MemoryRouter><FlareAuditorWorkspace tenders={[publicTender]} finalizedBlock={100n} /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Inspect the binding, not the bids." })).toBeInTheDocument();
     expect(screen.getByText(/NO BID DECRYPTION/i)).toBeInTheDocument();
     expect(screen.getAllByText(/TEE [123]/)).toHaveLength(3);
@@ -318,27 +319,73 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.queryByRole("button", { name: /reveal|decrypt|finalize/i })).toBeNull();
   });
 
-  it("opens the newest awarded audit dossier and filters the selector", () => {
+  it("opens the same newest tender by default and filters the auditor selector", () => {
     const tenders = [
-      { ...publicTender, tenderId: 2n, status: "Open" as const },
+      { ...publicTender, tenderId: 9n, status: "Open" as const },
       { ...publicTender, tenderId: 8n, status: "Awarded" as const },
       { ...publicTender, tenderId: 5n, status: "Awarded" as const },
     ];
-    render(<FlareAuditorWorkspace tenders={tenders} finalizedBlock={100n} />);
+    render(<MemoryRouter><FlareAuditorWorkspace tenders={tenders} finalizedBlock={100n} /></MemoryRouter>);
 
+    expect(screen.getByLabelText("Public tender dossier")).toHaveValue("9");
+    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "awarded" } });
     expect(screen.getByLabelText("Public tender dossier")).toHaveValue("8");
-    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "active" } });
-    expect(screen.getByLabelText("Public tender dossier")).toHaveValue("2");
     fireEvent.change(screen.getByLabelText("Search public state"), { target: { value: "missing" } });
     expect(screen.getByRole("heading", { name: "No dossiers match this view" })).toBeInTheDocument();
   });
 
+  it("keeps an explicitly selected tender aligned in Auditor and Activity", () => {
+    const tenders = [
+      { ...publicTender, tenderId: 12n, status: "Open" as const },
+      { ...publicTender, tenderId: 11n, status: "Open" as const },
+      { ...publicTender, tenderId: 9n, status: "Awarded" as const },
+      { ...publicTender, tenderId: 8n, status: "Awarded" as const },
+    ];
+    const auditor = render(
+      <MemoryRouter initialEntries={["/flare?role=evidence&tender=11"]}>
+        <FlareAuditorWorkspace tenders={tenders} finalizedBlock={100n} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByLabelText("Public tender dossier")).toHaveValue("11");
+    auditor.unmount();
+
+    const activity = render(
+      <MemoryRouter initialEntries={["/flare?role=finalizer&tender=8"]}>
+        <FlareFinalizerWorkspace wallet={wallet} tenders={tenders} onRefresh={() => undefined} />
+      </MemoryRouter>,
+    );
+    const cards = activity.container.querySelectorAll(".activity-action-card");
+    expect(cards[0]).toHaveTextContent("TENDER 8 · AWARDED · FINALIZED");
+    expect(cards[0]).toHaveClass("is-selected");
+  });
+
+  it("keeps a just-broadcast tender visible across Auditor and Activity before finality", () => {
+    savePendingFlareTender({
+      version: 1,
+      tenderId: null,
+      transactionHash: `0x${"93".repeat(32)}`,
+      blockNumber: null,
+      buyer: publicTender.buyer,
+      recordedAt: "2026-08-14T00:00:00.000Z",
+    });
+    const auditor = render(
+      <MemoryRouter><FlareAuditorWorkspace tenders={[publicTender]} finalizedBlock={100n} /></MemoryRouter>,
+    );
+    expect(screen.getByRole("heading", { name: "New tender transaction is waiting for finality" })).toBeInTheDocument();
+    auditor.unmount();
+
+    render(
+      <MemoryRouter><FlareFinalizerWorkspace wallet={wallet} tenders={[publicTender]} onRefresh={() => undefined} /></MemoryRouter>,
+    );
+    expect(screen.getByRole("heading", { name: "New tender transaction is waiting for finality" })).toBeInTheDocument();
+  });
+
   it("shows permissionless close readiness without computing a winner", () => {
-    render(<FlareFinalizerWorkspace wallet={wallet} tenders={[{
+    render(<MemoryRouter><FlareFinalizerWorkspace wallet={wallet} tenders={[{
       ...publicTender,
       bidCount: 1n,
       approvedVendorCount: 1,
-    }]} onRefresh={() => undefined} />);
+    }]} onRefresh={() => undefined} /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Advance public checkpoints." })).toBeInTheDocument();
     expect(screen.getByText("ACTION CENTER / CANONICAL CHECKPOINTS")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Ready to close" })).toBeInTheDocument();
@@ -360,15 +407,18 @@ describe("Coston2 public evidence boundary", () => {
     expect(directActionWasApplied("closeTender", 6)).toBe(false);
     expect(directActionWasApplied("cancelTender", 6)).toBe(true);
     expect(directActionWasApplied("refundExpiredSelection", 5)).toBe(true);
+    expect(directActionAppliedStatus("closeTender", 4)).toBe("Awarded");
+    expect(directActionAppliedStatus("closeTender", 5)).toBe("Refunded");
+    expect(directActionAppliedStatus("closeTender", 1)).toBeNull();
   });
 
   it("offers wallet-triggered FCC dispatch and threshold finalization", () => {
-    const closed = render(<FlareFinalizerWorkspace wallet={wallet} tenders={[{
+    const closed = render(<MemoryRouter><FlareFinalizerWorkspace wallet={wallet} tenders={[{
       ...publicTender,
       status: "Closed",
       bidCount: 2n,
       approvedVendorCount: 2,
-    }]} onRefresh={() => undefined} />);
+    }]} onRefresh={() => undefined} /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Ready to start FCC" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "✓ TENDER CLOSED" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "START FCC COMPUTE →" })).toBeDisabled();
@@ -376,7 +426,7 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.queryByText(/dedicated relay/i)).toBeNull();
     closed.unmount();
 
-    render(<FlareFinalizerWorkspace wallet={wallet} tenders={[{
+    render(<MemoryRouter><FlareFinalizerWorkspace wallet={wallet} tenders={[{
       ...publicTender,
       status: "ComputePending",
       bidCount: 2n,
@@ -384,7 +434,7 @@ describe("Coston2 public evidence boundary", () => {
       selectionStartedAt: 1_900_000_000n,
       selectionAttempt: 1,
       resultExpiry: 2_000_000_000n,
-    }]} onRefresh={() => undefined} />);
+    }]} onRefresh={() => undefined} /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "FCC result pending" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "✓ TENDER CLOSED" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "✓ FCC COMPUTE STARTED" })).toBeDisabled();
@@ -395,10 +445,15 @@ describe("Coston2 public evidence boundary", () => {
     const older = { ...publicTender, tenderId: 7n, status: "Awarded" as const };
     const latest = { ...publicTender, tenderId: 8n, status: "Awarded" as const };
     expect(finalizerLifecycleQueue([older, latest])).toEqual([latest]);
+    expect(finalizerLifecycleQueue([
+      { ...publicTender, tenderId: 10n },
+      { ...publicTender, tenderId: 12n },
+      latest,
+    ]).map((tender) => tender.tenderId)).toEqual([12n, 10n, 8n]);
 
-    render(<FlareFinalizerWorkspace wallet={wallet} tenders={[older, latest]} onRefresh={() => undefined} />);
+    render(<MemoryRouter><FlareFinalizerWorkspace wallet={wallet} tenders={[older, latest]} onRefresh={() => undefined} /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Award finalized" })).toBeInTheDocument();
-    expect(screen.getByText("TENDER 8 · AWARDED")).toBeInTheDocument();
+    expect(screen.getByText("TENDER 8 · AWARDED · FINALIZED")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "✓ TENDER CLOSED" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "✓ FCC COMPUTE STARTED" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "✓ AWARD / REFUND FINALIZED" })).toBeDisabled();

@@ -207,9 +207,15 @@ receipt set, or a common 2-machine quorum is unavailable.
 ## 6. Close, selection, and recovery
 
 Activity is a compact action center rather than a duplicate tender explorer.
-Each non-terminal tender shows its next checkpoint, the authority allowed to
-act, minimal deadline/bid progress, and a link back to the full Public dossier.
-Rules, scoring, commitments, and TEE facts remain in Public and Auditor.
+Each non-terminal tender keeps the same finalized status label used by Public
+and Auditor, then uses chain-tip reads only to enable the next valid action. If
+the operational state is ahead of the shared 12-block snapshot, Activity marks
+it `CHAIN TIP · FINALITY PENDING` instead of replacing the finalized label.
+The authority, minimal deadline/bid progress, and a link back to the full Public
+dossier remain visible. Rules, scoring, commitments, and TEE facts remain in
+Public and Auditor. A just-broadcast tender transaction stays visible as the
+same public-safe pending notice in all three workspaces until its canonical
+dossier exists.
 
 1. Any user or relay calls close when eligible. The market freezes bid root,
    rules, common quorum, close block, and the official XRP/USD FTSO snapshot.
@@ -227,8 +233,11 @@ Rules, scoring, commitments, and TEE facts remain in Public and Auditor.
 6. If the one-hour result envelope expires, retry with a fresh attempt nonce and
    request ID while preserving every frozen input. Old-attempt results fail.
 7. If another finalizer wins the race, reread chain state. If a dependency is
-   unavailable, preserve the checkpoint and resume; never use a client-computed
-   winner, manual price, replacement machine, or mock result.
+   unavailable, preserve the checkpoint and resume. Recovery applies the actual
+   status returned by Coston2, so an already awarded/refunded tender is never
+   displayed as Closed or ComputePending merely because an older button was
+   pressed. Never use a client-computed winner, manual price, replacement
+   machine, or mock result.
 8. If no threshold result is retrievable within 24 hours of the first request,
    the buyer may recover only the original escrow. This records failed-compute
    `Refunded`, creates no award, and is never displayed as FCC success.

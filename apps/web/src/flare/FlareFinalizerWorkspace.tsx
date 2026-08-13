@@ -1,6 +1,7 @@
 import { coston2FlarePublicRelease, flareQuorumFlareMarketAbi } from "@flarequorum/flare-bindings";
 import { createPublicClient, http, isAddressEqual, type Abi } from "viem";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import type { FlarePublicTender } from "../public-market/loadFlareMarket";
 import { ContextHelp } from "../shell/ContextHelp";
 import { useToasts } from "../shell/ToastProvider";
@@ -8,6 +9,8 @@ import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
 import { loadFlareSelectionQuorum } from "./flareBidIngress";
 import { FlareRedemptionPanel } from "./FlareRedemptionPanel";
+import { PendingTenderNotice } from "./PendingTenderNotice";
+import { usePendingFlareTender } from "./pendingFinality";
 
 const coston2 = {
   id: 114,
@@ -54,6 +57,13 @@ export function directActionWasApplied(action: DirectAction, status: number): bo
   if (action === "closeTender") return status >= 2 && status <= 5;
   if (action === "cancelTender") return status === 6;
   return status === 5;
+}
+
+export function directActionAppliedStatus(
+  action: DirectAction,
+  status: number,
+): TenderStatus | null {
+  return directActionWasApplied(action, status) ? tenderStatus(status) : null;
 }
 
 function deadline(timestamp: bigint) {
@@ -122,7 +132,8 @@ export function finalizerLifecycleQueue(
     if (!["Awarded", "Refunded"].includes(tender.status)) return latest;
     return !latest || tender.tenderId > latest.tenderId ? tender : latest;
   }, null);
-  return latestCompleted ? [...active, latestCompleted] : active;
+  return (latestCompleted ? [...active, latestCompleted] : active)
+    .sort((left, right) => left.tenderId > right.tenderId ? -1 : left.tenderId < right.tenderId ? 1 : 0);
 }
 
 export function FlareFinalizerWorkspace({
@@ -135,6 +146,8 @@ export function FlareFinalizerWorkspace({
   onRefresh: () => void;
 }) {
   const toasts = useToasts();
+  const [params] = useSearchParams();
+  const requestedTenderId = params.get("tender");
   const [now, setNow] = useState(() => BigInt(Math.floor(Date.now() / 1_000)));
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -143,6 +156,7 @@ export function FlareFinalizerWorkspace({
   const [localSelections, setLocalSelections] = useState<Record<string, LocalSelection>>({});
   const [localProgress, setLocalProgress] = useState<Record<string, LocalProgress>>({});
   const [latestLifecycles, setLatestLifecycles] = useState<Record<string, LatestLifecycle>>({});
+  const pendingTender = usePendingFlareTender(tenders.map((tender) => tender.tenderId.toString()));
   const connected = wallet.state.status === "connected" && wallet.state.account && wallet.state.walletClient;
 
   useEffect(() => {
@@ -236,10 +250,23 @@ export function FlareFinalizerWorkspace({
     [latestLifecycles, localSelections, localStatuses, tenders],
   );
 
-  const queue = useMemo(
-    () => finalizerLifecycleQueue(effectiveTenders),
-    [effectiveTenders],
-  );
+  const queue = useMemo(() => {
+    const effectiveById = new Map(
+      effectiveTenders.map((tender) => [tender.tenderId.toString(), tender]),
+    );
+    const canonicalQueue = finalizerLifecycleQueue(tenders)
+      .map((tender) => effectiveById.get(tender.tenderId.toString()) ?? tender);
+    if (!requestedTenderId) return canonicalQueue;
+    const requested = effectiveById.get(requestedTenderId);
+    const alignedQueue = requested && !canonicalQueue.some((tender) => tender.tenderId === requested.tenderId)
+      ? [...canonicalQueue, requested]
+      : canonicalQueue;
+    return [...alignedQueue].sort((left, right) => {
+      if (left.tenderId.toString() === requestedTenderId) return -1;
+      if (right.tenderId.toString() === requestedTenderId) return 1;
+      return 0;
+    });
+  }, [effectiveTenders, requestedTenderId, tenders]);
   const actionableCount = queue.filter((tender) => {
     const state = actionState(tender, now);
     if (["close", "request-selection", "compute-live", "retry-selection"].includes(state)) return true;
@@ -276,13 +303,17 @@ export function FlareFinalizerWorkspace({
       chain: coston2,
       transport: http(rpcUrl, { retryCount: 1, timeout: 8_000 }),
     });
-    const applyLocalStatus = () => {
+    const applyLocalStatus = (status = directActionStatus[action]) => {
       setLocalStatuses((current) => ({
         ...current,
-        [tender.tenderId.toString()]: directActionStatus[action],
+        [tender.tenderId.toString()]: status,
       }));
       setConfirmation(null);
-      if (action === "closeTender") markProgress(tender.tenderId, { closed: true });
+      if (status === "Awarded" || status === "Refunded") {
+        markProgress(tender.tenderId, { closed: true, computeStarted: true, finalized: true });
+      } else if (action === "closeTender") {
+        markProgress(tender.tenderId, { closed: true });
+      }
       setError(null);
       onRefresh();
     };
@@ -298,8 +329,9 @@ export function FlareFinalizerWorkspace({
     setBusy(key);
     setError(null);
     try {
-      if (directActionWasApplied(action, await readLatestStatus())) {
-        applyLocalStatus();
+      const existingStatus = directActionAppliedStatus(action, await readLatestStatus());
+      if (existingStatus) {
+        applyLocalStatus(existingStatus);
         toasts.succeed(toastId, `${labels[action]} is already confirmed on Coston2.`);
         return;
       }
@@ -315,12 +347,15 @@ export function FlareFinalizerWorkspace({
       toasts.update(toastId, "Waiting for the Coston2 transaction receipt…");
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("COSTON2_FINALIZER_TRANSACTION_FAILED");
-      applyLocalStatus();
+      const confirmedStatus = directActionAppliedStatus(action, await readLatestStatus());
+      if (!confirmedStatus) throw new Error("COSTON2_FINALIZER_ACTION_NOT_APPLIED");
+      applyLocalStatus(confirmedStatus);
       toasts.succeed(toastId, `${labels[action]} confirmed on Coston2.`);
     } catch (cause) {
       try {
-        if (directActionWasApplied(action, await readLatestStatus())) {
-          applyLocalStatus();
+        const recoveredStatus = directActionAppliedStatus(action, await readLatestStatus());
+        if (recoveredStatus) {
+          applyLocalStatus(recoveredStatus);
           toasts.succeed(toastId, `${labels[action]} confirmed on Coston2.`);
           return;
         }
@@ -355,36 +390,53 @@ export function FlareFinalizerWorkspace({
       chain: coston2,
       transport: http(rpcUrl, { retryCount: 1, timeout: 8_000 }),
     });
-    const applied = async () => {
+    const readSelectionLifecycle = async (): Promise<LatestLifecycle> => {
       const record = await publicClient.readContract({
         address: coston2FlarePublicRelease.market,
         abi: flareQuorumFlareMarketAbi as Abi,
         functionName: "getTender",
         args: [tender.tenderId],
-      }) as { selectionAttempt: number; status: number };
-      const status = Number(record.status);
-      return status >= 4 || (status === 3 && Number(record.selectionAttempt) >= expectedAttempt);
+      }) as { selectionAttempt: number; selectionStartedAt: bigint; resultExpiry: bigint; status: number };
+      return {
+        status: tenderStatus(record.status),
+        selectionAttempt: Number(record.selectionAttempt),
+        selectionStartedAt: BigInt(record.selectionStartedAt),
+        resultExpiry: BigInt(record.resultExpiry),
+      };
     };
-    const applyLocalStatus = () => {
-      const selectionStartedAt = BigInt(Math.floor(Date.now() / 1_000));
-      setLocalStatuses((current) => ({ ...current, [tender.tenderId.toString()]: "ComputePending" }));
-      setLocalSelections((current) => ({
-        ...current,
-        [tender.tenderId.toString()]: {
-          selectionAttempt: expectedAttempt,
-          selectionStartedAt,
-          resultExpiry: selectionStartedAt + 3_600n,
-        },
-      }));
-      markProgress(tender.tenderId, { closed: true, computeStarted: true });
+    const wasApplied = (lifecycle: LatestLifecycle) => (
+      ["Awarded", "Refunded"].includes(lifecycle.status)
+      || lifecycle.status === "ComputePending" && lifecycle.selectionAttempt >= expectedAttempt
+    );
+    const applyLocalLifecycle = (lifecycle: LatestLifecycle) => {
+      setLocalStatuses((current) => ({ ...current, [tender.tenderId.toString()]: lifecycle.status }));
+      if (lifecycle.status === "ComputePending") {
+        setLocalSelections((current) => ({
+          ...current,
+          [tender.tenderId.toString()]: {
+            selectionAttempt: lifecycle.selectionAttempt,
+            selectionStartedAt: lifecycle.selectionStartedAt,
+            resultExpiry: lifecycle.resultExpiry,
+          },
+        }));
+        markProgress(tender.tenderId, { closed: true, computeStarted: true });
+      } else {
+        setLocalSelections((current) => {
+          const next = { ...current };
+          delete next[tender.tenderId.toString()];
+          return next;
+        });
+        markProgress(tender.tenderId, { closed: true, computeStarted: true, finalized: true });
+      }
       setError(null);
       onRefresh();
     };
     setBusy(key);
     setError(null);
     try {
-      if (await applied()) {
-        applyLocalStatus();
+      const existing = await readSelectionLifecycle();
+      if (wasApplied(existing)) {
+        applyLocalLifecycle(existing);
         toasts.succeed(toastId, `${label} is already confirmed on Coston2.`);
         return;
       }
@@ -401,12 +453,15 @@ export function FlareFinalizerWorkspace({
       toasts.update(toastId, "Dispatching the frozen request to all three FCC machines…");
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("COSTON2_SELECTION_REQUEST_FAILED");
-      applyLocalStatus();
+      const confirmed = await readSelectionLifecycle();
+      if (!wasApplied(confirmed)) throw new Error("COSTON2_SELECTION_REQUEST_NOT_APPLIED");
+      applyLocalLifecycle(confirmed);
       toasts.succeed(toastId, `${label} confirmed. FCC result collection is now available.`);
     } catch (cause) {
       try {
-        if (await applied()) {
-          applyLocalStatus();
+        const recovered = await readSelectionLifecycle();
+        if (wasApplied(recovered)) {
+          applyLocalLifecycle(recovered);
           toasts.succeed(toastId, `${label} confirmed on Coston2.`);
           return;
         }
@@ -529,6 +584,7 @@ export function FlareFinalizerWorkspace({
           controls appear only when canonical rules permit them.
         </p>
       </section>
+      {pendingTender && <PendingTenderNotice pending={pendingTender} />}
       <nav className="activity-section-nav" aria-label="Activity sections">
         <a href="#lifecycle-queue">LIFECYCLE QUEUE</a>
         <a href="#assets-redemption">ASSETS &amp; REDEMPTION</a>
@@ -556,6 +612,9 @@ export function FlareFinalizerWorkspace({
         ) : (
           <div className="finalizer-card-list">
             {queue.map((tender) => {
+              const canonicalTender = tenders.find((candidate) => candidate.tenderId === tender.tenderId) ?? tender;
+              const finalityPending = tender.status !== canonicalTender.status
+                || tender.selectionAttempt !== canonicalTender.selectionAttempt;
               const state = actionState(tender, now);
               const buyerConnected = Boolean(
                 connected && isAddressEqual(wallet.state.account!, tender.buyer),
@@ -576,10 +635,17 @@ export function FlareFinalizerWorkspace({
               const startAvailable = closeComplete && !computeComplete && state === "request-selection";
               const finalizeAvailable = computeComplete && !finalizeComplete && state === "compute-live";
               return (
-                <article key={tender.tenderId.toString()} className="finalizer-card activity-action-card" data-lane={presentation.lane}>
+                <article
+                  key={tender.tenderId.toString()}
+                  className={`finalizer-card activity-action-card${requestedTenderId === tender.tenderId.toString() ? " is-selected" : ""}`}
+                  data-lane={presentation.lane}
+                >
                   <header>
-                    <div><p className="eyebrow">TENDER {tender.tenderId.toString()} · {tender.status.toUpperCase()}</p><h3>{presentation.title}</h3></div>
-                    <span className={`privacy-badge${presentation.lane === "action" ? " verified" : ""}`}>{presentation.status}</span>
+                    <div><p className="eyebrow">TENDER {tender.tenderId.toString()} · {canonicalTender.status.toUpperCase()} · FINALIZED</p><h3>{presentation.title}</h3></div>
+                    <div className="activity-status-badges">
+                      {finalityPending && <span className="privacy-badge encrypted">CHAIN TIP · FINALITY PENDING</span>}
+                      <span className={`privacy-badge${presentation.lane === "action" ? " verified" : ""}`}>{presentation.status}</span>
+                    </div>
                   </header>
                   <div className="activity-action-meta">
                     <span>{presentation.permission}</span>
