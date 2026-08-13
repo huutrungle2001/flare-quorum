@@ -294,6 +294,34 @@ count as a completed integration.
 | Integrated | FAssets/FTestXRP, FDC `XRPPayment`, FTSOv2, and Flare Smart Accounts | Connects XRP-native funding, price normalization, escrow, payout, and redemption |
 | Improved | Multi-criteria scoring, 3-of-3 bid custody, 2-of-3 result agreement, replay domains, bounded refunds, and replacement recovery | Reduces winner authority and makes failure states explicit and recoverable |
 
+### Why the new work is meaningful
+
+This is not an RPC switch or a visual port. The Summer Signal work changes who
+holds procurement authority. In the historical product, the compute,
+settlement, and interoperability assumptions belonged to a different network
+and confidential-compute stack. In FlareQuorum, a registered FCC machine set
+now receives the private inputs, applies the frozen qualification and scoring
+policy, and produces the only result the Coston2 market can settle. The buyer,
+web application, relay, finalizer, and administrator cannot submit a preferred
+winner or bypass the threshold.
+
+| Audience | Previous constraint | Meaningful outcome from the new Flare work |
+|---|---|---|
+| Treasury buyers | Public bidding exposes commercial strategy; a private server hides bids but leaves the operator able to influence selection | Buyers freeze the brief, admission list, ceiling, service bounds, weights, machine set, and escrow before bidding. Settlement requires a result bound to those exact facts, and fixed timeout paths return the full escrow without inventing a winner when FCC cannot complete |
+| Vendors | Losing price, delivery, warranty, and qualification terms are normally disclosed to the buyer, competitors, or a centralized procurement operator | Vendors encrypt one canonical offer to all three tender-fixed machines. Of the offer content, only a salted commitment and signed receipts become public; participation and timing remain public by design, but the buyer, finalizer, and Auditor receive no decryption capability. The vendor still gets proof that the accepted commitment entered the common ordered root |
+| Auditors and governance teams | A published winner is difficult to distinguish from a database decision or client-calculated result | A wallet-free reviewer can independently inspect the frozen rule hash, approved machine identities and code binding, 3-of-3 receipt custody, ordered bid root, FTSO checkpoint, two matching result signers, and exact FTestXRP conservation without accessing a bid payload |
+| Flare and XRP developers | Building one credible cross-chain confidential application requires coordinating external-payment proof, account execution, asset minting, oracle snapshots, private compute, generated bindings, retries, and evidence | The repository provides a complete, domain-separated implementation pattern across Solidity, Go, and TypeScript: XRPL Payment → FDC proof → Smart Account direct mint/funding → FCC selection → FTestXRP settlement → FAssets redemption request, including failure and recovery semantics rather than only happy-path calls |
+| Flare ecosystem | Protocol integrations are often demonstrated independently, leaving unclear whether any one of them is necessary to the product | FCC, FDC, Smart Accounts, FAssets, and FTSOv2 are exercised by one procurement lifecycle. FCC removes operator winner authority; FDC and Smart Accounts create the XRP-native funding path; FAssets supplies the escrowed asset and exit boundary; FTSOv2 fixes the conversion fact used by private scoring. Removing any of these breaks a demonstrated user capability rather than a marketing checklist |
+
+The user-level gain is therefore not merely “bids are encrypted.” Treasuries
+gain a bounded, publicly accountable purchasing process; vendors gain
+confidentiality for losing commercial terms; auditors gain verification without
+custody or decryption; and developers gain a reproducible architecture for
+combining public cross-chain facts with private deterministic decisions. For
+Flare, the release demonstrates that confidential compute can drive an actual
+asset-settlement decision while the wider protocol stack supplies funding,
+pricing, recovery, and public evidence.
+
 The detailed, evidence-backed mapping is in the
 [new-work ledger](submission/flarequorum/NEW-WORK-LEDGER.md).
 

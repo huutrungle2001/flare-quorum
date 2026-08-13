@@ -68,6 +68,7 @@ assert.match(readme, /Primary bounty:\*\* Confidential Compute Apps/);
 assert.match(readme, /Phase 0 feasibility validation is complete/i);
 assert.match(readme, /pre-hackathon baseline/i);
 assert.match(readme, /sepolia\.release\.json/);
+assert.match(readme, /Why the new work is meaningful/i);
 assert.match(
   readme,
   /multi-criteria offers to three\s+registered simulated FCC machines/i,
