@@ -151,6 +151,12 @@ const finalizerRoute = browserCapture(chrome, "/flare?role=finalizer", { width: 
 const docsMobile = browserCapture(chrome, "/docs", { width: 390, height: 844 }, "flare-production-docs-mobile.png");
 
 const market = release.contracts.FlareQuorumMarketV2.address;
+const finalizerControlsBundled = assetSources.some((source) =>
+  source.includes("DO THESE IN ORDER")
+  && source.includes("CLOSE & FREEZE FTSO")
+  && source.includes("START FCC COMPUTE")
+  && source.includes("CHECK 2/3 & FINALIZE"),
+);
 const assertions = {
   allRoutesReturned200: routes.every((route) => route.status === 200),
   canonicalMarketBundled: assetSources.some((source) => source.toLowerCase().includes(market.toLowerCase())),
@@ -167,7 +173,7 @@ const assertions = {
   privacyBoundaryVisible: tenderRoom.dom.includes("PRIVATE LOSING BIDS") && tenderRoom.dom.includes("Bid payloads are never fetched"),
   publicEvidenceDossierRendered: evidenceRoute.dom.includes("Inspect the binding, not the bids.") && evidenceRoute.dom.includes("AUDIT DOSSIER") && evidenceRoute.dom.includes("Binding → receipts → public outcome") && evidenceRoute.dom.includes("TRUST BINDING") && evidenceRoute.dom.includes("ACCEPTED BID RECEIPTS") && evidenceRoute.dom.includes("Ordered bid root"),
   publicEvidenceNoWalletGate: evidenceRoute.dom.includes("PUBLIC VERIFICATION ONLY") && evidenceRoute.dom.includes("NO BID DECRYPTION") && !evidenceRoute.dom.includes("Wallet providers are unavailable"),
-  publicFinalizerRendered: finalizerRoute.dom.includes("Advance public checkpoints.") && finalizerRoute.dom.includes("ACTION CENTER / CANONICAL CHECKPOINTS") && finalizerRoute.dom.includes("TRACKING ONLY") && finalizerRoute.dom.includes("Activity shows the next step only.") && (finalizerRoute.dom.includes("VIEW PUBLIC DOSSIER") || finalizerRoute.dom.includes("No pending lifecycle action")) && finalizerRoute.dom.includes("no bid-decryption capability") && !finalizerRoute.dom.includes("Selection attempt") && !finalizerRoute.dom.includes("OPEN RELAY RUNBOOK"),
+  publicFinalizerRendered: finalizerRoute.dom.includes("Advance public checkpoints.") && finalizerRoute.dom.includes("ACTION CENTER / CANONICAL CHECKPOINTS") && finalizerRoute.dom.includes("TRACKING ONLY") && finalizerRoute.dom.includes("Use the three numbered buttons in order.") && finalizerControlsBundled && (finalizerRoute.dom.includes("DO THESE IN ORDER") || finalizerRoute.dom.includes("No pending lifecycle action")) && (finalizerRoute.dom.includes("VIEW PUBLIC DOSSIER") || finalizerRoute.dom.includes("No pending lifecycle action")) && finalizerRoute.dom.includes("no bid-decryption capability") && !finalizerRoute.dom.includes("Selection attempt") && !finalizerRoute.dom.includes("OPEN RELAY RUNBOOK"),
   buyerBriefRendered: buyerRoute.dom.includes("Public objective") && buyerRoute.dom.includes("Acceptance criteria") && buyerRoute.dom.includes("Optional vendor questions"),
   vendorSubmissionNavigationRendered: vendorRoute.dom.includes("SUBMIT BID") && vendorRoute.dom.includes("MY SUBMISSIONS") && ((vendorRoute.dom.includes("REVIEW SEALED BID") && vendorRoute.dom.includes("THIS PRIVATE BID IS NOT SAVED")) || vendorRoute.dom.includes("No open Coston2 tenders")),
   xrpFundingJourneyRendered: treasuryRoute.dom.includes("BUYER / CHOOSE A FUNDING PATH") && treasuryRoute.dom.includes("FLAGSHIP FUNDING / XRPL → FDC → SMART ACCOUNT") && treasuryRoute.dom.includes("DEFINE RULES") && treasuryRoute.dom.includes("CONNECT &amp; PAY") && treasuryRoute.dom.includes("FDC &amp; MINT") && treasuryRoute.dom.includes("TENDER OPENED") && treasuryRoute.dom.includes("Define your tender rules.") && treasuryRoute.dom.includes("Review the XRP payment.") && treasuryRoute.dom.includes("NON-CUSTODIAL") && treasuryRoute.dom.includes("XRPL owner address") && treasuryRoute.dom.includes("ADVANCED FUNDING DETAILS") && treasuryRoute.dom.includes("XRPL wallet signing stays outside FlareQuorum."),
@@ -216,7 +222,7 @@ const evidence = {
   notes: [
     "The deployed v2 Vercel project loaded the verified Coston2 public market without a wallet.",
     "The Auditor route reread the same finalized market snapshot without a wallet, bid payload, signer, or decryption capability.",
-    "The Public Finalizer route exposes only canonical lifecycle actions; FCC dispatch and threshold grouping remain dedicated relay operations.",
+    "The Public Finalizer route keeps the three canonical lifecycle actions visible in order; completed actions remain visible and disabled while FCC dispatch and exact 2-of-3 threshold grouping stay fail closed.",
     "Activity exposes the official redemption boundary in a locked state until the connected Coston2 wallet is the public winner of an awarded tender; Private Bids does not duplicate redemption controls.",
     "The unified Buyer route defaults to direct Coston2/FTestXRP funding and exposes the structured public brief without collecting bid plaintext.",
     "The legacy treasury URL selects the advanced XRP-native option inside Buyer and presents one ordered Define Rules → Connect & Pay → FDC & Mint → Tender Opened journey; this wallet-free smoke does not submit a payment and no XRPL secret is accepted.",
