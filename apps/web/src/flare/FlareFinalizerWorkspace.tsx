@@ -15,9 +15,32 @@ const coston2 = {
   rpcUrls: { default: { http: ["https://coston2-api.flare.network/ext/C/rpc"] } },
 } as const;
 
-type DirectAction = "closeTender" | "cancelTender" | "refundExpiredSelection";
+export type DirectAction = "closeTender" | "cancelTender" | "refundExpiredSelection";
 type Confirmation = { tenderId: bigint; action: "cancelTender" | "refundExpiredSelection" };
 type ActivityState = "close" | "cancel-or-wait" | "wait-for-bids" | "request-selection" | "compute-live" | "retry-selection" | "refund-ready" | "terminal";
+type TenderStatus = FlarePublicTender["status"];
+
+const tenderStatusOrder: Record<TenderStatus, number> = {
+  FundingPending: 0,
+  Open: 1,
+  Closed: 2,
+  ComputePending: 3,
+  Awarded: 4,
+  Refunded: 5,
+  Cancelled: 6,
+};
+
+const directActionStatus: Record<DirectAction, TenderStatus> = {
+  closeTender: "Closed",
+  cancelTender: "Cancelled",
+  refundExpiredSelection: "Refunded",
+};
+
+export function directActionWasApplied(action: DirectAction, status: number): boolean {
+  if (action === "closeTender") return status >= 2 && status <= 5;
+  if (action === "cancelTender") return status === 6;
+  return status === 5;
+}
 
 function deadline(timestamp: bigint) {
   return new Intl.DateTimeFormat(undefined, {
@@ -80,6 +103,7 @@ export function FlareFinalizerWorkspace({
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const [localStatuses, setLocalStatuses] = useState<Record<string, TenderStatus>>({});
   const connected = wallet.state.status === "connected" && wallet.state.account && wallet.state.walletClient;
 
   useEffect(() => {
@@ -90,9 +114,33 @@ export function FlareFinalizerWorkspace({
     return () => window.clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    setLocalStatuses((current) => {
+      const next = { ...current };
+      let changed = false;
+      for (const tender of tenders) {
+        const key = tender.tenderId.toString();
+        const localStatus = next[key];
+        if (localStatus && tenderStatusOrder[tender.status] >= tenderStatusOrder[localStatus]) {
+          delete next[key];
+          changed = true;
+        }
+      }
+      return changed ? next : current;
+    });
+  }, [tenders]);
+
+  const effectiveTenders = useMemo(
+    () => tenders.map((tender) => {
+      const status = localStatuses[tender.tenderId.toString()];
+      return status ? { ...tender, status } : tender;
+    }),
+    [localStatuses, tenders],
+  );
+
   const queue = useMemo(
-    () => tenders.filter((tender) => !["Awarded", "Refunded", "Cancelled"].includes(tender.status)),
-    [tenders],
+    () => effectiveTenders.filter((tender) => !["Awarded", "Refunded", "Cancelled"].includes(tender.status)),
+    [effectiveTenders],
   );
   const actionableCount = queue.filter((tender) => {
     const state = actionState(tender, now);
@@ -119,13 +167,36 @@ export function FlareFinalizerWorkspace({
       refundExpiredSelection: "RECOVER ESCROW",
     };
     const toastId = toasts.startStack(labels[action], "Re-reading canonical Coston2 state…");
+    const publicClient = createPublicClient({
+      chain: coston2,
+      transport: http(rpcUrl, { retryCount: 1, timeout: 8_000 }),
+    });
+    const applyLocalStatus = () => {
+      setLocalStatuses((current) => ({
+        ...current,
+        [tender.tenderId.toString()]: directActionStatus[action],
+      }));
+      setConfirmation(null);
+      setError(null);
+      onRefresh();
+    };
+    const readLatestStatus = async () => {
+      const record = await publicClient.readContract({
+        address: coston2FlarePublicRelease.market,
+        abi: flareQuorumFlareMarketAbi as Abi,
+        functionName: "getTender",
+        args: [tender.tenderId],
+      }) as { status: number };
+      return Number(record.status);
+    };
     setBusy(key);
     setError(null);
     try {
-      const publicClient = createPublicClient({
-        chain: coston2,
-        transport: http(rpcUrl, { retryCount: 1, timeout: 8_000 }),
-      });
+      if (directActionWasApplied(action, await readLatestStatus())) {
+        applyLocalStatus();
+        toasts.succeed(toastId, `${labels[action]} is already confirmed on Coston2.`);
+        return;
+      }
       const simulation = await publicClient.simulateContract({
         account: wallet.state.account!,
         address: coston2FlarePublicRelease.market,
@@ -138,10 +209,18 @@ export function FlareFinalizerWorkspace({
       toasts.update(toastId, "Waiting for the Coston2 transaction receipt…");
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("COSTON2_FINALIZER_TRANSACTION_FAILED");
+      applyLocalStatus();
       toasts.succeed(toastId, `${labels[action]} confirmed on Coston2.`);
-      setConfirmation(null);
-      onRefresh();
     } catch (cause) {
+      try {
+        if (directActionWasApplied(action, await readLatestStatus())) {
+          applyLocalStatus();
+          toasts.succeed(toastId, `${labels[action]} confirmed on Coston2.`);
+          return;
+        }
+      } catch {
+        // Preserve the original action error when the recovery read is unavailable.
+      }
       setError(
         cause instanceof Error
           ? cause.message

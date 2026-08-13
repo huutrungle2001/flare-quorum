@@ -9,7 +9,10 @@ import {
 } from "../src/flare/FlareRoom";
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareAuditorWorkspace } from "../src/flare/FlareAuditorWorkspace";
-import { FlareFinalizerWorkspace } from "../src/flare/FlareFinalizerWorkspace";
+import {
+  directActionWasApplied,
+  FlareFinalizerWorkspace,
+} from "../src/flare/FlareFinalizerWorkspace";
 import { FlareVendorWorkspace } from "../src/flare/FlareVendorWorkspace";
 import { FlareLandingPage } from "../src/flare/FlareLandingPage";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
@@ -292,6 +295,15 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.queryByText("Selection attempt")).toBeNull();
     expect(screen.getByText(/no bid-decryption capability/i)).toBeInTheDocument();
     expect(screen.queryByText(/client-provided winner accepted/i)).toBeNull();
+  });
+
+  it("recognizes finalizer actions already applied in latest Coston2 state", () => {
+    expect(directActionWasApplied("closeTender", 1)).toBe(false);
+    expect(directActionWasApplied("closeTender", 2)).toBe(true);
+    expect(directActionWasApplied("closeTender", 3)).toBe(true);
+    expect(directActionWasApplied("closeTender", 6)).toBe(false);
+    expect(directActionWasApplied("cancelTender", 6)).toBe(true);
+    expect(directActionWasApplied("refundExpiredSelection", 5)).toBe(true);
   });
 
   it("asks the vendor to connect only when an open tender has a bid action", () => {
