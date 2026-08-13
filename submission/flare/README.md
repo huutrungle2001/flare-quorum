@@ -17,6 +17,7 @@ consumer switch. Gate H user validation is still recorded separately as
 | Live app | [flare-quorum.vercel.app](https://flare-quorum.vercel.app) |
 | Four-minute demo | [`flare-quorum-demo.mp4`](flare-quorum-demo.mp4) |
 | Demo evidence | [`judge-demo-video.release.json`](../../evidence/coston2/judge-demo-video.release.json) |
+| Long-form recording guide (Vietnamese) | [`VIDEO-RECORDING-GUIDE.vi.md`](VIDEO-RECORDING-GUIDE.vi.md) |
 | Public evidence ledger | [Coston2 Activity/Evidence view](https://flare-quorum.vercel.app/flare?role=evidence) |
 | Buyer workspace | [Coston2 Buyer](https://flare-quorum.vercel.app/flare?role=buyer) |
 | Vendor workspace | [Coston2 Vendor](https://flare-quorum.vercel.app/flare?role=vendor) |
