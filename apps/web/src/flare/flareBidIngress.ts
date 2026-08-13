@@ -1,5 +1,6 @@
 import {
   decodeBidReceipt,
+  decodeSelectionResult,
   encodePrivateBidSubmission,
   encryptPrivateBidForTee,
   flareBidIngressTypedData,
@@ -9,6 +10,7 @@ import {
   flareQuorumFlareMarketAbi,
   type FlareBidReceipt,
   type FlarePrivateBidSubmission,
+  type FlareSelectionResult,
   type FlareTeePublicKey,
 } from "@flarequorum/flare-bindings";
 import {
@@ -19,6 +21,8 @@ import {
   http,
   isAddress,
   isAddressEqual,
+  keccak256,
+  stringToHex,
   type Address,
   type Hex,
   type WalletClient,
@@ -58,6 +62,19 @@ export interface FlareBidReceiptSet {
 export interface FlareBidSubmissionResult extends FlareBidReceiptSet {
   transactionHash: Hex;
   blockNumber: bigint;
+}
+
+export interface FlareSelectionProof {
+  actionId: Hex;
+  submissionTagHash: Hex;
+  status: number;
+  signature: Hex;
+}
+
+export interface FlareSelectionQuorum {
+  result: FlareSelectionResult;
+  proofs: readonly [FlareSelectionProof, FlareSelectionProof];
+  resultDataHash: Hex;
 }
 
 function ingressUrl(env: Record<string, string | undefined> = import.meta.env): string {
@@ -158,6 +175,75 @@ export async function loadFlareIngressMachines(
   });
   if (!response.ok) throw new Error(response.status === 503 ? "FLARE_INGRESS_UNAVAILABLE" : "FLARE_INGRESS_RESPONSE_INVALID");
   return machineResponse(await response.json(), tenderId);
+}
+
+export async function loadFlareSelectionQuorum(
+  tender: FlarePublicTender,
+  env: Record<string, string | undefined> = import.meta.env,
+): Promise<FlareSelectionQuorum> {
+  const tenderId = tender.tenderId;
+  const response = await fetchWithTimeout(
+    `${ingressUrl(env)}/flare/finalizer/tenders/${positiveId(tenderId)}/selection-quorum`,
+    { headers: { accept: "application/json" } },
+  );
+  if (response.status === 202) throw new Error("FCC_SELECTION_QUORUM_PENDING");
+  if (!response.ok) {
+    throw new Error(response.status === 409 ? "FLARE_SELECTION_NOT_AVAILABLE" : "FLARE_INGRESS_UNAVAILABLE");
+  }
+  const record = jsonResponse(await response.json(), "FLARE_SELECTION_RESPONSE_INVALID");
+  if (
+    record.schemaVersion !== 1 || record.status !== "ready" ||
+    typeof record.resultData !== "string" || !/^0x(?:[0-9a-fA-F]{2})+$/.test(record.resultData) ||
+    typeof record.resultDataHash !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(record.resultDataHash) ||
+    !Array.isArray(record.teeIds) || record.teeIds.length !== 2 ||
+    !Array.isArray(record.proofs) || record.proofs.length !== 2
+  ) throw new Error("FLARE_SELECTION_RESPONSE_INVALID");
+  const resultData = record.resultData as Hex;
+  const result = decodeSelectionResult(resultData);
+  if (
+    record.resultDataHash.toLowerCase() !== keccak256(resultData).toLowerCase() ||
+    result.schemaVersion !== 1 || result.chainId !== 114n ||
+    result.tenderId !== tenderId || !isAddressEqual(result.market, tenderMarket(env)) ||
+    result.extensionId !== tender.extensionId || result.codeVersion.toLowerCase() !== tender.codeVersion.toLowerCase() ||
+    result.rulesHash.toLowerCase() !== tender.rulesHash.toLowerCase() ||
+    result.orderedBidRoot.toLowerCase() !== tender.orderedBidRoot.toLowerCase() ||
+    result.quorumBitmap !== tender.commonQuorumBitmap ||
+    result.ftsoFeedId.toLowerCase() !== tender.ftsoFeedId.toLowerCase() ||
+    result.ftsoValue !== tender.ftsoValue || result.ftsoDecimals !== tender.ftsoDecimals ||
+    result.ftsoTimestamp !== tender.ftsoTimestamp || result.closeBlock !== tender.closeBlock ||
+    result.resultNonce !== tender.resultNonce || result.expiry !== tender.resultExpiry
+  ) {
+    throw new Error("FLARE_SELECTION_RESPONSE_INVALID");
+  }
+  const teeIds = record.teeIds.map((value) => {
+    if (typeof value !== "string" || !isAddress(value)) throw new Error("FLARE_SELECTION_RESPONSE_INVALID");
+    return getAddress(value);
+  });
+  if (
+    isAddressEqual(teeIds[0], teeIds[1]) ||
+    teeIds.some((teeId) => !tender.teeIds.some((frozen) => isAddressEqual(frozen, teeId)))
+  ) throw new Error("FLARE_SELECTION_RESPONSE_INVALID");
+  const allowedTags = new Set([
+    keccak256(stringToHex("submit")).toLowerCase(),
+    keccak256(stringToHex("threshold")).toLowerCase(),
+  ]);
+  const proofs = record.proofs.map((value) => {
+    const proof = jsonResponse(value, "FLARE_SELECTION_RESPONSE_INVALID");
+    if (
+      typeof proof.actionId !== "string" || proof.actionId.toLowerCase() !== tender.requestId.toLowerCase() ||
+      typeof proof.submissionTagHash !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(proof.submissionTagHash) ||
+      !allowedTags.has(proof.submissionTagHash.toLowerCase()) ||
+      proof.status !== 1 ||
+      typeof proof.signature !== "string" || !/^0x[0-9a-fA-F]{130}$/.test(proof.signature)
+    ) throw new Error("FLARE_SELECTION_RESPONSE_INVALID");
+    return {
+      actionId: proof.actionId as Hex,
+      submissionTagHash: proof.submissionTagHash as Hex,
+      status: proof.status,
+      signature: proof.signature as Hex,
+    } satisfies FlareSelectionProof;
+  }) as [FlareSelectionProof, FlareSelectionProof];
+  return { result, proofs, resultDataHash: record.resultDataHash as Hex };
 }
 
 function actionResponse(value: unknown, expected: { actionId: Hex; teeId: Address }): FlareIngressAction {

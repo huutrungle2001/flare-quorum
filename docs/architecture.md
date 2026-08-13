@@ -167,7 +167,7 @@ remain private.
 
 ```mermaid
 sequenceDiagram
-    participant F as Finalizer
+    participant F as User finalizer
     participant M as Market
     participant R as FCC registries/relayers
     participant T as TEE quorum
@@ -178,8 +178,8 @@ sequenceDiagram
     M->>R: send fixed selection instruction to common quorum
     R->>T: deliver action
     T->>T: restore sealed state, rebuild root, score independently
-    T-->>F: signed ActionResults
-    F->>F: group by exact result digest
+    T-->>R: signed ActionResults
+    R-->>F: exact verified 2-of-3 quorum
     F->>M: finalizeTender(envelope, signatures[2+])
     M->>M: verify domain, distinct registered signers, threshold
     M->>M: terminal state before FTestXRP transfers
@@ -189,8 +189,9 @@ The result binds schema, chain, market, extension, code, tender, rules, ordered
 root, common quorum, FTSO snapshot, close block, winner slot/vendor/amount,
 nonce, and expiry.
 
-Split results remain pending and become public evidence of disagreement. A
-relay never selects between them.
+Split results remain pending and become public evidence of disagreement. The
+ingress/finalizer path never selects between them. An optional stateless relay
+may automate the same permissionless calls without changing the trust model.
 
 If the one-hour result envelope expires, a permissionless retry keeps every
 closed-tender fact fixed but creates a new attempt nonce, expiry, and FCC

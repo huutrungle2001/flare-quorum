@@ -347,14 +347,17 @@ and funding capability rather than decorative integrations.
    fetched by the extension from its private store using a domain-separated
    slot. The request also freezes a one-hour result expiry so every machine
    signs the same envelope.
-3. A stateless relay polls public proxy endpoints for results.
-4. It groups results by digest and submits signatures only when the configured
+3. The existing ingress offers a public-safe endpoint that polls the public
+   proxy result routes and groups exact result bytes only when the configured
    threshold agrees.
+4. A connected user submits that verified quorum from Activity. A stateless
+   relay may automate the same permissionless operation, but is not required.
 5. The market reconstructs the domain-separated digest, validates distinct
    registered signers, and settles once.
 
-The relay stores only public request IDs, result digests, signatures, and
-transactions. A browser or competing relay can resume from chain state.
+The ingress stores none of these responses. Finalizer clients handle only
+public request IDs, result digests, signatures, and transactions, and any
+browser or competing relay can resume from chain state.
 
 ## ADR-014 — Signature domain
 

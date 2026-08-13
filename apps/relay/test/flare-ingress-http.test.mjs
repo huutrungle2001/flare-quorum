@@ -110,6 +110,20 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
     async result() {
       return { actionId: `0x${"66".repeat(32)}`, teeId, data: `0x${"77".repeat(32)}`, expiresAt: 1_200n };
     },
+    async selectionQuorum() {
+      return {
+        result: {},
+        resultData: `0x${"88".repeat(32)}`,
+        resultDataHash: `0x${"99".repeat(32)}`,
+        teeIds: [teeId, "0x4000000000000000000000000000000000000004"],
+        proofs: [{
+          actionId: `0x${"aa".repeat(32)}`,
+          submissionTagHash: `0x${"bb".repeat(32)}`,
+          status: 1,
+          signature: `0x${"cc".repeat(65)}`,
+        }],
+      };
+    },
     async health() {
       return {
         status: "ok",
@@ -173,6 +187,25 @@ test("HTTP ingress publishes public machine keys and never echoes bid material",
       teeId,
       data: `0x${"77".repeat(32)}`,
       expiresAt: "1200",
+    });
+
+    const selection = await fetch(`${app.baseUrl}/flare/finalizer/tenders/7/selection-quorum`, {
+      headers: { Origin: "https://app.example" },
+    });
+    assert.equal(selection.status, 200);
+    assert.equal(selection.headers.get("access-control-allow-origin"), "https://app.example");
+    assert.deepEqual(await selection.json(), {
+      schemaVersion: 1,
+      status: "ready",
+      resultData: `0x${"88".repeat(32)}`,
+      resultDataHash: `0x${"99".repeat(32)}`,
+      teeIds: [teeId, "0x4000000000000000000000000000000000000004"],
+      proofs: [{
+        actionId: `0x${"aa".repeat(32)}`,
+        submissionTagHash: `0x${"bb".repeat(32)}`,
+        status: 1,
+        signature: `0x${"cc".repeat(65)}`,
+      }],
     });
   } finally {
     await app.close();

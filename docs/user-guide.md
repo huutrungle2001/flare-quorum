@@ -55,8 +55,9 @@ unlocks bid data or requires a wallet. It opens the newest awarded dossier by
 default, supports public ID/buyer/status filtering, and provides labelled copy
 controls for long public identifiers. Use `/flare?role=finalizer` for the separate
 public lifecycle queue: permissionless close is available in-browser, while
-FCC dispatch/result grouping stays in the dedicated relay. Buyer-only empty
-cancellation and failed-compute recovery require an explicit confirmation.
+connected users may also start FCC compute and submit an exact verified 2-of-3
+result. Buyer-only empty cancellation and failed-compute recovery require an
+explicit confirmation.
 
 The Buyer route is `/flare?role=buyer`: it starts with two explicit funding
 choices, defaults to direct Coston2/FTestXRP escrow, and can switch to the
@@ -201,12 +202,16 @@ Rules, scoring, commitments, and TEE facts remain in Public and Auditor.
 
 1. Any user or relay calls close when eligible. The market freezes bid root,
    rules, common quorum, close block, and the official XRP/USD FTSO snapshot.
-2. Any user requests selection from the frozen common quorum.
+2. In Activity, a connected user clicks `START FCC COMPUTE`, confirms the
+   public instruction fee, and requests selection from the frozen common quorum.
 3. Each TEE validates its sealed state against the public ordered root, checks
    credentials, normalizes quotes, and applies `SCORING_V1`.
-4. A stateless relay groups exact result digests and submits only after two
-   distinct approved machines agree.
-5. The market reconstructs the full domain, verifies threshold signatures,
+4. The existing ciphertext ingress exposes a public-safe finalizer endpoint
+   that groups exact result bytes only after two distinct approved machines
+   agree. It returns no bid plaintext, ciphertext, or decryption capability.
+5. The user clicks `CHECK 2/3 & FINALIZE`; the wallet submits the verified
+   result and its two FCC signatures. The market reconstructs the full domain,
+   verifies threshold signatures,
    marks terminal state, and settles once.
 6. If the one-hour result envelope expires, retry with a fresh attempt nonce and
    request ID while preserving every frozen input. Old-attempt results fail.
@@ -224,10 +229,12 @@ adds a separate close-time refund. Its live undispatched and post-dispatch
 refund lifecycles passed before promotion, and the app derives both actions
 from canonical V2 state without presenting either refund as FCC success.
 
-The Public Finalizer browser intentionally does not request selection or submit
-TEE results itself. Those operations require the relay's public FCC endpoints,
-live instruction fee, exact-result grouping, and canonical rereads; moving them
-into an ordinary client would add authority without adding safety.
+The Public Finalizer uses the connected wallet instead of an always-on signer.
+The browser pays only the public instruction fee, reads only a sanitized exact
+quorum from the existing ingress, and submits it unchanged. It never receives a
+TEE key, proxy API key, bid ciphertext, or winner-selection authority. A
+stateless relay remains an optional compatible automation path, not a required
+hosted service.
 
 ## 7. Evidence and privacy labels
 

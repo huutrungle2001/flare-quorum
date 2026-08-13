@@ -24,6 +24,7 @@ import type {
   FlareBidIngressTender,
 } from "./flare-ingress.js";
 import { parseFlareTender } from "./flare-lifecycle.js";
+import type { FlareTenderSelectionContext } from "./flare-results.js";
 
 const coston2Chain = {
   id: 114,
@@ -228,6 +229,51 @@ export class LiveFlareBidIngressChain implements FlareBidIngressChain {
   ) {
     this.config = config;
     this.reader = reader;
+  }
+
+  async selectionContext(tenderId: bigint): Promise<{
+    context: FlareTenderSelectionContext;
+    chainTimestamp: bigint;
+    status: FlareBidIngressTender["status"];
+  }> {
+    if (tenderId <= 0n) throw new Error("INVALID_FLARE_TENDER_ID");
+    const [chainId, block] = await Promise.all([this.reader.getChainId(), this.reader.getBlock()]);
+    if (chainId !== 114) throw new Error("WRONG_FLARE_INGRESS_CHAIN");
+    if (block.number === null || block.timestamp <= 0n) throw new Error("MALFORMED_FLARE_CHAIN_SNAPSHOT");
+    const [marketCode, tenderValue] = await Promise.all([
+      this.reader.getCode({ address: this.config.marketAddress, blockNumber: block.number }),
+      this.reader.readContract({
+        address: this.config.marketAddress,
+        abi: marketAbi,
+        functionName: "getTender",
+        args: [tenderId],
+        blockNumber: block.number,
+      }),
+    ]);
+    if (marketCode === undefined || marketCode === "0x") throw new Error("FLARE_MARKET_CODE_MISSING");
+    const tender = parseFlareTender(tenderId, tenderValue);
+    return {
+      chainTimestamp: block.timestamp,
+      status: tender.status,
+      context: {
+        market: this.config.marketAddress,
+        tenderId,
+        extensionId: tender.extensionId,
+        codeVersion: tender.codeVersion,
+        rulesHash: tender.rulesHash,
+        orderedBidRoot: tender.orderedBidRoot,
+        commonQuorumBitmap: tender.commonQuorumBitmap,
+        ftsoFeedId: tender.ftsoFeedId,
+        ftsoValue: tender.ftsoValue,
+        ftsoDecimals: tender.ftsoDecimals,
+        ftsoTimestamp: tender.ftsoTimestamp,
+        closeBlock: tender.closeBlock,
+        resultNonce: tender.resultNonce,
+        resultExpiry: tender.resultExpiry,
+        requestId: tender.requestId,
+        teeIds: tender.teeIds,
+      },
+    };
   }
 
   async inspect(tenderId: bigint, vendor?: Address): Promise<FlareBidIngressTender> {

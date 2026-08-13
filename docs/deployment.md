@@ -509,8 +509,11 @@ The current source release provides:
   Activity, and Evidence journeys;
 - verified extension/code/machine/key/quorum/FTSO/FAssets/FDC/Smart Account
   metadata;
-- a stateless relay that closes, requests, retrieves, groups exact digests, and
-  submits threshold results without bid data or winner logic;
+- user-triggered Activity actions that close, request FCC compute, retrieve an
+  exact verified quorum through ingress, and submit threshold results without
+  bid data or winner logic;
+- an optional stateless relay that may automate those same permissionless
+  checkpoints when an operator chooses to fund an always-on service;
 - an ingress service whose health rereads one finalized public tender and
   validates its three frozen machine bindings, while logs contain no body,
   ciphertext, credential, or plaintext;
@@ -535,12 +538,17 @@ that directory on a persistent volume; an ephemeral filesystem would make new
 brief text disappear after a restart even though contract hashes remain safe.
 The web may use a separate `VITE_FLARE_PUBLIC_BRIEF_URL`; when omitted it uses
 `VITE_FLARE_INGRESS_URL`. Both variables are public origins, not credentials.
+The public `VITE_FLARE_FCC_INSTRUCTION_FEE_WEI` configures the value attached
+to `requestSelection`; it is a fee amount, never a credential.
 A successful ingress action is not by itself a settlement;
 the receipt quorum still must be submitted to the frozen Coston2 market.
-The Flare relay includes a read-only `health-server` mode (`/live` and
-`/health`) that needs no signer. Settlement polling must be deployed only as a
-separate Coston2 service after a dedicated finalizer key and the three verified
-FCC proxy URLs are configured; it must never reuse a Sepolia service or key.
+The ingress also serves
+`/flare/finalizer/tenders/:tenderId/selection-quorum`. It re-reads latest V2
+state, retrieves public FCC result envelopes, verifies their full tender domain,
+and returns only two matching contract-ready proofs. Pending, split, malformed,
+expired, or weak results fail closed. The Flare relay remains available for
+operators who want automation, but the hosted product does not require a relay
+signer or a continuously running settlement service.
 
 The browser deployment gets no relay signer, TEE secret, proxy database, XRPL
 secret, or infrastructure credential. An optional GemWallet integration runs

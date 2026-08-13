@@ -306,6 +306,31 @@ describe("Coston2 public evidence boundary", () => {
     expect(directActionWasApplied("refundExpiredSelection", 5)).toBe(true);
   });
 
+  it("offers wallet-triggered FCC dispatch and threshold finalization", () => {
+    const closed = render(<FlareFinalizerWorkspace wallet={wallet} tenders={[{
+      ...publicTender,
+      status: "Closed",
+      bidCount: 2n,
+      approvedVendorCount: 2,
+    }]} onRefresh={() => undefined} />);
+    expect(screen.getByRole("heading", { name: "Ready to start FCC" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "START FCC COMPUTE →" })).toBeDisabled();
+    expect(screen.queryByText(/dedicated relay/i)).toBeNull();
+    closed.unmount();
+
+    render(<FlareFinalizerWorkspace wallet={wallet} tenders={[{
+      ...publicTender,
+      status: "ComputePending",
+      bidCount: 2n,
+      approvedVendorCount: 2,
+      selectionStartedAt: 1_900_000_000n,
+      selectionAttempt: 1,
+      resultExpiry: 2_000_000_000n,
+    }]} onRefresh={() => undefined} />);
+    expect(screen.getByRole("heading", { name: "FCC result pending" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "CHECK 2/3 & FINALIZE →" })).toBeDisabled();
+  });
+
   it("asks the vendor to connect only when an open tender has a bid action", () => {
     const first = render(<MemoryRouter><FlareVendorWorkspace wallet={wallet} tenders={[{ ...publicTender, status: "Cancelled" }]} onRefresh={() => undefined} /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "No open Coston2 tenders" })).toBeInTheDocument();

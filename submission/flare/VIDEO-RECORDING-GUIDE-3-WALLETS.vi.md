@@ -42,7 +42,6 @@ Ngay trước khi quay, chạy:
 
 ```bash
 pnpm flare:v2:machines:preflight
-pnpm flare:relay:health
 pnpm test:flare:production https://flare-quorum.vercel.app
 pnpm evidence:validate
 pnpm flare:judge:check
@@ -168,15 +167,20 @@ thua cuộc hoặc ciphertext.
 
 ### Clip 05 — Close và FCC (`60–90 giây`)
 
-1. Chờ deadline; dừng recording trong thời gian chờ.
-2. Mở `ACTIVITY` và close tender bằng bất kỳ ví nào đang kết nối.
-3. Quay close checkpoint và FTSO snapshot nếu tender bật USD.
-4. Để relay thực hiện FCC selection; không nói browser chọn winner.
-5. Khi finalized, quay hai matching TEE signers, result digest và trạng thái
-   `AWARDED`.
+1. Vì hai approved vendor đã submit, mở `ACTIVITY`; không cần chờ hết deadline.
+2. Bấm `CLOSE & FREEZE FTSO` và xác nhận giao dịch ví.
+3. Khi card chuyển sang `Ready to start FCC`, bấm `START FCC COMPUTE` và xác
+   nhận giao dịch thứ hai. Giao dịch này trả public FCC instruction fee.
+4. Chờ khoảng `10–30 giây`, rồi bấm `CHECK 2/3 & FINALIZE`.
+5. Nếu UI báo quorum chưa sẵn sàng, chờ thêm vài giây rồi bấm lại. Đây là trạng
+   thái chờ thật; không dùng sample result.
+6. Khi UI báo hai chữ ký FCC khớp nhau, xác nhận giao dịch finalize trong ví.
+7. Quay trạng thái `AWARDED`, hai matching TEE signers và result digest.
 
-Nếu relay/FCC đang chờ, dừng clip và quay tiếp khi public state thay đổi. Không
-chèn sample success.
+Browser không tính winner và không giải mã bid. Ingress hiện có chỉ gom hai kết
+quả FCC công khai có bytes giống hệt nhau; contract kiểm tra lại toàn bộ domain
+và chữ ký trước khi settlement. Luồng này không cần lifecycle relay chạy liên
+tục trên Railway.
 
 ### Clip 06 — Award và Auditor (`60 giây`)
 
@@ -217,6 +221,7 @@ Kết bằng Public hoặc Auditor dossier, không kết ở popup ví hay màn 
 - [ ] Hai vendor đều nhận đủ ba receipt; bitmap public là `0x07`.
 - [ ] Không frame nào chứa bid value, credential, plaintext hoặc ciphertext.
 - [ ] Close/FCC/finalize đến từ canonical state, không có mock winner.
+- [ ] Đã quay đủ ba thao tác Activity: Close, Start FCC Compute và Finalize.
 - [ ] Hai TEE signer khớp cùng result digest.
 - [ ] Payout, remainder và award receipt xuất hiện rõ.
 - [ ] Gate G được gọi đúng là public evidence đã ghi nhận.

@@ -6,6 +6,7 @@ import { ContextHelp } from "../shell/ContextHelp";
 import { useToasts } from "../shell/ToastProvider";
 import type { WalletController } from "../wallet/WalletPanel";
 import { WalletPanel } from "../wallet/WalletPanel";
+import { loadFlareSelectionQuorum } from "./flareBidIngress";
 import { FlareRedemptionPanel } from "./FlareRedemptionPanel";
 
 const coston2 = {
@@ -19,6 +20,7 @@ export type DirectAction = "closeTender" | "cancelTender" | "refundExpiredSelect
 type Confirmation = { tenderId: bigint; action: "cancelTender" | "refundExpiredSelection" };
 type ActivityState = "close" | "cancel-or-wait" | "wait-for-bids" | "request-selection" | "compute-live" | "retry-selection" | "refund-ready" | "terminal";
 type TenderStatus = FlarePublicTender["status"];
+type LocalSelection = { selectionAttempt: number; selectionStartedAt: bigint; resultExpiry: bigint };
 
 const tenderStatusOrder: Record<TenderStatus, number> = {
   FundingPending: 0,
@@ -75,11 +77,11 @@ function actionPresentation(state: ActivityState, buyerConnected: boolean) {
     case "wait-for-bids":
       return { title: "Accepting sealed bids", status: "WAITING", permission: "NO ACTION REQUIRED", lane: "waiting" };
     case "request-selection":
-      return { title: "Relay selection required", status: "RELAY QUEUE", permission: "DEDICATED RELAY", lane: "relay" };
+      return { title: "Ready to start FCC", status: "ACTION AVAILABLE", permission: "ANYONE", lane: "action" };
     case "compute-live":
-      return { title: "FCC computation in progress", status: "PROCESSING", permission: "NO ACTION REQUIRED", lane: "processing" };
+      return { title: "FCC result pending", status: "ACTION AVAILABLE", permission: "ANYONE", lane: "action" };
     case "retry-selection":
-      return { title: "Relay retry available", status: "RELAY QUEUE", permission: "DEDICATED RELAY", lane: "relay" };
+      return { title: "FCC retry available", status: "ACTION AVAILABLE", permission: "ANYONE", lane: "action" };
     case "refund-ready":
       return buyerConnected
         ? { title: "Escrow recovery available", status: "ACTION AVAILABLE", permission: "BUYER ONLY · THIS WALLET", lane: "action" }
@@ -104,6 +106,7 @@ export function FlareFinalizerWorkspace({
   const [error, setError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [localStatuses, setLocalStatuses] = useState<Record<string, TenderStatus>>({});
+  const [localSelections, setLocalSelections] = useState<Record<string, LocalSelection>>({});
   const connected = wallet.state.status === "connected" && wallet.state.account && wallet.state.walletClient;
 
   useEffect(() => {
@@ -130,12 +133,35 @@ export function FlareFinalizerWorkspace({
     });
   }, [tenders]);
 
+  useEffect(() => {
+    setLocalSelections((current) => {
+      const next = { ...current };
+      let changed = false;
+      for (const tender of tenders) {
+        const key = tender.tenderId.toString();
+        const local = next[key];
+        if (
+          local && (
+            tenderStatusOrder[tender.status] > tenderStatusOrder.ComputePending ||
+            tender.status === "ComputePending" && tender.selectionAttempt >= local.selectionAttempt
+          )
+        ) {
+          delete next[key];
+          changed = true;
+        }
+      }
+      return changed ? next : current;
+    });
+  }, [tenders]);
+
   const effectiveTenders = useMemo(
     () => tenders.map((tender) => {
-      const status = localStatuses[tender.tenderId.toString()];
-      return status ? { ...tender, status } : tender;
+      const key = tender.tenderId.toString();
+      const status = localStatuses[key];
+      const selection = localSelections[key];
+      return status || selection ? { ...tender, ...selection, ...(status ? { status } : {}) } : tender;
     }),
-    [localStatuses, tenders],
+    [localSelections, localStatuses, tenders],
   );
 
   const queue = useMemo(
@@ -144,7 +170,7 @@ export function FlareFinalizerWorkspace({
   );
   const actionableCount = queue.filter((tender) => {
     const state = actionState(tender, now);
-    if (state === "close") return true;
+    if (["close", "request-selection", "compute-live", "retry-selection"].includes(state)) return true;
     return Boolean(
       connected
       && (state === "cancel-or-wait" || state === "refund-ready")
@@ -232,6 +258,171 @@ export function FlareFinalizerWorkspace({
     }
   }
 
+  async function runSelectionRequest(tender: FlarePublicTender, retry: boolean) {
+    if (!connected) return;
+    const rpcUrl = import.meta.env.VITE_COSTON2_RPC_URL?.trim();
+    const rawFee = import.meta.env.VITE_FLARE_FCC_INSTRUCTION_FEE_WEI?.trim();
+    if (!rpcUrl || !rawFee || !/^[1-9][0-9]*$/.test(rawFee)) {
+      setError("FCC instruction fee or Coston2 RPC is not configured. No write was attempted.");
+      return;
+    }
+    const action = retry ? "retrySelection" : "requestSelection";
+    const key = `${action}:${tender.tenderId.toString()}`;
+    const label = retry ? "RETRY FCC COMPUTE" : "START FCC COMPUTE";
+    const expectedAttempt = tender.selectionAttempt + 1;
+    const toastId = toasts.startStack(label, "Re-reading canonical Coston2 state…");
+    const publicClient = createPublicClient({
+      chain: coston2,
+      transport: http(rpcUrl, { retryCount: 1, timeout: 8_000 }),
+    });
+    const applied = async () => {
+      const record = await publicClient.readContract({
+        address: coston2FlarePublicRelease.market,
+        abi: flareQuorumFlareMarketAbi as Abi,
+        functionName: "getTender",
+        args: [tender.tenderId],
+      }) as { selectionAttempt: number; status: number };
+      const status = Number(record.status);
+      return status >= 4 || (status === 3 && Number(record.selectionAttempt) >= expectedAttempt);
+    };
+    const applyLocalStatus = () => {
+      const selectionStartedAt = BigInt(Math.floor(Date.now() / 1_000));
+      setLocalStatuses((current) => ({ ...current, [tender.tenderId.toString()]: "ComputePending" }));
+      setLocalSelections((current) => ({
+        ...current,
+        [tender.tenderId.toString()]: {
+          selectionAttempt: expectedAttempt,
+          selectionStartedAt,
+          resultExpiry: selectionStartedAt + 3_600n,
+        },
+      }));
+      setError(null);
+      onRefresh();
+    };
+    setBusy(key);
+    setError(null);
+    try {
+      if (await applied()) {
+        applyLocalStatus();
+        toasts.succeed(toastId, `${label} is already confirmed on Coston2.`);
+        return;
+      }
+      const simulation = await publicClient.simulateContract({
+        account: wallet.state.account!,
+        address: coston2FlarePublicRelease.market,
+        abi: flareQuorumFlareMarketAbi as Abi,
+        functionName: action,
+        args: [tender.tenderId],
+        value: BigInt(rawFee),
+      });
+      toasts.update(toastId, "Awaiting the Coston2 wallet signature…");
+      const hash = await wallet.state.walletClient!.writeContract(simulation.request);
+      toasts.update(toastId, "Dispatching the frozen request to all three FCC machines…");
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      if (receipt.status !== "success") throw new Error("COSTON2_SELECTION_REQUEST_FAILED");
+      applyLocalStatus();
+      toasts.succeed(toastId, `${label} confirmed. FCC result collection is now available.`);
+    } catch (cause) {
+      try {
+        if (await applied()) {
+          applyLocalStatus();
+          toasts.succeed(toastId, `${label} confirmed on Coston2.`);
+          return;
+        }
+      } catch {
+        // Preserve the original dispatch error when the recovery read is unavailable.
+      }
+      setError(cause instanceof Error ? cause.message : "FCC selection dispatch failed.");
+      toasts.fail(toastId, "FCC compute was not started. No fallback result was used.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function runFinalize(tender: FlarePublicTender) {
+    if (!connected) return;
+    const rpcUrl = import.meta.env.VITE_COSTON2_RPC_URL?.trim();
+    if (!rpcUrl) {
+      setError("Coston2 RPC is unavailable. No write was attempted.");
+      return;
+    }
+    const key = `finalizeTender:${tender.tenderId.toString()}`;
+    const toastId = toasts.startStack("FINALIZE FCC RESULT", "Checking for an exact 2-of-3 FCC result…");
+    const publicClient = createPublicClient({
+      chain: coston2,
+      transport: http(rpcUrl, { retryCount: 1, timeout: 8_000 }),
+    });
+    const terminalStatus = async (): Promise<TenderStatus | null> => {
+      const record = await publicClient.readContract({
+        address: coston2FlarePublicRelease.market,
+        abi: flareQuorumFlareMarketAbi as Abi,
+        functionName: "getTender",
+        args: [tender.tenderId],
+      }) as { status: number };
+      const status = Number(record.status);
+      return status === 4 ? "Awarded" : status === 5 ? "Refunded" : null;
+    };
+    const applyTerminalStatus = (status: TenderStatus) => {
+      setLocalStatuses((current) => ({ ...current, [tender.tenderId.toString()]: status }));
+      setError(null);
+      onRefresh();
+    };
+    setBusy(key);
+    setError(null);
+    try {
+      const existing = await terminalStatus();
+      if (existing) {
+        applyTerminalStatus(existing);
+        toasts.succeed(toastId, `Tender is already ${existing} on Coston2.`);
+        return;
+      }
+      const latest = await publicClient.readContract({
+        address: coston2FlarePublicRelease.market,
+        abi: flareQuorumFlareMarketAbi as Abi,
+        functionName: "getTender",
+        args: [tender.tenderId],
+      }) as Pick<FlarePublicTender,
+        "closeBlock" | "codeVersion" | "commonQuorumBitmap" | "extensionId" |
+        "ftsoDecimals" | "ftsoFeedId" | "ftsoTimestamp" | "ftsoValue" |
+        "orderedBidRoot" | "requestId" | "resultExpiry" | "resultNonce" |
+        "rulesHash" | "teeIds">;
+      const quorum = await loadFlareSelectionQuorum({ ...tender, ...latest });
+      toasts.update(toastId, "2-of-3 FCC signatures match. Awaiting wallet confirmation…");
+      const simulation = await publicClient.simulateContract({
+        account: wallet.state.account!,
+        address: coston2FlarePublicRelease.market,
+        abi: flareQuorumFlareMarketAbi as Abi,
+        functionName: "finalizeTender",
+        args: [tender.tenderId, quorum.result, quorum.proofs],
+      });
+      const hash = await wallet.state.walletClient!.writeContract(simulation.request);
+      toasts.update(toastId, "Waiting for the Coston2 award receipt…");
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      if (receipt.status !== "success") throw new Error("COSTON2_FINALIZATION_FAILED");
+      const status = quorum.result.winnerBidId === 0n ? "Refunded" : "Awarded";
+      applyTerminalStatus(status);
+      toasts.succeed(toastId, `Tender finalized as ${status} with a verified 2-of-3 FCC result.`);
+    } catch (cause) {
+      try {
+        const status = await terminalStatus();
+        if (status) {
+          applyTerminalStatus(status);
+          toasts.succeed(toastId, `Tender is already ${status} on Coston2.`);
+          return;
+        }
+      } catch {
+        // Preserve the original finalization error when the recovery read is unavailable.
+      }
+      const message = cause instanceof Error ? cause.message : "FCC finalization failed.";
+      setError(message === "FCC_SELECTION_QUORUM_PENDING" ? "FCC is still computing. Wait a few seconds, then try FINALIZE again." : message);
+      toasts.fail(toastId, message === "FCC_SELECTION_QUORUM_PENDING"
+        ? "The 2-of-3 FCC result is not ready yet. Try again in a few seconds."
+        : "Finalization stopped. No client-computed winner or fallback was used.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <main id="main-content" className="role-workspace flare-finalizer-workspace">
       <section className="workspace-intro">
@@ -240,7 +431,8 @@ export function FlareFinalizerWorkspace({
           title="HOW PUBLIC FINALIZATION WORKS"
           steps={[
             "Close is permissionless once the deadline passes or every approved vendor has submitted.",
-            "Selection dispatch and threshold-result collection stay with the dedicated stateless relay because they require public FCC endpoints and the live instruction fee.",
+            "Start FCC Compute asks the connected wallet to pay the public instruction fee and dispatch the frozen request.",
+            "Finalize checks for two FCC machines signing the exact same result, then asks the wallet to submit it.",
             "A browser never calculates a winner or chooses between split TEE digests.",
             "After the fixed 24-hour failed-compute grace, only the buyer can recover the original escrow with no award.",
           ]}
@@ -249,10 +441,10 @@ export function FlareFinalizerWorkspace({
         <p className="eyebrow">COSTON2 PUBLIC FINALIZER / RECOVERY</p>
         <h1>Advance public checkpoints.</h1>
         <p>
-          Anyone may close eligible tenders. FCC dispatch, result grouping, and
-          threshold finalization remain relay operations with no bid-decryption
-          capability. Buyer-only cancellation and failed-compute refund controls
-          appear only when canonical rules permit them.
+          Anyone may close eligible tenders, start FCC compute, and submit an exact
+          threshold result. The browser receives no bid-decryption capability and never
+          calculates a winner. Buyer-only cancellation and failed-compute refund
+          controls appear only when canonical rules permit them.
         </p>
       </section>
       <nav className="activity-section-nav" aria-label="Activity sections">
@@ -287,6 +479,9 @@ export function FlareFinalizerWorkspace({
                 connected && isAddressEqual(wallet.state.account!, tender.buyer),
               );
               const closeKey = `closeTender:${tender.tenderId.toString()}`;
+              const requestKey = `requestSelection:${tender.tenderId.toString()}`;
+              const retryKey = `retrySelection:${tender.tenderId.toString()}`;
+              const finalizeKey = `finalizeTender:${tender.tenderId.toString()}`;
               const cancelKey = `cancelTender:${tender.tenderId.toString()}`;
               const refundKey = `refundExpiredSelection:${tender.tenderId.toString()}`;
               const isConfirming = confirmation?.tenderId === tender.tenderId;
@@ -306,15 +501,30 @@ export function FlareFinalizerWorkspace({
                     {state === "close" && <p>Deadline/vendor quorum allows a permissionless close. The contract captures the live XRP/USD FTSO snapshot.</p>}
                     {state === "cancel-or-wait" && <p>Still accepting bids. The connected buyer may cancel only while zero bids are accepted.</p>}
                     {state === "wait-for-bids" && <p>Still accepting sealed bids until the deadline or full vendor participation.</p>}
-                    {state === "request-selection" && <p>Closed and ready for the dedicated relay to pay the live FCC instruction fee and dispatch the frozen selection request.</p>}
-                    {state === "compute-live" && <p>FCC attempt {tender.selectionAttempt} is live. A relay groups exact result bytes and submits only a matching 2-of-3 quorum.</p>}
-                    {state === "retry-selection" && <p>The signed-result window expired. A relay may retry with a fresh nonce while every frozen input stays unchanged.</p>}
+                    {state === "request-selection" && <p>Pay the public FCC instruction fee and dispatch the frozen selection request to all three machines.</p>}
+                    {state === "compute-live" && <p>FCC attempt {Math.max(1, tender.selectionAttempt)} is live. Finalize accepts only exact result bytes signed by two distinct frozen machines.</p>}
+                    {state === "retry-selection" && <p>The signed-result window expired. Retry with a fresh nonce while every frozen input stays unchanged.</p>}
                     {state === "refund-ready" && <p>The failed-compute grace elapsed. Only the original buyer may recover the exact escrow; this creates no winner or award receipt.</p>}
                   </div>
                   <div className="finalizer-actions">
                     {state === "close" && (
                       <button className="primary-button" type="button" disabled={!connected || busy !== null} onClick={() => void runDirectAction(tender, "closeTender")}>
                         {busy === closeKey ? "CLOSING…" : "CLOSE & FREEZE FTSO →"}
+                      </button>
+                    )}
+                    {state === "request-selection" && (
+                      <button className="primary-button" type="button" disabled={!connected || busy !== null} onClick={() => void runSelectionRequest(tender, false)}>
+                        {busy === requestKey ? "STARTING FCC…" : "START FCC COMPUTE →"}
+                      </button>
+                    )}
+                    {state === "compute-live" && (
+                      <button className="primary-button" type="button" disabled={!connected || busy !== null} onClick={() => void runFinalize(tender)}>
+                        {busy === finalizeKey ? "CHECKING 2/3 FCC…" : "CHECK 2/3 & FINALIZE →"}
+                      </button>
+                    )}
+                    {state === "retry-selection" && (
+                      <button className="primary-button" type="button" disabled={!connected || busy !== null} onClick={() => void runSelectionRequest(tender, true)}>
+                        {busy === retryKey ? "RETRYING FCC…" : "RETRY FCC COMPUTE →"}
                       </button>
                     )}
                     {state === "cancel-or-wait" && buyerConnected && (

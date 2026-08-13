@@ -4,6 +4,10 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   server: {
     proxy: {
+      "/local-flare-ingress/flare/finalizer": {
+        target: "http://127.0.0.1:8789",
+        rewrite: (path) => path.replace(/^\/local-flare-ingress/, ""),
+      },
       "/local-flare-ingress": {
         target: "https://veilbid-flare-ingress-production.up.railway.app",
         changeOrigin: true,

@@ -7,11 +7,13 @@ import {
   type FlareBidIngressGateway,
 } from "./flare-ingress.js";
 import type { FlarePublicBriefStore } from "./flare-public-brief-store.js";
+import type { SelectionQuorum } from "./flare-results.js";
 
 const maximumRequestBytes = 600 * 1024;
 const machineRoute = /^\/flare\/ingress\/tenders\/([1-9][0-9]*)\/machines$/;
 const resultRoute = /^\/flare\/ingress\/tenders\/([1-9][0-9]*)\/machines\/([0-2])\/results\/(0x[0-9a-fA-F]{64})$/;
 const publicBriefRoute = /^\/flare\/public-briefs\/(0x[0-9a-fA-F]{64})$/;
+const selectionQuorumRoute = /^\/flare\/finalizer\/tenders\/([1-9][0-9]*)\/selection-quorum$/;
 const rateLimitWindowMs = 60_000;
 const rateLimitRequests = 120;
 const maximumRateLimitEntries = 10_000;
@@ -21,6 +23,7 @@ interface PublicIngressGateway {
   machineKeys(tenderId: bigint): ReturnType<FlareBidIngressGateway["machineKeys"]>;
   submit(request: ReturnType<typeof parseFlareBidIngressRequest>): Promise<FlareBidIngressAccepted>;
   result(tenderId: bigint, machineIndex: number, actionId: `0x${string}`): ReturnType<FlareBidIngressGateway["result"]>;
+  selectionQuorum?(tenderId: bigint): Promise<SelectionQuorum>;
   health?(): Promise<Record<string, unknown>>;
 }
 
@@ -126,6 +129,10 @@ function mappedError(error: unknown): HttpIngressError {
     code === "FCC_PROXY_ACTION_INVALID" || code === "FCC_PROXY_ACTION_MISMATCH"
   ) return new HttpIngressError(502, "FCC_PROXY_RESPONSE_INVALID");
   if (code === "FCC_PROXY_RESULT_PENDING") return new HttpIngressError(202, code);
+  if (code === "FCC_SELECTION_QUORUM_PENDING") return new HttpIngressError(202, code);
+  if (code === "FLARE_SELECTION_NOT_PENDING" || code === "FLARE_SELECTION_RESULT_EXPIRED") {
+    return new HttpIngressError(409, code);
+  }
   if (code === "FCC_PROXY_UNAVAILABLE") return new HttpIngressError(503, code);
   return new HttpIngressError(503, "FLARE_INGRESS_UNAVAILABLE");
 }
@@ -154,13 +161,14 @@ export function createFlareIngressHandler(
       const machineMatch = machineRoute.exec(path);
       const resultMatch = resultRoute.exec(path);
       const publicBriefMatch = publicBriefRoute.exec(path);
-      const knownRoute = machineMatch !== null || resultMatch !== null || publicBriefMatch !== null || path === "/flare/ingress/bids" || path === healthRoute;
+      const selectionQuorumMatch = selectionQuorumRoute.exec(path);
+      const knownRoute = machineMatch !== null || resultMatch !== null || publicBriefMatch !== null || selectionQuorumMatch !== null || path === "/flare/ingress/bids" || path === healthRoute;
       if (request.method === "OPTIONS" && knownRoute) {
         if (origin !== webOrigin) throw new HttpIngressError(403, "ORIGIN_NOT_ALLOWED");
         response.statusCode = 204;
         response.setHeader(
           "Access-Control-Allow-Methods",
-          publicBriefMatch ? "GET, PUT, OPTIONS" : machineMatch || resultMatch || path === healthRoute ? "GET, OPTIONS" : "POST, OPTIONS",
+          publicBriefMatch ? "GET, PUT, OPTIONS" : machineMatch || resultMatch || selectionQuorumMatch || path === healthRoute ? "GET, OPTIONS" : "POST, OPTIONS",
         );
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setHeader("Access-Control-Max-Age", "600");
@@ -197,6 +205,19 @@ export function createFlareIngressHandler(
           teeId: result.teeId,
           data: result.data,
           expiresAt: result.expiresAt.toString(),
+        });
+        return;
+      }
+      if (request.method === "GET" && selectionQuorumMatch !== null) {
+        if (!gateway.selectionQuorum) throw new HttpIngressError(503, "FLARE_SELECTION_UNAVAILABLE");
+        const quorum = await gateway.selectionQuorum(BigInt(selectionQuorumMatch[1]));
+        json(response, 200, {
+          schemaVersion: 1,
+          status: "ready",
+          resultData: quorum.resultData,
+          resultDataHash: quorum.resultDataHash,
+          teeIds: quorum.teeIds,
+          proofs: quorum.proofs,
         });
         return;
       }

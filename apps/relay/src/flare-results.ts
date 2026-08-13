@@ -37,6 +37,7 @@ export interface TeeActionProof {
 
 export interface SelectionQuorum {
   result: FlareSelectionResult;
+  resultData: Hex;
   proofs: readonly TeeActionProof[];
   teeIds: readonly Address[];
   resultDataHash: Hex;
@@ -209,6 +210,7 @@ export async function collectSelectionQuorum({
   const selected = entries.slice(0, resultThreshold);
   return {
     result: selected[0].result,
+    resultData: selected[0].response.result.data,
     proofs: selected.map(({ response }) => ({
       actionId: response.result.id,
       submissionTagHash: keccak256(stringToHex(response.result.submissionTag)),
