@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "suite": "coston2-frontend-smoke",
-  "recordedAt": "2026-08-11T09:12:56.186Z",
+  "recordedAt": "2026-08-13T13:26:47.308Z",
   "publicIdentifiers": {
-    "sourceCommit": "2c25c24eab36e61b64dc29eceb1a596448057f4d",
+    "sourceCommit": "7ec2959fc2e2420b2d3888b4bfde4494fea86e45",
     "provider": "vercel",
     "project": "flare-quorum",
     "canonicalUrl": "https://flare-quorum.vercel.app",
     "network": "flare-coston2",
     "chainId": 114,
-    "deploymentKind": "release",
+    "deploymentKind": "flarequorum-v2-release",
     "deploymentVerified": true,
-    "market": "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
-    "awardReceipt": "0x338Ea3e35F4c5E7dad02B9DEC333ecc76aCD25E5"
+    "market": "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
+    "awardReceipt": "0xA0249F4204503dcB9FE3A3153d7D48936E7a4Ac3"
   },
   "routeStatuses": {
     "/": 200,
@@ -31,63 +31,63 @@
         "width": 1440,
         "height": 1000
       },
-      "sha256": "29ab7129977631a63c0434061c8a4adbe203cf456b25177c1f25fe2f907b3caf"
+      "sha256": "3cca5b3e48ceb9a590dc92058a8f4b17ea5610d8bc5d4bf23f29da348f30a749"
     },
     "tenders": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "7fa238586743f1c3fa0eed9471eb89780e6a1e4587b0f133f7daad678f34c32b"
+      "sha256": "66b6750525ee6b1f49931772db7d8f012544b0d8e1f0450751a21756430e5fd9"
     },
     "mobile": {
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sha256": "49bf853dc18abae81e4b218c699303cb81c8fe0247138f2cf0ec4efc521b8c35"
+      "sha256": "dd046c9477d220700de709f8f069a45362bdf13342b643a981c132ce36ef282e"
     },
     "evidence": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "c2988f66a02020788d6945230f91220907e83f06cfcfbc382b263d80b1b23148"
+      "sha256": "e7862dd219ce6e8941c14e599c30394df8e54cc718c6208992f0ff6899bf2c7c"
     },
     "treasury": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "63aca1ecfa487a9b72f11ac9e0db0c81060cb9a26a7e798455e052050fb6562f"
+      "sha256": "77aca5e9298a3a1ee2199dd3d4d69741a39295ae04f2c1f3f0e5a9ef40455612"
     },
     "buyer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "eeff25c485e91b0e16448eb9ca608de62eb5014b82781d6c80dfdfed5259a9eb"
+      "sha256": "3106a7825bba3ab5ba21eabc9b1d57edbdf80424b4880fb464d68a7b3e91d840"
     },
     "vendor": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "6c5c82df6c19daea517a93a5f148ca238dc8a1f46ab4020321240a807f38280d"
+      "sha256": "ae14c16edc228a337e52cc18107cf4cd346195e9f466df09f4af056c0614fac7"
     },
     "finalizer": {
       "viewport": {
         "width": 1440,
         "height": 1000
       },
-      "sha256": "3a32f0dc167fb2415cf5b488597532c1e91ce068e00238ced1aeeeb4593d0b33"
+      "sha256": "59a79801a3dad8a59708a62864f7c8f2323c85d54b614a39e4b10c07c32e7ac8"
     },
     "docsMobile": {
       "viewport": {
         "width": 390,
         "height": 844
       },
-      "sha256": "cd32a472d53d8414f9a760d1d85a5e87a4b91f51f556224495ce984c1e2e27fd"
+      "sha256": "26b392ed2a1744f0a0ae460bc52029b3022aa9e1ac68b3d116237ded657efb8b"
     }
   },
   "assertions": {
@@ -104,17 +104,18 @@
     "publicProtocolFactsCollapsed": true,
     "awardedTenderVisible": true,
     "privacyBoundaryVisible": true,
-    "publicEvidenceLedgerRendered": true,
+    "publicEvidenceDossierRendered": true,
     "publicEvidenceNoWalletGate": true,
     "publicFinalizerRendered": true,
     "buyerBriefRendered": true,
-    "xrpFundingBoundaryRendered": true,
+    "vendorSubmissionNavigationRendered": true,
+    "xrpFundingJourneyRendered": true,
     "unifiedBuyerDefaultsToCoston2": true,
-    "vendorRedemptionBoundaryRendered": true,
+    "activityRedemptionBoundaryRendered": true,
     "noPublicStateFailureRendered": true,
     "mobileTenderNavigationActive": true,
     "docsRouteRendered": true,
-    "historicalDocsRemainSeparated": true,
+    "historicalSepoliaRouteHiddenFromCurrentDocs": true,
     "desktopScreenshotCaptured": true,
     "mobileScreenshotCaptured": true,
     "docsMobileScreenshotCaptured": true
@@ -124,11 +125,11 @@
     "The deployed v2 Vercel project loaded the verified Coston2 public market without a wallet.",
     "The Auditor route reread the same finalized market snapshot without a wallet, bid payload, signer, or decryption capability.",
     "The Public Finalizer route exposes only canonical lifecycle actions; FCC dispatch and threshold grouping remain dedicated relay operations.",
-    "The Vendor route exposes the official redemption request boundary but keeps approval and redemption behind the winning Coston2 wallet.",
+    "Activity exposes the official redemption boundary in a locked state until the connected Coston2 wallet is the public winner of an awarded tender; Private Bids does not duplicate redemption controls.",
     "The unified Buyer route defaults to direct Coston2/FTestXRP funding and exposes the structured public brief without collecting bid plaintext.",
-    "The legacy treasury URL selects the advanced XRP-native option inside Buyer and exposes a public-safe XRPL 0xFE wallet-ready payment draft plus optional GemWallet Testnet submit action; this wallet-free smoke does not click it and no XRPL secret is accepted.",
+    "The legacy treasury URL selects the advanced XRP-native option inside Buyer and presents one ordered Define Rules → Connect & Pay → FDC & Mint → Tender Opened journey; this wallet-free smoke does not submit a payment and no XRPL secret is accepted.",
     "The global refresh control, read-only wallet-assets panel, and public tender sort controls are rendered without requesting a signature.",
-    "The /docs route serves current Flare documentation when the verified release is enabled; the historical Sepolia/Nox guide remains on /room and is linked as a separate baseline.",
+    "The /docs route serves only the current Flare judge path and does not expose a navigation link to the historical Sepolia/Nox route.",
     "Tender state and award receipts are read from finalized Coston2 contract state; sealed bid payloads are never fetched.",
     "Screenshots remain local smoke artifacts; only public-safe viewport and digest metadata are committed."
   ]
