@@ -1,14 +1,14 @@
-# FlareQuorum validation protocol
+# FlareQuorum post-Summer Signal external-validation protocol
 
 This protocol is ready for real participants. It is a plan, not evidence of
 completed interviews or pilot traction. Do not fill in results until a person
 has actually completed the task, and do not record wallet addresses, seeds,
 private bids, or personal data in the repository.
 
-This Gate H validation track is separate from the completed V2 technical
-release. Its recorded state remains `NOT_RUN` until the sessions below occur;
-deployment, smoke tests, and protocol evidence do not substitute for real
-participants.
+This external-validation track follows the Summer Signal submission. Its
+recorded state remains `NOT_RUN` until the sessions below occur; deployment,
+automated smokes, and the owner-operated Gate H website acceptance do not
+substitute for real participants.
 
 ## Buyer/treasury interview (five sessions)
 
@@ -68,5 +68,7 @@ consentToQuote: false
 followUp: none | pilot | clarification
 ```
 
-The release cannot claim user validation until five buyer/treasury sessions,
-five vendor sessions, and one honest pilot/interest result are present.
+The project cannot claim external user validation or traction until five buyer/
+treasury sessions, five vendor sessions, and one honest pilot/interest result
+are present. This work does not retroactively change the pre-submission Gate H
+website-acceptance result.

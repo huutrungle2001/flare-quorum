@@ -29,9 +29,10 @@ Summer Signal. Commit IDs refer to the FlareQuorum repository's `main` branch.
 The supported recovery model is replacement registration rather than
 same-identity restoration. The recorded FAssets lifecycle reaches the official
 redemption-request boundary rather than asserting an instant underlying XRP
-payout. Gate H remains `NOT_RUN`, so interviews and pilot outcomes are absent
-from current claims. The checked-in four-minute captioned demo is a public
-smoke-capture walkthrough and does not replace those records.
+payout. Gate H passes only for owner-operated website acceptance. Independent
+interviews and pilot outcomes remain `NOT_RUN` and absent from current claims.
+The checked-in four-minute captioned demo is a public smoke-capture walkthrough
+and does not replace those records.
 
 V2 deployment, both refund paths, refreshed FCC machines, promotion, and the
 consumer switch are complete and represented by the canonical manifest and

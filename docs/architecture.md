@@ -2,8 +2,10 @@
 
 > Status: Accepted architecture implemented by the verified Coston2 release;
 > replacement-TEE recovery is the organizer-confirmed model and its rolling
-> three-machine drill passes, while broader stateful drills and user validation remain open. Public role-workspace and accessibility hardening
-> passes are recorded in Coston2 smoke evidence. Detailed rationale is in
+> three-machine drill passes, while broader stateful drills and external user
+> validation remain post-Summer Signal work. Owner-operated website acceptance,
+> public role-workspace, and accessibility passes are recorded in Coston2
+> evidence. Detailed rationale is in
 > [`architecture-decisions.md`](architecture-decisions.md).
 
 ## 1. Goals

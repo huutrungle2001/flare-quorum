@@ -4,9 +4,10 @@
 > and verified. The unified Buyer deployment passes repository test/lint/build
 > and hosted production, 320px keyboard/accessibility, XRP draft, and reload-
 > checkpoint smoke validation. The
-> organizer-approved rolling replacement-TEE drill passes. Broader browser
-> recovery is planned post-Summer Signal hardening, while Gate H user validation
-> remains `NOT_RUN`; the historical Sepolia/Nox baseline remains separate.
+> organizer-approved rolling replacement-TEE drill and Gate H owner-operated
+> website acceptance pass. Broader browser recovery and external user
+> validation remain post-Summer Signal work; the historical Sepolia/Nox
+> baseline remains separate.
 
 FCC registration and proxy operations must also satisfy the current
 [`FCC Coston2 Operational Baseline`](fcc-coston2-operations.md), derived from
@@ -365,8 +366,9 @@ fallbacks.
 
 Release construction starts from a candidate manifest with `verified: false`.
 The current immutable Coston2 manifest is promoted to `verified: true` only
-after the live deployment-consistency check; Gate H is still a separate product
-release gate. The manifest records at least:
+after the live deployment-consistency check; Gate H remains a separate website-
+acceptance gate and now passes through its bounded owner-operated record. The
+manifest records at least:
 
 ```text
 schemaVersion, network, chainId, kind, verified, sourceCommit, deployer

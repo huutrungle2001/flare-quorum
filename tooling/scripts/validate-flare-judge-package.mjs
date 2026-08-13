@@ -15,6 +15,7 @@ const requiredText = [
   "evidence/coston2/market-v2-refresh-one-result-outage.json",
   "evidence/coston2/fcc-market-v2-machines-refresh.json",
   "evidence/coston2/fassets-redemption.release.json",
+  "evidence/coston2/website-acceptance.release.json",
   "RedemptionRequested",
   "0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC",
   "extension `66142`",
@@ -63,6 +64,7 @@ const web = readJson(resolve(root, "evidence/coston2/web-v2-production-smoke.jso
 const accessibility = readJson(resolve(root, "evidence/coston2/web-v2-keyboard-accessibility.json"), "JUDGE_PACKAGE_V2_ACCESSIBILITY_INVALID");
 const xrpDraft = readJson(resolve(root, "evidence/coston2/web-v2-xrp-funding-draft.json"), "JUDGE_PACKAGE_V2_XRP_DRAFT_INVALID");
 const xrpCheckpoint = readJson(resolve(root, "evidence/coston2/web-v2-xrp-funding-checkpoint.json"), "JUDGE_PACKAGE_V2_XRP_CHECKPOINT_INVALID");
+const websiteAcceptance = readJson(resolve(root, "evidence/coston2/website-acceptance.release.json"), "JUDGE_PACKAGE_WEBSITE_ACCEPTANCE_INVALID");
 const recoveryAssertions = recovery.assertions ?? {};
 const normalizeSet = (values) => [...(values ?? [])].map((value) => String(value).toLowerCase()).sort();
 const releaseTeeIds = normalizeSet(release.fcc?.teeIds);
@@ -109,6 +111,12 @@ const assertions = {
     && xrpCheckpoint.blockers?.length === 0
     && Object.values(xrpDraft.assertions ?? {}).every(Boolean)
     && Object.values(xrpCheckpoint.assertions ?? {}).every(Boolean),
+  ownerOperatedWebsiteAcceptancePassed: websiteAcceptance.status === "PASSED"
+    && websiteAcceptance.network?.chainId === 114
+    && websiteAcceptance.publicIdentifiers?.canonicalUrl === "https://flare-quorum.vercel.app"
+    && websiteAcceptance.publicIdentifiers?.testOperator === "project-owner"
+    && Object.values(websiteAcceptance.assertions ?? {}).every(Boolean)
+    && websiteAcceptance.blockers?.length === 0,
 };
 for (const [name, passed] of Object.entries(assertions)) {
   if (!passed && !blockers.includes(`JUDGE_PACKAGE_${name.toUpperCase()}`)) blockers.push(`JUDGE_PACKAGE_${name.toUpperCase()}`);

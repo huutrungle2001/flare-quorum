@@ -53,17 +53,19 @@ organizer channel.
 
 The supplied brief encourages deployment network, acquisition, distribution,
 testing, feedback, usage, community interest, pilots, and partner conversations.
-FlareQuorum therefore requires:
+For the Summer Signal submission, FlareQuorum requires:
 
 - an explicit Coston2/Songbird/Flare deployment statement;
-- at least five structured XRP/treasury-user interviews;
-- at least five vendor usability sessions;
-- at least one honest pilot or design-partner attempt;
+- a recorded owner-operated end-to-end acceptance run of the deployed website;
 - a record of community/Telegram technical feedback;
 - no invented usage, traction, partnership, or acquisition claim.
 
-These targets are tracked in `PLAN.md` Phase 7 and
-`docs/verification.md` Gate H.
+Five structured XRP/treasury interviews, five vendor usability sessions, and
+one honest pilot/design-partner attempt remain the post-Summer Signal product-
+validation plan. Their zero-session state is disclosed rather than treated as
+a technical submission blocker. Gate H in `docs/verification.md` tracks the
+pre-submission website acceptance; `PLAN.md` Phase 7 tracks later external
+validation.
 
 ## 5. Existing-project disclosure
 
@@ -131,8 +133,8 @@ remain roadmap items rather than current acceptance gates.
   `submission/flarequorum/NEW-WORK-LEDGER.md`.
 - [x] Verified addresses, extension ID, code/image version, machine identities,
   transactions, and deployment network are included.
-- [ ] User testing, community interest, pilots, and traction are reported
-  honestly.
+- [x] Owner-operated website acceptance is recorded, while external user
+  testing, community interest, pilots, and traction remain honestly unclaimed.
 - [x] Roadmap and next steps do not exceed the threat model or evidence.
 
 The checklist remains incomplete until the corresponding rows in

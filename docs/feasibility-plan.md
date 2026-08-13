@@ -14,8 +14,8 @@
 > verified, consumer-selected V2 release. Its refreshed extension, governance,
 > three production machines, runtime wiring, success/outage/credential
 > lifecycles, both fixed-grace refunds, promotion verification, and consumer
-> switch pass. Gate H remains mandatory for any user-validation or traction
-> claim.
+> switch and Gate H owner-operated website acceptance pass. External sessions
+> remain mandatory for any user-validation or traction claim.
 
 ## 1. Rules
 
@@ -237,7 +237,7 @@ Prove on XRPL testnet and Coston2:
 Kill condition: FlareQuorum needs a custodial signer or the XRP payment/mint/tender
 actions cannot be cryptographically and atomically bound.
 
-## 10. Gate H — product, evidence, and user validation
+## 10. Gate H — product, evidence, and website acceptance
 
 Prove:
 
@@ -247,13 +247,20 @@ Prove:
 - no RPC/FCC/proxy/FDC/FTSO failure inserts mock success;
 - exact source/runtime/extension/code/machine/binding facts agree;
 - current and full-history secret/privacy scans pass;
-- at least five buyer/treasury interviews and five vendor usability sessions are
-  recorded honestly;
-- at least one pilot/design-partner signal or a transparent absence is reported;
+- the project owner completes the release-facing Buyer, Public, Private Bids,
+  Activity, and Auditor journeys on the deployed Coston2 website;
+- the bounded result is recorded without converting owner testing into an
+  external-user, adoption, pilot, or traction claim;
 - a four-minute demo completes the flagship journey.
 
 Kill condition: the product is only a developer script, the judge path requires
 private credentials, or public claims exceed executed evidence.
+
+Buyer interviews, vendor usability studies, and pilot/design-partner outreach
+continue after Summer Signal under
+[`submission/flarequorum/VALIDATION-PLAN.md`](../submission/flarequorum/VALIDATION-PLAN.md).
+They remain `NOT_RUN` until real external sessions occur and are not prerequisites
+for the pre-submission Gate H website-acceptance pass.
 
 ## 11. Planned evidence
 
@@ -266,7 +273,7 @@ evidence/coston2/gate-d-private-scoring.json
 evidence/coston2/gate-e-threshold-recovery.json
 evidence/coston2/gate-f-ftso-fassets.json
 evidence/coston2/gate-g-smart-account.json
-evidence/coston2/gate-h-product.json
+evidence/coston2/website-acceptance.release.json
 ```
 
 Until an artifact passes its schema and live assertions, its capability remains

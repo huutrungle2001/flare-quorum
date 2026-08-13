@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "suite": "coston2-owner-operated-website-acceptance",
+  "status": "PASSED",
+  "recordedAt": "2026-08-13T21:56:35.000Z",
+  "sourceCommit": "d3c3b62c4557a3dc4e57eff533b881970c600feb",
+  "network": {
+    "name": "flare-coston2",
+    "chainId": 114
+  },
+  "publicIdentifiers": {
+    "canonicalUrl": "https://flare-quorum.vercel.app",
+    "testOperator": "project-owner",
+    "method": "manual-end-to-end",
+    "scope": [
+      "buyer",
+      "public",
+      "private-bids",
+      "activity",
+      "auditor"
+    ]
+  },
+  "assertions": {
+    "buyerTenderJourneyCompleted": true,
+    "approvedVendorSubmissionJourneysCompleted": true,
+    "closeComputeAndAwardJourneyCompleted": true,
+    "publicActivityAndAuditorJourneysCompleted": true,
+    "walletBalanceVisibilityChecked": true,
+    "finalityAndReloadBehaviorChecked": true,
+    "noBlockingDefectObservedInTestedScope": true,
+    "externalUserOrTractionClaimExcluded": true
+  },
+  "blockers": [],
+  "notes": [
+    "The project owner reports completing the release-facing website journeys on the deployed Coston2 application after the final cross-workspace state synchronization fixes.",
+    "This is owner-operated acceptance evidence. It is not an independent usability study, buyer interview, vendor study, pilot, adoption, or traction claim.",
+    "The pass is bounded to the tested release and use cases; it is not a claim of defect-free, audited, production-secure, or mainnet-ready software."
+  ]
+}

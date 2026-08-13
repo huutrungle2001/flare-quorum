@@ -7,8 +7,9 @@
 > implemented. The
 > server-side XRP funding checkpoint/resume path, optional GemWallet Testnet
 > signing/submission, and public checkpoint resume are implemented; browser-
-> native executor recovery, broader wallet coverage, and user validation remain
-> open.
+> native executor recovery, broader wallet coverage, and external user
+> validation remain post-Summer Signal work. Owner-operated website acceptance
+> passes for the current submission release.
 
 ## 1. Product identity
 
@@ -100,8 +101,9 @@ Secondary:
 - Extension ID, code version, machine identities, quorum, rules, FTSO snapshot,
   result digest, settlement, and receipt evidence.
 - Responsive, keyboard-operable, explicit unavailable/recovery states.
+- Owner-operated end-to-end website acceptance before submission.
 - User interviews, vendor usability tests, and at least one pilot/design partner
-  target before submission.
+  target after Summer Signal, before any external-validation or traction claim.
 
 ## 6. Development-only vertical slice
 
@@ -199,7 +201,10 @@ All formerly open choices are accepted in
 | Deployment | Runtime/source/registry/extension/code/machine/binding facts agree |
 | Privacy | Secret and output scans find no forbidden bid, ciphertext, key, or credential material |
 | New work | Every Flare artifact is separated from historical Sepolia/Nox work |
-| Usefulness | Real buyer/vendor feedback and pilot/design-partner evidence is recorded honestly |
+| Website acceptance | Project owner completes the deployed Buyer, Public, Private Bids, Activity, and Auditor journeys without a blocking defect in the tested scope |
+
+Real buyer/vendor feedback and pilot/design-partner evidence remain an honest
+post-Summer Signal usefulness track, not a pre-submission technical gate.
 
 ## 12. Submission message
 

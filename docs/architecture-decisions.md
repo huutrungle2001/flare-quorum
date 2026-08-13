@@ -3,9 +3,10 @@
 > Status: Accepted decisions with live Coston2 implementation/evidence for the
 > FCC, ingress, consumer-selected V2 market, and XRP-native funding path. The
 > supported rolling replacement and bounded V2 refund paths pass; additional
-> live fault breadth, browser-native executor recovery, and Gate H human
-> validation remain explicitly tracked below. These decisions replace the open
-> alternatives in the initial transition plan.
+> live fault breadth, browser-native executor recovery, and external human
+> validation remain explicitly tracked below. Gate H owner-operated website
+> acceptance passes. These decisions replace the open alternatives in the
+> initial transition plan.
 
 ## ADR-001 — Product shape
 

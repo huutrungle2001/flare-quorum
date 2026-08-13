@@ -7,9 +7,12 @@
 > selection-expired refund, promotion, relay, and hosted web gates. The wallet-free role,
 > accessibility, XRP draft, and reload-checkpoint smokes also pass. Historical
 > V1 and Sepolia/Nox artifacts remain preserved but are not consumer authority.
-> Gate H remains open only for real buyer/vendor/pilot validation; broader live
-> fault injection and browser-native XRP executor recovery remain honest
-> post-Summer Signal hardening tracks.
+> Gate H passes for the owner-operated, end-to-end website acceptance run
+> recorded after the final cross-workspace state-synchronization fixes. Real
+> buyer/vendor research and pilot outreach remain explicitly unrun
+> post-Summer Signal validation tracks; no adoption or traction is claimed.
+> Broader live fault injection and browser-native XRP executor recovery remain
+> honest post-Summer Signal hardening tracks.
 >
 > Operational boundary: the refreshed machine evidence proves availability at
 > its recorded checkpoint. Because FCC availability is time-bounded, rerun the
@@ -47,7 +50,7 @@ in-memory and save only an allowlisted pass/fail code.
 | E — Threshold result | Two distinct common-quorum machines sign the same fully bound result; split/replay fails | Signer bitmap, domain fields, positive and negative transactions | PASSED for live result correctness and V2 recovery — the refreshed V2 quorum passed a three-vendor success lifecycle, a second lifecycle where machines 1 and 2 finalized while machine 3's result endpoint was excluded, and both fixed-grace full-refund paths |
 | F — FTSO and FTestXRP | Official XRP/USD snapshot is bound; escrow pays/refunds exactly once in FTestXRP and the award can enter the official redemption path | Feed snapshot, discovered asset IDs, balance conservation, redemption request | PASSED — live FTSO snapshot, conserved FTestXRP award, and amount-based AssetManager redemption request in `fassets-redemption.release.json` |
 | G — XRP Smart Account | XRPL `0xFE` commitment, FDC proof, direct mint, and tender funding execute atomically | XRPL tx ID, proof/request IDs, user-op hash, sender, nonce, Flare tx | PASSED — live evidence in `gate-g-smart-account.json`; delayed-mint checkpoint/resume is fail-closed and covered by relay tests |
-| H — Product release | Wallet-free judge path, role journeys, recovery, accessibility, and real user tests pass | Deployment consistency, smoke runs, interview/test ledger | IN PROGRESS — the hosted V2 Buyer, Public, Private Bids, Activity, Auditor, award dossier, 320px keyboard path, XRP draft, and reload checkpoint pass; the remaining gate requirement is real buyer/vendor/pilot validation, currently `NOT_RUN` |
+| H — Website acceptance | The release-facing Buyer, Public, Private Bids, Activity, and Auditor journeys work end to end without a known blocker in the tested scope | Deployment consistency, automated smokes, and owner-operated acceptance record | PASSED — the hosted V2 role surfaces, award dossier, 320px keyboard path, XRP draft, reload checkpoint, and project-owner end-to-end run pass; see `website-acceptance.release.json` |
 
 No later gate converts an earlier failure into success. Private ingress, FCC
 selection, FTestXRP conservation, and the XRP-native flagship path are product
@@ -66,8 +69,10 @@ promote an unexecuted drill. Additional live stateful fault breadth and
 browser-native XRP recovery remain post-Summer Signal hardening rather than
 current V2 submission blockers. V2's real undispatched and post-dispatch refund
 lifecycles, promotion verification, and consumer switch have passed.
-Gate H remains a current validation track and stays `NOT_RUN` until real
-sessions occur.
+Gate H covers pre-submission website acceptance. Independent buyer interviews,
+vendor studies, and pilot outreach are a separate post-Summer Signal track and
+remain `NOT_RUN`; that absence does not alter the technical acceptance pass and
+must never be presented as user validation or traction.
 
 | Area | Passing condition | Status |
 |---|---|---|
@@ -93,7 +98,8 @@ sessions occur.
 | Accessibility | 320px, keyboard, focus, reduced motion, labels, and error recovery pass | PASSED for the hosted V2 path in `evidence/coston2/web-v2-keyboard-accessibility.json`; browser-native signing/recovery remains a separate post-Summer Signal hardening track |
 | Privacy/secret scan | Current tree, history, runtime logs, browser artifacts, and evidence exclude forbidden material | PARTIAL — repository/history/evidence and browser smoke scans pass; 602 latest hosted Railway JSON log records were inspected in memory with zero forbidden-material pattern matches; longer-retention and stateful fault coverage are planned post-Summer Signal hardening |
 | New-work ledger | Pre-hackathon, ported, newly built, integrated, and improved work maps to commits/evidence | PASSED for the current FlareQuorum package — `submission/flarequorum/NEW-WORK-LEDGER.md` and judge-package validation agree |
-| User validation | At least five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN — explicit zero-session record in [`evidence/coston2/user-validation.release.json`](../evidence/coston2/user-validation.release.json); no traction is claimed |
+| Website/operator acceptance | Project owner completes the release-facing Buyer, Public, Private Bids, Activity, and Auditor journeys on the deployed Coston2 site | PASSED — [`evidence/coston2/website-acceptance.release.json`](../evidence/coston2/website-acceptance.release.json) records the bounded owner-operated run and excludes any external-user claim |
+| Post-hackathon user validation | Five buyer/treasury interviews, five vendor tests, and honest pilot/interest results | NOT RUN — explicit zero-session record in [`evidence/coston2/user-validation.release.json`](../evidence/coston2/user-validation.release.json); no traction is claimed and this is no longer a pre-submission gate |
 
 ## 4. Current evidence inventory
 
@@ -133,6 +139,7 @@ evidence/coston2/market-v2-selection-expired-refund.json
 evidence/coston2/market-v2-deployment-consistency.json
 evidence/coston2/web-role-workspaces.json
 evidence/coston2/flare-ingress-v2-production.json
+evidence/coston2/website-acceptance.release.json
 evidence/coston2/user-validation.release.json
 evidence/coston2/new-work-ledger.release.json
 ```

@@ -17,6 +17,7 @@ recording guides, and drafts are intentionally excluded.
 | New-work ledger | [`NEW-WORK-LEDGER.md`](NEW-WORK-LEDGER.md) |
 | Privacy boundary | [`PRIVACY-TRUST-TALK.md`](PRIVACY-TRUST-TALK.md) |
 | Validation status | [`VALIDATION-PLAN.md`](VALIDATION-PLAN.md) |
+| Website acceptance | [`website-acceptance.release.json`](../../evidence/coston2/website-acceptance.release.json) |
 
 The app uses Coston2 chain ID `114` and disposable test assets. Public
 inspection requires no wallet. This is simulated-TEE, unaudited hackathon
@@ -107,9 +108,11 @@ organizer-supported rolling replacement drill for new tenders.
 
 Not claimed: hardware-backed TEE operation, same-identity restoration after a
 restart, private token transfers, instant underlying XRP redemption payout,
-formal audit, production security, mainnet readiness, or completed user/pilot
-validation. Gate H remains `NOT_RUN` for five buyer interviews, five vendor
-sessions, and one honest pilot/design-partner outcome.
+formal audit, production security, mainnet readiness, or completed external
+user/pilot validation. Gate H passes for the bounded owner-operated website
+acceptance in `website-acceptance.release.json`. Five buyer interviews, five
+vendor sessions, and one honest pilot/design-partner outcome remain `NOT_RUN`
+post-Summer Signal work and no traction is claimed.
 
 ## Reproduce public checks
 

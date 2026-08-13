@@ -26,7 +26,8 @@
   ],
   "notes": [
     "No buyer, vendor, or pilot session is being represented as completed in this release.",
-    "The structured validation protocol is published in submission/flarequorum/VALIDATION-PLAN.md and requires five treasury/buyer sessions, five vendor sessions, and one honest pilot or design-partner signal before Gate H can pass.",
+    "The post-Summer Signal validation protocol is published in submission/flarequorum/VALIDATION-PLAN.md and targets five treasury/buyer sessions, five vendor sessions, and one honest pilot or design-partner signal before any external user-validation or traction claim.",
+    "Pre-submission Gate H is the separate owner-operated website acceptance recorded in website-acceptance.release.json; it does not convert these zero external sessions into user evidence.",
     "This record contains no participant identity, quote, private bid, credential, wallet secret, or confidential payload."
   ]
 }

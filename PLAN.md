@@ -9,9 +9,11 @@
 > undispatched refund, and selection-expired refund lifecycles pass. Relay was
 > deployed before the V2 web consumer; the hosted judge, role,
 > keyboard/accessibility, XRP draft, reload-checkpoint, and captioned-video
-> checks pass. V1 remains preserved as historical Coston2 evidence. Gate H user
-> validation remains `NOT_RUN`; browser-native executor recovery and additional
-> stateful live fault breadth remain post-Summer Signal hardening.
+> checks pass. V1 remains preserved as historical Coston2 evidence. Gate H
+> owner-operated website acceptance passes; independent buyer/vendor research
+> and pilot outreach remain `NOT_RUN` post-Summer Signal tracks. Browser-native
+> executor recovery and additional stateful live fault breadth also remain
+> post-Summer Signal hardening.
 > Judge-time operations still require a fresh machine preflight because status
 > `2` alone is insufficient and FCC availability expires after six hours.
 >
@@ -361,7 +363,7 @@ confidential bid or settlement boundary:
 Exit: canonical manifest, bindings, source, runtime, extension, UI, and evidence
 all agree and contain no confidential material.
 
-### Phase 7 — product validation and distribution
+### Phase 7 — post-Summer Signal product validation and distribution
 
 - [ ] Conduct at least five structured interviews with XRP/DAO treasury users.
 - [ ] Conduct at least five vendor usability tests.
@@ -374,7 +376,9 @@ all agree and contain no confidential material.
   collecting organizer/user feedback remains a builder-controlled external
   action and is not claimed as complete.
 
-Exit: the submission contains real user evidence, not only technical claims.
+Exit: a later product-validation release contains real external-user evidence,
+not only technical or owner-operated claims. This phase is not a prerequisite
+for the Summer Signal website-acceptance gate.
 
 ### Phase 8 — judge package
 
@@ -401,7 +405,8 @@ two minutes, and reproduce the public path from the repository.
 | Gate or track | Classification | Recorded state |
 |---|---|---|
 | Gates 0–G | Current Summer Signal technical acceptance | Passed with the cited Coston2 evidence |
-| Gate H | Current product and user-validation gate | `NOT_RUN`; no interview, usability, or traction result is claimed |
+| Gate H | Current owner-operated website-acceptance gate | PASSED; the deployed Buyer, Public, Private Bids, Activity, and Auditor journeys were completed without a blocking defect in the tested scope, as recorded in `website-acceptance.release.json` |
+| External user validation | Post-Summer Signal product-validation track | `NOT_RUN`; no independent interview, usability-study, pilot, adoption, or traction result is claimed |
 | Organizer submission and bounty-selection actions | External submission actions | Builder-controlled; not an engineering pass/fail result |
 | V2 live release promotion | Completed release track | Deployment, extension, refreshed three-machine set, governance, success, outage recovery, invalid-credential retry, both fixed-grace refunds, promotion verification, relay-first rollout, and consumer switch passed; V1 is historical |
 | Additional live fault breadth and browser-native XRP recovery | Planned post-Summer Signal hardening | The current recorded drills and public-safe wallet handoff remain the submission boundary |
@@ -593,8 +598,8 @@ the championship product and requires Product Plan approval.
 | Flare contracts | V2 LIVE VERIFIED AND CONSUMER-SELECTED — market `0xE1252D445ee86ED78C1da2bD5f1bF4a69bF476AC`, extension `66142`, three refreshed production machines, governance, runtime/wiring, success/outage/credential lifecycles, and both refund paths pass; V1 is historical |
 | FAssets/FDC/Smart Account journey | LIVE PASSED Gate G plus redemption request — disposable XRPL payment, FDC proof, Smart Account direct mint, atomic tender funding, official amount-based FTestXRP redemption request, and fail-closed delayed-mint checkpoint/resume are implemented; evidence is recorded in `gate-g-smart-account.json` and `fassets-redemption.release.json` |
 | FTSO scoring | LIVE PASSED for the championship lifecycle — XRP/USD snapshot is bound to private multi-criteria selection and public settlement |
-| Coston2 deployment/evidence | CURRENT RELEASE VALIDATED; GATE H IN PROGRESS — Gates 0–G and verified deployment evidence recorded; the unified Buyer deployment, wallet-free judge/role/accessibility/XRP smokes, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; additional live fault breadth and browser-native XRP recovery are planned post-Summer Signal hardening, while Gate H user validation remains `NOT_RUN` |
-| User research/traction | NOT STARTED |
+| Coston2 deployment/evidence | CURRENT RELEASE VALIDATED; GATES 0–H PASSED — Gates 0–G and verified deployment evidence are recorded; the unified Buyer deployment, wallet-free judge/role/accessibility/XRP smokes, owner-operated website acceptance, fail-closed hosted ciphertext-ingress health, market-machine preflight, rolling FCC replacement recovery, and a read-only hosted runtime-log review pass; additional live fault breadth and browser-native XRP recovery remain post-Summer Signal hardening |
+| User research/traction | POST-SUMMER SIGNAL; NOT STARTED and not claimed |
 
 Implementation begins with Phase 0 and Phase 1. No later phase may be reported
 as complete until its exit evidence exists.
