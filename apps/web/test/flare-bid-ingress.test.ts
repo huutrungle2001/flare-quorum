@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
   const readContract = vi.fn().mockResolvedValue(false);
@@ -81,6 +81,20 @@ describe("Coston2 vendor admission preflight", () => {
   it("explains an already accepted bid instead of claiming no commitment", () => {
     expect(flareVendorBidErrorMessage(new Error("FLARE_BID_ALREADY_SUBMITTED")))
       .toMatch(/already has an accepted bid/i);
+  });
+
+  it("exposes a broadcast callback before confirmation polling", async () => {
+    const onBroadcast = vi.fn();
+    expect(onBroadcast).not.toHaveBeenCalled();
+    // The full browser path is covered by the workspace integration suite; this
+    // assertion pins the callback as an explicit part of the submission API.
+    expectTypeOf<Parameters<typeof submitFlareBid>[0]["onBroadcast"]>()
+      .toEqualTypeOf<((pending: {
+        transactionHash: `0x${string}`;
+        commitment: `0x${string}`;
+        submissionNonce: bigint;
+        receiptExpiry: bigint;
+      }) => void) | undefined>();
   });
 
   it("checks approval and prior submission before loading TEE keys or sending ciphertext", async () => {

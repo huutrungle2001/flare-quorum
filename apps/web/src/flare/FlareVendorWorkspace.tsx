@@ -106,7 +106,7 @@ export function FlareVendorWorkspace({
   const [last, setLast] = useState<{
     tenderId: bigint;
     hash: Hex;
-    block: bigint;
+    block: bigint | null;
     commitment: Hex;
     submissionNonce: bigint;
     receiptExpiry: bigint;
@@ -223,6 +223,7 @@ export function FlareVendorWorkspace({
     setError(null);
     setLast(null);
     setBusy(true);
+    let broadcasted = false;
     const toastId = toasts.startStack("SEALED BID", "Preparing an encrypted Coston2 bid…");
     try {
       const result = await submitFlareBid({
@@ -235,6 +236,20 @@ export function FlareVendorWorkspace({
         onStage: (next) => {
           setStage(next);
           toasts.update(toastId, stageLabels[next]);
+        },
+        onBroadcast: (pending) => {
+          broadcasted = true;
+          setLast({
+            tenderId: selected.tenderId,
+            hash: pending.transactionHash,
+            block: null,
+            commitment: pending.commitment,
+            submissionNonce: pending.submissionNonce,
+            receiptExpiry: pending.receiptExpiry,
+          });
+          setPrice("");
+          setReviewing(false);
+          selectSection("submissions");
         },
       });
       setLast({
@@ -249,10 +264,11 @@ export function FlareVendorWorkspace({
       setReviewing(false);
       toasts.succeed(toastId, "Three receipts accepted; bid committed on Coston2.");
       onRefresh();
-      selectSection("submissions");
     } catch (cause) {
       setError(flareVendorBidErrorMessage(cause));
-      toasts.fail(toastId, "Bid stopped before an on-chain commitment. Plaintext was not persisted.");
+      toasts.fail(toastId, broadcasted
+        ? "Transaction was broadcast, but confirmation could not yet be verified. Check My submissions before retrying."
+        : "Bid stopped before an on-chain commitment. Plaintext was not persisted.");
     } finally {
       setBusy(false);
       setStage(null);
@@ -293,6 +309,7 @@ export function FlareVendorWorkspace({
             <strong>RECEIPTS, NOT BID CONTENT</strong>
             <span>Only your public commitment and quorum proof can be recovered. Private terms were deliberately not persisted.</span>
           </div>
+          {error && <p className="inline-error" role="alert">{error}</p>}
           {!connected && (
             <div className="my-submissions-connect">
               <WalletPanel wallet={wallet} network="coston2" compact />
@@ -301,15 +318,17 @@ export function FlareVendorWorkspace({
           {connected && recentPendingFinality && last && (
             <article className="my-submission-card pending-finality">
               <header>
-                <div><p className="eyebrow">TENDER {last.tenderId.toString()} · JUST SUBMITTED</p><h3>Receipt quorum committed</h3></div>
-                <span className="privacy-badge encrypted">CONFIRMED · FINALITY PENDING</span>
+                <div><p className="eyebrow">TENDER {last.tenderId.toString()} · JUST SUBMITTED</p><h3>{last.block === null ? "Transaction broadcast" : "Receipt quorum committed"}</h3></div>
+                <span className="privacy-badge encrypted">{last.block === null ? "CONFIRMATION PENDING" : "CONFIRMED · FINALITY PENDING"}</span>
               </header>
               <dl className="submission-facts">
                 <div><dt>Receipt quorum</dt><dd>3 / 3</dd></div>
-                <div><dt>Transaction block</dt><dd>{last.block.toString()}</dd></div>
+                <div><dt>Transaction block</dt><dd>{last.block === null ? "Pending" : last.block.toString()}</dd></div>
                 <div><dt>Private terms</dt><dd>Not recoverable</dd></div>
               </dl>
-              <p className="submission-explainer">The transaction succeeded. This card will become a finalized submission after the public reader reaches 12-block finality.</p>
+              <p className="submission-explainer">{last.block === null
+                ? "The wallet broadcast the transaction. FlareQuorum is checking Coston2 confirmation before asserting acceptance."
+                : "The transaction succeeded. This card will become a finalized submission after the public reader reaches 12-block finality."}</p>
               <div className="my-submission-actions">
                 <a className="secondary-button" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">VIEW TRANSACTION ↗</a>
                 <a className="text-link" href={`/flare?status=all&tender=${last.tenderId.toString()}`}>VIEW PUBLIC DOSSIER →</a>
@@ -453,7 +472,7 @@ export function FlareVendorWorkspace({
           {last && (
             <section className="readiness-strip" aria-live="polite">
               <span className="signal-dot" aria-hidden="true" />
-              <div><strong>Bid receipt quorum committed</strong><span>Tx <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">{short(last.hash)} ↗</a> · block {last.block.toString()}</span></div>
+              <div><strong>{last.block === null ? "Bid transaction broadcast" : "Bid receipt quorum committed"}</strong><span>Tx <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">{short(last.hash)} ↗</a> · {last.block === null ? "confirmation pending" : `block ${last.block.toString()}`}</span></div>
             </section>
           )}
         </section>

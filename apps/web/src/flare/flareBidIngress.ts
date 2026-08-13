@@ -328,6 +328,12 @@ export async function submitFlareBid(input: {
   warrantyDays: number;
   walletClient: WalletClient;
   onStage?: (stage: "keys" | "encrypting" | "authorizing" | "waiting-receipts" | "signing" | "confirming") => void;
+  onBroadcast?: (pending: {
+    transactionHash: Hex;
+    commitment: Hex;
+    submissionNonce: bigint;
+    receiptExpiry: bigint;
+  }) => void;
   env?: Record<string, string | undefined>;
 }): Promise<FlareBidSubmissionResult> {
   const env = input.env ?? import.meta.env;
@@ -408,6 +414,7 @@ export async function submitFlareBid(input: {
     args: [input.tender.tenderId, prepared.receipts, prepared.signatures],
   });
   const transactionHash = await input.walletClient.writeContract(simulation.request);
+  input.onBroadcast?.({ transactionHash, commitment, submissionNonce, receiptExpiry });
   input.onStage?.("confirming");
   let blockNumber: bigint;
   try {
