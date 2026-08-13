@@ -4,7 +4,11 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "../..");
 const packageRoot = resolve(root, "submission/flarequorum");
 const requiredFiles = [
+  "README-FIRST.md",
   "README.md",
+  "FLAREQUORUM-DORAHACKS-FORM.md",
+  "FLAREQUORUM-BUIDL-DETAILS.md",
+  "FLAREQUORUM-X-SUBMISSION.md",
   "PRIVACY-TRUST-TALK.md",
   "NEW-WORK-LEDGER.md",
 ];

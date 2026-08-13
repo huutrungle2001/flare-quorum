@@ -3,6 +3,10 @@
 > Confidential procurement for XRP and Flare treasuries, powered by Flare
 > Confidential Compute.
 
+For copy-ready form fields, start with
+[`README-FIRST.md`](README-FIRST.md) and
+[`FLAREQUORUM-DORAHACKS-FORM.md`](FLAREQUORUM-DORAHACKS-FORM.md).
+
 ## Submission overview
 
 | Required field | Submission |
