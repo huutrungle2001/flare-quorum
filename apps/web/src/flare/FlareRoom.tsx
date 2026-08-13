@@ -629,7 +629,7 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
             <div><p className="eyebrow">TENDER {pendingFinality.tenderId} · JUST CREATED</p><h3>Confirmed on Coston2</h3></div>
             <span className="privacy-badge encrypted">WAITING FOR 12-BLOCK FINALITY</span>
           </header>
-          <p className="submission-explainer">This public-safe checkpoint came from the confirmed creation receipt in this tab. Public refresh runs every 3 seconds and will replace it with the canonical dossier after finality.</p>
+          <p className="submission-explainer">This public-safe checkpoint came from the confirmed creation receipt in this tab. Public refresh runs automatically and will replace it with the canonical dossier after finality.</p>
           <div className="my-submission-actions">
             <a className="secondary-button" href={`https://coston2-explorer.flare.network/tx/${pendingFinality.transactionHash}`} target="_blank" rel="noreferrer">VIEW TRANSACTION ↗</a>
           </div>

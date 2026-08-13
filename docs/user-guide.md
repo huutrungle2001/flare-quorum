@@ -81,8 +81,8 @@ shows compact wallet assets in Buyer, Vendor, and Activity, and also in Public
 or Auditor immediately after a Coston2 wallet connects. Public and Auditor
 remain wallet-optional and show the read-only notice while disconnected. The
 Coston2 faucet remains available, and refresh is the global `↻` control beside
-`CONNECT FOR ACTIONS`. The app also rereads finalized Coston2 state every three
-seconds without replacing an already rendered workspace with a loading screen.
+`CONNECT FOR ACTIONS`. The app also rereads finalized Coston2 state every 15
+seconds while the tab is visible, without replacing an already rendered workspace with a loading screen.
 After direct Coston2 tender creation, Public immediately shows a clearly marked
 transaction-receipt checkpoint from this browser tab. It is not presented as
 canonical state and is replaced by the ordinary dossier once the 12-block
@@ -188,7 +188,7 @@ forget the checkpoint.
    transaction is labeled `CONFIRMED · FINALITY PENDING` until the finalized
    public reader can recover its canonical bid reference. This public-safe
    pending card survives workspace navigation in the same tab, and automatic
-   three-second refresh replaces it without requiring a reload. The browser
+   refresh replaces it without requiring a reload. The browser
    persists no private bid field or ciphertext. The finalized card
    shows only tender/bid ID, lifecycle state, commitment, receipt bitmap,
    accepted block, and a Public dossier link; it cannot restore price,

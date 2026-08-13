@@ -150,7 +150,7 @@ describe("Coston2 public evidence boundary", () => {
     const view = render(<MemoryRouter><FlareExplorerView state={state} onRetry={() => undefined} /></MemoryRouter>);
     expect(screen.getByText("TENDER 9 · JUST CREATED")).toBeInTheDocument();
     expect(screen.getByText("WAITING FOR 12-BLOCK FINALITY")).toBeInTheDocument();
-    expect(screen.getByText(/Public refresh runs every 3 seconds/)).toBeInTheDocument();
+    expect(screen.getByText(/Public refresh runs automatically/)).toBeInTheDocument();
 
     view.rerender(<MemoryRouter><FlareExplorerView state={{
       ...state,

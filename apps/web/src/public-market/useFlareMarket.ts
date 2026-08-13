@@ -30,7 +30,9 @@ export function useFlareMarket() {
   }, []);
   useEffect(() => {
     void refresh();
-    const timer = window.setInterval(() => void refresh(), 3_000);
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") void refresh();
+    }, 15_000);
     return () => window.clearInterval(timer);
   }, [refresh]);
   return { state, refresh };

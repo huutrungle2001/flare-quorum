@@ -377,7 +377,7 @@ export function FlareVendorWorkspace({
               </dl>
               <p className="submission-explainer">{last.block === null
                 ? "The wallet broadcast the transaction. FlareQuorum is checking Coston2 confirmation before asserting acceptance."
-                : "The transaction succeeded. Automatic refresh runs every 3 seconds; this card becomes a finalized submission after the public reader reaches 12-block finality."}</p>
+                : "The transaction succeeded. Automatic refresh replaces this card with a finalized submission after the public reader reaches 12-block finality."}</p>
               <div className="my-submission-actions">
                 <a className="secondary-button" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">VIEW TRANSACTION ↗</a>
                 <a className="text-link" href={`/flare?status=all&tender=${last.tenderId.toString()}`}>VIEW PUBLIC DOSSIER →</a>
