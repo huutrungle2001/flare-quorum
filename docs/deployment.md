@@ -264,6 +264,32 @@ submits `confirmAvailability(proof)`. A previously paused identity is recovered
 with a new proof and `toProduction(proof)`; stale proof state and unsupported
 statuses are rejected.
 
+For continuous testnet availability, deploy
+`apps/fcc-availability-keeper/railway.json` as a separate Railway cron service.
+It runs at minute 17 of every UTC hour, exits after one pass, and calls the same
+binding-checked renewal path only after a machine check reaches four hours old.
+Required server-side variables are:
+
+```text
+COSTON2_RPC_URL
+FLARE_DEPLOYMENT_PRIVATE_KEY
+FCC_V2_EXTENSION_ID
+FLARE_FCC_V2_PROXY_URLS
+FCC_V2_PROXY_CONTROL_URLS
+FCC_V2_NORMAL_PROXY_URL
+FCC_AVAILABILITY_REFRESH_AFTER_SECONDS=14400
+FLAREQUORUM_SOURCE_COMMIT=<40-hex deployed commit>
+```
+
+`FLARE_FCC_V2_PROXY_URLS` and `FCC_V2_PROXY_CONTROL_URLS` contain the same exact
+three stable public origins in machine order. The keeper image embeds and
+SHA-256-verifies the pinned official `register-tee` binary; it does not need a
+Docker daemon at runtime. Never give this service an XRPL key, finalizer key,
+direct-ingress API key, browser variable, public domain, or health endpoint.
+Keep one replica, Railway cron overlap protection, and `restartPolicyType:
+NEVER`. A failed invocation remains failed for operator visibility; the next
+hourly run may retry only after all fail-closed bindings pass.
+
 The live ingress repeats the same status and availability reads at the exact
 chain checkpoint used for bid admission. Its `/health` becomes unavailable when
 any frozen machine is expired or mismatched. Both Buyer funding paths require

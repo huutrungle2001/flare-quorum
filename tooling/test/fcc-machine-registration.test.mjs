@@ -17,6 +17,8 @@ import {
   requiredMachineRouteUpdate,
 } from "../flare/fcc-machine-registration.mjs";
 import {
+  availabilityRefreshAfterSeconds,
+  availabilityRefreshDue,
   evaluateAvailabilityWindow,
   operationTypesRespectReservations,
   readFccOperationalBaseline,
@@ -374,6 +376,39 @@ test("allows an explicit availability refresh only when every non-availability b
     }, { allowAvailabilityRefresh: true })[0],
     /READINESS_STALE_OR_MISMATCH/,
   );
+  assert.match(
+    registeredMachineReadinessBlockers({
+      ...expiredVerification,
+      machines: expiredVerification.machines.map((machine, index) => index === 0
+        ? { ...machine, assertions: { ...assertions, availabilityWindowValid: false } }
+        : machine),
+    }, { allowAvailabilityRefresh: true })[0],
+    /READINESS_STALE_OR_MISMATCH/,
+  );
+});
+
+test("refreshes at four hours by default and rejects spam-prone thresholds", () => {
+  assert.equal(availabilityRefreshAfterSeconds({}), 14_400);
+  assert.equal(availabilityRefreshAfterSeconds({
+    FCC_AVAILABILITY_REFRESH_AFTER_SECONDS: "18000",
+  }), 18_000);
+  assert.throws(
+    () => availabilityRefreshAfterSeconds({ FCC_AVAILABILITY_REFRESH_AFTER_SECONDS: "3600" }),
+    /FCC_AVAILABILITY_REFRESH_THRESHOLD_INVALID/,
+  );
+
+  const availability = evaluateAvailabilityWindow({
+    endTs: 31_600,
+    validityDurationSeconds: 21_600,
+    checkpointTimestamp: 24_399,
+    maxCheckAgeSeconds: 21_600,
+    lastSigningPolicyId: 42,
+  });
+  assert.equal(availabilityRefreshDue(availability, 14_400), false);
+  assert.equal(availabilityRefreshDue({
+    ...availability,
+    ageSeconds: 14_400,
+  }, 14_400), true);
 });
 
 test("loads the current provider-push baseline and rejects reserved operation types", () => {

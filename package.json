@@ -81,6 +81,7 @@
     "flare:v2:machines:register": "FCC_RELEASE_PROFILE=v2 node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs --execute",
     "flare:v2:availability:preflight": "FCC_RELEASE_PROFILE=v2 FCC_REFRESH_MACHINE_AVAILABILITY=true node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs",
     "flare:v2:availability:refresh": "FCC_RELEASE_PROFILE=v2 FCC_REFRESH_MACHINE_AVAILABILITY=true node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs --execute",
+    "flare:v2:availability:keep": "FCC_RELEASE_PROFILE=v2 FCC_REFRESH_MACHINE_AVAILABILITY=true FCC_AVAILABILITY_REFRESH_AFTER_SECONDS=14400 node --env-file-if-exists=.env.local tooling/scripts/register-fcc-machines.mjs --execute",
     "flare:v2:machine:pause-preflight": "FCC_RELEASE_PROFILE=v2 node --env-file-if-exists=.env.local tooling/scripts/pause-replaced-v2-machine.mjs",
     "flare:v2:machine:pause": "FCC_RELEASE_PROFILE=v2 node --env-file-if-exists=.env.local tooling/scripts/pause-replaced-v2-machine.mjs --execute",
     "flare:v2:governance:preflight": "FCC_RELEASE_PROFILE=v2 node --env-file-if-exists=.env.local tooling/scripts/set-fcc-governance.mjs",

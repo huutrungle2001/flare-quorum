@@ -1,0 +1,23 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "apps/fcc-availability-keeper/Dockerfile",
+    "watchPatterns": [
+      ".dockerignore",
+      "apps/fcc-availability-keeper/**",
+      "evidence/coston2/fcc-code-version.json",
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "packages/flare-contracts/deployments/coston2.v1.release.json",
+      "tooling/flare/**",
+      "tooling/scripts/register-fcc-machines.mjs"
+    ]
+  },
+  "deploy": {
+    "cronSchedule": "17 * * * *",
+    "restartPolicyType": "NEVER",
+    "startCommand": "node tooling/scripts/register-fcc-machines.mjs --execute"
+  }
+}

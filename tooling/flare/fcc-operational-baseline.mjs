@@ -49,6 +49,35 @@ export function evaluateAvailabilityWindow({
   };
 }
 
+export function availabilityRefreshAfterSeconds(
+  environment = process.env,
+  maxCheckAgeSeconds = 21_600,
+) {
+  const raw = environment.FCC_AVAILABILITY_REFRESH_AFTER_SECONDS?.trim() || "14400";
+  if (!/^\d+$/.test(raw)) throw new Error("FCC_AVAILABILITY_REFRESH_THRESHOLD_INVALID");
+  const value = Number(raw);
+  if (
+    !Number.isSafeInteger(value) ||
+    value < 10_800 ||
+    value >= maxCheckAgeSeconds
+  ) {
+    throw new Error("FCC_AVAILABILITY_REFRESH_THRESHOLD_INVALID");
+  }
+  return value;
+}
+
+export function availabilityRefreshDue(availability, refreshAfterSeconds) {
+  if (!availability?.assertions?.validityDurationConfigured) {
+    throw new Error("FCC_AVAILABILITY_WINDOW_INVALID");
+  }
+  if (!availability.assertions.checkTimestampNotFuture) {
+    throw new Error("FCC_AVAILABILITY_WINDOW_INVALID");
+  }
+  return !availability.assertions.validityNotExpired ||
+    !availability.assertions.checkFresh ||
+    availability.ageSeconds >= refreshAfterSeconds;
+}
+
 export function operationTypesRespectReservations(operationTypes, reservedPrefixes) {
   return operationTypes.every((operationType) =>
     reservedPrefixes.every((prefix) => !operationType.startsWith(prefix))

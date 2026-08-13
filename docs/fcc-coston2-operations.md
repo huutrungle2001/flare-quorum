@@ -130,6 +130,26 @@ pnpm flare:v2:availability:refresh
 pnpm flare:v2:machines:preflight
 ```
 
+Continuous Coston2 operation uses the dedicated Railway availability keeper.
+It starts once per hour and runs the equivalent of:
+
+```bash
+pnpm flare:v2:availability:keep
+```
+
+The keeper sends no transaction while every check is younger than four hours.
+At four hours it renews only the identities that are due, leaving roughly two
+hours before the manager's six-hour limit. The threshold is constrained to
+`10800 <= FCC_AVAILABILITY_REFRESH_AFTER_SECONDS < 21600`, preventing an
+accidentally aggressive schedule. Railway prevents overlapping cron runs, and
+the operator exits after each pass. Identity, extension, URL, active set, code,
+platform, public-key, owner, status, or availability-window drift blocks the
+whole pass before renewal.
+
+The cron is a liveness operator, not release evidence. Keep the manual
+preflight immediately before recording or judging. A regular renewal neither
+restarts a TEE nor redeploys a contract.
+
 The refresh command keeps a production machine active, requests one fresh TEE
 attestation and availability check, and calls the manager's
 `confirmAvailability(proof)`. It does not pause a healthy identity and never

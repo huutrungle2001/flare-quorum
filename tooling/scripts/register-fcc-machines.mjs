@@ -36,6 +36,8 @@ import {
   isTeeNotFoundError,
 } from "../flare/fcc-machine-registration.mjs";
 import {
+  availabilityRefreshAfterSeconds,
+  availabilityRefreshDue,
   evaluateAvailabilityWindow,
   readFccOperationalBaseline,
 } from "../flare/fcc-operational-baseline.mjs";
@@ -125,6 +127,32 @@ function extractRegistrationBinary(recipe) {
     throw new Error("FCC_REGISTRATION_BINARY_VERIFICATION_FAILED");
   }
   return binaryPath;
+}
+
+function registrationBinary(recipe) {
+  const configured = process.env.FCC_REGISTRATION_BINARY_PATH?.trim();
+  if (!configured) return extractRegistrationBinary(recipe);
+  if (!configured.startsWith("/") || !existsSync(configured)) {
+    throw new Error("FCC_REGISTRATION_BINARY_PATH_INVALID");
+  }
+  const digest = createHash("sha256").update(readFileSync(configured)).digest("hex");
+  if (digest !== recipe.releaseBinarySha256) {
+    throw new Error("FCC_REGISTRATION_BINARY_VERIFICATION_FAILED");
+  }
+  return configured;
+}
+
+function sourceCommit() {
+  const configured = (
+    process.env.FLAREQUORUM_SOURCE_COMMIT ||
+    process.env.RAILWAY_GIT_COMMIT_SHA ||
+    ""
+  ).trim();
+  if (/^[0-9a-f]{40}$/i.test(configured)) return configured.toLowerCase();
+  return execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  }).trim();
 }
 
 function publicPreflight(result, extraBlockers, activeSet, registeredVerification) {
@@ -419,7 +447,19 @@ try {
   const extensionIdHex = registeredMachineExtensionId(process.env);
   const rpcUrl = process.env.COSTON2_RPC_URL?.trim();
   const deploymentKey = normalizePrivateKey(process.env.FLARE_DEPLOYMENT_PRIVATE_KEY);
+  const refreshAfterSeconds = availabilityRefresh
+    ? availabilityRefreshAfterSeconds(
+        process.env,
+        operationalBaseline.availability.maxCheckAgeSeconds,
+      )
+    : null;
   const extraBlockers = [];
+  let releaseSourceCommit;
+  try {
+    releaseSourceCommit = sourceCommit();
+  } catch {
+    extraBlockers.push("SOURCE_COMMIT_NOT_CONFIGURED");
+  }
   if (!/^0x[0-9a-f]{64}$/i.test(extensionIdHex ?? "")) {
     extraBlockers.push("FCC_EXTENSION_ID_NOT_CONFIGURED");
   }
@@ -524,7 +564,7 @@ try {
     chmodSync(runtimeDirectory, 0o700);
     const addressesPath = resolve(runtimeDirectory, "coston2-addresses.json");
     writeRegistrationAddresses(addressesPath, manifest);
-    const binaryPath = extractRegistrationBinary(manifest.docker.teeRegistrationReleaseRecipe);
+    const binaryPath = registrationBinary(manifest.docker.teeRegistrationReleaseRecipe);
     const manager = getAddress(manifest.contracts.flareTeeManager);
     const client = createPublicClient({ transport: http(rpcUrl, { retryCount: 2, timeout: 20_000 }) });
     const walletClient = createWalletClient({
@@ -552,11 +592,12 @@ try {
       if (availabilityRefresh) {
         if (status === 2) {
           const availability = await currentMachineAvailability({ client, manager, machine });
-          if (availability.status === "PASSED") {
+          if (!availabilityRefreshDue(availability, refreshAfterSeconds)) {
             console.log(JSON.stringify({
-              event: "FCC_MACHINE_AVAILABILITY_ALREADY_FRESH",
+              event: "FCC_MACHINE_AVAILABILITY_REFRESH_NOT_DUE",
               machine: machine.machine,
               teeId: machine.teeId,
+              refreshAfterSeconds,
               availability,
             }));
             continue;
@@ -632,7 +673,7 @@ try {
         (v2 ? "FCC_MARKET_V2_MACHINES" : "0-fcc-machines"),
       status: evidenceStatus,
       recordedAt: new Date().toISOString(),
-      sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, encoding: "utf8" }).trim(),
+      sourceCommit: releaseSourceCommit,
       network: {
         name: manifest.network.name,
         chainId: manifest.network.chainId,
@@ -680,6 +721,7 @@ try {
       gate: evidence.gate,
       status: evidence.status,
       blockNumber: evidence.network.blockNumber,
+      ...(availabilityRefresh ? { refreshAfterSeconds } : {}),
       machines: verification.machines.map(({ machine, teeId, status, assertions }) => ({ machine, teeId, status, assertions })),
       evidence: availabilityRefresh ? null : evidenceDisplayPath,
     }, null, 2));

@@ -16,7 +16,10 @@
 > V2 machine preflight (`pnpm flare:v2:machines:preflight`) and run
 > `pnpm flare:v2:availability:refresh` if necessary near the judge demo; an old
 > pass is never treated as current availability. Renewal uses a fresh proof and
-> `confirmAvailability` without pausing production identities.
+> `confirmAvailability` without pausing production identities. The deployed
+> Railway keeper checks hourly and renews only after four hours, but it does not
+> replace the judge-time manual preflight or turn a time-bound fact into
+> permanent evidence.
 
 ## 1. Evidence policy
 

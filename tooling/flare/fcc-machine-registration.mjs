@@ -242,7 +242,10 @@ export function registeredMachineReadinessBlockers(
   const nonAvailabilityReady = verification?.activeSet?.status === "PASSED" &&
     machines.length === 3 &&
     machines.every(({ assertions = {} }) => Object.entries(assertions).every(
-      ([name, value]) => name.startsWith("availability") || value === true,
+      ([name, value]) => [
+        "availabilityNotExpired",
+        "availabilityFresh",
+      ].includes(name) || value === true,
     ));
   if (allowAvailabilityRefresh && nonAvailabilityReady) return [];
 
