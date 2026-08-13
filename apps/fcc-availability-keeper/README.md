@@ -13,3 +13,5 @@ skips an overlapping invocation rather than starting a second copy.
 Required runtime variables are documented in `docs/deployment.md`. The
 deployment key is a server-side Coston2 testnet operator secret and must never
 be copied into an image, repository file, `VITE_*` variable, log, or evidence.
+Keep `RAILWAY_DOCKERFILE_PATH=apps/fcc-availability-keeper/Dockerfile` on the
+service so an operator-triggered redeploy cannot silently select Railpack.

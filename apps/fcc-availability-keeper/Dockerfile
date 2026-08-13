@@ -19,6 +19,8 @@ RUN tar -xzf /tmp/fcc-scaffold.tar.gz --strip-components=1 -C /src \
 
 FROM --platform=linux/amd64 node:24-alpine3.22@sha256:191c9f0080fcbbc6547a85dc0ff7988072214a355aabdc1d2ec55a7dae5eea8a
 
+LABEL org.opencontainers.image.title="FlareQuorum FCC availability keeper"
+
 ENV NODE_ENV=production \
     FCC_REGISTRATION_BINARY_PATH=/usr/local/bin/register-tee \
     FCC_RELEASE_PROFILE=v2 \

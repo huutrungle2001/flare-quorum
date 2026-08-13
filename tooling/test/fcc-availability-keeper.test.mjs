@@ -30,6 +30,7 @@ test("FCC availability keeper embeds only the checksum-pinned operator binary", 
   assert.match(dockerfile, /71ccae716c373a3584e8de49aa44e962ade34b489b45836ec6922a70c464d206/);
   assert.match(dockerfile, /FCC_REGISTRATION_BINARY_PATH=\/usr\/local\/bin\/register-tee/);
   assert.match(dockerfile, /FCC_REFRESH_MACHINE_AVAILABILITY=true/);
+  assert.match(dockerfile, /org\.opencontainers\.image\.title="FlareQuorum FCC availability keeper"/);
   assert.match(dockerfile, /USER node/);
   assert.doesNotMatch(dockerfile, /FLARE_DEPLOYMENT_PRIVATE_KEY|FCC_DIRECT_API_KEY/);
 
