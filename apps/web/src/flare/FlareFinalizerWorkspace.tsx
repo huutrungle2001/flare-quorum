@@ -78,7 +78,7 @@ function actionState(tender: FlarePublicTender, now: bigint): ActivityState {
   return "terminal";
 }
 
-function actionPresentation(state: ActivityState, buyerConnected: boolean) {
+function actionPresentation(state: ActivityState, buyerConnected: boolean, status: TenderStatus) {
   switch (state) {
     case "close":
       return { title: "Ready to close", status: "ACTION AVAILABLE", permission: "ANYONE", lane: "action" };
@@ -99,8 +99,30 @@ function actionPresentation(state: ActivityState, buyerConnected: boolean) {
         ? { title: "Escrow recovery available", status: "ACTION AVAILABLE", permission: "BUYER ONLY · THIS WALLET", lane: "action" }
         : { title: "Buyer recovery available", status: "BUYER ACTION", permission: "BUYER ONLY", lane: "waiting" };
     default:
-      return { title: "No action required", status: "COMPLETE", permission: "PUBLIC RECORD", lane: "complete" };
+      return {
+        title: status === "Awarded"
+          ? "Award finalized"
+          : status === "Refunded"
+            ? "Escrow refunded"
+            : "No action required",
+        status: "COMPLETE",
+        permission: "PUBLIC RECORD",
+        lane: "complete",
+      };
   }
+}
+
+export function finalizerLifecycleQueue(
+  tenders: readonly FlarePublicTender[],
+): readonly FlarePublicTender[] {
+  const active = tenders.filter(
+    (tender) => !["Awarded", "Refunded", "Cancelled"].includes(tender.status),
+  );
+  const latestCompleted = tenders.reduce<FlarePublicTender | null>((latest, tender) => {
+    if (!["Awarded", "Refunded"].includes(tender.status)) return latest;
+    return !latest || tender.tenderId > latest.tenderId ? tender : latest;
+  }, null);
+  return latestCompleted ? [...active, latestCompleted] : active;
 }
 
 export function FlareFinalizerWorkspace({
@@ -215,7 +237,7 @@ export function FlareFinalizerWorkspace({
   );
 
   const queue = useMemo(
-    () => effectiveTenders.filter((tender) => !["Awarded", "Refunded", "Cancelled"].includes(tender.status)),
+    () => finalizerLifecycleQueue(effectiveTenders),
     [effectiveTenders],
   );
   const actionableCount = queue.filter((tender) => {
@@ -516,7 +538,7 @@ export function FlareFinalizerWorkspace({
         <header className="detail-header">
           <div>
             <p className="eyebrow">ACTION CENTER / CANONICAL CHECKPOINTS</p>
-            <h2>{queue.length} active checkpoint{queue.length === 1 ? "" : "s"}</h2>
+            <h2>{queue.length} lifecycle checkpoint{queue.length === 1 ? "" : "s"}</h2>
           </div>
           <button className="icon-button" onClick={onRefresh} aria-label="Refresh public lifecycle queue">↻</button>
         </header>
@@ -545,7 +567,7 @@ export function FlareFinalizerWorkspace({
               const cancelKey = `cancelTender:${tender.tenderId.toString()}`;
               const refundKey = `refundExpiredSelection:${tender.tenderId.toString()}`;
               const isConfirming = confirmation?.tenderId === tender.tenderId;
-              const presentation = actionPresentation(state, buyerConnected);
+              const presentation = actionPresentation(state, buyerConnected, tender.status);
               const progress = localProgress[tender.tenderId.toString()] ?? {};
               const closeComplete = progress.closed === true || ["Closed", "ComputePending", "Awarded", "Refunded"].includes(tender.status);
               const computeComplete = progress.computeStarted === true || tender.selectionAttempt > 0 || ["ComputePending", "Awarded", "Refunded"].includes(tender.status);

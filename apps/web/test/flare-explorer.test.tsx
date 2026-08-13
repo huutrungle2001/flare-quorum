@@ -11,6 +11,7 @@ import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareAuditorWorkspace } from "../src/flare/FlareAuditorWorkspace";
 import {
   directActionWasApplied,
+  finalizerLifecycleQueue,
   FlareFinalizerWorkspace,
 } from "../src/flare/FlareFinalizerWorkspace";
 import { FlareVendorWorkspace } from "../src/flare/FlareVendorWorkspace";
@@ -336,6 +337,20 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByRole("button", { name: "✓ TENDER CLOSED" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "✓ FCC COMPUTE STARTED" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "CHECK 2/3 & FINALIZE →" })).toBeDisabled();
+  });
+
+  it("keeps the latest completed FCC lifecycle visible after it leaves the active queue", () => {
+    const older = { ...publicTender, tenderId: 7n, status: "Awarded" as const };
+    const latest = { ...publicTender, tenderId: 8n, status: "Awarded" as const };
+    expect(finalizerLifecycleQueue([older, latest])).toEqual([latest]);
+
+    render(<FlareFinalizerWorkspace wallet={wallet} tenders={[older, latest]} onRefresh={() => undefined} />);
+    expect(screen.getByRole("heading", { name: "Award finalized" })).toBeInTheDocument();
+    expect(screen.getByText("TENDER 8 · AWARDED")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "✓ TENDER CLOSED" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "✓ FCC COMPUTE STARTED" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "✓ AWARD / REFUND FINALIZED" })).toBeDisabled();
+    expect(screen.queryByRole("heading", { name: "No pending lifecycle action" })).toBeNull();
   });
 
   it("asks the vendor to connect only when an open tender has a bid action", () => {
