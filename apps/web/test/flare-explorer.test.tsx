@@ -1,7 +1,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { FlareEvidenceWorkspace, FlareExplorerView, FlareRoleBar } from "../src/flare/FlareRoom";
+import {
+  FlareAppSidebar,
+  FlareEvidenceWorkspace,
+  FlareExplorerView,
+  FlareRoleBar,
+} from "../src/flare/FlareRoom";
 import { FlareBuyerWorkspace } from "../src/flare/FlareBuyerWorkspace";
 import { FlareAuditorWorkspace } from "../src/flare/FlareAuditorWorkspace";
 import { FlareFinalizerWorkspace } from "../src/flare/FlareFinalizerWorkspace";
@@ -116,6 +121,41 @@ describe("Coston2 public evidence boundary", () => {
     render(<MemoryRouter initialEntries={["/flare"]}><PrimaryNavigation wallet={wallet} /></MemoryRouter>);
     expect(screen.getByText("COSTON2")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "CONNECT FOR ACTIONS" })).toBeInTheDocument();
+  });
+
+  it.each(["public", "evidence"] as const)(
+    "shows connected wallet assets in the %s workspace",
+    (activeRole) => {
+      render(
+        <MemoryRouter>
+          <FlareAppSidebar
+            activeRole={activeRole}
+            onRoleChange={() => undefined}
+            wallet={connectedVendorWallet}
+          />
+        </MemoryRouter>,
+      );
+      expect(
+        screen.getByRole("region", { name: "Coston2 wallet assets" }),
+      ).toBeInTheDocument();
+      expect(screen.queryByText("PUBLIC READS NEED NO SIGNATURE")).toBeNull();
+    },
+  );
+
+  it("keeps the disconnected Public workspace wallet-optional", () => {
+    render(
+      <MemoryRouter>
+        <FlareAppSidebar
+          activeRole="public"
+          onRoleChange={() => undefined}
+          wallet={wallet}
+        />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("PUBLIC READS NEED NO SIGNATURE")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Coston2 wallet assets" }),
+    ).toBeNull();
   });
 
   it("renders the contract-canonical public scoring policy", () => {

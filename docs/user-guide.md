@@ -76,9 +76,11 @@ finalizer plus Assets/Redemption), and `AUDITOR`. Public uses canonical tender I
 on-chain facts rather than fabricating titles when only a metadata hash exists.
 Its desktop list provides search and five-item pagination, and the list/detail
 canvas uses one document scroll instead of nested scroll panes. The left rail
-shows compact wallet assets only in Buyer, Vendor, and Activity; Public and
-Auditor explicitly mark the wallet optional. The Coston2 faucet remains
-available, and refresh is the global `↻` control beside `CONNECT FOR ACTIONS`.
+shows compact wallet assets in Buyer, Vendor, and Activity, and also in Public
+or Auditor immediately after a Coston2 wallet connects. Public and Auditor
+remain wallet-optional and show the read-only notice while disconnected. The
+Coston2 faucet remains available, and refresh is the global `↻` control beside
+`CONNECT FOR ACTIONS`.
 Wallet connection stays in the global header and appears again as a compact
 checkpoint next to a relevant transaction, while FXRP redemption shows a compact
 locked state under Activity / Assets until the connected public winner has an

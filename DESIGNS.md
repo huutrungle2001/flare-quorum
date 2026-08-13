@@ -427,8 +427,9 @@ Copy must state: `THE TREASURY OWNS THE FUNDS. THE TEE SELECTS; THE CONTRACT SET
 - Show character/range guidance before submission and an explicit
   `CLEAR PUBLIC DRAFT` action.
 - Compose first; place the compact wallet connection checkpoint immediately
-  before the transaction action. Public and Auditor workspaces label the wallet
-  optional and do not show wallet balances in the workspace rail.
+  before the transaction action. Public and Auditor workspaces remain wallet
+  optional while disconnected, but show the same read-only Coston2 asset card
+  in the workspace rail immediately after a wallet connects.
 - On create, publish the canonical public-safe preimage to an immutable,
   content-addressed registry before any approval/payment/create transaction is
   requested. The returned content must hash to the same `metadataHash` passed

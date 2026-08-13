@@ -447,7 +447,7 @@ export function FlareRoleBar({
   );
 }
 
-function FlareAppSidebar({
+export function FlareAppSidebar({
   activeRole,
   onRoleChange,
   wallet,
@@ -456,6 +456,9 @@ function FlareAppSidebar({
   onRoleChange: (role: FlareRole) => void;
   wallet?: WalletController;
 }) {
+  const connected =
+    wallet?.state.status === "connected" && Boolean(wallet.state.account);
+  const actionWorkspace = ["buyer", "vendor", "finalizer"].includes(activeRole);
   return (
     <aside className="flare-app-sidebar" aria-label="Tender application sidebar">
       <div className="flare-sidebar-heading">
@@ -463,7 +466,7 @@ function FlareAppSidebar({
         <strong>FLARE / COSTON2</strong>
       </div>
       <FlareRoleBar activeRole={activeRole} onRoleChange={onRoleChange} />
-      {wallet && ["buyer", "vendor", "finalizer"].includes(activeRole) ? (
+      {wallet && (connected || actionWorkspace) ? (
         <FlareWalletAssets wallet={wallet} />
       ) : (
         <section className="flare-sidebar-readonly" aria-label="Wallet-free workspace">
