@@ -26,10 +26,10 @@ export function App() {
     );
 
   useEffect(() => {
-    document.title = "FlareQuorum · Confidential procurement on Flare";
+    document.title = "FlareQuorum · Private bids, public awards on Flare";
     document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute(
       "content",
-      "FlareQuorum — confidential procurement with threshold FCC on Flare Coston2.",
+      "Confidential procurement with public rules, three FCC machines, and threshold-verified FTestXRP settlement on Flare Coston2.",
     );
   }, []);
 

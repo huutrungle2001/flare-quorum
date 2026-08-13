@@ -169,9 +169,14 @@ describe("Coston2 public evidence boundary", () => {
   it("restores the Flare product story and keeps signing optional", () => {
     render(<MemoryRouter><FlareLandingPage /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: /Private bids.*Public awards/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "EXPLORE TENDERS →" })).toHaveAttribute("href", "/flare");
+    expect(screen.getByRole("link", { name: "EXPLORE LIVE TENDERS →" })).toHaveAttribute("href", "/flare");
+    expect(screen.getByRole("link", { name: "VIEW LIVE EVIDENCE →" })).toHaveAttribute("href", "/flare?role=auditor");
+    expect(screen.getByText(/V2 · COSTON2 TESTNET · 3 SIMULATED TEES/i)).toBeInTheDocument();
+    expect(screen.getByText(/Testnet assets · SIMULATED_TEE=true · unaudited hackathon software/i)).toBeInTheDocument();
     expect(screen.getByText(/FIVE WORKSPACES \/ ONE APP SHELL/i)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Private bids produce a threshold-signed award/i })).toBeInTheDocument();
+    expect(screen.queryByText(/losing offers never become browser/i)).toBeNull();
+    expect(screen.getByRole("contentinfo")).toHaveTextContent("TEST ASSETS ONLY · UNAUDITED");
   });
 
   it("exposes the complete Flare role taxonomy without private-audit authority", () => {

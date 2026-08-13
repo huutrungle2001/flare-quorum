@@ -65,9 +65,9 @@ export function FlareProcurementSignal() {
 export function FlareLifecycleMarquee() {
   return (
     <div className="flare-lifecycle-marquee" aria-label="FlareQuorum lifecycle">
-      <span>XRPL AUTHORIZATION</span><b aria-hidden="true">→</b>
+      <span>XRPL + FDC FUNDING</span><b aria-hidden="true">→</b>
       <span>FTESTXRP ESCROW</span><b aria-hidden="true">→</b>
-      <span>PRIVATE TEE BIDS</span><b aria-hidden="true">→</b>
+      <span>PRIVATE FCC BIDS</span><b aria-hidden="true">→</b>
       <span>FTSO SNAPSHOT</span><b aria-hidden="true">→</b>
       <span>2-OF-3 AWARD</span>
     </div>
