@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
 
@@ -32,13 +31,21 @@ test("web, relay, and console source do not import the staging candidate namespa
 });
 
 function search(relativePath) {
-  try {
-    return execFileSync("rg", ["-n", "candidates/v2|coston2\\.v2", relativePath], {
-      cwd: root,
-      encoding: "utf8",
-    }).trim();
-  } catch (error) {
-    if (error.status === 1) return "";
-    throw error;
+  const matches = [];
+  const pending = [resolve(root, relativePath)];
+  const forbidden = /candidates\/v2|coston2\.v2/;
+
+  while (pending.length > 0) {
+    const directory = pending.pop();
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = resolve(directory, entry.name);
+      if (entry.isDirectory()) {
+        pending.push(path);
+      } else if (entry.isFile() && forbidden.test(readFileSync(path, "utf8"))) {
+        matches.push(path);
+      }
+    }
   }
+
+  return matches.join("\n");
 }
