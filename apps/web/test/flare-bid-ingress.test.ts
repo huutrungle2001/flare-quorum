@@ -19,6 +19,28 @@ import {
 import { flareVendorBidErrorMessage } from "../src/flare/FlareVendorWorkspace";
 
 describe("Coston2 vendor admission preflight", () => {
+  it("allows the local Vite ingress proxy during development", async () => {
+    mocks.readContract.mockResolvedValueOnce(false);
+    await expect(submitFlareBid({
+      tender: {
+        tenderId: 21n,
+        status: "Open",
+        bidDeadline: BigInt(Math.floor(Date.now() / 1_000) + 600),
+        scoringPolicy: { ceilingXrpMicros: 1_000_000n, requiredCredentials: [] },
+      } as never,
+      vendor: "0x1111111111111111111111111111111111111111",
+      priceMicros: 500_000n,
+      deliveryDays: 7,
+      warrantyDays: 30,
+      walletClient: {} as never,
+      env: {
+        VITE_FLARE_MARKET_ADDRESS: "0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05",
+        VITE_COSTON2_RPC_URL: "https://coston2-api.flare.network/ext/C/rpc",
+        VITE_FLARE_INGRESS_URL: "http://localhost:5173/local-flare-ingress",
+      },
+    })).rejects.not.toThrow("FLARE_INGRESS_URL_INVALID");
+  });
+
   it("allows only a positive on-chain approval result", () => {
     expect(() => assertFlareVendorApproved(true)).not.toThrow();
   });

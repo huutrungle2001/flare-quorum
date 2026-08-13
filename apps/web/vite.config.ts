@@ -2,6 +2,20 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  server: {
+    proxy: {
+      "/local-flare-ingress": {
+        target: "https://veilbid-flare-ingress-production.up.railway.app",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/local-flare-ingress/, ""),
+        configure: (proxy) => {
+          proxy.on("proxyReq", (request) => {
+            request.setHeader("Origin", "https://flare-quorum.vercel.app");
+          });
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       buffer: "buffer/",

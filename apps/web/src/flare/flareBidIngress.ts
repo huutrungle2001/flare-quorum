@@ -69,7 +69,11 @@ function ingressUrl(env: Record<string, string | undefined> = import.meta.env): 
   } catch {
     throw new Error("FLARE_INGRESS_URL_INVALID");
   }
-  if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) {
+  const loopback = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1" || parsed.hostname === "[::1]";
+  if (
+    (parsed.protocol !== "https:" && !(parsed.protocol === "http:" && loopback)) ||
+    parsed.username || parsed.password || parsed.search || parsed.hash
+  ) {
     throw new Error("FLARE_INGRESS_URL_INVALID");
   }
   parsed.pathname = parsed.pathname.replace(/\/+$/, "");
