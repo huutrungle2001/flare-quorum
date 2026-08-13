@@ -51,3 +51,15 @@ test("repository keeper command fixes the four-hour anti-spam threshold", () => 
     /register-fcc-machines\.mjs --execute$/,
   );
 });
+
+test("availability confirmation accepts the successful proof response status", () => {
+  const registrationScript = text("tooling/scripts/register-fcc-machines.mjs");
+  assert.match(
+    registrationScript,
+    /Number\(proof\.responseBody\.status\) !== 0/,
+  );
+  assert.doesNotMatch(
+    registrationScript,
+    /Number\(proof\.responseBody\.status\) !== 1/,
+  );
+});

@@ -337,7 +337,7 @@ async function confirmMachineAvailability({
     proof.requestBody.url !== machine.publicUrl ||
     String(proof.responseBody.codeHash).toLowerCase() !== machine.codeHash ||
     String(proof.responseBody.platform).toLowerCase() !== machine.platform ||
-    Number(proof.responseBody.status) !== 1 ||
+    Number(proof.responseBody.status) !== 0 ||
     getAddress(proof.header.proofOwner) !== getAddress(account.address)
   ) {
     throw new Error(`FCC_MACHINE_${machine.machine}_AVAILABILITY_PROOF_BINDING_MISMATCH`);
