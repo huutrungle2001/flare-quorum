@@ -7745,8 +7745,9 @@ footer p {
   border-left: 6px solid var(--color-brand-accent);
 }
 
-.public-pending-tender {
-  margin: 24px 0;
+.pending-tender-card {
+  border-left: 6px solid var(--color-brand-accent);
+  cursor: default;
 }
 
 .my-submission-card > header {

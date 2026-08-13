@@ -519,13 +519,13 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
     return () => window.removeEventListener(pendingTenderChangedEvent, syncPendingTender);
   }, []);
   useEffect(() => {
-    if (!pendingTender) return;
+    if (!pendingTender?.tenderId) return;
     if (tenders.some((tender) => tender.tenderId.toString() === pendingTender.tenderId)) {
       clearPendingFlareTender(pendingTender.tenderId);
     }
   }, [pendingTender, tenders]);
   const pendingFinality = pendingTender
-    && !tenders.some((tender) => tender.tenderId.toString() === pendingTender.tenderId)
+    && (!pendingTender.tenderId || !tenders.some((tender) => tender.tenderId.toString() === pendingTender.tenderId))
     ? pendingTender
     : null;
   const requestedFilter = params.get("status");
@@ -623,18 +623,6 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
         <div className="intro-copy"><p>Browse finalized tender coordination without connecting a wallet. Commercial terms remain sealed while public award and settlement evidence stay inspectable.</p><span className="deployment-label">{state.data?.deploymentStatus === "verified" ? "VERIFIED COSTON2 RELEASE" : "COSTON2 DEPLOYMENT · NOT YET VERIFIED"}</span></div>
       </section>
       <ProtocolFacts compact />
-      {pendingFinality && (
-        <section className="my-submission-card pending-finality public-pending-tender" aria-live="polite">
-          <header>
-            <div><p className="eyebrow">TENDER {pendingFinality.tenderId} · JUST CREATED</p><h3>Confirmed on Coston2</h3></div>
-            <span className="privacy-badge encrypted">WAITING FOR 12-BLOCK FINALITY</span>
-          </header>
-          <p className="submission-explainer">This public-safe checkpoint came from the confirmed creation receipt in this tab. Public refresh runs automatically and will replace it with the canonical dossier after finality.</p>
-          <div className="my-submission-actions">
-            <a className="secondary-button" href={`https://coston2-explorer.flare.network/tx/${pendingFinality.transactionHash}`} target="_blank" rel="noreferrer">VIEW TRANSACTION ↗</a>
-          </div>
-        </section>
-      )}
       {state.status === "loading" && <section className="state-panel"><span className="loading-mark" /><div><h2>Reading Coston2 state</h2><p>No placeholder tender is inserted.</p></div></section>}
       {state.status === "error" && <section className="state-panel error" role="alert"><span>!</span><div><h2>Flare state unavailable</h2><p>{state.error}</p><button className="secondary-button" onClick={onRetry}>RETRY COSTON2 →</button></div></section>}
       {state.status === "ready" && tenders.length === 0 && <section className="state-panel"><span>0</span><div><h2>No Coston2 tenders yet</h2><p>The configured market has no public tender records.</p></div></section>}
@@ -657,7 +645,7 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
         <section id="tenders" className="explorer-grid">
           <aside className="dossier-list">
             <div className="dossier-list-controls">
-              <header><div><p className="eyebrow">COSTON2 DOSSIERS</p><h2>{visibleTenders.length} tender{visibleTenders.length === 1 ? "" : "s"}</h2></div></header>
+              <header><div><p className="eyebrow">COSTON2 DOSSIERS</p><h2>{visibleTenders.length + (pendingFinality ? 1 : 0)} tender{visibleTenders.length + (pendingFinality ? 1 : 0) === 1 ? "" : "s"}</h2></div></header>
               <label className="public-search-control">
                 <span>Search public state</span>
                 <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tender ID, buyer or status" />
@@ -667,6 +655,17 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
                 <label className="public-filter-control"><span>Sort by</span><select aria-label="Sort Coston2 tenders" value={sort} onChange={(event) => setSort(event.target.value as FlareTenderSort)}>{flareTenderSorts.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
               </div>
             </div>
+            {pendingFinality && (
+              <div className="tender-card-shell" aria-live="polite">
+                <article className="tender-card pending-tender-card">
+                  <span className="card-kicker">{pendingFinality.tenderId ? `TENDER #${pendingFinality.tenderId}` : "NEW TENDER"} / {pendingFinality.blockNumber ? "CONFIRMED" : "TRANSACTION BROADCAST"}</span>
+                  <span className="card-title">{pendingFinality.blockNumber ? "Waiting for 12-block finality" : "Waiting for Coston2 confirmation"}</span>
+                  <span className="card-buyer">Buyer · {short(pendingFinality.buyer)}</span>
+                  <span className="card-facts"><span><strong>{pendingFinality.blockNumber ?? "Pending"}</strong>Transaction block</span><span><strong>AUTO</strong>Refresh</span></span>
+                  <span className="card-footer"><span className="privacy-badge encrypted">{pendingFinality.blockNumber ? "FINALITY PENDING" : "CONFIRMATION PENDING"}</span><a className="text-link" href={`https://coston2-explorer.flare.network/tx/${pendingFinality.transactionHash}`} target="_blank" rel="noreferrer">VIEW TX ↗</a></span>
+                </article>
+              </div>
+            )}
             {pageTenders.map((tender) => <PublicTenderCard key={tender.tenderId.toString()} tender={tender} selected={selected?.tenderId === tender.tenderId} onSelect={() => selectTender(tender.tenderId)} />)}
             {pageCount > 1 && (
               <nav className="public-pagination" aria-label="Tender list pages">

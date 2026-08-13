@@ -107,6 +107,7 @@ export function FlareVendorWorkspace({
   const [busy, setBusy] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [stage, setStage] = useState<keyof typeof stageLabels | null>(null);
+  const [activeAttempt, setActiveAttempt] = useState<{ tenderId: bigint; stage: keyof typeof stageLabels } | null>(null);
   const [error, setError] = useState<string | null>(null);
   type PendingBidView = {
     tenderId: bigint;
@@ -136,7 +137,7 @@ export function FlareVendorWorkspace({
       && bid.plaintextCommitment.toLowerCase() === last.commitment.toLowerCase()
     )),
   );
-  const visibleSubmissionCount = mySubmissions.length + (recentPendingFinality ? 1 : 0);
+  const visibleSubmissionCount = mySubmissions.length + (recentPendingFinality || activeAttempt ? 1 : 0);
 
   useEffect(() => {
     if (!connected || !wallet.state.account) return;
@@ -250,6 +251,8 @@ export function FlareVendorWorkspace({
     setError(null);
     setLast(null);
     setBusy(true);
+    setActiveAttempt({ tenderId: selected.tenderId, stage: "keys" });
+    selectSection("submissions");
     let broadcasted = false;
     const toastId = toasts.startStack("SEALED BID", "Preparing an encrypted Coston2 bid…");
     try {
@@ -262,10 +265,12 @@ export function FlareVendorWorkspace({
         walletClient: wallet.state.walletClient!,
         onStage: (next) => {
           setStage(next);
+          setActiveAttempt({ tenderId: selected.tenderId, stage: next });
           toasts.update(toastId, stageLabels[next]);
         },
         onBroadcast: (pending) => {
           broadcasted = true;
+          setActiveAttempt(null);
           const pendingView = {
             tenderId: selected.tenderId,
             hash: pending.transactionHash,
@@ -314,6 +319,7 @@ export function FlareVendorWorkspace({
       toasts.succeed(toastId, "Three receipts accepted; bid committed on Coston2.");
       onRefresh();
     } catch (cause) {
+      setActiveAttempt(null);
       setError(flareVendorBidErrorMessage(cause));
       toasts.fail(toastId, broadcasted
         ? "Transaction was broadcast, but confirmation could not yet be verified. Check My submissions before retrying."
@@ -351,7 +357,7 @@ export function FlareVendorWorkspace({
       {section === "submissions" ? (
         <section className="evidence-panel vendor-submissions-panel" aria-label="My finalized bid submissions">
           <header className="detail-header">
-            <div><p className="eyebrow">MY SUBMISSIONS / PUBLIC RECEIPTS</p><h2>{connected ? `${mySubmissions.length} finalized${recentPendingFinality ? " · 1 waiting finality" : ""}` : "Connect to find your submissions"}</h2></div>
+            <div><p className="eyebrow">MY SUBMISSIONS / PUBLIC RECEIPTS</p><h2>{connected ? `${mySubmissions.length} finalized${recentPendingFinality ? " · 1 waiting finality" : activeAttempt ? " · 1 submitting" : ""}` : "Connect to find your submissions"}</h2></div>
             <span className={`privacy-badge${connected ? " verified" : ""}`}>{connected ? "WALLET FILTER ACTIVE" : "WALLET REQUIRED"}</span>
           </header>
           <div className="my-submissions-boundary" role="note">
@@ -363,6 +369,15 @@ export function FlareVendorWorkspace({
             <div className="my-submissions-connect">
               <WalletPanel wallet={wallet} network="coston2" compact />
             </div>
+          )}
+          {connected && activeAttempt && !last && (
+            <article className="my-submission-card pending-finality" aria-live="polite">
+              <header>
+                <div><p className="eyebrow">TENDER {activeAttempt.tenderId.toString()} · SUBMISSION IN PROGRESS</p><h3>Preparing sealed commitment</h3></div>
+                <span className="privacy-badge encrypted">IN PROGRESS</span>
+              </header>
+              <p className="submission-explainer">{stageLabels[activeAttempt.stage]} This is an in-progress attempt, not an accepted on-chain bid yet.</p>
+            </article>
           )}
           {connected && recentPendingFinality && last && (
             <article className="my-submission-card pending-finality">

@@ -83,10 +83,11 @@ remain wallet-optional and show the read-only notice while disconnected. The
 Coston2 faucet remains available, and refresh is the global `↻` control beside
 `CONNECT FOR ACTIONS`. The app also rereads finalized Coston2 state every 15
 seconds while the tab is visible, without replacing an already rendered workspace with a loading screen.
-After direct Coston2 tender creation, Public immediately shows a clearly marked
-transaction-receipt checkpoint from this browser tab. It is not presented as
-canonical state and is replaced by the ordinary dossier once the 12-block
-finalized reader includes that tender.
+After the wallet broadcasts direct Coston2 tender creation, Public immediately
+puts a clearly marked transaction checkpoint at the top of the dossier list.
+It advances from `TRANSACTION BROADCAST` to `FINALITY PENDING`, is never
+presented as canonical state, and is replaced by the ordinary dossier once the
+12-block-finalized reader includes that tender.
 Wallet connection stays in the global header and appears again as a compact
 checkpoint next to a relevant transaction, while FXRP redemption shows a compact
 locked state under Activity / Assets until the connected public winner has an
@@ -184,8 +185,10 @@ forget the checkpoint.
    private-ingress path. Neither plaintext nor ciphertext is written on-chain.
 6. Collect signed receipts and submit the matching set to the market before the
    deadline.
-7. After confirmation, Private Bids switches to `MY SUBMISSIONS`. The new
-   transaction is labeled `CONFIRMED · FINALITY PENDING` until the finalized
+7. As soon as submission starts, Private Bids switches to `MY SUBMISSIONS` and
+   shows a public-safe `SUBMISSION IN PROGRESS` card without claiming on-chain
+   acceptance. After broadcast and confirmation, the new transaction is labeled
+   `CONFIRMED · FINALITY PENDING` until the finalized
    public reader can recover its canonical bid reference. This public-safe
    pending card survives workspace navigation in the same tab, and automatic
    refresh replaces it without requiring a reload. The browser

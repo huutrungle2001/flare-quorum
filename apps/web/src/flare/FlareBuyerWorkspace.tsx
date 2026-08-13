@@ -34,7 +34,7 @@ import {
   assertFlareIngressReady,
   publishFlarePublicBrief,
 } from "./flarePublicBriefRegistry";
-import { savePendingFlareTender } from "./pendingFinality";
+import { clearPendingFlareTender, savePendingFlareTender } from "./pendingFinality";
 
 const coston2 = {
   id: 114,
@@ -517,8 +517,27 @@ export function FlareBuyerWorkspace({
       toasts.update(toastId, "Creating the funded tender with frozen FCC identities…");
       const creation = await publicClient.simulateContract({ account: wallet.state.account!, address: market, abi: flareQuorumFlareMarketAbi as Abi, functionName: "createTender", args: [terms] });
       const creationHash = await wallet.state.walletClient!.writeContract(creation.request);
+      savePendingFlareTender({
+        version: 1,
+        tenderId: null,
+        transactionHash: creationHash,
+        blockNumber: null,
+        buyer: wallet.state.account!,
+        recordedAt: new Date().toISOString(),
+      });
       const receipt = await publicClient.waitForTransactionReceipt({ hash: creationHash });
-      if (receipt.status !== "success") throw new Error("FLARE_TENDER_CREATION_FAILED");
+      if (receipt.status !== "success") {
+        clearPendingFlareTender();
+        throw new Error("FLARE_TENDER_CREATION_FAILED");
+      }
+      savePendingFlareTender({
+        version: 1,
+        tenderId: null,
+        transactionHash: creationHash,
+        blockNumber: receipt.blockNumber.toString(),
+        buyer: wallet.state.account!,
+        recordedAt: new Date().toISOString(),
+      });
       const createdLog = receipt.logs
         .filter((log) => log.address.toLowerCase() === market.toLowerCase())
         .map((log) => {

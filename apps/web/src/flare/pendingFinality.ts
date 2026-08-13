@@ -6,9 +6,9 @@ export const pendingTenderChangedEvent = "flarequorum:pending-tender-changed";
 
 export interface PendingFlareTender {
   version: 1;
-  tenderId: string;
+  tenderId: string | null;
   transactionHash: Hex;
-  blockNumber: string;
+  blockNumber: string | null;
   buyer: Address;
   recordedAt: string;
 }
@@ -28,12 +28,10 @@ function validPendingTender(value: unknown): value is PendingFlareTender {
   if (!value || typeof value !== "object") return false;
   const pending = value as Partial<PendingFlareTender>;
   return pending.version === 1
-    && typeof pending.tenderId === "string"
-    && /^[1-9][0-9]*$/.test(pending.tenderId)
+    && (pending.tenderId === null || typeof pending.tenderId === "string" && /^[1-9][0-9]*$/.test(pending.tenderId))
     && typeof pending.transactionHash === "string"
     && /^0x[0-9a-fA-F]{64}$/.test(pending.transactionHash)
-    && typeof pending.blockNumber === "string"
-    && /^[0-9]+$/.test(pending.blockNumber)
+    && (pending.blockNumber === null || typeof pending.blockNumber === "string" && /^[0-9]+$/.test(pending.blockNumber))
     && typeof pending.buyer === "string"
     && /^0x[0-9a-fA-F]{40}$/.test(pending.buyer)
     && typeof pending.recordedAt === "string";

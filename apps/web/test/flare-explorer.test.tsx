@@ -129,9 +129,9 @@ describe("Coston2 public evidence boundary", () => {
   it("shows a confirmed tender immediately while canonical finality catches up", async () => {
     savePendingFlareTender({
       version: 1,
-      tenderId: "9",
+      tenderId: null,
       transactionHash: `0x${"99".repeat(32)}`,
-      blockNumber: "123456",
+      blockNumber: null,
       buyer: publicTender.buyer,
       recordedAt: "2026-08-14T00:00:00.000Z",
     });
@@ -148,16 +148,28 @@ describe("Coston2 public evidence boundary", () => {
       },
     };
     const view = render(<MemoryRouter><FlareExplorerView state={state} onRetry={() => undefined} /></MemoryRouter>);
-    expect(screen.getByText("TENDER 9 · JUST CREATED")).toBeInTheDocument();
-    expect(screen.getByText("WAITING FOR 12-BLOCK FINALITY")).toBeInTheDocument();
-    expect(screen.getByText(/Public refresh runs automatically/)).toBeInTheDocument();
+    expect(screen.getByText("NEW TENDER / TRANSACTION BROADCAST")).toBeInTheDocument();
+    expect(screen.getByText("Waiting for Coston2 confirmation")).toBeInTheDocument();
+
+    savePendingFlareTender({
+      version: 1,
+      tenderId: "9",
+      transactionHash: `0x${"99".repeat(32)}`,
+      blockNumber: "123456",
+      buyer: publicTender.buyer,
+      recordedAt: "2026-08-14T00:00:01.000Z",
+    });
+    expect(await screen.findByText("TENDER #9 / CONFIRMED")).toBeInTheDocument();
+    expect(screen.getByText("Waiting for 12-block finality")).toBeInTheDocument();
+    expect(screen.getByText("FINALITY PENDING")).toBeInTheDocument();
+    expect(screen.getByText("AUTO")).toBeInTheDocument();
 
     view.rerender(<MemoryRouter><FlareExplorerView state={{
       ...state,
       data: { ...state.data, tenders: [publicTender, { ...publicTender, tenderId: 9n }] },
     }} onRetry={() => undefined} /></MemoryRouter>);
     await waitFor(() => expect(readPendingFlareTender()).toBeNull());
-    expect(screen.queryByText("TENDER 9 · JUST CREATED")).toBeNull();
+    expect(screen.queryByText("TENDER #9 / CONFIRMED")).toBeNull();
     expect(screen.getByRole("button", { name: /Tender #9/i })).toBeInTheDocument();
   });
 
