@@ -96,6 +96,29 @@ async function fetchRoute(path) {
   return { path, status: response.status, body: await response.text() };
 }
 
+async function fetchAssetGraph(initialPaths) {
+  const pending = [...initialPaths];
+  const visited = new Set();
+  const sources = [];
+  while (pending.length > 0) {
+    const path = pending.shift();
+    const url = new URL(path, baseUrl);
+    if (url.origin !== baseUrl.origin || visited.has(url.href)) continue;
+    visited.add(url.href);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch production asset ${url.pathname}`);
+    const source = await response.text();
+    sources.push(source);
+    for (const match of source.matchAll(/["']([^"']+\.js)["']/g)) {
+      const imported = new URL(match[1], url);
+      if (imported.origin === baseUrl.origin && imported.pathname.startsWith("/assets/")) {
+        pending.push(imported.href);
+      }
+    }
+  }
+  return sources;
+}
+
 mkdirSync(dirname(evidencePath), { recursive: true });
 mkdirSync(screenshotDirectory, { recursive: true });
 
@@ -111,12 +134,10 @@ const routes = await Promise.all([
   "/docs",
 ].map(fetchRoute));
 const rootHtml = routes.find((route) => route.path === "/")?.body ?? "";
-const assetPaths = [...rootHtml.matchAll(/<script[^>]+src="([^"]+)"/g)].map((match) => match[1]);
-const assetSources = await Promise.all(assetPaths.map(async (path) => {
-  const response = await fetch(new URL(path, baseUrl));
-  if (!response.ok) throw new Error(`Failed to fetch production asset ${path}`);
-  return response.text();
-}));
+const assetPaths = [
+  ...rootHtml.matchAll(/<(?:script|link)[^>]+(?:src|href)="([^"]+\.js)"/g),
+].map((match) => match[1]);
+const assetSources = await fetchAssetGraph(assetPaths);
 
 const chrome = findChrome();
 const desktop = browserCapture(chrome, "/", { width: 1440, height: 1000 }, "flare-production-desktop.png");
