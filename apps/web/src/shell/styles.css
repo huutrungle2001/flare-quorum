@@ -7745,6 +7745,10 @@ footer p {
   border-left: 6px solid var(--color-brand-accent);
 }
 
+.public-pending-tender {
+  margin: 24px 0;
+}
+
 .my-submission-card > header {
   align-items: start;
   display: flex;

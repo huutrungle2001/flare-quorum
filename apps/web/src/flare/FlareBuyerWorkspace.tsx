@@ -34,6 +34,7 @@ import {
   assertFlareIngressReady,
   publishFlarePublicBrief,
 } from "./flarePublicBriefRegistry";
+import { savePendingFlareTender } from "./pendingFinality";
 
 const coston2 = {
   id: 114,
@@ -554,7 +555,15 @@ export function FlareBuyerWorkspace({
       }
       const tenderId = args.tenderId;
       setLast({ hash: creationHash, tenderId: tenderId.toString() });
-      toasts.succeed(toastId, `Tender #${tenderId.toString()} is open on Coston2.`);
+      savePendingFlareTender({
+        version: 1,
+        tenderId: tenderId.toString(),
+        transactionHash: creationHash,
+        blockNumber: receipt.blockNumber.toString(),
+        buyer: wallet.state.account!,
+        recordedAt: new Date().toISOString(),
+      });
+      toasts.succeed(toastId, `Tender #${tenderId.toString()} confirmed; waiting for 12-block finality.`);
       onRefresh();
     } catch (cause) {
       const message = flareTenderErrorMessage(cause);
@@ -812,7 +821,7 @@ export function FlareBuyerWorkspace({
         {error && <p className="inline-error" role="alert">{error}</p>}
         {!usingXrplFunding && <WalletPanel wallet={wallet} network="coston2" compact />}
         {!usingXrplFunding && <button className="primary-button" type="button" onClick={() => void createTender()} disabled={busy || !connected || Boolean(weightError)}>{busy ? "WAITING FOR C2FLR…" : "APPROVE & OPEN TENDER →"}</button>}
-        {last && <p className="form-hint" aria-live="polite">Tender #{last.tenderId} created · <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">inspect transaction ↗</a></p>}
+        {last && <p className="form-hint" aria-live="polite">Tender #{last.tenderId} confirmed · waiting for 12-block finality · <a className="text-link" href={`/flare?tender=${last.tenderId}`}>open Public →</a> · <a className="text-link" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">inspect transaction ↗</a></p>}
       </section>
       {usingXrplFunding && <FlareXrpFundingPanel onPrepare={prepareXrpFunding} />}
       </div>

@@ -10,6 +10,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import { submitFlareBid } from "./flareBidIngress";
 import { FlareBuyerBriefPanel } from "./FlareBuyerBriefPanel";
+import {
+  clearPendingFlareBid,
+  readPendingFlareBid,
+  savePendingFlareBid,
+} from "./pendingFinality";
 
 const coston2 = {
   id: 114,
@@ -103,14 +108,15 @@ export function FlareVendorWorkspace({
   const [reviewing, setReviewing] = useState(false);
   const [stage, setStage] = useState<keyof typeof stageLabels | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [last, setLast] = useState<{
+  type PendingBidView = {
     tenderId: bigint;
     hash: Hex;
     block: bigint | null;
     commitment: Hex;
     submissionNonce: bigint;
     receiptExpiry: bigint;
-  } | null>(null);
+  };
+  const [last, setLast] = useState<PendingBidView | null>(null);
   const connected = wallet.state.status === "connected" && wallet.state.account && wallet.state.walletClient;
   const [eligibility, setEligibility] = useState<Record<string, boolean> | null>(null);
   const [eligibilityLoading, setEligibilityLoading] = useState(false);
@@ -130,6 +136,27 @@ export function FlareVendorWorkspace({
       && bid.plaintextCommitment.toLowerCase() === last.commitment.toLowerCase()
     )),
   );
+  const visibleSubmissionCount = mySubmissions.length + (recentPendingFinality ? 1 : 0);
+
+  useEffect(() => {
+    if (!connected || !wallet.state.account) return;
+    const pending = readPendingFlareBid();
+    if (!pending || !isAddressEqual(pending.vendor, wallet.state.account)) return;
+    setLast({
+      tenderId: BigInt(pending.tenderId),
+      hash: pending.transactionHash,
+      block: pending.blockNumber === null ? null : BigInt(pending.blockNumber),
+      commitment: pending.commitment,
+      submissionNonce: BigInt(pending.submissionNonce),
+      receiptExpiry: BigInt(pending.receiptExpiry),
+    });
+  }, [connected, wallet.state.account]);
+
+  useEffect(() => {
+    if (!last || recentPendingFinality) return;
+    clearPendingFlareBid(last.commitment);
+    setLast(null);
+  }, [last, recentPendingFinality]);
 
   function selectSection(next: "submit" | "submissions") {
     const updated = new URLSearchParams(params);
@@ -239,26 +266,48 @@ export function FlareVendorWorkspace({
         },
         onBroadcast: (pending) => {
           broadcasted = true;
-          setLast({
+          const pendingView = {
             tenderId: selected.tenderId,
             hash: pending.transactionHash,
             block: null,
             commitment: pending.commitment,
             submissionNonce: pending.submissionNonce,
             receiptExpiry: pending.receiptExpiry,
+          } satisfies PendingBidView;
+          setLast(pendingView);
+          savePendingFlareBid({
+            version: 1,
+            tenderId: pendingView.tenderId.toString(),
+            vendor: wallet.state.account!,
+            transactionHash: pendingView.hash,
+            blockNumber: null,
+            commitment: pendingView.commitment,
+            submissionNonce: pendingView.submissionNonce.toString(),
+            receiptExpiry: pendingView.receiptExpiry.toString(),
           });
           setPrice("");
           setReviewing(false);
           selectSection("submissions");
         },
       });
-      setLast({
+      const pendingView = {
         tenderId: selected.tenderId,
         hash: result.transactionHash,
         block: result.blockNumber,
         commitment: result.commitment,
         submissionNonce: result.submission.submissionNonce,
         receiptExpiry: result.submission.receiptExpiry,
+      } satisfies PendingBidView;
+      setLast(pendingView);
+      savePendingFlareBid({
+        version: 1,
+        tenderId: pendingView.tenderId.toString(),
+        vendor: wallet.state.account!,
+        transactionHash: pendingView.hash,
+        blockNumber: pendingView.block.toString(),
+        commitment: pendingView.commitment,
+        submissionNonce: pendingView.submissionNonce.toString(),
+        receiptExpiry: pendingView.receiptExpiry.toString(),
       });
       setPrice("");
       setReviewing(false);
@@ -297,12 +346,12 @@ export function FlareVendorWorkspace({
       </section>
       <nav className="vendor-section-nav" aria-label="Private Bids sections">
         <button type="button" className={section === "submit" ? "active" : ""} aria-current={section === "submit" ? "page" : undefined} onClick={() => selectSection("submit")}>SUBMIT BID</button>
-        <button type="button" className={section === "submissions" ? "active" : ""} aria-current={section === "submissions" ? "page" : undefined} onClick={() => selectSection("submissions")}>MY SUBMISSIONS{connected && mySubmissions.length > 0 ? ` · ${mySubmissions.length}` : ""}</button>
+        <button type="button" className={section === "submissions" ? "active" : ""} aria-current={section === "submissions" ? "page" : undefined} onClick={() => selectSection("submissions")}>MY SUBMISSIONS{connected && visibleSubmissionCount > 0 ? ` · ${visibleSubmissionCount}` : ""}</button>
       </nav>
       {section === "submissions" ? (
         <section className="evidence-panel vendor-submissions-panel" aria-label="My finalized bid submissions">
           <header className="detail-header">
-            <div><p className="eyebrow">MY SUBMISSIONS / PUBLIC RECEIPTS</p><h2>{connected ? `${mySubmissions.length} finalized submission${mySubmissions.length === 1 ? "" : "s"}` : "Connect to find your submissions"}</h2></div>
+            <div><p className="eyebrow">MY SUBMISSIONS / PUBLIC RECEIPTS</p><h2>{connected ? `${mySubmissions.length} finalized${recentPendingFinality ? " · 1 waiting finality" : ""}` : "Connect to find your submissions"}</h2></div>
             <span className={`privacy-badge${connected ? " verified" : ""}`}>{connected ? "WALLET FILTER ACTIVE" : "WALLET REQUIRED"}</span>
           </header>
           <div className="my-submissions-boundary" role="note">
@@ -328,7 +377,7 @@ export function FlareVendorWorkspace({
               </dl>
               <p className="submission-explainer">{last.block === null
                 ? "The wallet broadcast the transaction. FlareQuorum is checking Coston2 confirmation before asserting acceptance."
-                : "The transaction succeeded. This card will become a finalized submission after the public reader reaches 12-block finality."}</p>
+                : "The transaction succeeded. Automatic refresh runs every 3 seconds; this card becomes a finalized submission after the public reader reaches 12-block finality."}</p>
               <div className="my-submission-actions">
                 <a className="secondary-button" href={`https://coston2-explorer.flare.network/tx/${last.hash}`} target="_blank" rel="noreferrer">VIEW TRANSACTION ↗</a>
                 <a className="text-link" href={`/flare?status=all&tender=${last.tenderId.toString()}`}>VIEW PUBLIC DOSSIER →</a>

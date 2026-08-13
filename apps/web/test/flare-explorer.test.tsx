@@ -19,6 +19,11 @@ import { FlareLandingPage } from "../src/flare/FlareLandingPage";
 import { FlareRedemptionPanel } from "../src/flare/FlareRedemptionPanel";
 import { FlareXrpFundingPanel } from "../src/flare/FlareXrpFundingPanel";
 import { readPublicFlareFundingCheckpoint, savePublicFlareFundingCheckpoint } from "../src/flare/fundingCheckpoint";
+import {
+  savePendingFlareBid,
+  readPendingFlareTender,
+  savePendingFlareTender,
+} from "../src/flare/pendingFinality";
 import { PrimaryNavigation } from "../src/shell/PrimaryNavigation";
 import type { WalletController } from "../src/wallet/WalletPanel";
 
@@ -119,6 +124,41 @@ describe("Coston2 public evidence boundary", () => {
   it("keeps the verified release label visible inside the tender room", () => {
     render(<MemoryRouter><FlareExplorerView state={{ status: "ready", error: null, data: { chainId: 114, tenders: [], indexedBlock: 22n, finalizedBlock: 22n, latestBlock: 34n, deploymentStatus: "verified" } }} onRetry={() => undefined} /></MemoryRouter>);
     expect(screen.getByText("VERIFIED COSTON2 RELEASE")).toBeInTheDocument();
+  });
+
+  it("shows a confirmed tender immediately while canonical finality catches up", async () => {
+    savePendingFlareTender({
+      version: 1,
+      tenderId: "9",
+      transactionHash: `0x${"99".repeat(32)}`,
+      blockNumber: "123456",
+      buyer: publicTender.buyer,
+      recordedAt: "2026-08-14T00:00:00.000Z",
+    });
+    const state = {
+      status: "ready" as const,
+      error: null,
+      data: {
+        chainId: 114 as const,
+        tenders: [publicTender],
+        indexedBlock: 100n,
+        finalizedBlock: 100n,
+        latestBlock: 112n,
+        deploymentStatus: "verified" as const,
+      },
+    };
+    const view = render(<MemoryRouter><FlareExplorerView state={state} onRetry={() => undefined} /></MemoryRouter>);
+    expect(screen.getByText("TENDER 9 · JUST CREATED")).toBeInTheDocument();
+    expect(screen.getByText("WAITING FOR 12-BLOCK FINALITY")).toBeInTheDocument();
+    expect(screen.getByText(/Public refresh runs every 3 seconds/)).toBeInTheDocument();
+
+    view.rerender(<MemoryRouter><FlareExplorerView state={{
+      ...state,
+      data: { ...state.data, tenders: [publicTender, { ...publicTender, tenderId: 9n }] },
+    }} onRetry={() => undefined} /></MemoryRouter>);
+    await waitFor(() => expect(readPendingFlareTender()).toBeNull());
+    expect(screen.queryByText("TENDER 9 · JUST CREATED")).toBeNull();
+    expect(screen.getByRole("button", { name: /Tender #9/i })).toBeInTheDocument();
   });
 
   it("offers an optional Coston2 wallet without gating the read-only Flare route", () => {
@@ -402,6 +442,28 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText(/Private terms were deliberately not persisted/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "VIEW PUBLIC DOSSIER →" })).toHaveAttribute("href", "/flare?status=all&tender=1");
     expect(screen.queryByText(/0\.72 XRP|Delivery days|Warranty days/)).toBeNull();
+  });
+
+  it("restores a public-safe pending bid immediately in My Submissions", async () => {
+    savePendingFlareBid({
+      version: 1,
+      tenderId: "1",
+      vendor: vendorAddress,
+      transactionHash: `0x${"91".repeat(32)}`,
+      blockNumber: "123456",
+      commitment: `0x${"92".repeat(32)}`,
+      submissionNonce: "91",
+      receiptExpiry: "2000000000",
+    });
+    render(
+      <MemoryRouter initialEntries={["/flare?role=vendor&vendor=submissions"]}>
+        <FlareVendorWorkspace wallet={connectedVendorWallet} tenders={[publicTender]} onRefresh={() => undefined} />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText("TENDER 1 · JUST SUBMITTED")).toBeInTheDocument();
+    expect(screen.getByText("CONFIRMED · FINALITY PENDING")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "MY SUBMISSIONS · 1" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "0 finalized · 1 waiting finality" })).toBeInTheDocument();
   });
 
   it("keeps FXRP redemption behind the winning wallet and never asks for an XRPL secret", () => {

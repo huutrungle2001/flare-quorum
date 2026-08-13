@@ -1,6 +1,6 @@
 import { formatUnits } from "viem";
 import { useSearchParams } from "react-router";
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { coston2FlarePublicRelease } from "@flarequorum/flare-bindings";
 import type { FlareMarketState } from "../public-market/useFlareMarket";
 import { useFlareMarket } from "../public-market/useFlareMarket";
@@ -16,6 +16,11 @@ import { PublicValue } from "../shell/PublicValue";
 import { refreshStateEvent } from "../shell/refreshState";
 import { scrollToPageTop } from "../shell/navigationScroll";
 import { FlareBuyerBriefPanel, useVerifiedFlareBuyerBrief } from "./FlareBuyerBriefPanel";
+import {
+  clearPendingFlareTender,
+  pendingTenderChangedEvent,
+  readPendingFlareTender,
+} from "./pendingFinality";
 
 type FlareTenderFilter = "current" | "all" | "open" | "compute" | "awarded" | "refunded";
 type FlareTenderSort = "newest" | "oldest";
@@ -507,6 +512,22 @@ function FlareRoleWorkspace({
 export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState; onRetry: () => void }) {
   const [params, setParams] = useSearchParams();
   const tenders = state.data?.tenders ?? [];
+  const [pendingTender, setPendingTender] = useState(readPendingFlareTender);
+  useEffect(() => {
+    const syncPendingTender = () => setPendingTender(readPendingFlareTender());
+    window.addEventListener(pendingTenderChangedEvent, syncPendingTender);
+    return () => window.removeEventListener(pendingTenderChangedEvent, syncPendingTender);
+  }, []);
+  useEffect(() => {
+    if (!pendingTender) return;
+    if (tenders.some((tender) => tender.tenderId.toString() === pendingTender.tenderId)) {
+      clearPendingFlareTender(pendingTender.tenderId);
+    }
+  }, [pendingTender, tenders]);
+  const pendingFinality = pendingTender
+    && !tenders.some((tender) => tender.tenderId.toString() === pendingTender.tenderId)
+    ? pendingTender
+    : null;
   const requestedFilter = params.get("status");
   const filter = flareTenderFilters.some((option) => option.value === requestedFilter)
     ? requestedFilter as FlareTenderFilter
@@ -602,6 +623,18 @@ export function FlareExplorerView({ state, onRetry }: { state: FlareMarketState;
         <div className="intro-copy"><p>Browse finalized tender coordination without connecting a wallet. Commercial terms remain sealed while public award and settlement evidence stay inspectable.</p><span className="deployment-label">{state.data?.deploymentStatus === "verified" ? "VERIFIED COSTON2 RELEASE" : "COSTON2 DEPLOYMENT · NOT YET VERIFIED"}</span></div>
       </section>
       <ProtocolFacts compact />
+      {pendingFinality && (
+        <section className="my-submission-card pending-finality public-pending-tender" aria-live="polite">
+          <header>
+            <div><p className="eyebrow">TENDER {pendingFinality.tenderId} · JUST CREATED</p><h3>Confirmed on Coston2</h3></div>
+            <span className="privacy-badge encrypted">WAITING FOR 12-BLOCK FINALITY</span>
+          </header>
+          <p className="submission-explainer">This public-safe checkpoint came from the confirmed creation receipt in this tab. Public refresh runs every 3 seconds and will replace it with the canonical dossier after finality.</p>
+          <div className="my-submission-actions">
+            <a className="secondary-button" href={`https://coston2-explorer.flare.network/tx/${pendingFinality.transactionHash}`} target="_blank" rel="noreferrer">VIEW TRANSACTION ↗</a>
+          </div>
+        </section>
+      )}
       {state.status === "loading" && <section className="state-panel"><span className="loading-mark" /><div><h2>Reading Coston2 state</h2><p>No placeholder tender is inserted.</p></div></section>}
       {state.status === "error" && <section className="state-panel error" role="alert"><span>!</span><div><h2>Flare state unavailable</h2><p>{state.error}</p><button className="secondary-button" onClick={onRetry}>RETRY COSTON2 →</button></div></section>}
       {state.status === "ready" && tenders.length === 0 && <section className="state-panel"><span>0</span><div><h2>No Coston2 tenders yet</h2><p>The configured market has no public tender records.</p></div></section>}
