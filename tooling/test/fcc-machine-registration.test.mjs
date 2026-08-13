@@ -12,6 +12,7 @@ import {
   normalizeMachineOrigin,
   parseMachineInfo,
   registeredMachineExtensionId,
+  registeredMachineReadinessBlockers,
   registrationAddresses,
   requiredMachineRouteUpdate,
 } from "../flare/fcc-machine-registration.mjs";
@@ -336,6 +337,43 @@ test("fails a production machine whose availability check is expired or stale", 
   assert.equal(expired.status, "FAILED");
   assert.equal(expired.assertions.validityNotExpired, false);
   assert.equal(expired.assertions.checkFresh, false);
+});
+
+test("allows an explicit availability refresh only when every non-availability binding still passes", () => {
+  const assertions = {
+    productionStatus: true,
+    extensionMatches: true,
+    teeIdMatches: true,
+    urlMatches: true,
+    codeHashMatches: true,
+    platformMatches: true,
+    publicKeyMatches: true,
+    availabilityNotExpired: false,
+    availabilityFresh: false,
+    availabilityWindowValid: true,
+  };
+  const expiredVerification = {
+    status: "FAILED",
+    activeSet: { status: "PASSED" },
+    machines: [1, 2, 3].map((machine) => ({ machine, assertions })),
+  };
+  assert.deepEqual(registeredMachineReadinessBlockers(
+    expiredVerification,
+    { allowAvailabilityRefresh: true },
+  ), []);
+  assert.match(
+    registeredMachineReadinessBlockers(expiredVerification)[0],
+    /READINESS_STALE_OR_MISMATCH/,
+  );
+  assert.match(
+    registeredMachineReadinessBlockers({
+      ...expiredVerification,
+      machines: expiredVerification.machines.map((machine, index) => index === 0
+        ? { ...machine, assertions: { ...assertions, publicKeyMatches: false } }
+        : machine),
+    }, { allowAvailabilityRefresh: true })[0],
+    /READINESS_STALE_OR_MISMATCH/,
+  );
 });
 
 test("loads the current provider-push baseline and rejects reserved operation types", () => {

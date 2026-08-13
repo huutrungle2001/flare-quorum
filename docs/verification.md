@@ -13,9 +13,10 @@
 >
 > Operational boundary: the refreshed machine evidence proves availability at
 > its recorded checkpoint. Because FCC availability is time-bounded, rerun the
-> V2 machine preflight (`pnpm flare:v2:machines:preflight`) and refresh `rRap`
-> if necessary near the judge demo; an old pass is never treated as current
-> availability.
+> V2 machine preflight (`pnpm flare:v2:machines:preflight`) and run
+> `pnpm flare:v2:availability:refresh` if necessary near the judge demo; an old
+> pass is never treated as current availability. Renewal uses a fresh proof and
+> `confirmAvailability` without pausing production identities.
 
 ## 1. Evidence policy
 

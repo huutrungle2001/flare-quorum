@@ -96,6 +96,20 @@ apply:
 `SIMULATED_TEE=true` remains a Coston2 feasibility configuration. It must not be
 described as hardware-backed production confidentiality.
 
+Immediately before a judge session, require current rather than historical
+availability:
+
+```bash
+pnpm flare:v2:machines:preflight
+pnpm flare:v2:availability:refresh  # only when freshness has expired
+pnpm flare:v2:machines:preflight
+```
+
+Renewal keeps status-`2` identities active and uses
+`confirmAvailability(proof)`; it does not pause the three-machine set. The
+paused recovery branch uses a new proof with `toProduction(proof)` and rejects
+proof replay or any unexpected status.
+
 ## Release sequence
 
 Run one stage at a time and commit its public-safe evidence before proceeding.

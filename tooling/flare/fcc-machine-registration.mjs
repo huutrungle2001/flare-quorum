@@ -233,6 +233,30 @@ export function machineEvidenceRelativePath(environment = process.env) {
     : "evidence/coston2/fcc-machines.json";
 }
 
+export function registeredMachineReadinessBlockers(
+  verification,
+  { allowAvailabilityRefresh = false } = {},
+) {
+  if (verification?.status === "PASSED") return [];
+  const machines = verification?.machines ?? [];
+  const nonAvailabilityReady = verification?.activeSet?.status === "PASSED" &&
+    machines.length === 3 &&
+    machines.every(({ assertions = {} }) => Object.entries(assertions).every(
+      ([name, value]) => name.startsWith("availability") || value === true,
+    ));
+  if (allowAvailabilityRefresh && nonAvailabilityReady) return [];
+
+  const blockers = ["FCC_REGISTERED_MACHINE_READINESS_STALE_OR_MISMATCH"];
+  for (const machine of machines) {
+    if (!machine.assertions?.availabilityNotExpired) {
+      blockers.push(`MACHINE_${machine.machine}_AVAILABILITY_EXPIRED`);
+    } else if (!machine.assertions?.availabilityFresh) {
+      blockers.push(`MACHINE_${machine.machine}_AVAILABILITY_STALE`);
+    }
+  }
+  return blockers;
+}
+
 export function requiredMachineRouteUpdate(record, machine) {
   const teeId = getAddress(record.teeId);
   if (teeId === "0x0000000000000000000000000000000000000000") return null;

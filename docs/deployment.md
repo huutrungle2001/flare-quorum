@@ -249,6 +249,21 @@ instructions directly to the selected machine's registered
 or route those instructions. The deployment key remains process-local and is
 never placed in an argument, image, state file, output, or evidence.
 
+Registration evidence is immutable, but availability is not. Before a demo,
+run the V2 machine preflight and, when freshness alone has expired, renew all
+three machines without pausing the production set:
+
+```bash
+pnpm flare:v2:availability:preflight
+pnpm flare:v2:availability:refresh
+pnpm flare:v2:machines:preflight
+```
+
+The renewal path uses one fresh attestation/check per production identity and
+submits `confirmAvailability(proof)`. A previously paused identity is recovered
+with a new proof and `toProduction(proof)`; stale proof state and unsupported
+statuses are rejected.
+
 The live ingress repeats the same status and availability reads at the exact
 chain checkpoint used for bid admission. Its `/health` becomes unavailable when
 any frozen machine is expired or mismatched. Both Buyer funding paths require

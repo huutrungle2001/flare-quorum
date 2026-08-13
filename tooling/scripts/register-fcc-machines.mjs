@@ -5,6 +5,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  renameSync,
   statSync,
   writeFileSync,
 } from "node:fs";
@@ -13,9 +14,12 @@ import { resolve } from "node:path";
 import {
   createPublicClient,
   createWalletClient,
+  decodeAbiParameters,
   getAddress,
+  hexToString,
   http,
   parseAbi,
+  parseAbiParameters,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -28,6 +32,7 @@ import {
   registrationAddresses,
   requiredMachineRouteUpdate,
   registeredMachineExtensionId,
+  registeredMachineReadinessBlockers,
   isTeeNotFoundError,
 } from "../flare/fcc-machine-registration.mjs";
 import {
@@ -48,10 +53,21 @@ const managerAbi = parseAbi([
   "function getAvailabilityCheckValidity(address teeId) view returns (uint64 endTs,uint32 lastSigningPolicyId)",
   "function getSettings() view returns (uint256 availabilityCheckValidityDurationSeconds,uint256 challengeValidityDurationSeconds)",
   "function updateTeeMachineSettings(address teeId,address teeProxyId,string url)",
+  "function confirmAvailability(((bytes signingPolicySignatures,(uint8 v,bytes32 r,bytes32 s)[] teeSignatures,(uint8 v,bytes32 r,bytes32 s)[] cosignerSignatures) signatures,(bytes32 attestationType,bytes32 sourceId,uint16 thresholdBIPS,address proofOwner,address[] cosigners,uint64 cosignersThreshold,uint64 timestamp) header,(address teeId,address teeProxyId,string url,bytes32 challenge,bytes32 instructionId) requestBody,(uint8 status,uint64 teeTimestamp,bytes32 codeHash,bytes32 platform,uint32 initialSigningPolicyId,uint32 lastSigningPolicyId,(bytes systemState,bytes32 systemStateVersion,bytes state,bytes32 stateVersion) state) responseBody) proof)",
 ]);
+const availabilityHeaderParameters = parseAbiParameters(
+  "(bytes32 attestationType,bytes32 sourceId,uint16 thresholdBIPS,address proofOwner,address[] cosigners,uint64 cosignersThreshold,uint64 timestamp)",
+);
+const availabilityRequestParameters = parseAbiParameters(
+  "(address teeId,address teeProxyId,string url,bytes32 challenge,bytes32 instructionId)",
+);
+const availabilityResponseParameters = parseAbiParameters(
+  "(uint8 status,uint64 teeTimestamp,bytes32 codeHash,bytes32 platform,uint32 initialSigningPolicyId,uint32 lastSigningPolicyId,(bytes systemState,bytes32 systemStateVersion,bytes state,bytes32 stateVersion) state)",
+);
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 const operationalBaseline = readFccOperationalBaseline(repositoryRoot);
 const v2 = process.env.FCC_RELEASE_PROFILE?.trim().toLowerCase() === "v2";
+const availabilityRefresh = v2 && process.env.FCC_REFRESH_MACHINE_AVAILABILITY?.trim() === "true";
 const rollingMachineNumber = Number(process.env.FCC_ROLLING_MACHINE_INDEX ?? "0");
 const rollingMachineIndex = rollingMachineNumber - 1;
 const rolling = v2 && Number.isInteger(rollingMachineIndex) &&
@@ -116,7 +132,7 @@ function publicPreflight(result, extraBlockers, activeSet, registeredVerificatio
   return {
     status: blockers.length === 0 ? "READY" : "BLOCKED",
     mode: "simulated-coston2",
-    command: "rRap",
+    command: availabilityRefresh ? "Ra-confirm-or-Rap-promote" : "rRap",
     machineCount: result.machines.length,
     activeMachineCount: activeSet?.activeMachineCount ?? null,
     activeSetAssertions: activeSet?.assertions ?? null,
@@ -193,6 +209,131 @@ async function machineStatus({ client, manager, machine }) {
   }
 }
 
+async function currentMachineAvailability({ client, manager, machine }) {
+  const blockNumber = await client.getBlockNumber();
+  const [block, settings, validity] = await Promise.all([
+    client.getBlock({ blockNumber }),
+    client.readContract({
+      address: manager,
+      abi: managerAbi,
+      functionName: "getSettings",
+      blockNumber,
+    }),
+    client.readContract({
+      address: manager,
+      abi: managerAbi,
+      functionName: "getAvailabilityCheckValidity",
+      args: [machine.teeId],
+      blockNumber,
+    }),
+  ]);
+  return evaluateAvailabilityWindow({
+    endTs: validity[0],
+    validityDurationSeconds: settings[0],
+    checkpointTimestamp: block.timestamp,
+    maxCheckAgeSeconds: operationalBaseline.availability.maxCheckAgeSeconds,
+    lastSigningPolicyId: validity[1],
+  });
+}
+
+function archiveRegistrationState(statePath) {
+  if (!existsSync(statePath)) return null;
+  const archivedPath = `${statePath}.before-availability-refresh-${Date.now()}`;
+  renameSync(statePath, archivedPath);
+  return archivedPath;
+}
+
+function availabilityInstructionId(output) {
+  const matches = [...output.matchAll(/availability check sent, instructionId: ([0-9a-f]{64})/gi)];
+  if (matches.length !== 1) throw new Error("FCC_AVAILABILITY_INSTRUCTION_ID_UNAVAILABLE");
+  return `0x${matches[0][1]}`;
+}
+
+async function fetchAvailabilityProof(normalProxyUrl, instructionId) {
+  let response;
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    response = await fetch(new URL(`action/result/${instructionId}`, normalProxyUrl), {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (response.ok) break;
+    if (![202, 404].includes(response.status)) {
+      throw new Error("FCC_AVAILABILITY_PROOF_PROXY_REJECTED");
+    }
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 2_000));
+  }
+  if (!response?.ok) throw new Error("FCC_AVAILABILITY_PROOF_TIMEOUT");
+  const action = await response.json();
+  if (action?.result?.status !== 1 || !/^0x[0-9a-f]+$/i.test(action?.result?.data ?? "")) {
+    throw new Error("FCC_AVAILABILITY_PROOF_INVALID");
+  }
+  let encoded;
+  try {
+    encoded = JSON.parse(hexToString(action.result.data));
+  } catch {
+    throw new Error("FCC_AVAILABILITY_PROOF_INVALID");
+  }
+  const requiredHex = [
+    encoded.responseHeader,
+    encoded.requestBody,
+    encoded.responseBody,
+    encoded.dataProviderSignatures,
+  ];
+  if (!requiredHex.every((value) => /^0x[0-9a-f]+$/i.test(value ?? ""))) {
+    throw new Error("FCC_AVAILABILITY_PROOF_INVALID");
+  }
+  return {
+    signatures: {
+      signingPolicySignatures: encoded.dataProviderSignatures,
+      teeSignatures: [],
+      cosignerSignatures: [],
+    },
+    header: decodeAbiParameters(availabilityHeaderParameters, encoded.responseHeader)[0],
+    requestBody: decodeAbiParameters(availabilityRequestParameters, encoded.requestBody)[0],
+    responseBody: decodeAbiParameters(availabilityResponseParameters, encoded.responseBody)[0],
+  };
+}
+
+async function confirmMachineAvailability({
+  client,
+  walletClient,
+  account,
+  manager,
+  machine,
+  normalProxyUrl,
+  instructionId,
+}) {
+  const proof = await fetchAvailabilityProof(normalProxyUrl, instructionId);
+  if (
+    getAddress(proof.requestBody.teeId) !== getAddress(machine.teeId) ||
+    proof.requestBody.url !== machine.publicUrl ||
+    String(proof.responseBody.codeHash).toLowerCase() !== machine.codeHash ||
+    String(proof.responseBody.platform).toLowerCase() !== machine.platform ||
+    Number(proof.responseBody.status) !== 1 ||
+    getAddress(proof.header.proofOwner) !== getAddress(account.address)
+  ) {
+    throw new Error(`FCC_MACHINE_${machine.machine}_AVAILABILITY_PROOF_BINDING_MISMATCH`);
+  }
+  const transactionHash = await walletClient.writeContract({
+    account,
+    address: manager,
+    abi: managerAbi,
+    functionName: "confirmAvailability",
+    args: [proof],
+  });
+  const receipt = await client.waitForTransactionReceipt({ hash: transactionHash });
+  if (receipt.status !== "success") {
+    throw new Error(`FCC_MACHINE_${machine.machine}_AVAILABILITY_CONFIRM_REVERTED`);
+  }
+  console.log(JSON.stringify({
+    event: "FCC_MACHINE_AVAILABILITY_CONFIRMED",
+    machine: machine.machine,
+    teeId: machine.teeId,
+    transactionHash,
+    blockNumber: receipt.blockNumber.toString(),
+  }));
+}
+
 async function verifyOnchainMachines({ client, manager, extensionId, endpointResult }) {
   const blockNumber = await client.getBlockNumber();
   const [block, settings, activeMachines] = await Promise.all([
@@ -255,6 +396,18 @@ async function verifyOnchainMachines({ client, manager, extensionId, endpointRes
     machines,
     activeSet,
   };
+}
+
+async function verifyOnchainMachinesWithRetry(configuration) {
+  let verification;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    verification = await verifyOnchainMachines(configuration);
+    if (verification.status === "PASSED") return verification;
+    if (attempt < 4) {
+      await new Promise((resolvePromise) => setTimeout(resolvePromise, 1_500));
+    }
+  }
+  return verification;
 }
 
 try {
@@ -325,7 +478,10 @@ try {
         activeIds,
         activeUrls,
         endpointResult.machines,
-        { requireComplete: false },
+        {
+          requireComplete: v2 && !availabilityRefresh && !rolling &&
+            !process.argv.includes("--execute"),
+        },
       );
       if (activeSet.status !== "PASSED") {
         extraBlockers.push("FCC_ACTIVE_MACHINE_SET_CONFLICT");
@@ -336,16 +492,10 @@ try {
           extensionId: BigInt(extensionIdHex),
           endpointResult,
         });
-        if (registeredVerification.status !== "PASSED") {
-          extraBlockers.push("FCC_REGISTERED_MACHINE_READINESS_STALE_OR_MISMATCH");
-          for (const machine of registeredVerification.machines) {
-            if (!machine.assertions.availabilityNotExpired) {
-              extraBlockers.push(`MACHINE_${machine.machine}_AVAILABILITY_EXPIRED`);
-            } else if (!machine.assertions.availabilityFresh) {
-              extraBlockers.push(`MACHINE_${machine.machine}_AVAILABILITY_STALE`);
-            }
-          }
-        }
+        extraBlockers.push(...registeredMachineReadinessBlockers(
+          registeredVerification,
+          { allowAvailabilityRefresh: availabilityRefresh },
+        ));
       }
     } catch {
       extraBlockers.push("FCC_ACTIVE_MACHINE_SET_UNAVAILABLE");
@@ -361,13 +511,13 @@ try {
     console.log(JSON.stringify(preflight, null, 2));
     if (preflight.status !== "READY") process.exitCode = 1;
   } else {
-    if (v2 && execFileSync("git", ["status", "--porcelain"], {
+    if (v2 && !availabilityRefresh && execFileSync("git", ["status", "--porcelain"], {
       cwd: repositoryRoot,
       encoding: "utf8",
     }).trim()) {
       throw new Error("FCC_MARKET_V2_MACHINES_REQUIRE_CLEAN_WORKTREE");
     }
-    if (v2 && existsSync(evidencePath)) {
+    if (v2 && !availabilityRefresh && existsSync(evidencePath)) {
       throw new Error("FCC_MARKET_V2_MACHINE_EVIDENCE_ALREADY_EXISTS");
     }
     mkdirSync(runtimeDirectory, { recursive: true, mode: 0o700 });
@@ -381,7 +531,6 @@ try {
       account: deploymentAccount,
       transport: http(rpcUrl, { retryCount: 2, timeout: 20_000 }),
     });
-
     for (const machine of endpointResult.machines) {
       await reconcileMachineRoute({
         client,
@@ -391,7 +540,7 @@ try {
         machine,
       });
       const status = await machineStatus({ client, manager, machine });
-      if (status === 2) {
+      if (status === 2 && !availabilityRefresh) {
         console.log(JSON.stringify({
           event: "FCC_MACHINE_ALREADY_PRODUCTION",
           machine: machine.machine,
@@ -400,6 +549,25 @@ try {
         continue;
       }
       const statePath = resolve(runtimeDirectory, `${machine.teeId.toLowerCase()}.state.json`);
+      if (availabilityRefresh) {
+        if (status === 2) {
+          const availability = await currentMachineAvailability({ client, manager, machine });
+          if (availability.status === "PASSED") {
+            console.log(JSON.stringify({
+              event: "FCC_MACHINE_AVAILABILITY_ALREADY_FRESH",
+              machine: machine.machine,
+              teeId: machine.teeId,
+              availability,
+            }));
+            continue;
+          }
+          archiveRegistrationState(statePath);
+        } else if (status === 4) {
+          archiveRegistrationState(statePath);
+        } else {
+          throw new Error(`FCC_MACHINE_${machine.machine}_UNSAFE_REFRESH_STATUS_${status}`);
+        }
+      }
       const execution = spawnSync(binaryPath, [
         "-a", addressesPath,
         "-c", rpcUrl,
@@ -408,7 +576,7 @@ try {
         "-ep", endpointConfiguration.normalProxyUrl,
         "-state", statePath,
         "-resume",
-        "-command", "rRap",
+        "-command", availabilityRefresh ? (status === 4 ? "Rap" : "Ra") : "rRap",
       ], {
         cwd: runtimeDirectory,
         env: {
@@ -416,14 +584,30 @@ try {
           DEPLOYMENT_PRIVATE_KEY: deploymentKey,
           SIMULATED_TEE: "true",
         },
-        stdio: "inherit",
+        encoding: "utf8",
       });
+      process.stdout.write(execution.stdout ?? "");
+      process.stderr.write(execution.stderr ?? "");
       if (execution.status !== 0) {
         throw new Error(`FCC_MACHINE_${machine.machine}_REGISTRATION_FAILED`);
       }
+      if (availabilityRefresh && status === 2) {
+        await confirmMachineAvailability({
+          client,
+          walletClient,
+          account: deploymentAccount,
+          manager,
+          machine,
+          normalProxyUrl: endpointConfiguration.normalProxyUrl,
+          instructionId: availabilityInstructionId(`${execution.stdout ?? ""}\n${execution.stderr ?? ""}`),
+        });
+      }
+      if (availabilityRefresh && await machineStatus({ client, manager, machine }) !== 2) {
+        throw new Error(`FCC_MACHINE_${machine.machine}_REFRESH_NOT_PRODUCTION`);
+      }
     }
 
-    const verification = await verifyOnchainMachines({
+    const verification = await verifyOnchainMachinesWithRetry({
       client,
       manager,
       extensionId: BigInt(extensionIdHex),
@@ -458,7 +642,7 @@ try {
       publicIdentifiers: {
         manager: manifest.contracts.flareTeeManager,
         extensionId: extensionIdHex,
-        command: "rRap",
+        command: availabilityRefresh ? "Ra-confirm-or-Rap-promote" : "rRap",
         simulatedTee: true,
         ...(rolling ? { rollingMachine: rollingMachineNumber } : {}),
         activeMachineCount: verification.activeSet.activeMachineCount,
@@ -484,18 +668,20 @@ try {
       ],
     };
     if (evidenceStatus !== "PASSED") throw new Error("FCC_MACHINE_ONCHAIN_VERIFICATION_FAILED");
-    mkdirSync(resolve(repositoryRoot, "evidence/coston2"), { recursive: true });
-    writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, v2 ? { flag: "wx" } : {});
-    setLocalEnvironmentValues(environmentPath, {
-      [v2 ? "FCC_V2_TEE_IDS" : "FLAREQUORUM_FCC_TEE_IDS"]:
-        verification.machines.map(({ teeId }) => teeId).join(","),
-    });
+    if (!availabilityRefresh) {
+      mkdirSync(resolve(repositoryRoot, "evidence/coston2"), { recursive: true });
+      writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, v2 ? { flag: "wx" } : {});
+      setLocalEnvironmentValues(environmentPath, {
+        [v2 ? "FCC_V2_TEE_IDS" : "FLAREQUORUM_FCC_TEE_IDS"]:
+          verification.machines.map(({ teeId }) => teeId).join(","),
+      });
+    }
     console.log(JSON.stringify({
       gate: evidence.gate,
       status: evidence.status,
       blockNumber: evidence.network.blockNumber,
       machines: verification.machines.map(({ machine, teeId, status, assertions }) => ({ machine, teeId, status, assertions })),
-      evidence: evidenceDisplayPath,
+      evidence: availabilityRefresh ? null : evidenceDisplayPath,
     }, null, 2));
   }
 } catch (error) {

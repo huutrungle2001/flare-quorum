@@ -113,6 +113,31 @@ Reusing a historical extension ID, machine record, challenge, or address is a
 failure. Re-running `pre-build --force` casually is also forbidden because it
 can detach a machine from the expected extension.
 
+### 3.1 Renewing V2 availability
+
+FCC availability expires after six hours even when a machine remains in status
+`2`. Recheck the exact three-machine set before a demo:
+
+```bash
+pnpm flare:v2:machines:preflight
+```
+
+If freshness is the only failed binding, renew it with:
+
+```bash
+pnpm flare:v2:availability:preflight
+pnpm flare:v2:availability:refresh
+pnpm flare:v2:machines:preflight
+```
+
+The refresh command keeps a production machine active, requests one fresh TEE
+attestation and availability check, and calls the manager's
+`confirmAvailability(proof)`. It does not pause a healthy identity and never
+reuses a prior proof. If an interrupted operation finds an identity already in
+status `4` (`PAUSED`), it requests one new attestation/check and uses
+`toProduction(proof)` to restore that same identity. Any other status, binding
+drift, unexpected active identity, or non-fresh final checkpoint fails closed.
+
 The foundation sender evidence remains under
 `evidence/coston2/fcc-extension-registration.json`. The historical V1 product sender
 `0xFaEDc6793E72AFF05d29e6f0550d0FF8b90c4c05` is explicitly bound to extension
@@ -193,6 +218,7 @@ Expected status meanings from the supplied bulletin:
 |---:|---|---|
 | `1` | `INITIALIZED` | Not ready; inspect URL, versions, indexer, challenge, and votes |
 | `2` | `PRODUCTION` | Registration gate may proceed to action-result testing |
+| `4` | `PAUSED` | Not ready; restore only with a fresh supported availability proof |
 
 The machine record URL must equal the currently served stable URL. `PRODUCTION`
 alone does not prove private ingress, sealed state, scoring correctness, or
