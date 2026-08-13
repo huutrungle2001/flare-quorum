@@ -43,13 +43,15 @@ production-security, private-token-transfer, or zero-knowledge claim.
 | Resource | Public link |
 |---|---|
 | Working application | <https://flare-quorum.vercel.app> |
+| Demo video | <https://www.youtube.com/watch?v=4x26H04sBBM> |
 | Wallet-free Auditor | <https://flare-quorum.vercel.app/flare?role=evidence> |
 | Source repository | <https://github.com/huutrungle2001/flare-quorum> |
+| Official X submission | <https://x.com/nehuutrung/status/2088033753595814272> |
 | Verified release manifest | <https://github.com/huutrungle2001/flare-quorum/blob/main/packages/flare-contracts/deployments/coston2.release.json> |
 | New-work disclosure | <https://github.com/huutrungle2001/flare-quorum/blob/main/submission/flarequorum/NEW-WORK-LEDGER.md> |
 
-The working application is the demo resource; no video is required for this
-package.
+The working application remains the canonical interactive demo; the video
+provides a guided walkthrough of the same product boundary.
 
 ## The problem and product usefulness
 

@@ -16,6 +16,8 @@ For copy-ready form fields, start with
 | Short description | Transparent procurement rules and FTestXRP escrow with encrypted vendor offers, deterministic private FCC scoring, threshold-signed selection, and public settlement evidence |
 | Target users | XRP-native treasury operators, Flare DAOs/procurement teams, vendors protecting losing commercial terms, and auditors inspecting the result binding |
 | Working demo | [flare-quorum.vercel.app](https://flare-quorum.vercel.app) |
+| Demo video | [YouTube walkthrough](https://www.youtube.com/watch?v=4x26H04sBBM) |
+| Official X submission | [x.com/nehuutrung/status/2088033753595814272](https://x.com/nehuutrung/status/2088033753595814272) |
 | Wallet-free evidence | [Auditor workspace](https://flare-quorum.vercel.app/flare?role=evidence) |
 | Source and technical material | [GitHub repository](https://github.com/huutrungle2001/flare-quorum) · [architecture](../../docs/architecture.md) · [verification](../../docs/verification.md) |
 | Deployment | Flare Coston2 (`114`), verified V2 manifest |

@@ -12,8 +12,11 @@ const requiredFiles = [
   "PRIVACY-TRUST-TALK.md",
   "NEW-WORK-LEDGER.md",
 ];
+const requiredAssets = ["flarequorum-logo.png"];
 const requiredText = [
   "https://flare-quorum.vercel.app",
+  "https://www.youtube.com/watch?v=4x26H04sBBM",
+  "https://x.com/nehuutrung/status/2088033753595814272",
   "https://github.com/huutrungle2001/flare-quorum",
   "evidence/coston2/market-v2-refresh-multi-vendor-success.json",
   "evidence/coston2/market-v2-refresh-one-result-outage.json",
@@ -58,6 +61,9 @@ const blockers = [];
 for (const file of requiredFiles) {
   if (!existsSync(resolve(packageRoot, file))) blockers.push(`JUDGE_PACKAGE_FILE_MISSING_${file.replace(/[^A-Z0-9]+/gi, "_").toUpperCase()}`);
 }
+for (const file of requiredAssets) {
+  if (!existsSync(resolve(packageRoot, file))) blockers.push(`JUDGE_PACKAGE_ASSET_MISSING_${file.replace(/[^A-Z0-9]+/gi, "_").toUpperCase()}`);
+}
 
 const packageText = requiredFiles
   .filter((file) => existsSync(resolve(packageRoot, file)))
@@ -95,6 +101,7 @@ const recoveryTeeIds = normalizeSet(recovery.publicIdentifiers?.teeIds);
 const ingressTeeIds = normalizeSet(ingress.publicIdentifiers?.machineIds);
 const assertions = {
   packageFilesPresent: requiredFiles.every((file) => existsSync(resolve(packageRoot, file))),
+  packageAssetsPresent: requiredAssets.every((file) => existsSync(resolve(packageRoot, file))),
   currentV2LinksPresent: requiredText.every((text) => packageText.includes(text)),
   submissionRequirementsMapped: submissionRequirementText.every((text) => packageText.includes(text)),
   noForbiddenSecretOrHistoricalLink: forbiddenPatterns.every((pattern) => !pattern.test(packageText)),

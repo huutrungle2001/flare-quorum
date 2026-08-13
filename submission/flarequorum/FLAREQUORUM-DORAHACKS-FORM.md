@@ -18,12 +18,11 @@ Confidential procurement for XRP and Flare treasuries
 
 ## BUIDL logo
 
-Upload a square FlareQuorum brand image from the owner's approved assets. No
-logo file is invented in this package:
-
-```text
-[UPLOAD APPROVED SQUARE FLAREQUORUM LOGO]
-```
+Upload [`flarequorum-logo.png`](flarequorum-logo.png), a 1254×1254 PNG. The
+three sealed bid dossiers represent all-three confidential custody; the central
+verified award represents threshold agreement and public settlement. The mark
+uses only FlareQuorum orange, black, and white, contains no text, and does not
+copy a protocol logo.
 
 ## Vision
 
@@ -103,24 +102,20 @@ https://flare-quorum.vercel.app/flare?role=evidence
 
 ## Demo video
 
-This package intentionally uses the working application to satisfy the supplied
-`demo link, video, or working app link` requirement. Leave the video field empty
-unless the live form makes it mandatory:
-
 ```text
-[LEAVE EMPTY — WORKING APP LINK PROVIDED]
+https://www.youtube.com/watch?v=4x26H04sBBM
 ```
 
 ## Social link 1 — official X submission
 
 ```text
-[PUBLIC X SUBMISSION URL]
+https://x.com/nehuutrung/status/2088033753595814272
 ```
 
 ## Social link 2 — X profile
 
 ```text
-[PUBLIC X PROFILE URL]
+https://x.com/nehuutrung
 ```
 
 ## Social link 3
@@ -173,8 +168,8 @@ Run structured treasury and vendor research and pursue one bounded Coston2 desig
 - Test the website, Auditor route, repository, and explorer links while signed
   out.
 - Keep AI Agent set to `No`.
-- Keep the working app as the demo resource; do not add a video placeholder to
-  the public submission unless the form requires it.
+- Keep the working app, demo video, and published X submission URLs unchanged
+  unless the owner deliberately replaces one of them.
 - Do not describe simulated FCC machines as hardware-backed TEEs.
 - Do not claim independent user validation, audit, partnership, adoption,
   traction, mainnet readiness, private transfers, instant XRP redemption payout,

@@ -12,21 +12,25 @@ evidence, and current product boundary.
 2. Use [`FLAREQUORUM-BUIDL-DETAILS.md`](FLAREQUORUM-BUIDL-DETAILS.md) for the
    long project description.
 3. Use [`FLAREQUORUM-X-SUBMISSION.md`](FLAREQUORUM-X-SUBMISSION.md) if an
-   official social post or thread is requested.
+   official social post or thread is requested. The published submission is
+   <https://x.com/nehuutrung/status/2088033753595814272>.
 4. Keep [`README.md`](README.md),
    [`NEW-WORK-LEDGER.md`](NEW-WORK-LEDGER.md), and
    [`PRIVACY-TRUST-TALK.md`](PRIVACY-TRUST-TALK.md) available as the technical
    judge package.
+5. Upload [`flarequorum-logo.png`](flarequorum-logo.png), the square submission
+   logo.
 
-The working application is the demo resource for this package. No video is
-required or referenced.
+Public demo resources:
+
+- Working application: <https://flare-quorum.vercel.app>
+- Demo video: <https://www.youtube.com/watch?v=4x26H04sBBM>
+- Official X submission: <https://x.com/nehuutrung/status/2088033753595814272>
 
 ## Owner fields still required
 
 - Active email address and Telegram handle.
-- A square logo file if the final form requires one.
 - Confirmation of the category labels exposed by the live form.
-- Public X submission URL only if the organizer requires a social post.
 - Final public submission URL or receipt.
 
 Placeholders are intentionally obvious and must not be submitted unchanged.
@@ -41,13 +45,15 @@ claimed.
 - **Category:** DeFi, or the closest treasury/procurement category exposed by
   the final form.
 - **AI Agent:** No. Winner selection is deterministic FCC code, not AI.
-- **Demo resource:** <https://flare-quorum.vercel.app>
+- **Working app:** <https://flare-quorum.vercel.app>
+- **Demo video:** <https://www.youtube.com/watch?v=4x26H04sBBM>
+- **Official X submission:** <https://x.com/nehuutrung/status/2088033753595814272>
 
 ## Final checks
 
 - Replace every value enclosed in `[SQUARE BRACKETS]`.
-- Test the app, Auditor route, repository, explorer links, and any X post while
-  signed out.
+- Test the app, video, Auditor route, repository, explorer links, and X post
+  while signed out.
 - Keep both selected bounties and make Confidential Compute Apps primary in the
   prose.
 - Preserve the simulated-FCC, Coston2/testnet, unaudited, public-settlement,

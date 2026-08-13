@@ -1,9 +1,15 @@
 # FlareQuorum
 
+<p align="center">
+  <img src="submission/flarequorum/flarequorum-logo.png" alt="FlareQuorum sealed-bid quorum and verified-award emblem" width="180">
+</p>
+
 > Confidential procurement for XRP and Flare treasuries, powered by Flare
 > Confidential Compute.
 
 [LIVE COSTON2 APP](https://flare-quorum.vercel.app) ·
+[DEMO VIDEO](https://www.youtube.com/watch?v=4x26H04sBBM) ·
+[X SUBMISSION](https://x.com/nehuutrung/status/2088033753595814272) ·
 [WALLET-FREE AUDITOR](https://flare-quorum.vercel.app/flare?role=evidence) ·
 [JUDGE PACKAGE](submission/flarequorum/README.md) ·
 [VERIFIED MANIFEST](packages/flare-contracts/deployments/coston2.release.json) ·
@@ -17,6 +23,8 @@
 | Selected bounties | **Confidential Compute Apps** and **Interoperable Asset Products** |
 | Target users | XRP-native treasury operators, Flare DAOs/procurement teams, and vendors protecting commercial offers |
 | Working demo | [flare-quorum.vercel.app](https://flare-quorum.vercel.app) on Flare Testnet Coston2 (`114`) |
+| Demo video | [Watch on YouTube](https://www.youtube.com/watch?v=4x26H04sBBM) |
+| Official X submission | [x.com/nehuutrung/status/2088033753595814272](https://x.com/nehuutrung/status/2088033753595814272) |
 | Primary outcome | A public, independently inspectable procurement award without publishing losing bids |
 | Release status | Verified Coston2 V2; three simulated FCC machines, 3-of-3 bid custody, and 2-of-3 result agreement |
 

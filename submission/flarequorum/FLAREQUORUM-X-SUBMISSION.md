@@ -1,8 +1,15 @@
-# FlareQuorum — optional X submission
+# FlareQuorum — official X submission
 
-Use this only if the organizer requires or rewards a public social post. No
-video attachment is assumed. Verify the official hackathon hashtag and
-organizer account before publishing.
+Published main post:
+
+<https://x.com/nehuutrung/status/2088033753595814272>
+
+Public demo video:
+
+<https://www.youtube.com/watch?v=4x26H04sBBM>
+
+The copy below is retained as a reusable thread outline. Keep the published URL
+in the submission form even if the outline is not posted as replies.
 
 ## Main post
 
@@ -12,6 +19,7 @@ FlareQuorum: confidential procurement for XRP and Flare treasuries.
 Vendors encrypt their offers to 3 registered FCC machines. A public contract settles only after 2 machines agree on the same deterministic winner.
 
 App: https://flare-quorum.vercel.app
+Video: https://www.youtube.com/watch?v=4x26H04sBBM
 Code: https://github.com/huutrungle2001/flare-quorum
 #Flare
 ```
@@ -58,9 +66,10 @@ The repo separates the historical Sepolia/Nox baseline from all new, ported, int
 
 ## Posting checklist
 
-- Keep the account and complete thread public.
-- Test the app, Auditor, repository, and final thread URL while signed out.
-- Paste the final main-post URL into the submission form.
+- Keep the published account and post public.
+- Test the app, video, Auditor, repository, and published post while signed out.
+- Paste `https://x.com/nehuutrung/status/2088033753595814272` into the submission
+  form.
 - Do not attach bid material, credentials, signatures, keys, or authenticated
   provider output.
 - Do not claim hardware-backed TEEs, audit, mainnet, private settlement,
