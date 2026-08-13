@@ -21,6 +21,8 @@ type Confirmation = { tenderId: bigint; action: "cancelTender" | "refundExpiredS
 type ActivityState = "close" | "cancel-or-wait" | "wait-for-bids" | "request-selection" | "compute-live" | "retry-selection" | "refund-ready" | "terminal";
 type TenderStatus = FlarePublicTender["status"];
 type LocalSelection = { selectionAttempt: number; selectionStartedAt: bigint; resultExpiry: bigint };
+type LocalProgress = { closed?: true; computeStarted?: true; finalized?: true };
+type LatestLifecycle = LocalSelection & { status: TenderStatus };
 
 const tenderStatusOrder: Record<TenderStatus, number> = {
   FundingPending: 0,
@@ -37,6 +39,16 @@ const directActionStatus: Record<DirectAction, TenderStatus> = {
   cancelTender: "Cancelled",
   refundExpiredSelection: "Refunded",
 };
+
+const tenderStatuses: readonly TenderStatus[] = [
+  "FundingPending", "Open", "Closed", "ComputePending", "Awarded", "Refunded", "Cancelled",
+];
+
+function tenderStatus(value: unknown): TenderStatus {
+  const status = tenderStatuses[Number(value)];
+  if (!status) throw new Error("COSTON2_TENDER_STATUS_INVALID");
+  return status;
+}
 
 export function directActionWasApplied(action: DirectAction, status: number): boolean {
   if (action === "closeTender") return status >= 2 && status <= 5;
@@ -107,6 +119,8 @@ export function FlareFinalizerWorkspace({
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [localStatuses, setLocalStatuses] = useState<Record<string, TenderStatus>>({});
   const [localSelections, setLocalSelections] = useState<Record<string, LocalSelection>>({});
+  const [localProgress, setLocalProgress] = useState<Record<string, LocalProgress>>({});
+  const [latestLifecycles, setLatestLifecycles] = useState<Record<string, LatestLifecycle>>({});
   const connected = wallet.state.status === "connected" && wallet.state.account && wallet.state.walletClient;
 
   useEffect(() => {
@@ -154,14 +168,50 @@ export function FlareFinalizerWorkspace({
     });
   }, [tenders]);
 
+  useEffect(() => {
+    const rpcUrl = import.meta.env.VITE_COSTON2_RPC_URL?.trim();
+    if (!rpcUrl) return;
+    let active = true;
+    const publicClient = createPublicClient({
+      chain: coston2,
+      transport: http(rpcUrl, { retryCount: 1, timeout: 8_000 }),
+    });
+    void Promise.all(tenders.map(async (tender) => {
+      const record = await publicClient.readContract({
+        address: coston2FlarePublicRelease.market,
+        abi: flareQuorumFlareMarketAbi as Abi,
+        functionName: "getTender",
+        args: [tender.tenderId],
+      }) as { selectionAttempt: number; selectionStartedAt: bigint; resultExpiry: bigint; status: number };
+      return [tender.tenderId.toString(), {
+        status: tenderStatus(record.status),
+        selectionAttempt: Number(record.selectionAttempt),
+        selectionStartedAt: BigInt(record.selectionStartedAt),
+        resultExpiry: BigInt(record.resultExpiry),
+      }] as const;
+    })).then((entries) => {
+      if (active) setLatestLifecycles(Object.fromEntries(entries));
+    }).catch(() => {
+      // Finalized market props remain authoritative when the latest RPC read is unavailable.
+    });
+    return () => { active = false; };
+  }, [tenders]);
+
   const effectiveTenders = useMemo(
     () => tenders.map((tender) => {
       const key = tender.tenderId.toString();
-      const status = localStatuses[key];
+      const latest = latestLifecycles[key];
+      const base = latest && tenderStatusOrder[latest.status] >= tenderStatusOrder[tender.status]
+        ? { ...tender, ...latest }
+        : tender;
+      const localStatus = localStatuses[key];
+      const status = localStatus && tenderStatusOrder[localStatus] >= tenderStatusOrder[base.status]
+        ? localStatus
+        : base.status;
       const selection = localSelections[key];
-      return status || selection ? { ...tender, ...selection, ...(status ? { status } : {}) } : tender;
+      return { ...base, ...selection, status };
     }),
-    [localSelections, localStatuses, tenders],
+    [latestLifecycles, localSelections, localStatuses, tenders],
   );
 
   const queue = useMemo(
@@ -178,6 +228,13 @@ export function FlareFinalizerWorkspace({
     );
   }).length;
   const hasWalletAction = actionableCount > 0;
+
+  function markProgress(tenderId: bigint, progress: LocalProgress) {
+    setLocalProgress((current) => ({
+      ...current,
+      [tenderId.toString()]: { ...current[tenderId.toString()], ...progress },
+    }));
+  }
 
   async function runDirectAction(tender: FlarePublicTender, action: DirectAction) {
     if (!connected) return;
@@ -203,6 +260,7 @@ export function FlareFinalizerWorkspace({
         [tender.tenderId.toString()]: directActionStatus[action],
       }));
       setConfirmation(null);
+      if (action === "closeTender") markProgress(tender.tenderId, { closed: true });
       setError(null);
       onRefresh();
     };
@@ -296,6 +354,7 @@ export function FlareFinalizerWorkspace({
           resultExpiry: selectionStartedAt + 3_600n,
         },
       }));
+      markProgress(tender.tenderId, { closed: true, computeStarted: true });
       setError(null);
       onRefresh();
     };
@@ -364,6 +423,7 @@ export function FlareFinalizerWorkspace({
     };
     const applyTerminalStatus = (status: TenderStatus) => {
       setLocalStatuses((current) => ({ ...current, [tender.tenderId.toString()]: status }));
+      markProgress(tender.tenderId, { closed: true, computeStarted: true, finalized: true });
       setError(null);
       onRefresh();
     };
@@ -463,7 +523,7 @@ export function FlareFinalizerWorkspace({
         <div className="activity-queue-summary" aria-label="Activity action summary">
           <div><strong>{actionableCount}</strong><span>NEED{actionableCount === 1 ? "S" : ""} ACTION</span></div>
           <div><strong>{queue.length - actionableCount}</strong><span>TRACKING ONLY</span></div>
-          <p>Activity shows the next step only. Rules and evidence remain in each Public dossier.</p>
+          <p>Use the three numbered buttons in order. A confirmed step stays visible and cannot be submitted again.</p>
         </div>
         {hasWalletAction && <WalletPanel wallet={wallet} network="coston2" compact />}
         {queue.length === 0 ? (
@@ -486,6 +546,13 @@ export function FlareFinalizerWorkspace({
               const refundKey = `refundExpiredSelection:${tender.tenderId.toString()}`;
               const isConfirming = confirmation?.tenderId === tender.tenderId;
               const presentation = actionPresentation(state, buyerConnected);
+              const progress = localProgress[tender.tenderId.toString()] ?? {};
+              const closeComplete = progress.closed === true || ["Closed", "ComputePending", "Awarded", "Refunded"].includes(tender.status);
+              const computeComplete = progress.computeStarted === true || tender.selectionAttempt > 0 || ["ComputePending", "Awarded", "Refunded"].includes(tender.status);
+              const finalizeComplete = progress.finalized === true || ["Awarded", "Refunded"].includes(tender.status);
+              const closeAvailable = state === "close";
+              const startAvailable = closeComplete && !computeComplete && state === "request-selection";
+              const finalizeAvailable = computeComplete && !finalizeComplete && state === "compute-live";
               return (
                 <article key={tender.tenderId.toString()} className="finalizer-card activity-action-card" data-lane={presentation.lane}>
                   <header>
@@ -506,22 +573,54 @@ export function FlareFinalizerWorkspace({
                     {state === "retry-selection" && <p>The signed-result window expired. Retry with a fresh nonce while every frozen input stays unchanged.</p>}
                     {state === "refund-ready" && <p>The failed-compute grace elapsed. Only the original buyer may recover the exact escrow; this creates no winner or award receipt.</p>}
                   </div>
-                  <div className="finalizer-actions">
-                    {state === "close" && (
-                      <button className="primary-button" type="button" disabled={!connected || busy !== null} onClick={() => void runDirectAction(tender, "closeTender")}>
-                        {busy === closeKey ? "CLOSING…" : "CLOSE & FREEZE FTSO →"}
-                      </button>
-                    )}
-                    {state === "request-selection" && (
-                      <button className="primary-button" type="button" disabled={!connected || busy !== null} onClick={() => void runSelectionRequest(tender, false)}>
-                        {busy === requestKey ? "STARTING FCC…" : "START FCC COMPUTE →"}
-                      </button>
-                    )}
-                    {state === "compute-live" && (
-                      <button className="primary-button" type="button" disabled={!connected || busy !== null} onClick={() => void runFinalize(tender)}>
-                        {busy === finalizeKey ? "CHECKING 2/3 FCC…" : "CHECK 2/3 & FINALIZE →"}
-                      </button>
-                    )}
+                  <section className="activity-step-guide" aria-label={`Tender ${tender.tenderId.toString()} three-step finalization guide`}>
+                    <div>
+                      <p className="eyebrow">DO THESE IN ORDER · ONE WALLET CONFIRMATION AT A TIME</p>
+                      <p>Press step 1, wait for its checkmark, then continue to step 2 and step 3. Locked buttons open automatically after the previous transaction succeeds.</p>
+                    </div>
+                    <ol className="activity-step-actions">
+                      <li data-complete={closeComplete}>
+                        <span>1</span>
+                        <button
+                          className={closeComplete ? "secondary-button lifecycle-step-button is-complete" : "primary-button lifecycle-step-button"}
+                          type="button"
+                          disabled={closeComplete || !closeAvailable || !connected || busy !== null}
+                          aria-current={!closeComplete && closeAvailable ? "step" : undefined}
+                          onClick={() => void runDirectAction(tender, "closeTender")}
+                        >
+                          {closeComplete ? "✓ TENDER CLOSED" : busy === closeKey ? "CLOSING…" : "CLOSE & FREEZE FTSO →"}
+                        </button>
+                        <small>{closeComplete ? "Confirmed" : closeAvailable ? "Ready now" : "Complete bid quorum first"}</small>
+                      </li>
+                      <li data-complete={computeComplete}>
+                        <span>2</span>
+                        <button
+                          className={computeComplete ? "secondary-button lifecycle-step-button is-complete" : "primary-button lifecycle-step-button"}
+                          type="button"
+                          disabled={computeComplete || !startAvailable || !connected || busy !== null}
+                          aria-current={!computeComplete && startAvailable ? "step" : undefined}
+                          onClick={() => void runSelectionRequest(tender, false)}
+                        >
+                          {computeComplete ? "✓ FCC COMPUTE STARTED" : busy === requestKey ? "STARTING FCC…" : "START FCC COMPUTE →"}
+                        </button>
+                        <small>{computeComplete ? "Confirmed" : closeComplete ? "Ready after close finality" : "Locked until step 1"}</small>
+                      </li>
+                      <li data-complete={finalizeComplete}>
+                        <span>3</span>
+                        <button
+                          className={finalizeComplete ? "secondary-button lifecycle-step-button is-complete" : "primary-button lifecycle-step-button"}
+                          type="button"
+                          disabled={finalizeComplete || !finalizeAvailable || !connected || busy !== null}
+                          aria-current={!finalizeComplete && finalizeAvailable ? "step" : undefined}
+                          onClick={() => void runFinalize(tender)}
+                        >
+                          {finalizeComplete ? "✓ AWARD / REFUND FINALIZED" : busy === finalizeKey ? "CHECKING 2/3 FCC…" : "CHECK 2/3 & FINALIZE →"}
+                        </button>
+                        <small>{finalizeComplete ? "Confirmed" : finalizeAvailable ? "Wait for 2-of-3 FCC, then press" : "Locked until step 2"}</small>
+                      </li>
+                    </ol>
+                  </section>
+                  <div className="finalizer-actions activity-recovery-actions">
                     {state === "retry-selection" && (
                       <button className="primary-button" type="button" disabled={!connected || busy !== null} onClick={() => void runSelectionRequest(tender, true)}>
                         {busy === retryKey ? "RETRYING FCC…" : "RETRY FCC COMPUTE →"}

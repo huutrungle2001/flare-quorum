@@ -3094,6 +3094,7 @@ main {
     align-items: stretch;
     flex-direction: column;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -8012,6 +8013,87 @@ footer p {
 
 .activity-action-copy p {
   margin: 12px 0 14px;
+}
+
+.activity-step-guide {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-ink-black);
+  margin: 4px 0 16px;
+  padding: 16px;
+}
+
+.activity-step-guide > div > p:last-child {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin: 6px 0 16px;
+}
+
+.activity-step-actions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.activity-step-actions li {
+  align-content: start;
+  display: grid;
+  gap: 7px;
+  grid-template-columns: 28px minmax(0, 1fr);
+}
+
+.activity-step-actions li > span {
+  align-items: center;
+  background: var(--color-ink-black);
+  border: 1px solid var(--color-ink-black);
+  border-radius: 50%;
+  color: var(--color-paper-white);
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+.activity-step-actions li[data-complete="true"] > span {
+  background: var(--color-brand-accent);
+  color: var(--color-ink-black);
+}
+
+.activity-step-actions .lifecycle-step-button {
+  font-size: 0.72rem;
+  min-height: 48px;
+  padding: 9px 12px;
+  width: 100%;
+}
+
+.activity-step-actions .lifecycle-step-button.is-complete:disabled {
+  background: transparent;
+  border-color: var(--color-ink-black);
+  color: var(--color-ink-black);
+  opacity: 1;
+}
+
+.activity-step-actions small {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  grid-column: 2;
+  line-height: 1.4;
+}
+
+.activity-recovery-actions {
+  border-top: 1px dashed var(--color-ink-black);
+  padding-top: 12px;
+}
+
+@media (max-width: 720px) {
+  .activity-step-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 .activity-assets-section {

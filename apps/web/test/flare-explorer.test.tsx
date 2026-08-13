@@ -290,6 +290,9 @@ describe("Coston2 public evidence boundary", () => {
     expect(screen.getByText("ACTION CENTER / CANONICAL CHECKPOINTS")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Ready to close" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "CLOSE & FREEZE FTSO →" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "START FCC COMPUTE →" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "CHECK 2/3 & FINALIZE →" })).toBeDisabled();
+    expect(screen.getByText(/press step 1, wait for its checkmark/i)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "VIEW PUBLIC DOSSIER →" })).toHaveAttribute("href", "/flare?status=all&tender=1");
     expect(screen.queryByRole("link", { name: "OPEN RELAY RUNBOOK →" })).toBeNull();
     expect(screen.queryByText("Selection attempt")).toBeNull();
@@ -314,7 +317,9 @@ describe("Coston2 public evidence boundary", () => {
       approvedVendorCount: 2,
     }]} onRefresh={() => undefined} />);
     expect(screen.getByRole("heading", { name: "Ready to start FCC" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "✓ TENDER CLOSED" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "START FCC COMPUTE →" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "CHECK 2/3 & FINALIZE →" })).toBeDisabled();
     expect(screen.queryByText(/dedicated relay/i)).toBeNull();
     closed.unmount();
 
@@ -328,6 +333,8 @@ describe("Coston2 public evidence boundary", () => {
       resultExpiry: 2_000_000_000n,
     }]} onRefresh={() => undefined} />);
     expect(screen.getByRole("heading", { name: "FCC result pending" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "✓ TENDER CLOSED" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "✓ FCC COMPUTE STARTED" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "CHECK 2/3 & FINALIZE →" })).toBeDisabled();
   });
 
