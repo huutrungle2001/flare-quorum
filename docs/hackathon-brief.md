@@ -128,8 +128,8 @@ remain roadmap items rather than current acceptance gates.
   knowledge.
 - [x] Live app, wallet-free demo, and public evidence links work; the working
   app satisfies the supplied demo-link/video/working-app requirement.
-- [ ] Make the GitHub repository accessible to anonymous judges before final
-  submission; the repository URL currently returns `404` without authentication.
+- [x] GitHub repository and technical materials are accessible to anonymous
+  judges; the public repository and raw README return HTTP `200`.
 - [x] Every Flare integration is explained by user value and live evidence.
 - [x] Existing/new/ported/integrated/improved work is separated in
   `submission/flarequorum/NEW-WORK-LEDGER.md`.
@@ -139,10 +139,9 @@ remain roadmap items rather than current acceptance gates.
   testing, community interest, pilots, and traction remain honestly unclaimed.
 - [x] Roadmap and next steps do not exceed the threat model or evidence.
 
-The engineering checklist is complete. Anonymous GitHub access remains the one
-external submission action above; explicitly bounded `PARTIAL` assurance rows
-in [`verification.md`](verification.md) are disclosed post-Summer Signal
-hardening tracks, not hidden submission passes.
+The engineering and anonymous-access checklist is complete. Explicitly bounded
+`PARTIAL` assurance rows in [`verification.md`](verification.md) are disclosed
+post-Summer Signal hardening tracks, not hidden submission passes.
 
 ## 8. Supplied organizer links
 
