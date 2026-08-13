@@ -140,8 +140,11 @@ Leave empty unless the form requires another public profile:
 
 ## Long description
 
-Paste the complete contents of
-[`FLAREQUORUM-BUIDL-DETAILS.md`](FLAREQUORUM-BUIDL-DETAILS.md).
+Open
+[`FLAREQUORUM-BUIDL-DETAILS-COPY.html`](FLAREQUORUM-BUIDL-DETAILS-COPY.html)
+in a browser, press `Ctrl+A`, then `Ctrl+C`, and paste into the rich-text field.
+Use [`FLAREQUORUM-BUIDL-DETAILS.md`](FLAREQUORUM-BUIDL-DETAILS.md) as the
+plain-Markdown fallback.
 
 ## Smart contract and deployment summary
 

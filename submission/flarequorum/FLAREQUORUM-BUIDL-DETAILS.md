@@ -178,6 +178,33 @@ The commit- and artifact-level disclosure is published in
 [`NEW-WORK-LEDGER.md`](NEW-WORK-LEDGER.md). Historical addresses, tests, and
 evidence are not relabeled as Summer Signal work.
 
+## Why the new work is meaningful
+
+This is not an RPC switch or a visual port. The Summer Signal work changes who
+holds procurement authority. Registered FCC machines now receive the private
+inputs, apply the frozen qualification and scoring policy, and produce the only
+result the Coston2 market can settle. The buyer, web app, relay, finalizer, and
+administrator cannot submit a preferred winner or bypass the threshold.
+
+- **For treasury buyers:** rules, machine policy, and escrow are frozen before
+  bidding. A result must bind to those exact facts, while fixed timeout paths
+  return escrow without inventing a winner when compute cannot complete.
+- **For vendors:** losing price, delivery, warranty, and qualification terms
+  stay inside the intended confidential-compute boundary. Participation and
+  timing remain public, but buyers, finalizers, and auditors receive no
+  decryption capability.
+- **For auditors:** a wallet-free reviewer can inspect the rule hash,
+  machine/code binding, 3-of-3 receipt custody, ordered bid root, FTSO
+  checkpoint, two result signers, and exact FTestXRP conservation without
+  accessing a bid payload.
+- **For developers:** the repository provides a domain-separated Solidity, Go,
+  and TypeScript pattern for XRPL Payment → FDC proof → Smart Account funding →
+  FCC selection → FTestXRP settlement → FAssets redemption request, including
+  failure and recovery semantics.
+- **For the Flare ecosystem:** FCC, FDC, Smart Accounts, FAssets, and FTSOv2
+  serve one working lifecycle. Removing any integration breaks a demonstrated
+  user capability rather than a marketing checklist.
+
 ## Judge route
 
 No wallet, test funds, or confidential input is required:
@@ -212,8 +239,9 @@ and design-partner outreach remain explicitly unrun rather than invented.
 
 FlareQuorum is Coston2-only, uses disposable test assets, and has not received a
 formal security audit. Its registered machines use the organizer-supported
-simulated FCC profile, not hardware-backed attestation. Ordinary FTestXRP/FXRP
-amounts, addresses, timing, winner, and transaction graph are public. The
+simulated FCC profile, not hardware-backed attestation. Ordinary FTestXRP
+movements on Coston2—and future FXRP movements—reveal amounts, addresses,
+timing, the winner, and transaction graph. The
 FAssets evidence reaches `RedemptionRequested`; it does not claim instant
 underlying XRP payout. The system does not prove legal delivery, prevent
 collusion, hide bidder participation, or provide a buyer dispute override.

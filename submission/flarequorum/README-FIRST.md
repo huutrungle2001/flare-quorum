@@ -11,14 +11,17 @@ evidence, and current product boundary.
    field-by-field form answers.
 2. Use [`FLAREQUORUM-BUIDL-DETAILS.md`](FLAREQUORUM-BUIDL-DETAILS.md) for the
    long project description.
-3. Use [`FLAREQUORUM-X-SUBMISSION.md`](FLAREQUORUM-X-SUBMISSION.md) if an
+3. Open [`FLAREQUORUM-BUIDL-DETAILS-COPY.html`](FLAREQUORUM-BUIDL-DETAILS-COPY.html)
+   in a browser, press `Ctrl+A`, then `Ctrl+C`, and paste into the submission
+   rich-text editor to preserve headings, links, bold text, and lists.
+4. Use [`FLAREQUORUM-X-SUBMISSION.md`](FLAREQUORUM-X-SUBMISSION.md) if an
    official social post or thread is requested. The published submission is
    <https://x.com/nehuutrung/status/2088033753595814272>.
-4. Keep [`README.md`](README.md),
+5. Keep [`README.md`](README.md),
    [`NEW-WORK-LEDGER.md`](NEW-WORK-LEDGER.md), and
    [`PRIVACY-TRUST-TALK.md`](PRIVACY-TRUST-TALK.md) available as the technical
    judge package.
-5. Upload [`flarequorum-logo.png`](flarequorum-logo.png), the square submission
+6. Upload [`flarequorum-logo.png`](flarequorum-logo.png), the square submission
    logo.
 
 Public demo resources:
