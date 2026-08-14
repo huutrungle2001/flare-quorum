@@ -23,11 +23,8 @@ out/
 image/
 *.checkpoint.json
 
-# Submission source is tracked; local recording/render exports are not
-submission/**/*.mkv
-submission/**/*.mov
-submission/**/raw/
-submission/**/renders/
+# Local submission materials and rendered media
+submission/
 
 # IDE, OS, and logs
 .DS_Store
