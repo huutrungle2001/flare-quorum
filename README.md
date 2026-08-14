@@ -4,7 +4,7 @@
 [![Coston2 Read-only Health](https://github.com/huutrungle2001/flare-quorum/actions/workflows/coston2-read-only-health.yml/badge.svg)](https://github.com/huutrungle2001/flare-quorum/actions/workflows/coston2-read-only-health.yml)
 
 <p align="center">
-  <img src="submission/flarequorum/flarequorum-logo.png" alt="FlareQuorum sealed-bid quorum and verified-award emblem" width="180">
+  <img src="submission/flarequorum/flarequorum-logo.png" alt="FlareQuorum sealed-bid quorum and verified-award emblem" width="260">
 </p>
 
 > Confidential procurement for XRP and Flare treasuries, powered by Flare
