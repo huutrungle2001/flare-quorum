@@ -74,6 +74,7 @@
     "judge:verify": "node tooling/scripts/verify-judge-release.mjs",
     "judge:verify:offline": "node tooling/scripts/verify-judge-release.mjs --offline",
     "judge:verify:live": "node tooling/scripts/verify-judge-release.mjs --live",
+    "judge:report:check": "node tooling/scripts/validate-judge-report.mjs",
     "flare:slither:v2": "node tooling/scripts/run-slither-v2.mjs",
     "flare:v2:prepare": "pnpm --filter @flarequorum/flare-contracts build && node tooling/scripts/prepare-flare-v2-release.mjs",
     "flare:v2:prepare:check": "pnpm --filter @flarequorum/flare-contracts build && node tooling/scripts/prepare-flare-v2-release.mjs --check",

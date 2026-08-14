@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/huutrungle2001/flare-quorum/tooling/flare/judge-verification.schema.json",
+  "title": "FlareQuorum judge verification report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "suite",
+    "status",
+    "recordedAt",
+    "offline",
+    "live",
+    "blockers"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "suite": { "const": "flarequorum-judge-verification" },
+    "status": { "$ref": "#/$defs/status" },
+    "recordedAt": { "type": "string", "format": "date-time" },
+    "offline": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/offline" }
+      ]
+    },
+    "live": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/live" }
+      ]
+    },
+    "blockers": { "$ref": "#/$defs/blockers" }
+  },
+  "$defs": {
+    "status": {
+      "enum": ["PASSED", "BLOCKED"]
+    },
+    "blockers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Z0-9_]+$"
+      }
+    },
+    "offline": {
+      "type": "object",
+      "required": ["schemaVersion", "suite", "status", "checks", "blockers"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "suite": { "const": "flarequorum-judge-offline" },
+        "status": { "$ref": "#/$defs/status" },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "status", "exitCode", "durationMs", "outputSha256"],
+            "properties": {
+              "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+              "status": { "enum": ["PASSED", "FAILED"] },
+              "exitCode": { "type": ["integer", "null"] },
+              "durationMs": { "type": "integer", "minimum": 0 },
+              "outputSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        },
+        "blockers": { "$ref": "#/$defs/blockers" }
+      }
+    },
+    "live": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "suite",
+        "status",
+        "recordedAt",
+        "publicIdentifiers",
+        "assertions",
+        "machineAvailability",
+        "endpointStatus",
+        "deployment",
+        "runtimeHash",
+        "blockers",
+        "notes"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "suite": { "const": "flarequorum-judge-live-read-only" },
+        "status": { "$ref": "#/$defs/status" },
+        "recordedAt": { "type": "string", "format": "date-time" },
+        "publicIdentifiers": { "type": "object" },
+        "assertions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "boolean" }
+        },
+        "machineAvailability": { "type": "array", "maxItems": 3 },
+        "endpointStatus": { "type": "object" },
+        "deployment": { "type": ["object", "null"] },
+        "runtimeHash": {
+          "type": ["string", "null"],
+          "pattern": "^0x[0-9a-f]{64}$"
+        },
+        "blockers": { "$ref": "#/$defs/blockers" },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
