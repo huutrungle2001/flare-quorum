@@ -3,6 +3,7 @@ import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
 const workflowUrl = new URL("../../.github/workflows/release-ci.yml", import.meta.url);
+const liveHealthWorkflowUrl = new URL("../../.github/workflows/coston2-read-only-health.yml", import.meta.url);
 const foundationsUrl = new URL("../flare/coston2-foundations.json", import.meta.url);
 const slitherPolicyUrl = new URL("../flare/slither-v2-allowlist.json", import.meta.url);
 const packageUrl = new URL("../../package.json", import.meta.url);
@@ -27,6 +28,20 @@ test("release CI actions are immutable commit pins", async () => {
   const workflow = await readFile(workflowUrl, "utf8");
   const actionReferences = [...workflow.matchAll(/^\s*uses:\s+[^@\s]+@([^\s]+)(?:\s+#.*)?$/gm)];
   assert.ok(actionReferences.length >= 5, "Expected all release actions to be enumerated");
+  for (const [, reference] of actionReferences) {
+    assert.match(reference, /^[0-9a-f]{40}$/, `${reference} is not an immutable action commit`);
+  }
+});
+
+test("scheduled Coston2 health verification is public and read-only", async () => {
+  const workflow = await readFile(liveHealthWorkflowUrl, "utf8");
+  assert.match(workflow, /^\s*schedule:$/m);
+  assert.match(workflow, /^\s*workflow_dispatch:$/m);
+  assert.match(workflow, /permissions:\n\s+contents: read/);
+  assert.match(workflow, /pnpm judge:verify:live/);
+  assert.doesNotMatch(workflow, /secrets\.|--execute|private.?key|permissions:\n\s+contents: write/i);
+  const actionReferences = [...workflow.matchAll(/^\s*uses:\s+[^@\s]+@([^\s]+)(?:\s+#.*)?$/gm)];
+  assert.ok(actionReferences.length >= 4);
   for (const [, reference] of actionReferences) {
     assert.match(reference, /^[0-9a-f]{40}$/, `${reference} is not an immutable action commit`);
   }

@@ -433,12 +433,24 @@ See [PLAN.md](PLAN.md) for acceptance criteria and sequencing.
 ## Validation
 
 ```bash
+corepack pnpm judge:verify
 corepack pnpm test
 corepack pnpm lint
 corepack pnpm build
 corepack pnpm evidence:validate
 corepack pnpm flare:judge:check
 ```
+
+`corepack pnpm judge:verify` produces one consolidated offline-and-live report
+covering the pinned toolchain, tests, coverage, static analysis, build,
+bindings, documentation, secret scan, evidence schemas, deployment bytecode
+and transaction, machine freshness, and hosted endpoint health. It is
+read-only: it never creates a tender, submits a bid, sends a transaction, or
+reads a credential. Use `corepack pnpm judge:verify:offline` for deterministic
+repository checks or `corepack pnpm judge:verify:live` for the public Coston2
+health surface. The scheduled GitHub workflow runs only the latter and retains
+its sanitized report as an Actions artifact; live writes remain manual and
+owner-controlled.
 
 Live Coston2 write harnesses require explicit operator configuration and are
 not needed to inspect the checked-in public evidence. See

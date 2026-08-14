@@ -7,6 +7,7 @@ import {
 import { dirname, resolve } from "node:path";
 
 const repositoryRoot = resolve(import.meta.dirname, "../..");
+const readOnly = process.argv.includes("--no-write");
 const outputPath = resolve(
   repositoryRoot,
   "evidence/local/secret-scan.json",
@@ -92,6 +93,7 @@ function inspectSource(source, path, scope, seen) {
 }
 
 function saveEvidence() {
+  if (readOnly) return;
   mkdirSync(dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, `${JSON.stringify(evidence, null, 2)}\n`, {
     mode: 0o600,
@@ -194,7 +196,8 @@ try {
   ) {
     console.error(
       JSON.stringify({
-        evidence: "evidence/local/secret-scan.json",
+        evidence: readOnly ? null : "evidence/local/secret-scan.json",
+        mode: readOnly ? "read-only" : "write-evidence",
         violations: evidence.violations,
       }),
     );
@@ -202,7 +205,8 @@ try {
   } else {
     console.log(
       JSON.stringify({
-        evidence: "evidence/local/secret-scan.json",
+        evidence: readOnly ? null : "evidence/local/secret-scan.json",
+        mode: readOnly ? "read-only" : "write-evidence",
         assertions: evidence.assertions,
         trackedFilesInspected:
           evidence.publicIdentifiers.trackedFilesInspected,
@@ -217,7 +221,8 @@ try {
   saveEvidence();
   console.error(
     JSON.stringify({
-      evidence: "evidence/local/secret-scan.json",
+      evidence: readOnly ? null : "evidence/local/secret-scan.json",
+      mode: readOnly ? "read-only" : "write-evidence",
       violations: evidence.violations,
     }),
   );
