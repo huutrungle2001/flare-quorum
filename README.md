@@ -1,6 +1,7 @@
 # FlareQuorum
 
 [![Release CI](https://github.com/huutrungle2001/flare-quorum/actions/workflows/release-ci.yml/badge.svg)](https://github.com/huutrungle2001/flare-quorum/actions/workflows/release-ci.yml)
+[![Coston2 Read-only Health](https://github.com/huutrungle2001/flare-quorum/actions/workflows/coston2-read-only-health.yml/badge.svg)](https://github.com/huutrungle2001/flare-quorum/actions/workflows/coston2-read-only-health.yml)
 
 <p align="center">
   <img src="submission/flarequorum/flarequorum-logo.png" alt="FlareQuorum sealed-bid quorum and verified-award emblem" width="180">

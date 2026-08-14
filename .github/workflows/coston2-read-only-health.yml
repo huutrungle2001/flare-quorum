@@ -40,11 +40,19 @@ jobs:
       - name: Verify public Coston2 release
         run: pnpm judge:verify:live --output "$RUNNER_TEMP/flarequorum-live-verification.json"
 
+      - name: Validate sanitized report contract
+        if: always()
+        run: pnpm judge:report:check "$RUNNER_TEMP/flarequorum-live-verification.json"
+
+      - name: Publish public health summary
+        if: always()
+        run: pnpm judge:report:summary "$RUNNER_TEMP/flarequorum-live-verification.json" "$GITHUB_STEP_SUMMARY"
+
       - name: Upload sanitized public report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: flarequorum-live-verification
+          name: flarequorum-live-verification-${{ github.run_id }}
           path: ${{ runner.temp }}/flarequorum-live-verification.json
           if-no-files-found: error
           retention-days: 14

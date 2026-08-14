@@ -39,6 +39,9 @@ test("scheduled Coston2 health verification is public and read-only", async () =
   assert.match(workflow, /^\s*workflow_dispatch:$/m);
   assert.match(workflow, /permissions:\n\s+contents: read/);
   assert.match(workflow, /pnpm judge:verify:live/);
+  assert.match(workflow, /pnpm judge:report:check/);
+  assert.match(workflow, /pnpm judge:report:summary/);
+  assert.match(workflow, /flarequorum-live-verification-\$\{\{ github\.run_id \}\}/);
   assert.doesNotMatch(workflow, /secrets\.|--execute|private.?key|permissions:\n\s+contents: write/i);
   const actionReferences = [...workflow.matchAll(/^\s*uses:\s+[^@\s]+@([^\s]+)(?:\s+#.*)?$/gm)];
   assert.ok(actionReferences.length >= 4);
