@@ -1,5 +1,7 @@
 # FlareQuorum
 
+[![Release CI](https://github.com/huutrungle2001/flare-quorum/actions/workflows/release-ci.yml/badge.svg)](https://github.com/huutrungle2001/flare-quorum/actions/workflows/release-ci.yml)
+
 <p align="center">
   <img src="submission/flarequorum/flarequorum-logo.png" alt="FlareQuorum sealed-bid quorum and verified-award emblem" width="180">
 </p>
@@ -56,6 +58,12 @@ corepack pnpm install --frozen-lockfile
 cp .env.example .env.local
 corepack pnpm --filter @flarequorum/tender-room dev --host 0.0.0.0
 ```
+
+For a clean contributor environment, open the repository in the checked-in
+[devcontainer](.devcontainer/devcontainer.json). Its base image, Node, Go, and
+Foundry archives are digest/checksum pinned to the canonical Coston2 toolchain;
+`corepack pnpm env:doctor` verifies Node, pnpm, Go, Foundry, and Slither before
+release work begins.
 
 Open <http://localhost:5173> or <http://localhost:5173/flare>. The wallet-free
 Public and Auditor workspaces require these four public release values:

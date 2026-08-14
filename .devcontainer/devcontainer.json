@@ -1,0 +1,19 @@
+{
+  "name": "FlareQuorum pinned release environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "ubuntu",
+  "workspaceFolder": "/workspaces/flare-quorum",
+  "postCreateCommand": "corepack pnpm install --frozen-lockfile && corepack pnpm env:doctor",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "golang.go"
+      ]
+    }
+  }
+}

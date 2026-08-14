@@ -66,6 +66,7 @@
     "upgrade:review-market": "pnpm --filter @flarequorum/auction-house upgrade:review-market",
     "deploy:safe-unwrap-preparation": "pnpm --filter @flarequorum/auction-house deploy:safe-unwrap-preparation",
     "docs:check": "node tooling/scripts/check-release-docs.mjs",
+    "env:doctor": "node tooling/scripts/check-release-toolchain.mjs",
     "publish:sources:release": "pnpm --filter @flarequorum/auction-house publish:sources:release",
     "test:preflight": "node --env-file-if-exists=.env.local tooling/scripts/preflight.mjs",
     "evidence:validate": "node tooling/scripts/validate-evidence.mjs",
