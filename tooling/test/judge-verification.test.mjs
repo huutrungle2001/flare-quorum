@@ -3,6 +3,8 @@ import test from "node:test";
 
 import {
   buildLiveAssertions,
+  createPacedRpcReader,
+  normalizeReleaseTeeIds,
   offlineCommands,
   parseArguments,
 } from "../scripts/verify-judge-release.mjs";
@@ -53,4 +55,37 @@ test("judge verifier defaults to the complete suite and supports isolated modes"
   assert.deepEqual(parseArguments(["--offline"]), { runOffline: true, runLive: false, output: null });
   assert.deepEqual(parseArguments(["--live"]), { runOffline: false, runLive: true, output: null });
   assert.throws(() => parseArguments(["--output"]), /JUDGE_VERIFY_OUTPUT_PATH_MISSING/);
+});
+
+test("judge verifier normalizes release TEE IDs without leaking Array.map indexes", () => {
+  const teeIds = [
+    "0x325E7f5DE26e2ECdaAc23d4883024850E76a0F9B",
+    "0x77091a12534cdD90Ea9F4cA11003Ba645b6E8abD",
+    "0xc3c454aaDb538A15B18a9Cce24E5e53cC062AFC1",
+  ];
+  assert.deepEqual(normalizeReleaseTeeIds(teeIds), teeIds);
+});
+
+test("judge verifier paces public RPC reads and retries once", async () => {
+  let clock = 0;
+  const waits = [];
+  const reader = createPacedRpcReader({
+    minimumIntervalMs: 400,
+    retryDelayMs: 1_200,
+    now: () => clock,
+    wait: async (delayMs) => {
+      waits.push(delayMs);
+      clock += delayMs;
+    },
+  });
+  assert.equal(await reader(async () => "first"), "first");
+  assert.equal(await reader(async () => "second"), "second");
+  let attempts = 0;
+  assert.equal(await reader(async () => {
+    attempts += 1;
+    if (attempts === 1) throw new Error("transient public RPC limit");
+    return "retry";
+  }), "retry");
+  assert.equal(attempts, 2);
+  assert.deepEqual(waits, [400, 400, 1_200]);
 });

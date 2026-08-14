@@ -27,6 +27,31 @@ const defaultRpcUrl = "https://coston2-api.flare.network/ext/C/rpc";
 const defaultWebUrl = "https://flare-quorum.vercel.app";
 const defaultIngressUrl = "https://veilbid-flare-ingress-production.up.railway.app";
 
+export function normalizeReleaseTeeIds(teeIds) {
+  return teeIds.map((teeId) => getAddress(teeId));
+}
+
+export function createPacedRpcReader({
+  minimumIntervalMs = 400,
+  retryDelayMs = 1_200,
+  now = Date.now,
+  wait = (delayMs) => new Promise((resolveDelay) => setTimeout(resolveDelay, delayMs)),
+} = {}) {
+  let nextRpcReadAt = 0;
+  return async (read) => {
+    const delayMs = Math.max(0, nextRpcReadAt - now());
+    if (delayMs > 0) await wait(delayMs);
+    nextRpcReadAt = now() + minimumIntervalMs;
+    try {
+      return await read();
+    } catch {
+      await wait(retryDelayMs);
+      nextRpcReadAt = now() + minimumIntervalMs;
+      return read();
+    }
+  };
+}
+
 export const offlineCommands = Object.freeze([
   ["toolchain", "pnpm", ["env:doctor"]],
   ["workspace-tests", "pnpm", ["test"]],
@@ -150,26 +175,14 @@ export async function runLiveVerification({
   const webUrl = environment.FLARE_JUDGE_WEB_URL?.trim() || defaultWebUrl;
   const ingressUrl = environment.FLARE_JUDGE_INGRESS_URL?.trim() || defaultIngressUrl;
   const client = suppliedClient ?? createPublicClient({ transport: http(rpcUrl) });
-  let nextRpcReadAt = 0;
-  const publicRpcRead = async (read) => {
-    const delayMs = Math.max(0, nextRpcReadAt - Date.now());
-    if (delayMs > 0) await new Promise((resolveDelay) => setTimeout(resolveDelay, delayMs));
-    nextRpcReadAt = Date.now() + 400;
-    try {
-      return await read();
-    } catch {
-      await new Promise((resolveDelay) => setTimeout(resolveDelay, 1_200));
-      nextRpcReadAt = Date.now() + 400;
-      return read();
-    }
-  };
+  const publicRpcRead = createPacedRpcReader();
   const publicIdentifiers = {
     network: release.network,
     chainId: release.chainId,
     market: getAddress(release.contracts.FlareQuorumMarketV2.address),
     deploymentTransaction: release.contracts.FlareQuorumMarketV2.deploymentTransaction,
     teeManager: getAddress(release.fcc.manager),
-    teeIds: release.fcc.teeIds.map((teeId) => getAddress(teeId)),
+    teeIds: normalizeReleaseTeeIds(release.fcc.teeIds),
     webOrigin: safeOrigin(webUrl),
     ingressOrigin: safeOrigin(ingressUrl),
     rpcSource: rpcUrl === defaultRpcUrl ? "official-coston2" : "environment",
