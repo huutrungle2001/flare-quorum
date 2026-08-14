@@ -475,4 +475,5 @@ not needed to inspect the checked-in public evidence. See
 - [Threat Model](docs/threat-model.md)
 - [Deployment](docs/deployment.md)
 - [Verification](docs/verification.md)
+- [One-command Judge Verification](docs/judge-verification.md)
 - [Security Policy](SECURITY.md)
