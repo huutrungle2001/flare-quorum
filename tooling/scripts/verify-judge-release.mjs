@@ -105,13 +105,26 @@ function runOfflineVerification() {
   };
 }
 
-function safeOrigin(value) {
+export function safePublicOrigin(value) {
   try {
     const url = new URL(value);
+    if (url.protocol !== "https:") return null;
     return `${url.protocol}//${url.host}`;
   } catch {
     return null;
   }
+}
+
+export function summarizePublicEndpoints({ web, ingress }) {
+  return {
+    web: { statusCode: web.statusCode ?? null },
+    ingress: {
+      statusCode: ingress.statusCode ?? null,
+      serviceStatus: ingress.body?.status ?? null,
+      tenderId: ingress.body?.tenderId ?? null,
+      tenderStatus: ingress.body?.tenderStatus ?? null,
+    },
+  };
 }
 
 async function fetchPublic(fetchImplementation, url, format) {
@@ -183,8 +196,8 @@ export async function runLiveVerification({
     deploymentTransaction: release.contracts.FlareQuorumMarketV2.deploymentTransaction,
     teeManager: getAddress(release.fcc.manager),
     teeIds: normalizeReleaseTeeIds(release.fcc.teeIds),
-    webOrigin: safeOrigin(webUrl),
-    ingressOrigin: safeOrigin(ingressUrl),
+    webOrigin: safePublicOrigin(webUrl),
+    ingressOrigin: safePublicOrigin(ingressUrl),
     rpcSource: rpcUrl === defaultRpcUrl ? "official-coston2" : "environment",
   };
   let chainId = null;
@@ -297,15 +310,7 @@ export async function runLiveVerification({
       ageSeconds: availability.ageSeconds,
       endTimestamp: availability.endTimestamp,
     })),
-    endpointStatus: {
-      web: { statusCode: web.statusCode },
-      ingress: {
-        statusCode: ingress.statusCode,
-        serviceStatus: ingress.body?.status ?? null,
-        tenderId: ingress.body?.tenderId ?? null,
-        tenderStatus: ingress.body?.tenderStatus ?? null,
-      },
-    },
+    endpointStatus: summarizePublicEndpoints({ web, ingress }),
     deployment: deploymentReceipt,
     runtimeHash,
     blockers: [...new Set(blockers)],

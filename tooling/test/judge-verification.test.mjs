@@ -7,6 +7,8 @@ import {
   normalizeReleaseTeeIds,
   offlineCommands,
   parseArguments,
+  safePublicOrigin,
+  summarizePublicEndpoints,
 } from "../scripts/verify-judge-release.mjs";
 
 const release = {
@@ -88,4 +90,36 @@ test("judge verifier paces public RPC reads and retries once", async () => {
   }), "retry");
   assert.equal(attempts, 2);
   assert.deepEqual(waits, [400, 400, 1_200]);
+});
+
+test("judge verifier strips credentials, paths, and private endpoint bodies", () => {
+  assert.equal(
+    safePublicOrigin(["https://user", ":value@", "example.com/private?token=value"].join("")),
+    "https://example.com",
+  );
+  assert.equal(safePublicOrigin("http://example.com"), null);
+  const summary = summarizePublicEndpoints({
+    web: { statusCode: 200, body: "not persisted" },
+    ingress: {
+      statusCode: 200,
+      body: {
+        status: "ok",
+        tenderId: "7",
+        tenderStatus: "Awarded",
+        ciphertext: "forbidden",
+        signature: "forbidden",
+        apiKey: "forbidden",
+      },
+    },
+  });
+  assert.deepEqual(summary, {
+    web: { statusCode: 200 },
+    ingress: {
+      statusCode: 200,
+      serviceStatus: "ok",
+      tenderId: "7",
+      tenderStatus: "Awarded",
+    },
+  });
+  assert.doesNotMatch(JSON.stringify(summary), /ciphertext|signature|apiKey|not persisted/);
 });
